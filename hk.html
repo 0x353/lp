@@ -20,7 +20,6 @@ body {
     margin: 0;
     padding: 0;
     width: 100%;
-    max-width: 1000px;
     background-color: #000;
     color: #ccc;
     display: flex;
@@ -31,21 +30,22 @@ body {
     padding-top: 70px; /* Memberikan ruang untuk navbar */
 }
         
-/* Container */
 .container {
     width: 100%;
     max-width: 1000px;
-    margin: auto;
+    margin: 0 auto; /* Pastikan container selalu di tengah */
     padding: 20px;
     background: #000000;
     box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     backdrop-filter: blur(10px);
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     margin-top: 20px; /* Tambahkan jarak dari navbar */
 }
-
+        
 /* Kolom Input dengan Efek Glassmorphism */
 input {
     display: block;
