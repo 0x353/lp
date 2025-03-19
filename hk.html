@@ -250,15 +250,15 @@ background-color: rgba(0, 0, 0, 0.7);
 
 /* Modal Content */
 .modal-content {
-background: #111;
-color: white;
-margin: 10% auto;
-padding: 20px;
-width: 80%;
-max-width: 900px;
-border-radius: 10px;
-text-align: center;
-box-shadow: 0px 0px 15px rgba(0, 255, 255, 0.5);
+    background: #111;
+    color: white;
+    position: absolute;
+    padding: 20px;
+    width: 80%;
+    max-width: 900px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0px 0px 15px rgba(0, 255, 255, 0.5);
 }
         
 
@@ -1259,6 +1259,20 @@ function closeMenu() {
 
 function closeResult() {
     closeModal('resultModal');
+}
+
+// Modal Popup
+function openModal(modalId, button) {
+    var modal = document.getElementById(modalId);
+    var buttonRect = button.getBoundingClientRect(); // Mendapatkan posisi tombol
+    
+    modal.style.top = (window.scrollY + buttonRect.top - modal.offsetHeight - 10) + "px"; // Atur posisi di atas tombol
+    modal.style.left = (buttonRect.left + buttonRect.width / 2 - modal.offsetWidth / 2) + "px"; // Pusatkan modal
+    modal.style.display = "block";
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = "none";
 }
         
 // Initialize saat halaman terbuka
