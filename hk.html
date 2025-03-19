@@ -1255,20 +1255,6 @@ function closeMenu() {
 function closeResult() {
     closeModal('resultModal');
 }
-
-// Modal Popup
-function openModal(modalId, button) {
-    var modal = document.getElementById(modalId);
-    var buttonRect = button.getBoundingClientRect(); // Mendapatkan posisi tombol
-    
-    modal.style.top = (window.scrollY + buttonRect.top - modal.offsetHeight - 10) + "px"; // Atur posisi di atas tombol
-    modal.style.left = (buttonRect.left + buttonRect.width / 2 - modal.offsetWidth / 2) + "px"; // Pusatkan modal
-    modal.style.display = "block";
-}
-
-function closeModal(modalId) {
-    document.getElementById(modalId).style.display = "none";
-}
         
 // Initialize saat halaman terbuka
 window.onload = () => {
