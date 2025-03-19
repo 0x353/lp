@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bet History DApp</title>
+    <!-- Favicons -->
+    <link href="img/logo.png" rel="icon">
+    <link href="img/logo.png" rel="apple-touch-icon">
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.0/web3.min.js"></script>
@@ -594,7 +597,7 @@ h3 {
    <!-- Navbar -->
 <nav class="navbar">
     <div class="logo">
-        <img src="lg.svg" alt="Lotto Chain Logo" class="logo-img">
+        <img src="img/logo.svg" alt="Lotto Chain Logo" class="logo-img">
         <span style="
     font-size: 22px; 
     font-weight: bold; 
@@ -1010,7 +1013,7 @@ async function placeBet() {
     try {
         // Menampilkan status transaksi      
         document.getElementById("betStatus").innerHTML = `
-            <img src="loading.png" width="20" height="20" style="vertical-align: middle;">
+            <img src="img/load.svg" width="20" height="20" style="vertical-align: middle;">
             <span style="color: #aaffaa; font-size: 12px;">Transaction in progress...</span>
         `;
 
@@ -1021,7 +1024,7 @@ async function placeBet() {
 
         // Jika sukses
         document.getElementById("betStatus").innerHTML = `
-            <img src="success.png" width="20" height="20" style="vertical-align: middle;">
+            <img src="img/success.svg" width="20" height="20" style="vertical-align: middle;">
             <span style="color: #00cc00; font-size: 12px;">Bet placed successfully!</span>
         `;
 
@@ -1036,7 +1039,7 @@ async function placeBet() {
 
         // Jika gagal
         document.getElementById("betStatus").innerHTML = `
-            <img src="failed.png" width="20" height="20" style="vertical-align: middle;">
+            <img src="img/failed.svg" width="20" height="20" style="vertical-align: middle;">
             <span style="color: #ff3333; font-size: 12px;">Transaction failed!</span>
         `;
 
