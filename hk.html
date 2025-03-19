@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bet History DApp</title>
     <!-- Favicons -->
-    <link href="img/logo.png" rel="icon">
-    <link href="img/logo.png" rel="apple-touch-icon">
+    <link href="img/logo.svg" rel="icon">
+    <link href="img/logo.svg" rel="apple-touch-icon">
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.0/web3.min.js"></script>
@@ -624,8 +624,9 @@ h3 {
         <h3>Lotto Chain Decentralizer Betting</h3>
         <br><br>
         <!-- Wallet Connection -->
-        <center><button id="connectWallet" onclick="connectWallet()">Connect Wallet</button>
-        <button id="disconnectWallet" onclick="disconnectWallet()" style="display:none;">Disconnect</button></center>
+        <center><button id="connectWallet" onclick="connectWallet()"><img src="img/connect.svg" alt="Wallet Icon" width="20" height="20" style="vertical-align: middle; margin-right: 5px;">Connect Wallet</button>  
+        <button id="disconnectWallet" onclick="disconnectWallet()" style="display:none;"><img src="img/close.svg" alt="Disconnect Icon" width="20" height="20" style="vertical-align: middle; margin-right: 5px;">Disconnect</button>
+        </center>
         <p id="walletAddress" style="display:none; color: #ad5cff"></p>
         <p id="walletBalance" style="display:none; color: #00ca09;">Balance: 0 ETH</p><br>
         <hr style="background-color: #333333; height: 1px; border: none;">
@@ -639,7 +640,7 @@ h3 {
         <p id="betStatus"></p>
        <br>
        <h2>Public Bet History</h2>
-       <button onclick="window.open('search', '_blank')"><img src="icon.svg" alt="Lotto">Search Winners</button><br><br>
+       <button onclick="window.open('search', '_blank')"><img src="img/search.svg" alt="Lotto">Search Winners</button><br><br>
        <hr style="background-color: #333333; height: 1px; border: none;">
        <div id="betHistory"></div>
        <div class="button-container">
@@ -677,11 +678,11 @@ h3 {
         </div>
 
 <div id="menu">
-    <button onclick="openModal('menuModal')"><img src="pools.svg" alt="Lotto">Pools</button>
-    <button onclick="window.open('4d', '_blank')"><img src="tool.svg" alt="Lotto">Tool</button>
-    <button onclick="openModal('myModal')"><img src="mybet.svg" alt="Lotto">MyBets</button>
-    <button onclick="openModal('resultModal')"><img src="results.svg" alt="Lotto"> Results</button>
-    <button onclick="window.open('claim', '_blank')"><img src="claim.svg" alt="Lotto">Claim</button>
+    <button onclick="openModal('menuModal')"><img src="img/pools.svg" alt="Lotto">Pools</button>
+    <button onclick="window.open('4d', '_blank')"><img src="img/tools.svg" alt="Lotto">Tool</button>
+    <button onclick="openModal('myModal')"><img src="img/mybet.svg" alt="Lotto">MyBets</button>
+    <button onclick="openModal('resultModal')"><img src="img/results.svg" alt="Lotto"> Results</button>
+    <button onclick="window.open('claim', '_blank')"><img src="img/claim.svg" alt="Lotto">Claim</button>
 </div> <!-- Penutupan <div> harus ada di sini -->
 
         <!-- Modal MyBets -->
@@ -1043,10 +1044,10 @@ async function placeBet() {
             <span style="color: #ff3333; font-size: 12px;">Transaction failed!</span>
         `;
 
-        // Menghilangkan status setelah 2 detik
+        // Menghilangkan status setelah 4 detik
         setTimeout(() => {
             document.getElementById("betStatus").innerHTML = "";
-        }, 3000);
+        }, 4000);
     }
 }
 
