@@ -9,6 +9,6 @@
 
         <!-- Animasi shake -->
         <animateTransform attributeType="XML" attributeName="transform" type="translate"
-            values="0,0; 3,0; -3,0; 3,0; -3,0; 0,0" dur="0.5s" repeatCount="indefinite"/>
+            values="0,0; 3,0; -3,0; 3,0; -3,0; 0,0" dur="1s" repeatCount="indefinite"/>
     </g>
 </svg>
