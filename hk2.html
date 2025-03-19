@@ -594,7 +594,7 @@ h3 {
    <!-- Navbar -->
 <nav class="navbar">
     <div class="logo">
-        <img src="lg.svg" alt="Lotto Chain Logo" class="logo-img">
+        <img src="img/logo.svg" alt="Lotto Chain Logo" class="logo-img">
         <span style="
     font-size: 22px; 
     font-weight: bold; 
@@ -636,7 +636,7 @@ h3 {
         <p id="betStatus"></p>
        <br>
        <h2>Public Bet History</h2>
-       <button onclick="window.open('search', '_blank')"><img src="icon.svg" alt="Lotto">Search Winners</button><br><br>
+       <button onclick="window.open('search', '_blank')"><img src="img/search.svg" alt="Lotto" style="width: 15px; height: 15px;>Search Winners</button><br><br>
        <hr style="background-color: #333333; height: 1px; border: none;">
        <div id="betHistory"></div>
        <div class="button-container">
@@ -678,7 +678,7 @@ h3 {
     <button onclick="window.open('4d', '_blank')"><img src="icon.svg" alt="Lotto">Tool</button>
     <button onclick="openModal('myModal')"><img src="icon.svg" alt="Lotto">MyBets</button>
     <button onclick="openModal('resultModal')"><img src="icon.svg" alt="Lotto"> Results</button>
-    <button onclick="window.open('claim', '_blank')"><img src="icon.svg" alt="Lotto">Claim</button>
+    <button onclick="window.open('claim', '_blank')"><img src="icon.svg" alt="Lotto" style="width: 28px; height: 28px;>Claim</button>
 </div> <!-- Penutupan <div> harus ada di sini -->
 
         <!-- Modal MyBets -->
@@ -701,28 +701,28 @@ h3 {
         <h2>Menu</h2>
         <table class="menu-table">
             <tr>
-                <td><img src="contoh.svg" alt="HK"></td>
-                <td><a href="hk" target="_blank">🇭🇰 Hong Kong (HK)</a></td>
+                <td><img src="img/hk.svg" alt="HK"></td>
+                <td><a href="hk" target="_blank">Hong Kong (HK)</a></td>
             </tr>
             <tr>
-                <td><img src="contoh.svg" alt="SGP"></td>
-                <td><a href="sgp" target="_blank">🇸🇬 Singapore (SGP)</a></td>
+                <td><img src="img/sgp.svg" alt="SGP"></td>
+                <td><a href="sgp" target="_blank">Singapore (SGP)</a></td>
             </tr>
             <tr>
-                <td><img src="contoh.svg" alt="SYD"></td>
-                <td><a href="syd" target="_blank">🇦🇺 Sydney (SYD)</a></td>
+                <td><img src="img/syd.svg" alt="SYD"></td>
+                <td><a href="syd" target="_blank">Sydney (SYD)</a></td>
             </tr>
             <tr>
-                <td><img src="contoh.svg" alt="CHI"></td>
-                <td><a href="chi" target="_blank">🇨🇳 China (CHI)</a></td>
+                <td><img src="img/chi.svg" alt="CHI"></td>
+                <td><a href="chi" target="_blank">China (CHI)</a></td>
             </tr>
             <tr>
-                <td><img src="contoh.svg" alt="MC"></td>
-                <td><a href="mc" target="_blank">🇰🇭 Cambodia (MC)</a></td>
+                <td><img src="img/mc.svg" alt="MC"></td>
+                <td><a href="mc" target="_blank">Cambodia (MC)</a></td>
             </tr>
             <tr>
-                <td><img src="contoh.svg" alt="BE"></td>
-                <td><a href="be" target="_blank">🎯 Bull Eye (BE)</a></td>
+                <td><img src="img/be.svg" alt="BE"></td>
+                <td><a href="be" target="_blank">Bull Eye (BE)</a></td>
             </tr>
         </table>
     </div>
@@ -1010,7 +1010,7 @@ async function placeBet() {
     try {
         // Menampilkan status transaksi      
         document.getElementById("betStatus").innerHTML = `
-            <img src="loading.png" width="20" height="20" style="vertical-align: middle;">
+            <img src="img/load.svg" width="20" height="20" style="vertical-align: middle;">
             <span style="color: #aaffaa; font-size: 12px;">Transaction in progress...</span>
         `;
 
@@ -1021,7 +1021,7 @@ async function placeBet() {
 
         // Jika sukses
         document.getElementById("betStatus").innerHTML = `
-            <img src="success.png" width="20" height="20" style="vertical-align: middle;">
+            <img src="img/success.svg" width="20" height="20" style="vertical-align: middle;">
             <span style="color: #00cc00; font-size: 12px;">Bet placed successfully!</span>
         `;
 
@@ -1036,7 +1036,7 @@ async function placeBet() {
 
         // Jika gagal
         document.getElementById("betStatus").innerHTML = `
-            <img src="failed.png" width="20" height="20" style="vertical-align: middle;">
+            <img src="img/failed.svg" width="20" height="20" style="vertical-align: middle;">
             <span style="color: #ff3333; font-size: 12px;">Transaction failed!</span>
         `;
 
