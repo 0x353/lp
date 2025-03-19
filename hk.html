@@ -238,27 +238,30 @@ footer {
 
 /* Gaya untuk modal */
 .modal {
-  display: none; /* Awalnya modal disembunyikan */
-  position: fixed;
-  z-index: 999;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Transparan gelap */
+    display: none;
+    position: absolute; /* Mengubah dari fixed ke absolute */
+    z-index: 999;
+    width: 80%;
+    max-width: 900px;
+    background-color: rgba(0, 0, 0, 0.7);
 }
 
-/* Konten modal */
+/* Modal Content */
 .modal-content {
-  background: #000000;
-  color: white;
-  margin: 40% auto;
-  padding: 20px;
-  width: 90%;
-  max-width: 900px;
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.2);
+    background: #111;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0px 0px 15px rgba(0, 255, 255, 0.5);
+    width: 100%;
+}
+
+/* Posisi Modal Tepat di Atas Tombol */
+#menuModal {
+    bottom: 100%; /* Posisikan di atas tombol */
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 /* Tombol close */
