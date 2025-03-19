@@ -89,16 +89,16 @@ h6 {
 # Global Header
 --------------------------------------------------------------*/
 .header {
-  --background-color: rgba(0, 0, 0, 0.2); /* Transparan, tapi tetap gelap */
+  --background-color: rgba(0, 0, 0, 0.3); /* Tambah opasitas supaya lebih terlihat */
   color: var(--default-color);
   background-color: var(--background-color);
   padding: 15px 0;
   transition: all 0.5s;
   z-index: 997;
-  backdrop-filter: blur(10px); /* Efek blur kaca */
-  -webkit-backdrop-filter: blur(10px); /* Safari */
-  border-radius: 10px; /* Agar sedikit membulat */
-  box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.1); /* Efek cahaya putih lembut */
+  backdrop-filter: blur(20px); /* Blur lebih kuat */
+  -webkit-backdrop-filter: blur(20px); /* Safari */
+  border-radius: 10px; /* Membulatkan sudut */
+  box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.15); /* Tambah efek glow */
 }
 
 /* Logo */
@@ -120,10 +120,10 @@ h6 {
 
 /* Efek saat di-scroll */
 .scrolled .header {
-  --background-color: rgba(0, 0, 0, 0.7); /* Sedikit lebih solid */
-  box-shadow: 0px 0 18px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
+  --background-color: rgba(0, 0, 0, 0.8); /* Lebih solid saat di-scroll */
+  box-shadow: 0px 0 18px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(25px); /* Lebih blur saat di-scroll */
+  -webkit-backdrop-filter: blur(25px);
 }
 
 /*--------------------------------------------------------------
