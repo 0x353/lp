@@ -64,6 +64,19 @@
     display: flex;
 }
 
+/* Tombol Close (×) di pojok kanan atas */
+#closePopup {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: red; /* Warna merah */
+    cursor: pointer;
+    font-weight: bold;
+}
+
 /* Daftar Notifikasi */
 #notificationList {
     position: fixed;
@@ -71,7 +84,7 @@
     right: 20px;
     width: 250px;
     background-color: #d7f8da;
-    color: #ffffff;
+    color: #1a1a1a;
     border: 1px solid #ddd;
     box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
     border-radius: 5px;
@@ -100,7 +113,7 @@
     display: block;
 }
 
-#notificationList button {
+#notificationList, #closePopup button {
     width: 100%;
     padding: 5px;
     margin-top: 5px;
@@ -122,8 +135,8 @@
 
 <!-- Notifikasi Popup -->
 <div id="notificationPopup" class="popup" role="alert">
+    <button id="closePopup" onclick="closePopup()">×</button>
     <p id="notificationMessage"></p>
-    <button onclick="closeNotificationList()">Close</button>
 </div>
 
 <!-- Ikon Notifikasi -->
