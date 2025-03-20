@@ -11,6 +11,7 @@
     font-family: Arial, sans-serif;
 }
 
+/* Popup Notifikasi */
 .popup {
     display: none;
     position: fixed;
@@ -22,15 +23,24 @@
     padding: 15px;
     border-radius: 5px;
     box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+    z-index: 1000;
 }
 
+/* Ikon Notifikasi */
 #notificationIcon {
     position: fixed;
     top: 20px;
     right: 20px;
     cursor: pointer;
+    z-index: 1000;
 }
 
+#notificationIcon img {
+    width: 30px;
+    height: 30px;
+}
+
+/* Titik Merah Notifikasi */
 #notificationBadge {
     position: absolute;
     top: 0;
@@ -42,34 +52,92 @@
     border-radius: 50%;
     text-align: center;
     font-size: 12px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
 }
 
+/* Aktifkan titik merah saat ada notifikasi */
+#notificationBadge.active {
+    display: flex;
+}
+
+/* Daftar Notifikasi */
+#notificationList {
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    width: 250px;
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+    border-radius: 5px;
+    padding: 10px;
+    z-index: 1000;
+}
+
+#notificationList ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#notificationList ul li {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+#notificationList ul li:last-child {
+    border-bottom: none;
+}
+
+#notificationList ul li a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+}
+
+#notificationList button {
+    width: 100%;
+    padding: 5px;
+    margin-top: 5px;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: none;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+/* Sembunyikan elemen dengan class 'hidden' */
 .hidden {
     display: none;
-    }
+}
     </style>
 </head>
 <body>
-    <!-- Tombol konek Wallet -->
     <button id="connectWallet">Connect Wallet</button>
 
-    <!-- Notifikasi Popup -->
-    <div id="notificationPopup" class="popup">
-        <p id="notificationMessage"></p>
-        <button onclick="closePopup()">Close</button>
-    </div>
+<!-- Notifikasi Popup -->
+<div id="notificationPopup" class="popup" role="alert">
+    <p id="notificationMessage"></p>
+    <button onclick="closePopup()">Close</button>
+</div>
 
-    <!-- Ikon Notifikasi -->
-    <div id="notificationIcon" onclick="toggleNotificationList()">
-        <img src="bell-icon.png" alt="Notifications">
-        <span id="notificationBadge" class="hidden"></span>
-    </div>
+<!-- Ikon Notifikasi -->
+<div id="notificationIcon" onclick="toggleNotificationList()">
+    <img src="bell-icon.png" alt="Notifications">
+    <span id="notificationBadge" class="hidden"></span>
+</div>
 
-    <!-- Daftar Notifikasi -->
-    <div id="notificationList" class="hidden">
-        <ul id="notifications"></ul>
+<!-- Daftar Notifikasi -->
+<div id="notificationList" class="hidden">
+    <div class="notification-header">
+        <p>Notifications</p>
         <button onclick="closeNotificationList()">Close</button>
     </div>
+    <ul id="notifications" aria-live="polite"></ul>
+</div>
 
     <script src="script.js"></script>
     <script>
@@ -105,6 +173,28 @@ async function checkForWinnings() {
         }
     } catch (error) {
         console.error("Error checking winnings:", error);
+    }
+}
+
+// Fungsi menambah notifikasi
+function addNotification(message, link) {
+    const notifications = document.getElementById("notifications");
+    const li = document.createElement("li");
+    li.innerHTML = `<a href="${link}">${message}</a>`;
+    notifications.appendChild(li);
+
+    // Tampilkan titik merah
+    document.getElementById("notificationBadge").classList.add("active");
+}
+
+// Fungsi menyembunyikan titik merah setelah daftar dibuka
+function toggleNotificationList() {
+    const list = document.getElementById("notificationList");
+    list.classList.toggle("hidden");
+
+    // Jika daftar dibuka, hilangkan titik merah
+    if (!list.classList.contains("hidden")) {
+        document.getElementById("notificationBadge").classList.remove("active");
     }
 }
 
