@@ -712,15 +712,17 @@ section,
 .about .content h2 {
   font-weight: 700;
   font-size: 24px;
+  margin-bottom: 10px; /* Kurangi jarak bawah h2 */
 }
 
 .about .content ul {
   list-style: none;
   padding: 0;
+  margin: 0; /* Pastikan tidak ada margin tambahan */
 }
 
 .about .content ul li {
-  margin-bottom: 20px;
+  margin-bottom: 10px; /* Kurangi jarak antar list item */
   display: flex;
   align-items: center;
 }
@@ -733,7 +735,7 @@ section,
   font-size: 16px;
   margin-right: 5px;
   color: var(--accent-color);
-  line-height: 0;
+  line-height: 1; /* Pastikan tidak ada spasi vertikal ekstra */
 }
 
 /*--------------------------------------------------------------
