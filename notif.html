@@ -185,7 +185,7 @@ async function checkForWinnings() {
 function addNotification(message, link) {
     const notifications = document.getElementById("notifications");
     const li = document.createElement("li");
-    li.innerHTML = `<a href="${link}">${message}</a>`;
+    li.innerHTML = `<a href="${link}.html" target="_blank">${message}</a>`;
     notifications.appendChild(li);
 
     // Tampilkan titik merah
@@ -206,7 +206,9 @@ function toggleNotificationList() {
 // Menampilkan popup notifikasi
 function showNotification(message) {
     const popup = document.getElementById("notificationPopup");
-    document.getElementById("notificationMessage").innerText = message;
+    document.getElementById("notificationMessage").innerHTML = 
+        `${message} <a href="claim.html" target="_blank" style="color: yellow; text-decoration: underline;">Click to claim</a>`;
+    
     popup.style.display = "block";
 
     setTimeout(() => {
