@@ -186,10 +186,9 @@ async function checkForWinnings() {
 function addNotification(message, link) {
     const notifications = document.getElementById("notifications");
     const li = document.createElement("li");
-    li.innerHTML = `<a href="${link}.html" target="_blank">${message}</a>`;
+    li.innerHTML = `<a href="${link}" target="_blank" style="color: green; text-decoration: none;">${message}</a>`;
     notifications.appendChild(li);
 
-    // Tampilkan titik merah notifikasi
     document.getElementById("notificationBadge").classList.add("active");
 }
 
@@ -208,13 +207,14 @@ function toggleNotificationList() {
 function showNotification(message) {
     const popup = document.getElementById("notificationPopup");
     document.getElementById("notificationMessage").innerHTML = 
-        `${message} <a href="claim.html" target="_blank" style="color: yellow; text-decoration: underline;">Click to claim</a>`;
+        `<span style="color: green;">${message}</span> 
+        <a href="claim.html" target="_blank" style="color: green; text-decoration: none;">Click to claim</a>`;
     
     popup.style.display = "block";
 
     setTimeout(() => {
         popup.style.display = "none";
-    }, 10000);
+    }, 1000000);
 }
 
 // Menutup popup
