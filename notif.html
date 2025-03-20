@@ -173,22 +173,23 @@ async function checkForWinnings() {
     try {
         const winnings = await contract.methods.winnings(userAddress).call();
         if (parseInt(winnings) > 0) {
-            showNotification(`You won ${web3.utils.fromWei(winnings, "ether")} ETH! Click to claim.`);
-            addNotification(`You won ${web3.utils.fromWei(winnings, "ether")} ETH!`, "claim.html");
+            const ethAmount = web3.utils.fromWei(winnings, "ether");
+            showNotification(`You won ${ethAmount} ETH!`);
+            addNotification(`You won ${ethAmount} ETH!`, "claim");
         }
     } catch (error) {
         console.error("Error checking winnings:", error);
     }
 }
 
-// Fungsi menambah notifikasi
+// Fungsi menambah notifikasi ke daftar
 function addNotification(message, link) {
     const notifications = document.getElementById("notifications");
     const li = document.createElement("li");
     li.innerHTML = `<a href="${link}.html" target="_blank">${message}</a>`;
     notifications.appendChild(li);
 
-    // Tampilkan titik merah
+    // Tampilkan titik merah notifikasi
     document.getElementById("notificationBadge").classList.add("active");
 }
 
@@ -219,22 +220,6 @@ function showNotification(message) {
 // Menutup popup
 function closePopup() {
     document.getElementById("notificationPopup").style.display = "none";
-}
-
-// Menambah notifikasi ke daftar
-function addNotification(message, link) {
-    const notifications = document.getElementById("notifications");
-    const li = document.createElement("li");
-    li.innerHTML = `<a href="${link}">${message}</a>`;
-    notifications.appendChild(li);
-
-    document.getElementById("notificationBadge").classList.remove("hidden");
-}
-
-// Menampilkan atau menyembunyikan daftar notifikasi
-function toggleNotificationList() {
-    const list = document.getElementById("notificationList");
-    list.classList.toggle("hidden");
 }
 
 // Menutup daftar notifikasi
