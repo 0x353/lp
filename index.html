@@ -891,7 +891,7 @@ section,
   width: 64px;
   height: 64px;
   background: #1a79ff;
-  border-radius: 8px;
+  border-radius: 50%; /* Membuat ikon menjadi bundar */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -899,6 +899,7 @@ section,
   transition: all 0.3s ease-in-out;
   transform: rotateX(0deg) rotateY(0deg);
   box-shadow: 0 0 10px rgba(26, 121, 255, 0.6), 0 0 20px rgba(26, 121, 255, 0.4);
+  position: relative;
 }
 
 .services .service-item .icon i {
@@ -915,7 +916,7 @@ section,
   height: 100%;
   width: 100%;
   background: radial-gradient(circle, rgba(26, 121, 255, 0.5) 0%, transparent 70%);
-  border-radius: 8px;
+  border-radius: 50%; /* Membuat efek glow juga bundar */
   transition: all 0.3s ease-out;
   transform: translateZ(-5px);
   opacity: 0;
@@ -963,7 +964,61 @@ section,
 /*--------------------------------------------------------------
 # Button
 --------------------------------------------------------------*/
+button {
+    font-size: 0.7em;
+    padding: 6px 12px;
+    border-radius: 0.7em;
+    border: none;
+    background-color: #000;
+    color: #fff;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 0 10px rgba(0, 0, 255, 0.6);
+    transition: all 0.3s ease-in-out;
+    font-family: Ubuntu, sans-serif;
+}
 
+ .button-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Jarak antar tombol diperbesar */
+ }
+
+/* Efek Neon Glow */
+button::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 0.9em;
+    background: linear-gradient(90deg, #03a9f4, #f441a5);
+    z-index: -1;
+    filter: blur(0);
+    transition: filter 0.4s ease, opacity 0.4s ease;
+    opacity: 1;
+}
+
+button:hover::before {
+    filter: blur(1.2em);
+    opacity: 1;
+}
+
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+button:active {
+    transform: scale(0.95);
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+button:active::before {
+    filter: blur(0.2em);
+}
+
+/*--------------------------------------------------------------
+# Table
+--------------------------------------------------------------*/
   </style>
   
 </head>
