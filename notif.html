@@ -187,11 +187,11 @@ async function checkForWinnings() {
         const winnings = await contract.methods.winnings(userAddress).call();
         if (parseInt(winnings) > 0) {
             const ethAmount = web3.utils.fromWei(winnings, "ether");
-            showNotification(`You won ${ethAmount} ETH!`);
-            addNotification(`You won ${ethAmount} ETH!`, "claim");
+            showNotification(`Congratulations, You won ${ethAmount} ETH!`);
+            addNotification(`Congratulations, You won ${ethAmount} ETH!`, "claim");
         }
     } catch (error) {
-        console.error("Error checking winnings:", error);
+        console.error("%cError checking winnings:", "color: red;", error);
     }
 }
 
@@ -221,7 +221,7 @@ function showNotification(message) {
     const popup = document.getElementById("notificationPopup");
     document.getElementById("notificationMessage").innerHTML = 
         `<span style="color: green;">${message}</span> 
-        <a href="claim.html" target="_blank" style="color: green; text-decoration: none;">Click to claim</a>`;
+        <a href="claim.html" target="_blank" style="color: green; text-decoration: none;">Claim now!</a>`;
     
     popup.style.display = "block";
 
