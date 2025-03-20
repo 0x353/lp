@@ -453,16 +453,38 @@ h6 {
   width: 36px;
   height: 36px;
   transition: 0.3s;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 5px rgba(26, 121, 255, 0.5);
+}
+
+.footer .social-links a::before {
+  content: "";
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: 50%;
+  left: 50%;
+  background: radial-gradient(circle, #1a79ff 10%, transparent 70%);
+  transition: 0.3s;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0.6;
 }
 
 .footer .social-links a:hover {
-  background: color-mix(in srgb, var(--accent-color), transparent 20%);
-  text-decoration: none;
+  background: #1a79ff;
+  color: #000;
+  box-shadow: 0 0 15px #1a79ff, 0 0 30px #1a79ff;
+}
+
+.footer .social-links a:hover::before {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
 }
 
 .footer .copyright {
   padding-top: 25px;
-  border-top: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
+  border-top: 1px solid;
 }
 
 .footer .credits {
@@ -529,20 +551,10 @@ h6 {
   line-height: 0;
 }
 
-@keyframes hoverEffect {
-  0% {
-    transform: scale(1.1);
-    box-shadow: 0 0 15px #4fb8f9, 0 0 30px #4fb8f9, 0 0 45px #4fb8f9;
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: none;
-  }
-}
-
 .scroll-top:hover {
   background-color: #4fb8f9; /* Neon blue */
-  animation: hoverEffect 1s forwards; /* Efek hilang setelah 1 detik */
+  box-shadow: 0 0 15px #4fb8f9, 0 0 30px #00f2ff, 0 0 45px #4fb8f9; /* Glow effect */
+  transform: scale(1.1); /* Sedikit membesar saat hover */
 }
 
 .scroll-top:hover i {
