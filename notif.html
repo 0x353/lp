@@ -26,6 +26,43 @@
     z-index: 1000;
 }
 
+/* Pusatkan teks dalam popup */
+#notificationPopup {
+    display: flex;
+    align-items: center; /* Pusat vertikal */
+    justify-content: center; /* Pusat horizontal */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 150px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Tombol Close (×) di pojok kanan atas */
+#closePopup {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: red;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Agar teks di dalam popup tetap rapi */
+#notificationMessage {
+    max-width: 80%;
+    line-height: 1.5;
+}
+
 /* Ikon Notifikasi */
 #notificationIcon {
     position: fixed;
@@ -64,19 +101,6 @@
     display: flex;
 }
 
-/* Tombol Close (×) di pojok kanan atas */
-#closePopup {
-    position: absolute;
-    top: 5px;
-    right: 10px;
-    background: none;
-    border: none;
-    font-size: 18px;
-    color: red; /* Warna merah */
-    cursor: pointer;
-    font-weight: bold;
-}
-
 /* Daftar Notifikasi */
 #notificationList {
     position: fixed;
@@ -113,7 +137,7 @@
     display: block;
 }
 
-#notificationList, #closePopup button {
+#notificationList button {
     width: 100%;
     padding: 5px;
     margin-top: 5px;
