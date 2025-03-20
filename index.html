@@ -487,8 +487,8 @@ h6 {
   position: fixed;
   top: calc(50% - 30px);
   left: calc(50% - 30px);
-  border: 6px solid #00FFFF; /* Biru neon */
-  border-color: #00FFFF transparent #00FFFF transparent; /* Efek animasi */
+  border: 6px solid #1a79ff; /* Biru neon */
+  border-color: #1a79ff transparent #1a79ff transparent; /* Efek animasi */
   box-shadow: 0 0 10px #00FFFF, 0 0 20px #00FFFF;
   border-radius: 50%;
   width: 60px;
@@ -516,7 +516,7 @@ h6 {
   right: 15px;
   bottom: -15px;
   z-index: 99999;
-  background-color: var(--accent-color);
+  background-color: #1a79ff;
   width: 44px;
   height: 44px;
   border-radius: 50px;
@@ -525,13 +525,18 @@ h6 {
 
 .scroll-top i {
   font-size: 24px;
-  color: var(--contrast-color);
+  color: #ffffff;
   line-height: 0;
 }
 
 .scroll-top:hover {
-  background-color: color-mix(in srgb, var(--accent-color), transparent 20%);
-  color: var(--contrast-color);
+  background-color: #00f2ff; /* Neon blue */
+  box-shadow: 0 0 15px #00f2ff, 0 0 30px #00f2ff, 0 0 45px #00f2ff; /* Glow effect */
+  transform: scale(1.1); /* Sedikit membesar saat hover */
+}
+
+.scroll-top:hover i {
+  color: #000000; /* Ubah warna ikon agar kontras */
 }
 
 .scroll-top.active {
