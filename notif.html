@@ -113,15 +113,25 @@
     display: block;
 }
 
-#notificationList button {
-    width: 100%;
-    padding: 5px;
-    margin-top: 5px;
-    background-color: #f8d7da;
-    color: #721c24;
+/* Tombol Close (×) di pojok kanan atas */
+#closeNotificationList {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: none;
     border: none;
+    font-size: 18px;
+    color: red;
     cursor: pointer;
-    border-radius: 3px;
+    font-weight: bold;
+}
+
+/* Latar belakang tombol tetap seperti sebelumnya */
+#notificationList {
+    position: relative; /* Agar tombol bisa diposisikan relatif ke div ini */
+    background-color: #f8d7da;
+    padding: 10px;
+    border-radius: 5px;
 }
 
 /* Sembunyikan elemen dengan class 'hidden' */
@@ -151,7 +161,7 @@
         <p>Notifications</p>
         <ul id="notifications" aria-live="polite"></ul>
     </div>
-    <button onclick="closeNotificationList()">Close</button>
+    <button id="closeNotificationList" onclick="closeNotificationList()">×</button>
 </div>
 
     <script src="script.js"></script>
