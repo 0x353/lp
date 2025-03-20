@@ -136,9 +136,9 @@
 <div id="notificationList" class="hidden">
     <div class="notification-header">
         <p>Notifications</p>
-        <button onclick="closeNotificationList()">Close</button>
+        <ul id="notifications" aria-live="polite"></ul>
     </div>
-    <ul id="notifications" aria-live="polite"></ul>
+    <button onclick="closeNotificationList()">Close</button>
 </div>
 
     <script src="script.js"></script>
