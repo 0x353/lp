@@ -33,6 +33,7 @@
     right: 20px;
     cursor: pointer;
     z-index: 1000;
+    display: none;
 }
 
 #notificationIcon img {
@@ -159,6 +160,9 @@ document.getElementById("connectWallet").addEventListener("click", async () => {
 
         contract = new web3.eth.Contract(abi, contractAddress);
         checkForWinnings();
+
+        // Tampilkan ikon notifikasi setelah wallet terhubung
+        document.getElementById("notificationIcon").style.display = "block";
     } else {
         alert("Metamask not found");
     }
