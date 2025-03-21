@@ -600,122 +600,63 @@ h3 {
     margin: 0 auto; /* Jika ingin ikon tetap rapi di tengah sel */
   }
 
-/* Popup Notifikasi */
-.popup {
-    display: none;
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #D7F8DA;
-    color: #1a1a1a;
-    padding: 15px;
-    border-radius: 5px;
-    box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
-    z-index: 1000;
-}
-
-/* Tombol Close (×) */
-#closePopup {
-    position: absolute;
-    top: 5px;
-    right: 10px;
-    background: none;
-    border: none;
-    font-size: 18px;
-    color: red;
+/* Style untuk notifikasi */
+.notification-bell {
+    position: relative;
+    font-size: 24px;
     cursor: pointer;
-    font-weight: bold;
 }
 
-/* Ikon Notifikasi */
-#notificationIcon {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    cursor: pointer;
-    z-index: 1000;
-}
-
-#notificationIcon img {
-    width: 30px;
-    height: 30px;
-}
-
-/* Titik Merah Notifikasi */
 #notificationBadge {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: -5px;
+    right: -5px;
     background-color: red;
     color: white;
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    text-align: center;
     font-size: 12px;
-    display: none;
-    align-items: center;
-    justify-content: center;
     font-weight: bold;
+    border-radius: 50%;
+    padding: 3px 6px;
+    display: inline-block;
 }
 
-#notificationBadge.active {
-    display: flex;
-}
-
-/* Daftar Notifikasi */
-#notificationList {
-    position: fixed;
-    top: 60px;
-    right: 20px;
-    width: 250px;
-    background-color: #d7f8da;
-    color: #1a1a1a;
-    border: 1px solid #ddd;
-    box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
-    border-radius: 5px;
-    padding: 10px;
-    z-index: 1000;
+.hidden {
     display: none;
 }
 
-#notificationList ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+/* Style untuk popup notifikasi */
+#notificationPopup {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: white;
+    color: black;
+    padding: 15px;
+    border: 1px solid black;
+    border-radius: 5px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
 }
 
-#notificationList ul li {
-    padding: 8px;
-    border-bottom: 1px solid #ddd;
-}
-
-#notificationList ul li:last-child {
-    border-bottom: none;
-}
-
-#notificationList ul li a {
-    text-decoration: none;
-    color: green;
-    display: block;
-}
-
-#notificationList button {
-    width: 100%;
-    padding: 5px;
-    margin-top: 5px;
-    background-color: #f8d7da;
-    color: #721c24;
-    border: none;
+#notificationPopup button {
+    margin-top: 10px;
+    padding: 5px 10px;
     cursor: pointer;
-    border-radius: 3px;
 }
 
-/* Sembunyikan elemen */
-.hidden {
-    display: none !important;
-        }
+/* Style untuk daftar notifikasi */
+#notifications {
+    position: absolute;
+    top: 30px;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    width: 200px;
+    max-height: 200px;
+    overflow-y: auto;
+    list-style-type: none;
+    }
     </style>
 </head>
 <body>
@@ -749,26 +690,18 @@ h3 {
         <h3>Lotto Chain Decentralizer Betting</h3>
         <br>
 
-        <!-- Notifikasi Popup -->
-<div id="notificationPopup" class="popup hidden">
-    <button id="closePopup">&times;</button>
-    <p id="notificationMessage"></p>
-</div>
+        <div id="notificationIcon" class="notification-bell">
+            🔔
+            <span id="notificationBadge" class="hidden">!</span>
+        </div>
+    </header>
 
-<!-- Ikon Notifikasi -->
-<div id="notificationIcon" onclick="toggleNotificationList()">
-    <img src="img/bell.svg" alt="Notifications">
-    <span id="notificationBadge" class="hidden"></span>
-</div>
-
-<!-- Daftar Notifikasi -->
-<div id="notificationList" class="hidden">
-    <div class="notification-header">
-        <p>Notifications</p>
-        <ul id="notifications"></ul>
+    <div id="notificationPopup" class="hidden">
+        <span id="notificationMessage"></span>
+        <button id="closePopup">Close</button>
     </div>
-    <button onclick="closeNotificationList()">Close</button>
-</div>
+
+    <ul id="notifications" class="hidden"></ul>
        
         <!-- Wallet Connection -->
         <center><button id="connectWallet" onclick="connectWallet()"><img src="img/connect.svg" alt="Wallet Icon" width="20" height="20" style="vertical-align: middle; margin-right: 5px;">Connect Wallet</button>  
@@ -1283,13 +1216,35 @@ function nextUserBets() {
 
 // Notifikasi
 document.addEventListener("DOMContentLoaded", () => {
-    checkForWinnings(); // Cek apakah user menang saat halaman dimuat
+    console.log("🔄 DOM Loaded");
+
+    checkForWinnings(); // Cek apakah user menang
+
+    // Pastikan elemen tombol "Close" ada sebelum menambahkan event listener
+    const closePopupBtn = document.getElementById("closePopup");
+    if (closePopupBtn) {
+        closePopupBtn.addEventListener("click", () => {
+            document.getElementById("notificationPopup").classList.add("hidden");
+        });
+    }
+
+    // Event untuk ikon notifikasi
+    const notificationIcon = document.getElementById("notificationIcon");
+    if (notificationIcon) {
+        notificationIcon.addEventListener("click", toggleNotificationList);
+    }
 });
 
 // Fungsi mengecek kemenangan
 async function checkForWinnings() {
     try {
+        console.log("🔍 Checking winnings...");
+
+        // Contoh: Gantilah dengan metode panggilan kontrak Web3.js yang benar
         const winnings = await contract.methods.winnings(userAddress).call();
+
+        console.log("🏆 Winnings:", winnings);
+
         if (parseInt(winnings) > 0) {
             const ethAmount = web3.utils.fromWei(winnings, "ether");
             showNotification(`🎉 Congratulations, You won ${ethAmount} ETH!`);
@@ -1300,25 +1255,16 @@ async function checkForWinnings() {
     }
 }
 
-// Fungsi menambahkan notifikasi ke daftar
-function addNotification(message, link) {
-    const notifications = document.getElementById("notifications");
-    
-    // Cek apakah notifikasi sudah ada untuk menghindari duplikasi
-    if ([...notifications.children].some(li => li.innerText.includes(message))) {
+// Fungsi menampilkan popup notifikasi
+function showNotification(message) {
+    console.log("📢 Showing notification:", message);
+
+    const popup = document.getElementById("notificationPopup");
+    if (!popup) {
+        console.error("❌ Popup element not found.");
         return;
     }
 
-    const li = document.createElement("li");
-    li.innerHTML = `<a href="${link}" target="_blank">${message}</a>`;
-    notifications.appendChild(li);
-
-    document.getElementById("notificationBadge").classList.add("active");
-}
-
-// Fungsi menampilkan popup notifikasi
-function showNotification(message) {
-    const popup = document.getElementById("notificationPopup");
     document.getElementById("notificationMessage").innerHTML = 
         `${message} <a href="https://example.com/claim" target="_blank" style="color: green;">Claim now!</a>`;
     
@@ -1329,25 +1275,33 @@ function showNotification(message) {
     }, 10000);
 }
 
-// Fungsi menutup popup
-document.getElementById("closePopup").addEventListener("click", () => {
-    document.getElementById("notificationPopup").classList.add("hidden");
-});
+// Fungsi menambahkan notifikasi ke daftar
+function addNotification(message, link) {
+    const notifications = document.getElementById("notifications");
+    
+    // Cek apakah notifikasi sudah ada (hindari duplikasi)
+    if ([...notifications.children].some(li => li.innerText.includes(message))) {
+        return;
+    }
+
+    const li = document.createElement("li");
+    li.innerHTML = `<a href="${link}" target="_blank">${message}</a>`;
+    notifications.appendChild(li);
+
+    document.getElementById("notificationBadge").classList.remove("hidden");
+}
 
 // Fungsi membuka/menutup daftar notifikasi
 function toggleNotificationList() {
-    const list = document.getElementById("notificationList");
+    console.log("🔔 Notification icon clicked!");
+
+    const list = document.getElementById("notifications");
     list.classList.toggle("hidden");
 
     if (!list.classList.contains("hidden")) {
-        document.getElementById("notificationBadge").classList.remove("active");
+        document.getElementById("notificationBadge").classList.add("hidden");
     }
-}
-
-// Fungsi menutup daftar notifikasi
-function closeNotificationList() {
-    document.getElementById("notificationList").classList.add("hidden");
-               }
+                                          }
 
 // **Load Bet History (with Pagination)**
 async function loadBetHistory() {
