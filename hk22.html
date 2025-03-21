@@ -1155,12 +1155,12 @@ function closePopup() {
     }, 300);
 }
 
-// Uji coba manual
-document.addEventListener("DOMContentLoaded", () => {
-    setTimeout(() => {
-        showNotification("You have a new prizes!");
-    }, 20000); // Muncul otomatis setelah 2 detik (bisa dihapus)
-});
+// Popup Part II
+setTimeout(() => {
+    if (isWinner && walletConnected) { 
+        showNotification("Congratulations! You won a reward.");
+    }
+}, 20000); // Muncul otomatis setelah 2 detik (bisa dihapus)
 
 // **Close Popup**
 function closePopup() {
