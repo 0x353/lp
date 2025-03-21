@@ -600,26 +600,6 @@ h3 {
     margin: 0 auto; /* Jika ingin ikon tetap rapi di tengah sel */
   }
 
-/* Style untuk notifikasi */
-/* Popup Notifikasi */
-.popup-notification {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 15px 25px;
-    border-radius: 5px;
-    z-index: 2000;
-    font-size: 18px;
-    opacity: 1;
-    transition: opacity 0.5s ease-out;
-}
-
-.popup-content {
-    text-align: center;
-}
     </style>
 </head>
 <body>
@@ -652,23 +632,6 @@ h3 {
         <h1>HK Bet DApp</h1>
         <h3>Lotto Chain Decentralizer Betting</h3>
         <br>
-
-        <!-- Icon Bell -->
-    <div class="notification-container">
-        <div class="bell-icon" onclick="openNotificationModal()">
-            🔔
-            <span id="notificationBadge" class="badge hidden"></span>
-        </div>
-    </div>
-
-    <!-- Modal Notifikasi -->
-    <div id="notificationModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeNotificationModal()">&times;</span>
-            <h2>Notifications</h2>
-            <ul id="notificationList"></ul>
-        </div>
-    </div>
        
         <!-- Wallet Connection -->
         <center><button id="connectWallet" onclick="connectWallet()"><img src="img/connect.svg" alt="Wallet Icon" width="20" height="20" style="vertical-align: middle; margin-right: 5px;">Connect Wallet</button>  
@@ -1180,72 +1143,6 @@ function nextUserBets() {
     userBetsPage++;
     loadUserBets();
 }
-
-// Notifikasi
-// List untuk menyimpan notifikasi tanpa duplikasi
-let notifications = [];
-
-function setWinner(winner, amount) {
-    let message = `🎉 Congratulations! You won ${amount} ETH!`;
-
-    // Cek apakah sudah ada notifikasi yang sama sebelumnya
-    if (!notifications.includes(message)) {
-        notifications.push(message);
-        updateNotifications();
-        showPopup(message);  // Pastikan popup muncul
-    }
-}
-
-// Fungsi untuk menampilkan popup alert
-function showPopup(message) {
-    let modal = document.createElement("div");
-    modal.classList.add("popup-notification");
-    modal.innerHTML = `
-        <div class="popup-content">
-            <p>${message}</p>
-        </div>
-    `;
-
-    document.body.appendChild(modal); // Tambahkan ke dalam body agar muncul
-    modal.style.display = "block"; // Pastikan muncul
-
-    // Hilangkan popup setelah 5 detik
-    setTimeout(() => {
-        modal.style.opacity = "0"; // Efek fade out
-        setTimeout(() => modal.remove(), 500); // Hapus dari DOM setelah fade out
-    }, 5000);
-}
-
-// Update daftar notifikasi di modal bell
-function updateNotifications() {
-    let list = document.getElementById("notificationList");
-    list.innerHTML = ""; // Reset
-
-    notifications.forEach(msg => {
-        let li = document.createElement("li");
-        li.textContent = msg;
-        list.appendChild(li);
-    });
-
-    // Perbarui titik merah di bell
-    let badge = document.getElementById("notificationBadge");
-    if (notifications.length > 0) {
-        badge.textContent = notifications.length;
-        badge.classList.remove("hidden");
-    } else {
-        badge.classList.add("hidden");
-    }
-}
-
-// Buka modal notifikasi
-function openNotificationModal() {
-    document.getElementById("notificationModal").style.display = "block";
-}
-
-// Tutup modal notifikasi
-function closeNotificationModal() {
-    document.getElementById("notificationModal").style.display = "none";
-        }
         
 // **Load Bet History (with Pagination)**
 async function loadBetHistory() {
