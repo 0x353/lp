@@ -601,75 +601,120 @@ h3 {
   }
 
 /* Popup Notifikasi */
-#popupNotif {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #fff;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+.popup {
     display: none;
-    transition: all 0.5s ease-in-out;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #D7F8DA;
+    color: #1a1a1a;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+    z-index: 1000;
 }
 
-/* Sembunyikan Popup */
-.popup-hidden {
-    display: none !important;
-}
-
-/* Animasi Getar Icon Bell */
-@keyframes shake {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-10deg); }
-    50% { transform: rotate(10deg); }
-    75% { transform: rotate(-10deg); }
-}
-
-.shake {
-    animation: shake 0.5s ease-in-out;
-}
-
-/* Bell dengan Titik Merah */
-.bell-icon {
-    font-size: 24px;
+/* Tombol Close (×) */
+#closePopup {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: red;
     cursor: pointer;
-    position: relative;
+    font-weight: bold;
 }
 
-.bell-icon::after {
-    content: "";
-    width: 8px;
-    height: 8px;
-    background: red;
+/* Ikon Notifikasi */
+#notificationIcon {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+#notificationIcon img {
+    width: 30px;
+    height: 30px;
+}
+
+/* Titik Merah Notifikasi */
+#notificationBadge {
     position: absolute;
     top: 0;
     right: 0;
+    background-color: red;
+    color: white;
+    width: 15px;
+    height: 15px;
     border-radius: 50%;
+    text-align: center;
+    font-size: 12px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+#notificationBadge.active {
+    display: flex;
+}
+
+/* Daftar Notifikasi */
+#notificationList {
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    width: 250px;
+    background-color: #d7f8da;
+    color: #1a1a1a;
+    border: 1px solid #ddd;
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+    border-radius: 5px;
+    padding: 10px;
+    z-index: 1000;
     display: none;
 }
 
-.bell-icon.has-new::after {
+#notificationList ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#notificationList ul li {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+#notificationList ul li:last-child {
+    border-bottom: none;
+}
+
+#notificationList ul li a {
+    text-decoration: none;
+    color: green;
     display: block;
 }
 
-/* Notifikasi Dropdown */
-#notifList {
-    position: absolute;
-    top: 30px;
-    right: 0;
-    background: #fff;
-    width: 250px;
-    max-height: 300px;
-    overflow-y: auto;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
-    display: none;
-    padding: 10px;
+#notificationList button {
+    width: 100%;
+    padding: 5px;
+    margin-top: 5px;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: none;
+    cursor: pointer;
+    border-radius: 3px;
 }
 
-.notif-hidden {
-    display: none;
+/* Sembunyikan elemen */
+.hidden {
+    display: none !important;
         }
     </style>
 </head>
@@ -704,16 +749,25 @@ h3 {
         <h3>Lotto Chain Decentralizer Betting</h3>
         <br>
 
-        <!-- Popup Notifikasi -->
-<div id="popupNotif" class="popup-hidden">
-    🎉 Selamat! Anda memenangkan <span id="winAmount">0.1</span> ETH!  
-    <a id="claimLink" href="#" target="_blank">💰 Klaim Sekarang</a>
+        <!-- Notifikasi Popup -->
+<div id="notificationPopup" class="popup hidden">
+    <button id="closePopup">&times;</button>
+    <p id="notificationMessage"></p>
 </div>
 
-<!-- Icon Bell -->
-<div id="notifBell">
-    <span id="notifIcon" class="bell-icon">🔔</span>
-    <div id="notifList" class="notif-hidden"></div> <!-- Tambahkan daftar notifikasi -->
+<!-- Ikon Notifikasi -->
+<div id="notificationIcon" onclick="toggleNotificationList()">
+    <img src="img/bell.svg" alt="Notifications">
+    <span id="notificationBadge" class="hidden"></span>
+</div>
+
+<!-- Daftar Notifikasi -->
+<div id="notificationList" class="hidden">
+    <div class="notification-header">
+        <p>Notifications</p>
+        <ul id="notifications"></ul>
+    </div>
+    <button onclick="closeNotificationList()">Close</button>
 </div>
        
         <!-- Wallet Connection -->
@@ -1228,69 +1282,72 @@ function nextUserBets() {
 }
 
 // Notifikasi
-// 🔊 Fungsi untuk memainkan suara kemenangan
-function playWinSound() {
-    let audio = new Audio('win.mp3'); // Ganti dengan file suara kemenangan
-    audio.play();
-}
+document.addEventListener("DOMContentLoaded", () => {
+    checkForWinnings(); // Cek apakah user menang saat halaman dimuat
+});
 
-// 🏆 Fungsi untuk menampilkan notifikasi kemenangan (Popup)
-function showPopupWin(amount, claimUrl) {
-    let popup = document.getElementById("popupNotif");
-    let bell = document.getElementById("notifIcon");
-    let notifList = document.getElementById("notifList");
-
-    document.getElementById("winAmount").innerText = amount;
-    document.getElementById("claimLink").href = claimUrl;
-    
-    popup.classList.remove("popup-hidden"); // Tampilkan popup
-    bell.classList.add("shake", "has-new"); // Animasi icon bell
-
-    // Tambahkan notifikasi ke daftar
-    let newNotif = document.createElement("div");
-    newNotif.innerHTML = `🎉 Anda menang ${amount} ETH! <a href="${claimUrl}" target="_blank">Klaim</a>`;
-    notifList.appendChild(newNotif);
-    notifList.style.display = "block"; // Pastikan daftar notifikasi muncul
-
-    playWinSound(); // Mainkan suara kemenangan
-
-    setTimeout(() => {
-        popup.classList.add("popup-hidden"); // Sembunyikan popup setelah 10 detik
-        bell.classList.remove("shake");
-    }, 10000);
-}
-
-// 🔔 Fungsi untuk menampilkan notifikasi browser
-function sendBrowserNotification(amount, claimUrl) {
-    if (!("Notification" in window)) {
-        console.log("Browser tidak mendukung notifikasi.");
-    } else if (Notification.permission === "granted") {
-        new Notification(`🎉 Anda menang ${amount} ETH!`, {
-            body: "Klik untuk klaim sekarang.",
-            icon: "notif-icon.png", // Ganti dengan icon yang sesuai
-            vibrate: [200, 100, 200],
-        }).onclick = () => window.open(claimUrl, "_blank");
-    } else if (Notification.permission !== "denied") {
-        Notification.requestPermission().then((permission) => {
-            if (permission === "granted") {
-                sendBrowserNotification(amount, claimUrl);
-            }
-        });
+// Fungsi mengecek kemenangan
+async function checkForWinnings() {
+    try {
+        const winnings = await contract.methods.winnings(userAddress).call();
+        if (parseInt(winnings) > 0) {
+            const ethAmount = web3.utils.fromWei(winnings, "ether");
+            showNotification(`🎉 Congratulations, You won ${ethAmount} ETH!`);
+            addNotification(`🎉 You won ${ethAmount} ETH!`, "https://example.com/claim");
+        }
+    } catch (error) {
+        console.error("❌ Error checking winnings:", error);
     }
 }
 
-// 🔘 Event Listener untuk Icon Bell
-document.getElementById("notifIcon").addEventListener("click", function () {
-    let notifList = document.getElementById("notifList");
-    notifList.style.display = notifList.style.display === "block" ? "none" : "block";
+// Fungsi menambahkan notifikasi ke daftar
+function addNotification(message, link) {
+    const notifications = document.getElementById("notifications");
+    
+    // Cek apakah notifikasi sudah ada untuk menghindari duplikasi
+    if ([...notifications.children].some(li => li.innerText.includes(message))) {
+        return;
+    }
+
+    const li = document.createElement("li");
+    li.innerHTML = `<a href="${link}" target="_blank">${message}</a>`;
+    notifications.appendChild(li);
+
+    document.getElementById("notificationBadge").classList.add("active");
+}
+
+// Fungsi menampilkan popup notifikasi
+function showNotification(message) {
+    const popup = document.getElementById("notificationPopup");
+    document.getElementById("notificationMessage").innerHTML = 
+        `${message} <a href="https://example.com/claim" target="_blank" style="color: green;">Claim now!</a>`;
+    
+    popup.classList.remove("hidden");
+
+    setTimeout(() => {
+        popup.classList.add("hidden");
+    }, 10000);
+}
+
+// Fungsi menutup popup
+document.getElementById("closePopup").addEventListener("click", () => {
+    document.getElementById("notificationPopup").classList.add("hidden");
 });
 
-// 🚀 Simulasi Kemenangan (Bisa diganti dengan event dari smart contract)
-setTimeout(() => {
-    let claimUrl = "https://example.com/claim"; // Ganti dengan link klaim asli
-    showPopupWin(0.1, claimUrl);
-    sendBrowserNotification(0.1, claimUrl);
-}, 10000);
+// Fungsi membuka/menutup daftar notifikasi
+function toggleNotificationList() {
+    const list = document.getElementById("notificationList");
+    list.classList.toggle("hidden");
+
+    if (!list.classList.contains("hidden")) {
+        document.getElementById("notificationBadge").classList.remove("active");
+    }
+}
+
+// Fungsi menutup daftar notifikasi
+function closeNotificationList() {
+    document.getElementById("notificationList").classList.add("hidden");
+               }
 
 // **Load Bet History (with Pagination)**
 async function loadBetHistory() {
