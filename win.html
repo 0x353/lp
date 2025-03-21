@@ -122,17 +122,35 @@ async function loadBlockchainData() {
             })
             .on("error", console.error);
 
-        // 4. Last 5 Players
-        const bets = await contract.methods.getAllBets().call();
-        let lastPlayers = bets.slice(-5).map(bet => bet.player); // Ambil 5 pemain terakhir
+        // Last 5 Players
+        if (contract.methods.getAllBets) {
+            const bets = await contract.methods.getAllBets().call();
+            console.log("Bets Data:", bets); // Debugging
+            
+            if (Array.isArray(bets) && bets.length > 0) {
+                let lastPlayers = bets.slice(-5).map(bet => bet.player); // Ambil 5 pemain terakhir
 
-        document.getElementById("lastPlayers").innerHTML = lastPlayers
-            .map(address => `<li>${address}</li>`)
-            .join("");
+                if (document.getElementById("lastPlayers")) {
+                    document.getElementById("lastPlayers").innerHTML = lastPlayers
+                        .map(address => `<li>${address}</li>`)
+                        .join("");
+                }
+            } else {
+                console.warn("No bets found.");
+                document.getElementById("lastPlayers").innerText = "No players yet";
+            }
+        } else {
+            console.warn("getAllBets() is not available in the smart contract.");
+        }
 
         // Top Player (Most Bets)
-        const topPlayer = await contract.methods.getTopPlayer().call();
-        document.getElementById("topPlayer").innerText = topPlayer;
+        if (contract.methods.getTopPlayer) {
+            const topPlayer = await contract.methods.getTopPlayer().call();
+            document.getElementById("topPlayer").innerText = topPlayer;
+        } else {
+            console.warn("getTopPlayer() is not available in the smart contract.");
+        }
+
     } catch (error) {
         console.error("Error fetching data:", error);
     }
