@@ -103,53 +103,31 @@ async function loadBlockchainData() {
     contract = new web3.eth.Contract(contractABI, contractAddress);
 
     try {
-        // Total Players
+        // 1. Total Players
         const totalPlayers = await contract.methods.totalPlayers().call();
         document.getElementById("totalPlayers").innerText = totalPlayers;
 
-        // Total Payout
+        // 2. Total Payout
         const totalPayout = await contract.methods.totalPayout().call();
         document.getElementById("totalPayout").innerText = web3.utils.fromWei(totalPayout, "ether") + " ETH";
 
-        // Ambil last winner terakhir dari smart contract
+        // 3. Last Winner
         const lastWinner = await contract.methods.lastWinner().call();
         document.getElementById("lastWinner").innerText = lastWinner;
 
-        // Subscribe ke event LastWinnerUpdated untuk update real-time
-        contract.events.LastWinnerUpdated()
-            .on("data", function(event) {
-                document.getElementById("lastWinner").innerText = event.returnValues.winner;
-            })
-            .on("error", console.error);
+        // 4. Last 5 Players
+        const bets = await contract.methods.getAllBets().call();
+        let lastPlayers = bets.slice(-5).map(bet => bet.player); // Ambil 5 pemain terakhir
 
-        // Last 5 Players
-        if (contract.methods.getAllBets) {
-            const bets = await contract.methods.getAllBets().call();
-            console.log("Bets Data:", bets); // Debugging
-            
-            if (Array.isArray(bets) && bets.length > 0) {
-                let lastPlayers = bets.slice(-5).map(bet => bet.player); // Ambil 5 pemain terakhir
+        document.getElementById("lastPlayers").innerHTML = lastPlayers
+            .map(address => `<li>${address}</li>`)
+            .join("");
 
-                if (document.getElementById("lastPlayers")) {
-                    document.getElementById("lastPlayers").innerHTML = lastPlayers
-                        .map(address => `<li>${address}</li>`)
-                        .join("");
-                }
-            } else {
-                console.warn("No bets found.");
-                document.getElementById("lastPlayers").innerText = "No players yet";
-            }
-        } else {
-            console.warn("getAllBets() is not available in the smart contract.");
-        }
+        // 5. Top Player (Paling Banyak Taruhan)
+        const players = await contract.methods.totalBetsByPlayer().call();
+        let topPlayer = Object.keys(players).reduce((a, b) => players[a] > players[b] ? a : b, Object.keys(players)[0]);
 
-        // Top Player (Most Bets)
-        if (contract.methods.getTopPlayer) {
-            const topPlayer = await contract.methods.getTopPlayer().call();
-            document.getElementById("topPlayer").innerText = topPlayer;
-        } else {
-            console.warn("getTopPlayer() is not available in the smart contract.");
-        }
+        document.getElementById("topPlayer").innerText = topPlayer;
 
     } catch (error) {
         console.error("Error fetching data:", error);
