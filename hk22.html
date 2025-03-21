@@ -76,7 +76,7 @@ input:hover {
                 0 0 35px rgba(0, 153, 255, 0.4);
 }
 
-button {
+button:not(#closePopup) {
     font-size: 0.7em;
     padding: 6px 12px;
     border-radius: 0.7em;
@@ -90,7 +90,7 @@ button {
     font-family: Ubuntu, sans-serif;
 }
 
- .button-container {
+ .button-container:not(#closePopup) {
     display: flex;
     justify-content: center;
     gap: 20px; /* Jarak antar tombol diperbesar */
@@ -110,28 +110,28 @@ button:not(#closePopup)::before {
 }
 
 /* Efek Hover */
-button:hover::before {
+button:not(#closePopup):hover::before {
     filter: blur(1.2em);
     opacity: 1;
 }
 
-button:hover {
+button:not(#closePopup):hover {
     transform: scale(1.05);
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
 /* Efek Tekan */
-button:active {
+button:not(#closePopup):active {
     transform: scale(0.95);
     box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
 }
 
-button:active::before {
+button:not(#closePopup):active::before {
     filter: blur(0.2em);
 }
 
 /* Efek Gelombang saat Diklik */
-button::after {
+button:not(#closePopup)::after {
     content: "";
     position: absolute;
     top: 50%;
@@ -144,7 +144,7 @@ button::after {
     transition: transform 0.5s, opacity 0.5s;
 }
 
-button:active::after {
+button:not(#closePopup):active::after {
     transform: translate(-50%, -50%) scale(2);
     opacity: 1;
 }
