@@ -103,32 +103,38 @@ async function loadBlockchainData() {
     contract = new web3.eth.Contract(contractABI, contractAddress);
 
     try {
-        // 1. Total Players
+        // Total Players
         const totalPlayers = await contract.methods.totalPlayers().call();
         document.getElementById("totalPlayers").innerText = totalPlayers;
 
-        // 2. Total Payout
+        // Total Payout
         const totalPayout = await contract.methods.totalPayout().call();
         document.getElementById("totalPayout").innerText = web3.utils.fromWei(totalPayout, "ether") + " ETH";
 
-        // 3. Last Winner
+        // Last Winner dengan pengecekan apakah itu admin
         const lastWinner = await contract.methods.lastWinner().call();
-        document.getElementById("lastWinner").innerText = lastWinner;
+        const contractOwner = await contract.methods.owner().call(); // Ambil owner dari smart contract
 
-        // 4. Last 5 Players
-        const bets = await contract.methods.getAllBets().call();
-        let lastPlayers = bets.slice(-5).map(bet => bet.player); // Ambil 5 pemain terakhir
+        if (lastWinner.toLowerCase() === contractOwner.toLowerCase()) {
+            document.getElementById("lastWinner").innerText = "Belum Ada Pemenang";
+        } else {
+            document.getElementById("lastWinner").innerText = lastWinner;
+        }
 
-        document.getElementById("lastPlayers").innerHTML = lastPlayers
-            .map(address => `<li>${address}</li>`)
-            .join("");
+        // Last 5 Players
+        const lastPlayers = await contract.methods.getLast5Players().call();
+        const lastPlayersList = document.getElementById("lastPlayers");
+        lastPlayersList.innerHTML = ""; // Hapus loading text
 
-        // 5. Top Player (Paling Banyak Taruhan)
-        const players = await contract.methods.totalBetsByPlayer().call();
-        let topPlayer = Object.keys(players).reduce((a, b) => players[a] > players[b] ? a : b, Object.keys(players)[0]);
+        lastPlayers.forEach(player => {
+            const li = document.createElement("li");
+            li.textContent = player;
+            lastPlayersList.appendChild(li);
+        });
 
+        // Top Player (Most Bets)
+        const topPlayer = await contract.methods.getTopPlayer().call();
         document.getElementById("topPlayer").innerText = topPlayer;
-
     } catch (error) {
         console.error("Error fetching data:", error);
     }
