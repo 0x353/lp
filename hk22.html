@@ -1087,7 +1087,7 @@ async function checkForWinnings() {
             addNotification(`Congratulations, You won ${ethAmount} ETH Claim Now!`, "claim");
         }
     } catch (error) {
-        console.error("%cError checking winnings:", "color: red;", error);
+        console.error("%cError checking winnings:", "color: #1a88ff;", error);
     }
 }
 
@@ -1095,7 +1095,7 @@ async function checkForWinnings() {
 function addNotification(message, link) {
     const notifications = document.getElementById("notifications");
     const li = document.createElement("li");
-    li.innerHTML = `<a href="${link}" target="_blank" style="color: green; text-decoration: none;">${message}</a>`;
+    li.innerHTML = `<a href="${link}" target="_blank" style="color: #00FF66; text-decoration: none;">${message}</a>`;
     notifications.appendChild(li);
 
     document.getElementById("notificationBadge").classList.add("active");
@@ -1121,8 +1121,8 @@ function showNotification(message) {
         return;
     }
 
-    messageContainer.innerHTML = `<span style="color: green;">${message}</span> 
-        <a href="claim" target="_blank" style="color: #0066ff; text-decoration: none;">Claim now!</a>`;
+    messageContainer.innerHTML = `<span style="color: #00FF66;">${message}</span> 
+        <a href="claim" target="_blank" style="color: #00b7ff; text-decoration: none;">Claim now!</a>`;
 
     // Pastikan popup ditampilkan
     popup.classList.remove("hidden");
