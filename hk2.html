@@ -699,7 +699,7 @@ h3 {
     </div>
 </header>
 
-<!-- Modal Notifikasi -->
+<!-- Modal Daftar Notifikasi -->
 <div id="notificationContainer" class="hidden">
     <ul id="notifications"></ul>
 </div>
@@ -1225,27 +1225,28 @@ function nextUserBets() {
 document.addEventListener("DOMContentLoaded", () => {
     console.log("🔄 DOM Loaded");
 
-    // Simulasi pengecekan tiap 10 detik
+    // Periksa kemenangan setiap 10 detik
     setInterval(checkForWinnings, 10000);
 
-    // Tombol untuk menutup popup
+    // Tombol untuk menutup popup modal
     document.getElementById("closePopup").addEventListener("click", () => {
         document.getElementById("notificationPopup").classList.add("hidden");
     });
 
-    // Klik ikon 🔔 untuk buka daftar notifikasi
+    // Klik ikon 🔔 untuk buka/tutup daftar notifikasi
     document.getElementById("notificationIcon").addEventListener("click", toggleNotificationList);
 });
 
-let lastWin = null; // Simpan kemenangan terakhir agar tidak spam
+let lastWin = null; // Menyimpan data kemenangan terakhir
 
 async function checkForWinnings() {
     console.log("🔍 Checking winnings...");
 
-    const winnings = Math.random() > 0.7 ? (Math.random() * 5).toFixed(2) : "0"; // Simulasi kemenangan
+    // Simulasi API / hasil kemenangan
+    const winnings = Math.random() > 0.7 ? (Math.random() * 5).toFixed(2) : "0"; 
 
     if (parseFloat(winnings) > 0 && winnings !== lastWin) {
-        lastWin = winnings; // Simpan kemenangan terakhir
+        lastWin = winnings; // Update kemenangan terakhir
         setWinner(winnings);
     } else {
         console.log("❌ No winnings this time.");
@@ -1257,12 +1258,12 @@ function setWinner(winningsEth) {
 
     const message = `🎉 You won ${winningsEth} ETH!`;
 
-    // Tambah notifikasi ke modal
+    // Tambahkan notifikasi ke daftar modal
     addNotification(message);
 
     // Tampilkan popup modal
     const popup = document.getElementById("notificationPopup");
-    document.getElementById("notificationMessage").innerHTML = message;
+    document.getElementById("notificationMessage").textContent = message;
     popup.classList.remove("hidden");
 
     // Sembunyikan popup setelah 10 detik
@@ -1273,10 +1274,13 @@ function setWinner(winningsEth) {
 
 function addNotification(message) {
     const notifications = document.getElementById("notifications");
-    
-    const li = document.createElement("li");
-    li.textContent = message;
-    notifications.prepend(li); // Notifikasi terbaru di atas
+
+    // Cek jika notifikasi sudah ada, jangan duplikasi
+    if (![...notifications.children].some(li => li.textContent === message)) {
+        const li = document.createElement("li");
+        li.textContent = message;
+        notifications.prepend(li); // Notifikasi terbaru di atas
+    }
 
     document.getElementById("notificationBadge").classList.remove("hidden"); // Munculkan titik merah
 }
@@ -1289,7 +1293,7 @@ function toggleNotificationList() {
     if (!list.classList.contains("hidden")) {
         document.getElementById("notificationBadge").classList.add("hidden"); // Hilangkan titik merah setelah dibuka
     }
-        }
+            }
 
 // **Load Bet History (with Pagination)**
 async function loadBetHistory() {
