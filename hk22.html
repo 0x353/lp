@@ -625,15 +625,16 @@ h3 {
 /* Tombol Close (×) di pojok kanan atas */
 #closePopup {
     position: absolute;
-    top: 5px;
-    right: 10px;
-    background: #d7f8da;
+    top: 2px; /* Bisa dikurangi agar lebih rapat */
+    right: 5px; /* Sesuaikan agar tidak terlalu jauh */
+    background: transparent; /* Hapus warna latar belakang */
     border: none;
     outline: none; /* Hilangkan outline bawaan */
-    font-size: 18px;
+    font-size: 24px; /* Perbesar ukuran ikon "×" */
     color: red;
     cursor: pointer;
     font-weight: bold;
+    padding: 2px; /* Perkecil padding agar tidak terlalu besar */
 }
 
 #closePopup:focus {
@@ -726,7 +727,7 @@ h3 {
     outline: none; /* Hilangkan outline bawaan */
     box-shadow: none; /* Pastikan tidak ada efek bayangan */
     cursor: pointer;
-    border-radius: 0;
+    border-radius: 0.7em;
 }
 
 /* Tambahan untuk memastikan efek garis hilang saat tombol ditekan atau difokuskan */
