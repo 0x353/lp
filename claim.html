@@ -457,7 +457,7 @@ document.getElementById("disconnectWallet").addEventListener("click", () => {
     signer = null;
     contract = null;
 
-    document.getElementById("networkStatus").innerHTML = `<img src="cross.svg" width="16" height="16"> <span style="color: #ff3333;">Disconnected</span>`;
+    document.getElementById("networkStatus").innerHTML = `<img src="img/failed.svg" width="16" height="16"> <span style="color: #ff3333;">Disconnected</span>`;
     document.getElementById("walletAddress").classList.add("hidden");
     document.getElementById("walletBalance").classList.add("hidden");
     document.getElementById("connectWallet").classList.remove("hidden");
