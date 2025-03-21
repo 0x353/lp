@@ -84,58 +84,47 @@
         const contract = new ethers.Contract(contractAddress, abi, provider);
 
         async function fetchWinners() {
-            try {
-                const winners = await contract.getWinners();
-                if (!winners || winners.length === 0) {
-                    console.warn("Tidak ada data pemenang.");
-                    return;
-                }
-                updateUI(winners);
-            } catch (error) {
-                console.error("Gagal mengambil daftar pemenang:", error);
+    try {
+        console.log("Fetching winners...");
+        const contract = new ethers.Contract(contractAddress, abi, provider);
+        
+        const winnerEvent = contract.filters.WinnerSet();
+        const events = await contract.queryFilter(winnerEvent);
+
+        console.log("Events fetched:", events.length);
+
+        let tableBody = document.querySelector("#winnerTable tbody");
+        let listBody = document.getElementById("winnerList");
+        let leaderboardBody = document.getElementById("leaderboard");
+
+        tableBody.innerHTML = "";
+        listBody.innerHTML = "";
+        leaderboardBody.innerHTML = "";
+
+        events.forEach((event, index) => {
+            let { winner, amount } = event.args;
+
+            let row = `<tr>
+                <td>${index + 1}</td>
+                <td>${winner}</td>
+                <td>${ethers.utils.formatEther(amount)} ETH</td>
+            </tr>`;
+            tableBody.innerHTML += row;
+
+            let listItem = `<li>${winner} - ${ethers.utils.formatEther(amount)} ETH</li>`;
+            listBody.innerHTML += listItem;
+
+            if (index === 0) {
+                let leaderItem = `<div class="leader">${winner} 🏆 - ${ethers.utils.formatEther(amount)} ETH</div>`;
+                leaderboardBody.innerHTML += leaderItem;
             }
-        }
+        });
+    } catch (error) {
+        console.error("Error fetching winners:", error);
+    }
+}
 
-        function listenForWinners() {
-            contract.on("WinnerSet", (hash, winner, amount) => {
-                console.log("Pemenang Baru:", winner, "Mendapat:", ethers.utils.formatEther(amount), "ETH");
-                fetchWinners();
-            });
-        }
-
-        function updateUI(winners) {
-            const tableBody = document.querySelector("#winnerTable tbody");
-            tableBody.innerHTML = ""; 
-            winners.forEach((winner, index) => {
-                const row = `<tr>
-                                <td>${index + 1}</td>
-                                <td>${winner.player}</td>
-                                <td>${ethers.utils.formatEther(winner.amount)} ETH</td>
-                            </tr>`;
-                tableBody.innerHTML += row;
-            });
-
-            const list = document.getElementById("winnerList");
-            list.innerHTML = ""; 
-            winners.forEach((winner) => {
-                const listItem = `<li>${winner.player} - ${ethers.utils.formatEther(winner.amount)} ETH</li>`;
-                list.innerHTML += listItem;
-            });
-
-            const leaderboard = document.getElementById("leaderboard");
-            leaderboard.innerHTML = "";  
-            const sortedWinners = [...winners].sort((a, b) => Number(b.amount) - Number(a.amount));  
-            sortedWinners.slice(0, 3).forEach((winner, rank) => {
-                const medal = rank === 0 ? "🥇" : rank === 1 ? "🥈" : "🥉";
-                const leaderItem = `<div class="leader">${medal} ${winner.player} - ${ethers.utils.formatEther(winner.amount)} ETH</div>`;
-                leaderboard.innerHTML += leaderItem;
-            });
-        }
-
-        window.onload = async () => {
-            await fetchWinners();
-            listenForWinners();
-        };
+fetchWinners();
     </script>
 </body>
 </html>
