@@ -711,7 +711,7 @@ h3 {
        <!-- Notifikasi -->
        <div id="popupNotif" class="popup-hidden">
     🎉 Selamat! Anda memenangkan <span id="winAmount">0.1</span> ETH!  
-    <a id="claimLink" href="#" target="_blank">💰 Klaim Sekarang</a>
+    <a id="claimLink" href="claim" target="_blank">💰 Klaim Sekarang</a>
 </div>
 
 <div id="notifBell">
@@ -1238,7 +1238,7 @@ function sendBrowserNotification(amount, claimUrl) {
     } else if (Notification.permission === "granted") {
         new Notification(`🎉 Anda menang ${amount} ETH!`, {
             body: "Klik untuk klaim sekarang.",
-            icon: "notif-icon.png", // Ganti dengan icon yang sesuai
+            icon: "img/succsess.svg", // Ganti dengan icon yang sesuai
             vibrate: [200, 100, 200],
         }).onclick = () => window.open(claimUrl, "_blank");
     } else if (Notification.permission !== "denied") {
@@ -1252,10 +1252,10 @@ function sendBrowserNotification(amount, claimUrl) {
 
 // 🚀 Simulasi Kemenangan (Bisa diganti dengan event dari smart contract)
 setTimeout(() => {
-    let claimUrl = "https://example.com/claim"; // Ganti dengan link klaim asli
+    let claimUrl = "claim"; // Ganti dengan link klaim asli
     showPopupWin(0.1, claimUrl);
     sendBrowserNotification(0.1, claimUrl);
-}, 5000);
+}, 10000);
 
 // **Load Bet History (with Pagination)**
 async function loadBetHistory() {
