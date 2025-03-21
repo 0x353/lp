@@ -1085,25 +1085,50 @@ function toggleNotificationList() {
 // Menampilkan popup notifikasi dengan animasi
 function showNotification(message) {
     const popup = document.getElementById("notificationPopup");
-    document.getElementById("notificationMessage").innerHTML = 
-        `<span style="color: green;">${message}</span> 
+    const messageContainer = document.getElementById("notificationMessage");
+
+    if (!popup || !messageContainer) {
+        console.error("Element not found!");
+        return;
+    }
+
+    messageContainer.innerHTML = `<span style="color: green;">${message}</span> 
         <a href="claim.html" target="_blank" style="color: green; text-decoration: none;">Claim now!</a>`;
-    
+
+    // Pastikan popup ditampilkan
     popup.classList.remove("hidden");
+    popup.style.display = "block"; // Menampilkan elemen
     popup.classList.add("show");
+
+    console.log("Popup shown!"); // Debugging
 
     setTimeout(() => {
         popup.classList.remove("show");
-        setTimeout(() => popup.classList.add("hidden"), 300); // Delay agar efek fade-out terasa
-    }, 10000);
+        setTimeout(() => {
+            popup.classList.add("hidden");
+            popup.style.display = "none"; // Sembunyikan elemen
+        }, 300);
+    }, 5000); // Tampilkan selama 5 detik
 }
 
 // Menutup popup
 function closePopup() {
     const popup = document.getElementById("notificationPopup");
+    if (!popup) return;
+
     popup.classList.remove("show");
-    setTimeout(() => popup.classList.add("hidden"), 300);
+    setTimeout(() => {
+        popup.classList.add("hidden");
+        popup.style.display = "none";
+    }, 300);
 }
+
+// Uji coba manual
+document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => {
+        showNotification("You have a new message!");
+    }, 10000); // Muncul otomatis setelah 2 detik (bisa dihapus)
+});
 
 // **Close Popup**
 function closePopup() {
