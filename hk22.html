@@ -97,7 +97,7 @@ button {
  }
 
 /* Efek Neon Glow */
-button::before {
+button:not(#closePopup)::before {
     content: "";
     position: absolute;
     inset: -2px;
@@ -782,7 +782,7 @@ h3 {
 
        <!-- Notifikasi Popup -->
 <div id="notificationPopup" class="popup hidden" role="alert">
-    <button id="closePopup" onclick="closePopup()" style="background-color: #d7f8da;">×</button>
+    <button id="closePopup" onclick="closePopup()">×</button>
     <p id="notificationMessage"></p>
 </div>
 
