@@ -1140,7 +1140,7 @@ function showNotification(message) {
             popup.classList.add("hidden");
             popup.style.display = "none"; // Sembunyikan elemen
         }, 300);
-    }, 20000); // Tampilkan selama 5 detik
+    }, 15000); // Tampilkan selama 5 detik
 }
 
 // Menutup popup
@@ -1154,13 +1154,6 @@ function closePopup() {
         popup.style.display = "none";
     }, 300);
 }
-
-// Popup Part II
-setTimeout(() => {
-    if (isWinner && walletConnected) { 
-        showNotification("Congratulations! You won a reward.");
-    }
-}, 20000); // Muncul otomatis setelah 2 detik (bisa dihapus)
 
 // **Close Popup**
 function closePopup() {
