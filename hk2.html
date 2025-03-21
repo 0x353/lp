@@ -601,64 +601,28 @@ h3 {
   }
 
 /* Style untuk notifikasi */
-.notification-bell {
-    position: relative;
+/* Bell Icon */
+.notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
     font-size: 24px;
     cursor: pointer;
-    display: inline-block;
-    padding: 10px;
 }
 
-#notificationBadge {
+.badge {
     position: absolute;
-    top: 0px;
-    right: 0px;
+    top: -5px;
+    right: -5px;
     background-color: red;
     color: white;
     font-size: 12px;
-    font-weight: bold;
     border-radius: 50%;
-    padding: 3px 6px;
-    display: none;
-}
-
-#notificationBadge.hidden {
-    display: none;
+    padding: 5px 8px;
 }
 
 .hidden {
     display: none;
-}
-
-#notificationPopup {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: white;
-    padding: 15px;
-    border: 1px solid black;
-    border-radius: 5px;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-}
-
-#notificationPopup button {
-    margin-top: 10px;
-    padding: 5px 10px;
-    cursor: pointer;
-}
-
-#notificationContainer {
-    position: absolute;
-    top: 40px;
-    right: 10px;
-    background-color: white;
-    border: 1px solid #ccc;
-    padding: 10px;
-    width: 200px;
-    max-height: 200px;
-    overflow-y: auto;
-    list-style-type: none;
 }
     </style>
 </head>
@@ -693,22 +657,22 @@ h3 {
         <h3>Lotto Chain Decentralizer Betting</h3>
         <br>
 
-        <div id="notificationIcon" class="notification-bell">
-        🔔
-        <span id="notificationBadge" class="hidden">!</span>
+        <!-- Icon Bell -->
+    <div class="notification-container">
+        <div class="bell-icon" onclick="openNotificationModal()">
+            🔔
+            <span id="notificationBadge" class="badge hidden"></span>
+        </div>
     </div>
-</header>
 
-<!-- Modal Daftar Notifikasi -->
-<div id="notificationContainer" class="hidden">
-    <ul id="notifications"></ul>
-</div>
-
-<!-- Popup Modal -->
-<div id="notificationPopup" class="hidden">
-    <span id="notificationMessage"></span>
-    <button id="closePopup">Close</button>
-</div>
+    <!-- Modal Notifikasi -->
+    <div id="notificationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeNotificationModal()">&times;</span>
+            <h2>Notifications</h2>
+            <ul id="notificationList"></ul>
+        </div>
+    </div>
        
         <!-- Wallet Connection -->
         <center><button id="connectWallet" onclick="connectWallet()"><img src="img/connect.svg" alt="Wallet Icon" width="20" height="20" style="vertical-align: middle; margin-right: 5px;">Connect Wallet</button>  
@@ -1222,78 +1186,69 @@ function nextUserBets() {
 }
 
 // Notifikasi
-document.addEventListener("DOMContentLoaded", () => {
-    console.log("🔄 DOM Loaded");
+// List untuk menyimpan notifikasi tanpa duplikasi
+let notifications = [];
 
-    // Periksa kemenangan setiap 10 detik
-    setInterval(checkForWinnings, 10000);
+function setWinner(winner, amount) {
+    let message = `🎉 Congratulations! You won ${amount} ETH!`;
 
-    // Tombol untuk menutup popup modal
-    document.getElementById("closePopup").addEventListener("click", () => {
-        document.getElementById("notificationPopup").classList.add("hidden");
+    // Cek apakah sudah ada notifikasi yang sama sebelumnya
+    if (!notifications.includes(message)) {
+        notifications.push(message);
+        updateNotifications();
+        showPopup(message);
+    }
+}
+
+// Fungsi untuk menampilkan popup modal
+function showPopup(message) {
+    let modal = document.createElement("div");
+    modal.classList.add("modal");
+    modal.innerHTML = `
+        <div class="modal-content">
+            <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+            <p>${message}</p>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    modal.style.display = "block";
+
+    // Tutup modal otomatis setelah 5 detik
+    setTimeout(() => {
+        modal.remove();
+    }, 5000);
+}
+
+// Update daftar notifikasi di modal bell
+function updateNotifications() {
+    let list = document.getElementById("notificationList");
+    list.innerHTML = ""; // Reset
+
+    notifications.forEach(msg => {
+        let li = document.createElement("li");
+        li.textContent = msg;
+        list.appendChild(li);
     });
 
-    // Klik ikon 🔔 untuk buka/tutup daftar notifikasi
-    document.getElementById("notificationIcon").addEventListener("click", toggleNotificationList);
-});
-
-let lastWin = null; // Menyimpan data kemenangan terakhir
-
-async function checkForWinnings() {
-    console.log("🔍 Checking winnings...");
-
-    // Simulasi API / hasil kemenangan
-    const winnings = Math.random() > 0.7 ? (Math.random() * 5).toFixed(2) : "0"; 
-
-    if (parseFloat(winnings) > 0 && winnings !== lastWin) {
-        lastWin = winnings; // Update kemenangan terakhir
-        setWinner(winnings);
+    // Perbarui titik merah di bell
+    let badge = document.getElementById("notificationBadge");
+    if (notifications.length > 0) {
+        badge.textContent = notifications.length;
+        badge.classList.remove("hidden");
     } else {
-        console.log("❌ No winnings this time.");
+        badge.classList.add("hidden");
     }
 }
 
-function setWinner(winningsEth) {
-    console.log("🏆 Winning detected:", winningsEth);
-
-    const message = `🎉 You won ${winningsEth} ETH!`;
-
-    // Tambahkan notifikasi ke daftar modal
-    addNotification(message);
-
-    // Tampilkan popup modal
-    const popup = document.getElementById("notificationPopup");
-    document.getElementById("notificationMessage").textContent = message;
-    popup.classList.remove("hidden");
-
-    // Sembunyikan popup setelah 10 detik
-    setTimeout(() => {
-        popup.classList.add("hidden");
-    }, 10000);
+// Buka modal notifikasi
+function openNotificationModal() {
+    document.getElementById("notificationModal").style.display = "block";
 }
 
-function addNotification(message) {
-    const notifications = document.getElementById("notifications");
-
-    // Cek jika notifikasi sudah ada, jangan duplikasi
-    if (![...notifications.children].some(li => li.textContent === message)) {
-        const li = document.createElement("li");
-        li.textContent = message;
-        notifications.prepend(li); // Notifikasi terbaru di atas
-    }
-
-    document.getElementById("notificationBadge").classList.remove("hidden"); // Munculkan titik merah
+// Tutup modal notifikasi
+function closeNotificationModal() {
+    document.getElementById("notificationModal").style.display = "none";
 }
-
-function toggleNotificationList() {
-    console.log("🔔 Notification icon clicked!");
-    const list = document.getElementById("notificationContainer");
-    list.classList.toggle("hidden");
-
-    if (!list.classList.contains("hidden")) {
-        document.getElementById("notificationBadge").classList.add("hidden"); // Hilangkan titik merah setelah dibuka
-    }
-            }
 
 // **Load Bet History (with Pagination)**
 async function loadBetHistory() {
