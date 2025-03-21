@@ -56,21 +56,34 @@ h1 {
 </head>
 <body>
     <div class="container">
-        <h1>Bet History Stats</h1>
-        <div class="stats">
-            <div class="stat-box">
-                <h2>Total Players</h2>
-                <p id="totalPlayers">Loading...</p>
-            </div>
-            <div class="stat-box">
-                <h2>Total Payout</h2>
-                <p id="totalPayout">Loading...</p>
-            </div>
-            <div class="stat-box">
-                <h2>Last Winner</h2>
-                <p id="lastWinner">Loading...</p>
-            </div>
+    <h1>Bet History Stats</h1>
+    <div class="stats">
+        <div class="stat-box">
+            <h2>Total Players</h2>
+            <p id="totalPlayers">Loading...</p>
         </div>
+        <div class="stat-box">
+            <h2>Total Payout</h2>
+            <p id="totalPayout">Loading...</p>
+        </div>
+        <div class="stat-box">
+            <h2>Last Winner</h2>
+            <p id="lastWinner">Loading...</p>
+        </div>
+    </div>
+
+    <div class="extra-stats">
+        <div class="stat-box">
+            <h2>Last 5 Players</h2>
+            <ul id="lastPlayers">
+                <li>Loading...</li>
+            </ul>
+        </div>
+        <div class="stat-box">
+            <h2>Top Player (Most Bets)</h2>
+            <p id="topPlayer">Loading...</p>
+        </div>
+    </div>
     </div>
     <script defer src="script.js"></script>
     <script>
@@ -90,14 +103,32 @@ async function loadBlockchainData() {
     contract = new web3.eth.Contract(contractABI, contractAddress);
 
     try {
+        // 1. Total Players
         const totalPlayers = await contract.methods.totalPlayers().call();
         document.getElementById("totalPlayers").innerText = totalPlayers;
 
+        // 2. Total Payout
         const totalPayout = await contract.methods.totalPayout().call();
         document.getElementById("totalPayout").innerText = web3.utils.fromWei(totalPayout, "ether") + " ETH";
 
+        // 3. Last Winner
         const lastWinner = await contract.methods.lastWinner().call();
         document.getElementById("lastWinner").innerText = lastWinner;
+
+        // 4. Last 5 Players
+        const bets = await contract.methods.getAllBets().call();
+        let lastPlayers = bets.slice(-5).map(bet => bet.player); // Ambil 5 pemain terakhir
+
+        document.getElementById("lastPlayers").innerHTML = lastPlayers
+            .map(address => `<li>${address}</li>`)
+            .join("");
+
+        // 5. Top Player (Paling Banyak Taruhan)
+        const players = await contract.methods.totalBetsByPlayer().call();
+        let topPlayer = Object.keys(players).reduce((a, b) => players[a] > players[b] ? a : b, Object.keys(players)[0]);
+
+        document.getElementById("topPlayer").innerText = topPlayer;
+
     } catch (error) {
         console.error("Error fetching data:", error);
     }
