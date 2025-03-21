@@ -1077,7 +1077,7 @@ async function checkForWinnings() {
         if (parseInt(winnings) > 0) {
             const ethAmount = web3.utils.fromWei(winnings, "ether");
             showNotification(`Congratulations, You won ${ethAmount} ETH!`);
-            addNotification(`Congratulations, You won ${ethAmount} ETH!`, "claim");
+            addNotification(`Congratulations, You won ${ethAmount} ETH Claim Now!`, "claim");
         }
     } catch (error) {
         console.error("%cError checking winnings:", "color: red;", error);
@@ -1115,7 +1115,7 @@ function showNotification(message) {
     }
 
     messageContainer.innerHTML = `<span style="color: green;">${message}</span> 
-        <a href="claim.html" target="_blank" style="color: green; text-decoration: none;">Claim now!</a>`;
+        <a href="claim" target="_blank" style="color: green; text-decoration: none;">Claim now!</a>`;
 
     // Pastikan popup ditampilkan
     popup.classList.remove("hidden");
@@ -1130,7 +1130,7 @@ function showNotification(message) {
             popup.classList.add("hidden");
             popup.style.display = "none"; // Sembunyikan elemen
         }, 300);
-    }, 5000); // Tampilkan selama 5 detik
+    }, 10000); // Tampilkan selama 5 detik
 }
 
 // Menutup popup
@@ -1148,7 +1148,7 @@ function closePopup() {
 // Uji coba manual
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
-        showNotification("You have a new message!");
+        showNotification("You have a new prizes!");
     }, 10000); // Muncul otomatis setelah 2 detik (bisa dihapus)
 });
 
