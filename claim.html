@@ -537,7 +537,7 @@ document.addEventListener("DOMContentLoaded", function () {
             let claimStatus = document.getElementById("claimStatus");
 
             // ⏳ Status: Sedang Diproses
-            claimStatus.innerHTML = `<img src="img/load.svg" width="16" height="16"> <span style="color: #ccc;">Processing your claim...</span>`;
+            claimStatus.innerHTML = `<img src="img/dis.svg" width="16" height="16"> <span style="color: #ccc;">Processing your claim...</span>`;
 
             let tx = await contract.claimETH();
             await tx.wait();
