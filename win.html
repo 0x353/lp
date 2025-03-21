@@ -121,16 +121,13 @@ async function loadBlockchainData() {
             document.getElementById("lastWinner").innerText = lastWinner;
         }
 
-        // Last 5 Players
-        const lastPlayers = await contract.methods.getLast5Players().call();
-        const lastPlayersList = document.getElementById("lastPlayers");
-        lastPlayersList.innerHTML = ""; // Hapus loading text
+        // 4. Last 5 Players
+        const bets = await contract.methods.getAllBets().call();
+        let lastPlayers = bets.slice(-5).map(bet => bet.player); // Ambil 5 pemain terakhir
 
-        lastPlayers.forEach(player => {
-            const li = document.createElement("li");
-            li.textContent = player;
-            lastPlayersList.appendChild(li);
-        });
+        document.getElementById("lastPlayers").innerHTML = lastPlayers
+            .map(address => `<li>${address}</li>`)
+            .join("");
 
         // Top Player (Most Bets)
         const topPlayer = await contract.methods.getTopPlayer().call();
