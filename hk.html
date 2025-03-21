@@ -599,124 +599,6 @@ h3 {
     display: block; /* Pastikan gambar tidak turun ke bawah teks */
     margin: 0 auto; /* Jika ingin ikon tetap rapi di tengah sel */
   }
-
-/* Popup Notifikasi */
-.popup {
-    display: none;
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #D7F8DA;
-    color: #721c24;
-    padding: 15px;
-    border-radius: 5px;
-    box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
-    z-index: 1000;
-}
-
-/* Tombol Close (×) di pojok kanan atas */
-#closePopup {
-    position: absolute;
-    top: 5px;
-    right: 10px;
-    background: none;
-    border: none;
-    font-size: 18px;
-    color: red;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-/* Ikon Notifikasi */
-#notificationIcon {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    cursor: pointer;
-    z-index: 1000;
-    display: none;
-}
-
-#notificationIcon img {
-    width: 30px;
-    height: 30px;
-}
-
-/* Titik Merah Notifikasi */
-#notificationBadge {
-    position: absolute;
-    top: 0;
-    right: 0;
-    background-color: red;
-    color: white;
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    text-align: center;
-    font-size: 12px;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-}
-
-/* Aktifkan titik merah saat ada notifikasi */
-#notificationBadge.active {
-    display: flex;
-}
-
-/* Daftar Notifikasi */
-#notificationList {
-    position: fixed;
-    top: 60px;
-    right: 20px;
-    width: 250px;
-    background-color: #d7f8da;
-    color: #1a1a1a;
-    border: 1px solid #ddd;
-    box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
-    border-radius: 5px;
-    padding: 10px;
-    z-index: 1000;
-}
-
-#notificationList ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-#notificationList ul li {
-    padding: 8px;
-    border-bottom: 1px solid #ddd;
-}
-
-#notificationList ul li:last-child {
-    border-bottom: none;
-}
-
-#notificationList ul li a {
-    text-decoration: none;
-    color: #333;
-    display: block;
-}
-
-#notificationList button {
-    width: 100%;
-    padding: 5px;
-    margin-top: 5px;
-    background-color: #f8d7da;
-    color: #721c24;
-    border: none;
-    cursor: pointer;
-    border-radius: 3px;
-    }
-
-/* Sembunyikan elemen dengan class 'hidden' */
-.hidden {
-    display: none;
-    }
     </style>
 </head>
 <body>
@@ -756,28 +638,6 @@ h3 {
         <p id="walletAddress" style="display:none; color: #ad5cff"></p>
         <p id="walletBalance" style="display:none; color: #00ca09;">Balance: 0 ETH</p><br>
         <hr style="background-color: #333333; height: 1px; border: none;">
-
-        <!-- Notifikasi Popup -->
-       <div id="notificationPopup" class="popup" role="alert">
-            <button id="closePopup" onclick="closePopup()">×</button>
-            <p id="notificationMessage"></p>
-        </div>
-
-        <!-- Ikon Notifikasi -->
-        <div id="notificationIcon" onclick="toggleNotificationList()">
-            <img src="img/bell.svg" alt="Notifications">
-            <span id="notificationBadge" class="hidden"></span>
-        </div>
-
-        <!-- Daftar Notifikasi -->
-        <div id="notificationList" class="hidden">
-            <div class="notification-header">
-                <p>Notifications</p>
-                <ul id="notifications" aria-live="polite"></ul>
-            </div>
-            <button onclick="closeNotificationList()">Close</button>
-        </div>
-       
         <h2>Place Bet</h2>
         <h6 class="blinking-text">Always use slippage to save transaction gas fees</h6><br>
         <input type="number" id="betNumber" placeholder="4D 3D or 2D" oninput="validateBetNumber()"><br>
@@ -995,7 +855,6 @@ h3 {
         let web3;
 let contract;
 let userAccount;
-let userAddress;
 let userBetsPage = 0;
 let betHistoryPage = 0;
 const pageSize = 10;
@@ -1022,7 +881,6 @@ window.addEventListener("load", async () => {
                     document.getElementById("walletBalance").style.display = "block";
                     document.getElementById("connectWallet").style.display = "none";
                     document.getElementById("disconnectWallet").style.display = "block";
-                    document.getElementById("notificationIcon").style.display = "block";
 
                     updateBalance();
                     loadUserBets();
@@ -1068,7 +926,6 @@ async function connectWallet() {
             document.getElementById("walletBalance").style.display = "block";
             document.getElementById("connectWallet").style.display = "none";
             document.getElementById("disconnectWallet").style.display = "block";
-            document.getElementById("notificationIcon").style.display = "block";
 
             updateBalance();
             loadUserBets();
@@ -1128,7 +985,6 @@ function disconnectWallet() {
     document.getElementById("walletBalance").style.display = "none";
     document.getElementById("connectWallet").style.display = "block";
     document.getElementById("disconnectWallet").style.display = "none";
-    document.getElementById("notificationIcon").style.display = "block";
 }
 
 // **Update Balance**
@@ -1333,66 +1189,6 @@ function nextBetHistory() {
     betHistoryPage++;
     loadBetHistory();
 }
-
-// Notifications
-// Cek apakah user menang
-async function checkForWinnings() {
-    try {
-        const winnings = await contract.methods.winnings(userAddress).call();
-        if (parseInt(winnings) > 0) {
-            const ethAmount = web3.utils.fromWei(winnings, "ether");
-            showNotification(`Congratulations, You won ${ethAmount} ETH!`);
-            addNotification(`Congratulations, You won ${ethAmount} ETH!`, "claim");
-        }
-    } catch (error) {
-        console.error("%cError checking winnings:", "color: red;", error);
-    }
-}
-
-// Fungsi menambah notifikasi ke daftar
-function addNotification(message, link) {
-    const notifications = document.getElementById("notifications");
-    const li = document.createElement("li");
-    li.innerHTML = `<a href="${link}" target="_blank" style="color: green; text-decoration: none;">${message}</a>`;
-    notifications.appendChild(li);
-
-    document.getElementById("notificationBadge").classList.add("active");
-}
-
-// Fungsi menyembunyikan titik merah setelah daftar dibuka
-function toggleNotificationList() {
-    const list = document.getElementById("notificationList");
-    list.classList.toggle("hidden");
-
-    // Jika daftar dibuka, hilangkan titik merah
-    if (!list.classList.contains("hidden")) {
-        document.getElementById("notificationBadge").classList.remove("active");
-    }
-}
-
-// Menampilkan popup notifikasi
-function showNotification(message) {
-    const popup = document.getElementById("notificationPopup");
-    document.getElementById("notificationMessage").innerHTML = 
-        `<span style="color: green;">${message}</span> 
-        <a href="claim.html" target="_blank" style="color: green; text-decoration: none;">Claim now!</a>`;
-    
-    popup.style.display = "block";
-
-    setTimeout(() => {
-        popup.style.display = "none";
-    }, 10000);
-}
-
-// Menutup popup
-function closePopup() {
-    document.getElementById("notificationPopup").style.display = "none";
-}
-
-// Menutup daftar notifikasi
-function closeNotificationList() {
-    document.getElementById("notificationList").classList.add("hidden");
-               }
         
 // Modal Result
 function updateHistory(newBall1) {
@@ -1468,7 +1264,6 @@ window.onload = () => {
                 document.getElementById("walletBalance").style.display = "block";
                 document.getElementById("connectWallet").style.display = "none";
                 document.getElementById("disconnectWallet").style.display = "block";
-                document.getElementById("notificationIcon").style.display = "block";
                 
                 updateBalance();
                 loadUserBets();
