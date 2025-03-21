@@ -68,8 +68,7 @@ button:hover {
 </head>
 <body>
     <header>
-        <h1>📢 Blockchain Betting Info</h1>
-    </header>
+         <h1>📢 Blockchain Betting Info</h1>
 
     <section id="winner">
         <h2>🏆 Pemenang Terbaru</h2>
@@ -85,15 +84,6 @@ button:hover {
         <p><strong>Total Taruhan:</strong> <span id="totalBets">Loading...</span></p>
         <button onclick="toggleBetList()">Lihat Daftar Taruhan</button>
         <ul id="betList" style="display: none;"></ul>
-    </section>
-
-    <section id="winner-bet">
-        <h2>📌 Detail Taruhan Pemenang</h2>
-        <p><strong>ID Taruhan:</strong> <span id="betId">Loading...</span></p>
-        <p><strong>Nomor Taruhan:</strong> <span id="betNumber">Loading...</span></p>
-        <p><strong>Jumlah Taruhan:</strong> <span id="betCount">Loading...</span></p>
-        <p><strong>Blok Taruhan:</strong> <span id="betBlock">Loading...</span></p>
-        <p><strong>Tx Hash Taruhan:</strong> <span id="betTxHash">Loading...</span></p>
     </section>
 
     <section id="contract-stats">
@@ -119,25 +109,23 @@ const abi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{
 const contract = new ethers.Contract(contractAddress, abi, provider);
 
 async function loadData() {
-    document.getElementById("totalPlayers").textContent = await contract.totalPlayers();
-    document.getElementById("totalPayout").textContent = ethers.formatEther(await contract.totalPayout()) + " ETH";
-    document.getElementById("totalBets").textContent = await contract.totalBets();
-    
-    document.getElementById("contractBalance").textContent = ethers.formatEther(await contract.contractBalance()) + " ETH";
-    document.getElementById("claimedWinners").textContent = await contract.totalClaimedWinners();
-    document.getElementById("totalPaid").textContent = ethers.formatEther(await contract.totalPaid()) + " ETH";
-    document.getElementById("totalParticipants").textContent = await contract.totalParticipants();
-    
-    document.getElementById("winnerAddress").textContent = await contract.lastWinner();
-    document.getElementById("winnerAmount").textContent = ethers.formatEther(await contract.lastWinnerAmount()) + " ETH";
-    document.getElementById("winnerTime").textContent = new Date((await contract.lastWinnerTime()) * 1000).toUTCString();
+    try {
+        document.getElementById("totalPlayers").textContent = await contract.totalPlayers();
+        document.getElementById("totalPayout").textContent = ethers.formatEther(await contract.totalPayout()) + " ETH";
+        document.getElementById("totalBets").textContent = await contract.totalBets();
 
-    const [betId, betNumber, betCount, betBlock, betTxHash] = await contract.getWinnerBet();
-    document.getElementById("betId").textContent = betId;
-    document.getElementById("betNumber").textContent = betNumber;
-    document.getElementById("betCount").textContent = betCount;
-    document.getElementById("betBlock").textContent = `Block #${betBlock}`;
-    document.getElementById("betTxHash").textContent = betTxHash;
+        document.getElementById("contractBalance").textContent = ethers.formatEther(await contract.contractBalance()) + " ETH";
+        document.getElementById("claimedWinners").textContent = await contract.totalClaimedWinners();
+        document.getElementById("totalPaid").textContent = ethers.formatEther(await contract.totalPaid()) + " ETH";
+        document.getElementById("totalParticipants").textContent = await contract.totalParticipants();
+
+        document.getElementById("winnerAddress").textContent = await contract.lastWinner();
+        document.getElementById("winnerAmount").textContent = ethers.formatEther(await contract.lastWinnerAmount()) + " ETH";
+        document.getElementById("winnerTime").textContent = new Date((await contract.lastWinnerTime()) * 1000).toUTCString();
+    } catch (error) {
+        console.error("Gagal memuat data:", error);
+        alert("Terjadi kesalahan dalam memuat data dari smart contract.");
+    }
 }
 
 function listenEvents() {
@@ -158,6 +146,11 @@ function addNotification(message) {
     const listItem = document.createElement("li");
     listItem.textContent = message;
     document.getElementById("eventList").appendChild(listItem);
+}
+
+function toggleBetList() {
+    const betList = document.getElementById("betList");
+    betList.style.display = betList.style.display === "none" ? "block" : "none";
 }
 
 window.onload = async () => {
