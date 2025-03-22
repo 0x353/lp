@@ -71,25 +71,25 @@ const popupText = document.getElementById("popup-text");
 // **1. Menampilkan riwayat pemenang saat halaman dimuat**
 async function loadWinners() {
     try {
-        const bets = await contract.getAllBets();
+        const filter = contract.filters.WinnerSet();
+        const events = await contract.queryFilter(filter);
+
         winnerList.innerHTML = "";
 
-        bets.forEach(bet => {
-            const { player, betAmount, timestamp } = bet;
+        events.forEach(event => {
+            const { winner, amount } = event.args;
 
             // **Filter agar alamat admin tidak masuk daftar pemenang**
-            if (player.toLowerCase() === adminAddress.toLowerCase()) {
+            if (winner.toLowerCase() === adminAddress.toLowerCase()) {
                 return;
             }
 
-            const date = new Date(timestamp * 1000).toLocaleString();
-
-            // **Pastikan konversi ETH sesuai**
-            const ethAmount = ethers.utils.formatUnits(betAmount, "ether");
+            const ethAmount = ethers.utils.formatUnits(amount, "ether"); // Konversi ETH dengan benar
+            const date = new Date(event.blockTimestamp * 1000).toLocaleString();
 
             const winnerItem = document.createElement("div");
             winnerItem.classList.add("winner-item");
-            winnerItem.innerHTML = `<strong>${player}</strong> menang ${ethAmount} ETH pada ${date}`;
+            winnerItem.innerHTML = `<strong>${winner}</strong> menang ${ethAmount} ETH pada ${date}`;
             winnerList.appendChild(winnerItem);
         });
 
@@ -103,20 +103,19 @@ async function loadWinners() {
 }
 
 // **2. Menampilkan pemenang terbaru secara real-time**
-contract.on("WinnerSet", (betId, winner, amount) => {
+contract.on("WinnerSet", async (betId, winner, amount) => {
     // **Filter agar alamat admin tidak masuk daftar pemenang**
     if (winner.toLowerCase() === adminAddress.toLowerCase()) {
         return;
     }
 
-    // **Pastikan konversi ETH sesuai**
-    const ethAmount = ethers.utils.formatUnits(amount, "ether");
-
+    const ethAmount = ethers.utils.formatUnits(amount, "ether"); // Konversi ETH dengan benar
+    const date = new Date().toLocaleString();
     showPopup(`🎉 ${winner} menang ${ethAmount} ETH!`);
 
     const newWinnerItem = document.createElement("div");
     newWinnerItem.classList.add("winner-item");
-    newWinnerItem.innerHTML = `<strong>${winner}</strong> menang ${ethAmount} ETH`;
+    newWinnerItem.innerHTML = `<strong>${winner}</strong> menang ${ethAmount} ETH pada ${date}`;
     winnerList.prepend(newWinnerItem);
 });
 
