@@ -75,7 +75,7 @@ async function loadWinners() {
         winnerList.innerHTML = "";
 
         bets.forEach(bet => {
-            const { player, betAmount, timestamp } = bet;
+            const { player, betID, number, betAmount, ethAmount, timestamp } = bet;
 
             // **Filter agar alamat admin tidak masuk daftar pemenang**
             if (player.toLowerCase() === adminAddress.toLowerCase()) {
@@ -85,9 +85,7 @@ async function loadWinners() {
             const date = new Date(timestamp * 1000).toUTCString();
             const ethBetAmount = ethers.utils.formatEther(bet.betAmount);
 
-            const winnerItem = document.createElement("div");
-            winnerItem.classList.add("winner-item");
-            winnerItem.innerHTML = `<strong>${player}</strong> | BetID: ${bet.betId} | BetNumber: ${bet.number} | BetAmount: ${ethBetAmount} ETH | Menang ${ethAmount} ETH pada ${date} (UTC)`;
+            const winnerItem = document.createElement("div"); winnerItem.classList.add("winner-item"); winnerItem.innerHTML = <strong>${player}</strong> BetID  ${betId} BetNumber ${number} BetAmount  ${betAmount} Menang ${ethAmount} ETH pada ${date} (UTC);
             winnerList.appendChild(winnerItem);
         });
 
