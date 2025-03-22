@@ -63,8 +63,9 @@ h1 {
             <p id="totalPlayers">Loading...</p>
         </div>
         <div class="stat-box">
-            <h2>Total Payout</h2>
-            <p id="totalPayout">Loading...</p>
+            <p>Total Payout: <span id="totalPayout">Loading...</span></p>
+            <h3>Riwayat Payout:</h3>
+            <ul id="payoutHistory">Loading...</ul>
         </div>
         <div class="stat-box">
             <h2>Last Winner</h2>
@@ -108,8 +109,37 @@ async function loadBlockchainData() {
         document.getElementById("totalPlayers").innerText = totalPlayers;
 
         // 2. Total Payout
+        async function loadTotalPayout() {
+    try {
         const totalPayout = await contract.methods.totalPayout().call();
         document.getElementById("totalPayout").innerText = web3.utils.fromWei(totalPayout, "ether") + " ETH";
+    } catch (error) {
+        console.error("Error fetching total payout:", error);
+    }
+}
+
+async function loadPayoutHistory() {
+    try {
+        const payouts = await contract.methods.getPayoutHistory().call();
+        const payoutList = document.getElementById("payoutHistory");
+
+        payoutList.innerHTML = ""; // Bersihkan daftar sebelum mengisi ulang
+        payouts.forEach((payout, index) => {
+            const payoutETH = web3.utils.fromWei(payout, "ether");
+            const listItem = document.createElement("li");
+            listItem.textContent = `Payout ${index + 1}: ${payoutETH} ETH`;
+            payoutList.appendChild(listItem);
+        });
+    } catch (error) {
+        console.error("Error fetching payout history:", error);
+    }
+}
+
+// Panggil semua fungsi saat halaman dimuat
+window.onload = async function () {
+    await loadTotalPayout();
+    await loadPayoutHistory();
+};
 
         // 3. Last Winner
         const lastWinner = await contract.methods.lastWinner().call();
