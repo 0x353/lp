@@ -82,12 +82,12 @@ async function loadWinners() {
                 return;
             }
 
-            const date = new Date(timestamp * 1000).toLocaleString();
-            const ethAmount = ethers.utils.formatEther(betAmount); // Konversi ETH yang benar
+            const date = new Date(timestamp * 1000).toUTCString();
+            const ethBetAmount = ethers.utils.formatEther(bet.betAmount);
 
             const winnerItem = document.createElement("div");
             winnerItem.classList.add("winner-item");
-            winnerItem.innerHTML = `<strong>${player}</strong> menang ${ethAmount} ETH pada ${date}`;
+            winnerItem.innerHTML = `<strong>${player}</strong> | BetID: ${bet.betId} | BetNumber: ${bet.number} | BetAmount: ${ethBetAmount} ETH | Menang ${ethAmount} ETH pada ${date} (UTC)`;
             winnerList.appendChild(winnerItem);
         });
 
