@@ -71,12 +71,11 @@ const popupText = document.getElementById("popup-text");
 // **1. Menampilkan riwayat pemenang saat halaman dimuat**
 async function loadWinners() {
     try {
-        const contract = new ethers.Contract(contractAddress, abi, provider);
-        const bets = await contract.getAllBets(); // Pastikan metode ini benar sesuai kontrak Anda
+        const bets = await contract.getAllBets();
         winnerList.innerHTML = "";
 
-        bets.forEach((bet, index) => {
-            const { player, amount, number, timestamp } = bet;
+        bets.forEach(bet => {
+            const { player, betAmount, timestamp } = bet;
 
             // **Filter agar alamat admin tidak masuk daftar pemenang**
             if (player.toLowerCase() === adminAddress.toLowerCase()) {
@@ -84,17 +83,11 @@ async function loadWinners() {
             }
 
             const date = new Date(timestamp * 1000).toLocaleString();
-            const ethAmount = ethers.utils.formatEther(amount); // Konversi ETH yang benar
+            const ethAmount = ethers.utils.formatEther(betAmount); // Konversi ETH yang benar
 
             const winnerItem = document.createElement("div");
             winnerItem.classList.add("winner-item");
-            winnerItem.innerHTML = `
-                <strong>Bet ID:</strong> ${index} <br>
-                <strong>Address:</strong> ${player} <br>
-                <strong>Bet Amount:</strong> ${ethAmount} ETH <br>
-                <strong>Bet Number:</strong> ${number} <br>
-                <em>${date}</em>
-            `;
+            winnerItem.innerHTML = `<strong>${player}</strong> menang ${ethAmount} ETH pada ${date}`;
             winnerList.appendChild(winnerItem);
         });
 
@@ -119,11 +112,7 @@ contract.on("WinnerSet", (betId, winner, amount) => {
 
     const newWinnerItem = document.createElement("div");
     newWinnerItem.classList.add("winner-item");
-    newWinnerItem.innerHTML = `
-        <strong>Bet ID:</strong> ${betId} <br>
-        <strong>Address:</strong> ${winner} <br>
-        <strong>Bet Amount:</strong> ${ethAmount} ETH <br>
-    `;
+    newWinnerItem.innerHTML = `<strong>${winner}</strong> menang ${ethAmount} ETH`;
     winnerList.prepend(newWinnerItem);
 });
 
