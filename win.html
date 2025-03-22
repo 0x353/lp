@@ -87,7 +87,7 @@ async function loadWinners() {
 
             const winnerItem = document.createElement("div");
             winnerItem.classList.add("winner-item");
-            winnerItem.innerHTML = `<strong>${player}</strong> | BetID: ${betId} | BetNumber: ${number} | BetAmount: ${ethBetAmount} ETH | Menang pada ${date} (UTC)`;
+            winnerItem.innerHTML = `<strong>${player}</strong> | BetID: ${betId} | BetNumber: ${number} | BetAmount: ${betAmount} | Menang pada ${date} (UTC)`;
             winnerList.appendChild(winnerItem);
         });
 
