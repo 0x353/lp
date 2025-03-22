@@ -76,22 +76,25 @@ async function loadWinners() {
 
         winnerList.innerHTML = "";
 
-        events.forEach(event => {
+        for (const event of events) {
             const { winner, amount } = event.args;
 
             // **Filter agar alamat admin tidak masuk daftar pemenang**
             if (winner.toLowerCase() === adminAddress.toLowerCase()) {
-                return;
+                continue;
             }
 
-            const ethAmount = ethers.utils.formatUnits(amount, "ether"); // Konversi ETH dengan benar
-            const date = new Date(event.blockTimestamp * 1000).toLocaleString();
+            const ethAmount = ethers.utils.formatEther(amount); // Konversi ETH dengan benar
+
+            // **Ambil timestamp dari blockNumber**
+            const block = await provider.getBlock(event.blockNumber);
+            const date = new Date(block.timestamp * 1000).toLocaleString();
 
             const winnerItem = document.createElement("div");
             winnerItem.classList.add("winner-item");
             winnerItem.innerHTML = `<strong>${winner}</strong> menang ${ethAmount} ETH pada ${date}`;
             winnerList.appendChild(winnerItem);
-        });
+        }
 
         if (winnerList.innerHTML === "") {
             winnerList.innerHTML = "<p>Belum ada pemenang.</p>";
@@ -103,14 +106,18 @@ async function loadWinners() {
 }
 
 // **2. Menampilkan pemenang terbaru secara real-time**
-contract.on("WinnerSet", async (betId, winner, amount) => {
+contract.on("WinnerSet", async (betId, winner, amount, event) => {
     // **Filter agar alamat admin tidak masuk daftar pemenang**
     if (winner.toLowerCase() === adminAddress.toLowerCase()) {
         return;
     }
 
-    const ethAmount = ethers.utils.formatUnits(amount, "ether"); // Konversi ETH dengan benar
-    const date = new Date().toLocaleString();
+    const ethAmount = ethers.utils.formatEther(amount); // Konversi ETH dengan benar
+
+    // **Ambil timestamp dari blockNumber**
+    const block = await provider.getBlock(event.blockNumber);
+    const date = new Date(block.timestamp * 1000).toLocaleString();
+
     showPopup(`🎉 ${winner} menang ${ethAmount} ETH!`);
 
     const newWinnerItem = document.createElement("div");
