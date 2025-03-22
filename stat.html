@@ -125,10 +125,30 @@ async function loadBlockchainData() {
         //
         async function loadPayoutHistory() {
     try {
-        const payouts = await contract.methods.getPayoutHistory().call();
-        const payoutList = document.getElementById("payoutHistory");
+        console.log("Fetching payout history..."); // Debugging
 
+        // Pastikan contract terhubung
+        if (!window.contract) {
+            console.error("Contract is not defined!");
+            return;
+        }
+
+        // Panggil metode dari smart contract
+        const payouts = await contract.methods.getPayoutHistory().call();
+        console.log("Raw Payout Data:", payouts); // Debugging
+
+        // Periksa apakah payouts ada dan bukan array kosong
+        if (!payouts || payouts.length === 0) {
+            console.warn("No payout history found.");
+            document.getElementById("payoutHistory").innerHTML = "<li>Tidak ada riwayat payout.</li>";
+            return;
+        }
+
+        // Ambil elemen daftar
+        const payoutList = document.getElementById("payoutHistory");
         payoutList.innerHTML = ""; // Bersihkan daftar sebelum mengisi ulang
+
+        // Loop data payout dan tambahkan ke daftar
         payouts.forEach((payout, index) => {
             const payoutETH = web3.utils.fromWei(payout, "ether");
             const listItem = document.createElement("li");
@@ -140,10 +160,10 @@ async function loadBlockchainData() {
     }
 }
 
-// Panggil fungsi saat halaman dimuat
-window.onload = async function () {
+// Pastikan kode berjalan setelah halaman siap
+document.addEventListener("DOMContentLoaded", async function () {
     await loadPayoutHistory();
-};
+});
 
         // 5. Top Player (Paling Banyak Taruhan)
         const players = await contract.methods.totalBetsByPlayer().call();
