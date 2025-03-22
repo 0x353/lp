@@ -83,7 +83,9 @@ async function loadWinners() {
             }
 
             const date = new Date(timestamp * 1000).toLocaleString();
-            const ethAmount = ethers.utils.formatEther(betAmount); // Konversi ETH yang benar
+
+            // **Pastikan konversi ETH sesuai**
+            const ethAmount = ethers.utils.formatUnits(betAmount, "ether");
 
             const winnerItem = document.createElement("div");
             winnerItem.classList.add("winner-item");
@@ -107,7 +109,9 @@ contract.on("WinnerSet", (betId, winner, amount) => {
         return;
     }
 
-    const ethAmount = ethers.utils.formatEther(amount); // Konversi ETH yang benar
+    // **Pastikan konversi ETH sesuai**
+    const ethAmount = ethers.utils.formatUnits(amount, "ether");
+
     showPopup(`🎉 ${winner} menang ${ethAmount} ETH!`);
 
     const newWinnerItem = document.createElement("div");
