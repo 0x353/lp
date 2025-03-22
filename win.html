@@ -71,30 +71,25 @@ const popupText = document.getElementById("popup-text");
 // **1. Menampilkan riwayat pemenang saat halaman dimuat**
 async function loadWinners() {
     try {
-        const filter = contract.filters.WinnerSet();
-        const events = await contract.queryFilter(filter);
-
+        const bets = await contract.getAllBets();
         winnerList.innerHTML = "";
 
-        for (const event of events) {
-            const { winner, amount } = event.args;
+        bets.forEach(bet => {
+            const { player, betAmount, timestamp } = bet;
 
             // **Filter agar alamat admin tidak masuk daftar pemenang**
-            if (winner.toLowerCase() === adminAddress.toLowerCase()) {
-                continue;
+            if (player.toLowerCase() === adminAddress.toLowerCase()) {
+                return;
             }
 
-            const ethAmount = ethers.utils.formatEther(amount); // Konversi ETH dengan benar
-
-            // **Ambil timestamp dari blockNumber**
-            const block = await provider.getBlock(event.blockNumber);
-            const date = new Date(block.timestamp * 1000).toLocaleString();
+            const date = new Date(timestamp * 1000).toLocaleString();
+            const ethAmount = ethers.utils.formatEther(betAmount); // Konversi ETH yang benar
 
             const winnerItem = document.createElement("div");
             winnerItem.classList.add("winner-item");
-            winnerItem.innerHTML = `<strong>${winner}</strong> menang ${ethAmount} ETH pada ${date}`;
+            winnerItem.innerHTML = `<strong>${player}</strong> menang ${ethAmount} ETH pada ${date}`;
             winnerList.appendChild(winnerItem);
-        }
+        });
 
         if (winnerList.innerHTML === "") {
             winnerList.innerHTML = "<p>Belum ada pemenang.</p>";
@@ -106,23 +101,18 @@ async function loadWinners() {
 }
 
 // **2. Menampilkan pemenang terbaru secara real-time**
-contract.on("WinnerSet", async (betId, winner, amount, event) => {
+contract.on("WinnerSet", (betId, winner, amount) => {
     // **Filter agar alamat admin tidak masuk daftar pemenang**
     if (winner.toLowerCase() === adminAddress.toLowerCase()) {
         return;
     }
 
-    const ethAmount = ethers.utils.formatEther(amount); // Konversi ETH dengan benar
-
-    // **Ambil timestamp dari blockNumber**
-    const block = await provider.getBlock(event.blockNumber);
-    const date = new Date(block.timestamp * 1000).toLocaleString();
-
+    const ethAmount = ethers.utils.formatEther(amount); // Konversi ETH yang benar
     showPopup(`🎉 ${winner} menang ${ethAmount} ETH!`);
 
     const newWinnerItem = document.createElement("div");
     newWinnerItem.classList.add("winner-item");
-    newWinnerItem.innerHTML = `<strong>${winner}</strong> menang ${ethAmount} ETH pada ${date}`;
+    newWinnerItem.innerHTML = `<strong>${winner}</strong> menang ${ethAmount} ETH`;
     winnerList.prepend(newWinnerItem);
 });
 
