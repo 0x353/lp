@@ -50,6 +50,9 @@ h1 {
         <p>Memuat data...</p>
     </div>
 
+    <ul id="payoutHistory">Loading...</ul>
+    <button onclick="getPayoutHistory()">Perbarui Riwayat Payout</button>
+
     <div id="popup" class="hidden">
         <p id="popup-text"></p>
     </div>
@@ -124,6 +127,35 @@ function showPopup(message) {
         popup.style.display = "none";
     }, 5000);
 }
+
+// Payout History
+async function getPayoutHistory() {
+    try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const contract = new ethers.Contract(contractAddress, contractABI, provider);
+        
+        const filter = contract.filters.WinnerSet(null, null);
+        const events = await contract.queryFilter(filter);
+
+        let payoutList = "";
+        if (events.length === 0) {
+            payoutList = "<li>Belum ada payout.</li>";
+        } else {
+            events.forEach((event) => {
+                const winner = event.args[0];
+                const amount = ethers.utils.formatEther(event.args[1]);
+                payoutList += `<li>Pemenang: ${winner}, Payout: ${amount} ETH</li>`;
+            });
+        }
+
+        document.getElementById("payoutHistory").innerHTML = payoutList;
+    } catch (error) {
+        console.error("Gagal mengambil riwayat payout:", error);
+        document.getElementById("payoutHistory").innerHTML = "<li>Error mengambil data.</li>";
+    }
+}
+
+window.onload = getPayoutHistory;
 
 // **Jalankan saat halaman dimuat**
 loadWinners();
