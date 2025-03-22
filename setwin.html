@@ -103,7 +103,11 @@ input:focus {
     <h3>Set Winner</h3>
     <input type="text" id="winnerAddress" placeholder="Winner Address"><br>
     <input type="number" id="winnerAmount" placeholder="Amount ETH"><br>
+    <input type="text" id="betId" placeholder="Bet ID"><br>
+    <input type="text" id="Number" placeholder="Bet Number"><br> 
     <button onclick="setWinner()">✅ Set Winner</button>
+
+<p id="status"></p>
 
     <p id="status"></p>
 
@@ -230,6 +234,8 @@ async function setWinner() {
 
     const winner = document.getElementById("winnerAddress").value;
     const amount = document.getElementById("winnerAmount").value;
+    const Number = document.getElementById("number").value;
+    const betId = document.getElementById("betId").value;
 
     if (!winner || amount <= 0) {
         alert("Enter a valid winner address and ETH amount!");
