@@ -1170,6 +1170,11 @@ async function loadBetHistory() {
     Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
     Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
     Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
+    <button onclick="likeBet('${bet.betId}')" id="like-${bet.betId}">👍 Like</button>
+    <button onclick="unlikeBet('${bet.betId}')" id="unlike-${bet.betId}">👎 Unlike</button>
+    <span id="like-count-${bet.betId}">0</span> Likes
+</p>
+<p>Liked by: <span id="likers-${bet.betId}" style="color: cyan;">-</span>
 </p>
 <hr style="background-color: #333333; height: 1px; border: none;">`; 
         
@@ -1189,6 +1194,71 @@ function nextBetHistory() {
     betHistoryPage++;
     loadBetHistory();
 }
+
+// Like Function
+async function likeBet(betId) {
+    try {
+        const tx = await contract.likeBet(betId);
+        await tx.wait();
+        updateLikeCount(betId);
+    } catch (error) {
+        console.error("Error liking bet:", error);
+    }
+}
+
+async function unlikeBet(betId) {
+    try {
+        const tx = await contract.unlikeBet(betId);
+        await tx.wait();
+        updateLikeCount(betId);
+    } catch (error) {
+        console.error("Error unliking bet:", error);
+    }
+}
+
+async function updateLikeCount(betId) {
+    const likeCount = await contract.betLikeCount(betId);
+    document.getElementById(`like-count-${betId}`).textContent = likeCount;
+}
+
+function prevBetHistory() {
+    if (betHistoryPage > 0) {
+        betHistoryPage--;
+        loadBetHistory();
+    }
+}
+
+function nextBetHistory() {
+    betHistoryPage++;
+    loadBetHistory();
+}
+
+// Muat data awal saat halaman dimuat
+window.onload = loadBetHistory;
+
+// Like Function Other
+const betLikersCount = {}; // Simpan jumlah pemain yang pernah like
+
+async function updateLikeCount(betId) {
+    const likeCount = await contract.betLikeCount(betId);
+    if (!betLikersCount[betId]) {
+        const likers = await contract.betLikers(betId);
+        betLikersCount[betId] = likers.length;
+    }
+    document.getElementById(`like-count-${betId}`).textContent = `${likeCount}/${betLikersCount[betId]} Likes`;
+}
+
+const betLikersData = {}; // Simpan daftar pemain yang like
+
+async function updateLikeCount(betId) {
+    const likeCount = await contract.betLikeCount(betId);
+    const likers = await contract.betLikers(betId);
+
+    betLikersData[betId] = likers;
+
+    document.getElementById(`like-count-${betId}`).textContent = `${likeCount}/${likers.length} Likes`;
+    document.getElementById(`likers-${betId}`).textContent = likers.length > 0 ? likers.join(", ") : "-";
+        }
         
 // Modal Result
 function updateHistory(newBall1) {
