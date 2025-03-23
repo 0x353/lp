@@ -1467,59 +1467,89 @@ function nextBetHistory() {
 
 // Like Bet 
 document.addEventListener("DOMContentLoaded", async function () {
-    if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        await window.ethereum.request({ method: "eth_requestAccounts" });
-        const accounts = await web3.eth.getAccounts();
-        userAccount = accounts[0];
-        contract = new web3.eth.Contract(contractABI, contractAddress);
-        loadLikes();
+    if (typeof window.ethereum !== "undefined") {
+        try {
+            window.web3 = new Web3(window.ethereum);
+            await window.ethereum.request({ method: "eth_requestAccounts" });
+            const accounts = await web3.eth.getAccounts();
+            window.userAccount = accounts[0];
+            window.contract = new web3.eth.Contract(contractABI, contractAddress);
+
+            console.log("MetaMask terhubung dengan akun:", window.userAccount);
+
+            await loadLikes(); // Load data likes
+            addEventListeners(); // Tambah event listener setelah data dimuat
+        } catch (error) {
+            console.error("Error menghubungkan MetaMask:", error);
+            alert("Gagal menghubungkan MetaMask. Coba reload halaman.");
+        }
     } else {
-        alert("MetaMask tidak terdeteksi");
+        alert("MetaMask tidak terdeteksi. Silakan instal MetaMask.");
     }
 });
 
+// **Memuat jumlah likes dari blockchain**
 async function loadLikes() {
     const buttons = document.querySelectorAll(".like-button");
     for (let button of buttons) {
         let betId = button.getAttribute("data-bet-id");
         let icon = document.getElementById(`likeIcon-${betId}`);
+        let likeCountSpan = document.getElementById(`likeCount-${betId}`);
 
         try {
             const likeCount = await contract.methods.betLikeCount(betId).call();
-            document.getElementById(`likeCount-${betId}`).innerText = likeCount;
+            likeCountSpan.innerText = likeCount.toString(); // Pastikan selalu string
 
             const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
-            icon.src = hasLiked ? "unlike.png" : "like.png"; // Ubah ikon Like/Unlike
+            icon.src = hasLiked ? "unlike.png" : "like.png"; // Ubah ikon
+
+            console.log(`Bet ID: ${betId}, Likes: ${likeCount}, Liked: ${hasLiked}`);
         } catch (error) {
-            console.error(`Error loading likes for bet ${betId}:`, error);
+            console.error(`Error memuat likes untuk bet ${betId}:`, error);
         }
     }
 }
 
+// **Fungsi Toggle Like**
 async function toggleLike(event) {
     const button = event.target.closest(".like-button");
+    if (!button) return;
+
     const betId = button.getAttribute("data-bet-id");
     const icon = document.getElementById(`likeIcon-${betId}`);
+    const likeCountSpan = document.getElementById(`likeCount-${betId}`);
 
     try {
         const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
         const method = hasLiked ? "unlikeBet" : "likeBet";
 
+        console.log(`Mengirim transaksi ${method} untuk bet ID: ${betId}`);
+
         const tx = await contract.methods[method](betId).send({ from: userAccount });
 
         if (tx.status) {
-            icon.src = hasLiked ? "like.png" : "unlike.png"; // Ubah ikon setelah transaksi berhasil
-            await loadLikes(); // Perbarui jumlah like
+            let currentLikes = parseInt(likeCountSpan.innerText);
+            if (hasLiked) {
+                likeCountSpan.innerText = (currentLikes - 1).toString();
+                icon.src = "like.png";
+            } else {
+                likeCountSpan.innerText = (currentLikes + 1).toString();
+                icon.src = "unlike.png";
+            }
         }
     } catch (error) {
-        console.error("Error toggling like:", error);
+        console.error("Error saat toggle like:", error);
+        alert("Gagal mengirim transaksi. Coba lagi.");
     }
 }
 
-document.querySelectorAll(".like-button").forEach(button => {
-    button.addEventListener("click", toggleLike);
-});
+// **Memasang Event Listener Setelah Load**
+function addEventListeners() {
+    document.querySelectorAll(".like-button").forEach(button => {
+        button.removeEventListener("click", toggleLike); // Hapus dulu biar tidak dobel
+        button.addEventListener("click", toggleLike);
+    });
+}
         
 // Modal Result
 function updateHistory(newBall1) {
