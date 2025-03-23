@@ -108,9 +108,12 @@ async function connectWallet() {
             document.getElementById("disconnectWallet").style.display = "block";
 
             contract = new web3.eth.Contract(contractABI, contractAddress);
+            const betId = "0x123456789abcdef";
 
-            // Cek status like
-            await checkLikeStatus("0x123456789abcdef");
+            // Pastikan jumlah like dan status like langsung muncul
+            await getBetLikes(betId);
+            await checkLikeStatus(betId);
+
         } catch (error) {
             console.error("Wallet connection failed:", error);
         }
@@ -172,6 +175,42 @@ async function getBetLikes(betId) {
 }
 
 // Status
+async function toggleLike(betId) {
+        if (!userAccount) {
+            alert("Harap koneksikan wallet terlebih dahulu!");
+            return;
+        }
+
+        const likeButton = document.getElementById("likeButton");
+        const likeStatus = document.getElementById("likeStatus");
+
+        try {
+            likeButton.disabled = true;
+            likeStatus.innerText = "Processing...";
+            likeStatus.style.color = "blue";
+
+            const likers = await contract.methods.getBetLikers(betId).call();
+            const hasLiked = likers.includes(userAccount);
+
+            if (hasLiked) {
+                await contract.methods.unlikeBet(betId).send({ from: userAccount });
+                likeStatus.innerText = "Unlike berhasil!";
+            } else {
+                await contract.methods.likeBet(betId).send({ from: userAccount });
+                likeStatus.innerText = "Like berhasil!";
+            }
+
+            likeStatus.style.color = "green";
+            await updateLikeStatus(betId);
+
+        } catch (error) {
+            console.error("Error toggling like:", error);
+            likeStatus.innerText = "Gagal melakukan aksi!";
+            likeStatus.style.color = "red";
+        } finally {
+            likeButton.disabled = false;
+        }
+}
 
 // Panggil fungsi jika Metamask sudah terhubung sebelumnya
 window.onload = async function () {
@@ -185,8 +224,18 @@ window.onload = async function () {
             document.getElementById("disconnectWallet").style.display = "block";
 
             contract = new web3.eth.Contract(contractABI, contractAddress);
-            await checkLikeStatus("0x123456789abcdef");
+            const betId = "0x123456789abcdef";
+
+            // Pastikan status like dan jumlah like langsung ditampilkan
+            await getBetLikes(betId);
+            await checkLikeStatus(betId);
+        } else {
+            // Jika wallet belum terhubung, tetap update jumlah likes
+            await getBetLikes("0x123456789abcdef");
         }
+    } else {
+        // Jika Metamask tidak tersedia, tetap update jumlah likes
+        await getBetLikes("0x123456789abcdef");
     }
 };
     </script>
