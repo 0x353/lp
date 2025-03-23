@@ -1434,20 +1434,16 @@ async function loadBetHistory() {
         let shortTxHash = bet.txHash.slice(0, 10) + "..." + bet.txHash.slice(-10);
 
        html += `<p>
-    Player: <span style="color: #ad5cff;">${shortPlayer}</span><br>
-    BetID: <span style="color: #b37500; font-size: 9px;">${bet.betId}</span><br>
-    BetNumber: <span style="color: #00FF66;">${bet.number}</span><br>
-    BetAmount: <span style="color: #00FF66;">${bet.betAmount}</span><br>
-    Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
-    Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
-    Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
-    <div>
-        <p id="betLikesCount">Likes: Loading...</p>
-        <button id="likeButton" onclick="toggleLike('0x123456789abcdef')" style="display: none;">Loading...</button>
-        <p id="likeStatus" style="color: blue; font-weight: bold;"></p>
-    </div>
-</p><hr style="background-color: #333333; height: 1px; border: none;">`;
-        
+           Player: <span style="color: #ad5cff;">${shortPlayer}</span><br>
+           BetID: <span style="color: #b37500; font-size: 9px;">${bet.betId}</span><br>
+           BetNumber: <span style="color: #00FF66;">${bet.number}</span><br>
+           BetAmount: <span style="color: #00FF66;">${bet.betAmount}</span><br>
+           Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
+           Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
+           Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
+           <p id="betLikesCount-${bet.betId}">Likes: Loading...</p>
+           <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" class="like-button">Loading...</button>
+       </p><hr style="background-color: #333333; height: 1px; border: none;">`; 
     }
     
     document.getElementById("betHistory").innerHTML = html;
