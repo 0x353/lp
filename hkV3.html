@@ -1463,55 +1463,73 @@ function nextBetHistory() {
 }
 
 // Like Bet 
-// Inisialisasi Web3 dan kontrak
+// **1️⃣ Inisialisasi Web3 & MetaMask**
 async function init() {
     if (window.ethereum) {
         web3 = new Web3(window.ethereum);
-        await window.ethereum.request({ method: "eth_requestAccounts" });
-        const accounts = await web3.eth.getAccounts();
-        userAccount = accounts[0];
         contract = new web3.eth.Contract(contractABI, contractAddress);
-        loadLikes(); // Muat status like awal
+
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        userAccount = accounts[0];
+
+        loadLikes(); // **Ambil jumlah like saat halaman dibuka**
     } else {
-        alert("MetaMask tidak terdeteksi");
+        console.error("MetaMask tidak terdeteksi!");
     }
 }
 
-// Fungsi untuk memuat jumlah like dan status like dari blockchain
+// **2️⃣ Ambil jumlah like dari blockchain**
 async function loadLikes() {
-    const bets = document.querySelectorAll(".like-button");
-    for (let button of bets) {
-        let betId = button.getAttribute("onclick").match(/'(.+?)'/)[1];
+    const betElements = document.querySelectorAll("[id^='likeCount-']");
+    
+    for (const element of betElements) {
+        const betId = element.id.split("-")[1]; // Ambil betId dari elemen
         try {
             const likeCount = await contract.methods.betLikeCount(betId).call();
-            document.getElementById(`betLikesCount-${betId}`).innerText = `Likes: ${likeCount}`;
+            const isLiked = await contract.methods.betLikes(betId, userAccount).call();
 
-            const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
-            button.innerText = hasLiked ? "Unlike" : "Like";
-            button.style.display = "block";
+            element.innerText = likeCount; // Update jumlah like
+            updateButtonText(betId, isLiked); // Update teks tombol
         } catch (error) {
-            console.error(`Error loading likes for bet ${betId}:`, error);
+            console.error("Gagal memuat like:", error);
         }
     }
 }
 
-// Fungsi untuk Like atau Unlike bet
+// **3️⃣ Fungsi Like & Unlike**
 async function toggleLike(betId) {
     try {
-        const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
-        const method = hasLiked ? "unlikeBet" : "likeBet";
+        const isLiked = await contract.methods.betLikes(betId, userAccount).call();
 
-        const tx = await contract.methods[method](betId).send({ from: userAccount });
-
-        if (tx.status) {
-            loadLikes(); // Update tampilan setelah transaksi berhasil
+        if (isLiked) {
+            // **Unlike Bet**
+            await contract.methods.unlikeBet(betId).send({ from: userAccount });
+        } else {
+            // **Like Bet**
+            await contract.methods.likeBet(betId).send({ from: userAccount });
         }
+
+        // **Update jumlah like setelah transaksi**
+        const updatedLikeCount = await contract.methods.betLikeCount(betId).call();
+        document.getElementById(`likeCount-${betId}`).innerText = updatedLikeCount;
+
+        // **Update teks tombol**
+        updateButtonText(betId, !isLiked);
+
     } catch (error) {
-        console.error("Error toggling like:", error);
+        console.error("Gagal melakukan like/unlike:", error);
     }
 }
 
-// Panggil init saat halaman dimuat
+// **4️⃣ Fungsi Ubah Teks Tombol**
+function updateButtonText(betId, isLiked) {
+    const button = document.getElementById(`likeButton-${betId}`);
+    if (button) {
+        button.innerText = isLiked ? "Unlike" : "Like";
+    }
+}
+
+// **5️⃣ Panggil saat halaman terbuka**
 window.onload = init;
         
 // Modal Result
