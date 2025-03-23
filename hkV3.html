@@ -1493,7 +1493,23 @@ async function loadLikes() {
             console.error(`Error loading likes for bet ${betId}:`, error);
         }
     }
- }
+}
+
+// Fungsi untuk Like atau Unlike bet
+async function toggleLike(betId) {
+    try {
+        const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
+        const method = hasLiked ? "unlikeBet" : "likeBet";
+
+        const tx = await contract.methods[method](betId).send({ from: userAccount });
+
+        if (tx.status) {
+            loadLikes(); // Update tampilan setelah transaksi berhasil
+        }
+    } catch (error) {
+        console.error("Error toggling like:", error);
+    }
+}
 
 // Panggil init saat halaman dimuat
 window.onload = init;
@@ -1562,7 +1578,7 @@ function closeResult() {
 }
         
 // Initialize saat halaman terbuka
-window.onload = async () => {
+window.onload = () => {
     if (window.ethereum) {
         window.ethereum.on("accountsChanged", (accounts) => {
             if (accounts.length > 0) {
@@ -1576,15 +1592,11 @@ window.onload = async () => {
                 updateBalance();
                 loadUserBets();
                 loadBetHistory();
-                loadLikes(); // Memuat jumlah likes setelah bet history dimuat
             } else {
                 disconnectWallet();
             }
         });
     }
-
-    // Memastikan loadLikes() juga berjalan saat halaman pertama kali dibuka
-    await loadLikes();
 };
     </script>
        
