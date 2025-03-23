@@ -71,16 +71,16 @@ button:disabled {
 <body>
     <h2>Bet Like System</h2>
 
-    <!-- Tombol Connect & Disconnect Wallet -->
-    <button id="connectWallet" onclick="connectWallet()">Connect Wallet</button>
-    <button id="disconnectWallet" onclick="disconnectWallet()" style="display: none;">Disconnect Wallet</button>
-    <p id="walletAddress">Not Connected</p>
+    <!-- Like & Unlike Button -->
+<button id="likeButton" onclick="toggleLike()">Like</button>
+<p id="likeCount">Likes: 0</p>
 
-    <!-- Menampilkan jumlah likes -->
-    <p id="betLikesCount">Likes: Loading...</p>
+<!-- Display Likers -->
+<h3>Likers:</h3>
+<ul id="likersList"></ul>
 
-    <!-- Tombol Like/Unlike -->
-    <button id="likeButton" onclick="toggleLike('0x123456789abcdef')" style="display: none;">Loading...</button>
+<!-- Total Likes Across All Bets -->
+<p id="totalLikes">Total Likes: 0</p>
 
     <!-- Import JavaScript -->
     <script src="app.js"></script>
@@ -132,15 +132,19 @@ async function toggleLike(betId) {
         return;
     }
     try {
-        if (userHasLiked) {
+        const likers = await contract.methods.getBetLikers(betId).call();
+        const hasLiked = likers.includes(userAccount);
+
+        if (hasLiked) {
             await contract.methods.unlikeBet(betId).send({ from: userAccount });
         } else {
             await contract.methods.likeBet(betId).send({ from: userAccount });
         }
-        await checkLikeStatus(betId); // Perbarui status tombol setelah aksi
-        getBetLikes(betId);
+
+        // Update status setelah aksi like/unlike
+        updateLikeStatus(betId);
     } catch (error) {
-        console.error("Error saat toggle like:", error);
+        console.error("Error toggling like:", error);
     }
 }
 
@@ -159,14 +163,49 @@ async function checkLikeStatus(betId) {
 }
 
 // Fungsi untuk mengambil jumlah likes
-async function getBetLikes(betId) {
-    try {
-        const likeCount = await contract.methods.betLikeCount(betId).call();
-        document.getElementById("betLikesCount").innerText = `Likes: ${likeCount}`;
+async function updateLikeStatus(betId) { 
+    try { 
+        // Dapatkan jumlah like untuk bet tertentu
+        const likeCount = await contract.methods.getBetLikeCount(betId).call(); 
+        document.getElementById("likeCount").innerText = `Likes: ${likeCount}`;
+
+        // Dapatkan daftar likers untuk bet tertentu
+        const likers = await contract.methods.getBetLikers(betId).call();
+        const likersList = document.getElementById("likersList");
+        likersList.innerHTML = "";
+        likers.forEach(liker => {
+            const listItem = document.createElement("li");
+            listItem.textContent = liker;
+            likersList.appendChild(listItem);
+        });
+
+        // Dapatkan total like di seluruh bet
+        const totalLikes = await contract.methods.getLikeCount(betId).call();
+        document.getElementById("totalLikes").innerText = `Total Likes: ${totalLikes}`;
+
+        // Periksa apakah user sudah like atau belum
+        const hasLiked = likers.includes(userAccount);
+        document.getElementById("likeButton").innerText = hasLiked ? "Unlike" : "Like";
     } catch (error) {
-        console.error("Error mengambil jumlah likes:", error);
+        console.error("Error fetching like data:", error);
     }
 }
+
+async function toggleLike() { try { // Periksa apakah user sudah like atau belum const likers = await contract.methods.getBetLikers(betId).call(); const hasLiked = likers.includes(userAddress);
+
+if (hasLiked) {
+        await contract.methods.unlikeBet(betId).send({ from: userAddress });
+    } else {
+        await contract.methods.likeBet(betId).send({ from: userAddress });
+    }
+
+    // Update UI setelah like/unlike
+    updateLikeStatus();
+} catch (error) {
+    console.error("Error toggling like:", error);
+}
+
+                            }
 
 // Panggil fungsi jika Metamask sudah terhubung sebelumnya
 window.onload = async function () {
@@ -180,9 +219,15 @@ window.onload = async function () {
             document.getElementById("disconnectWallet").style.display = "block";
 
             contract = new web3.eth.Contract(contractABI, contractAddress);
-            await checkLikeStatus("0x123456789abcdef");
+            const betId = "0x123456789abcdef";
+            await checkLikeStatus(betId);
+            await updateLikeStatus(betId);
         }
     }
+
+    // Panggil updateLikeStatus saat halaman dimuat, jika tidak ada wallet yang terhubung
+    const betId = "0x123456789abcdef";
+    await updateLikeStatus(betId);
 };
     </script>
 </body>
