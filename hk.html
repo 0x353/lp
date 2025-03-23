@@ -1170,12 +1170,12 @@ async function loadBetHistory() {
     Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
     Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
     Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
+    </p>
     <p id="like-count-${bet.betId}" style="color: yellow;">0/0 Likes</p>
     <p>Liked by: <span id="likers-${bet.betId}" style="color: cyan;">-</span></p>
     <button onclick="likeBet('${bet.betId}')">👍 Like</button>
     <button onclick="unlikeBet('${bet.betId}')">👎 Unlike</button>
-</p>
-<hr style="background-color: #333333; height: 1px; border: none;">`; 
+    <hr style="background-color: #333333; height: 1px; border: none;">`;
         
     }
     document.getElementById("betHistory").innerHTML = html;
@@ -1194,48 +1194,39 @@ function nextBetHistory() {
     loadBetHistory();
 }
 
-// Pastikan kontrak menggunakan signer dari akun yang sudah terhubung
-async function getContract() {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    return new ethers.Contract(contractAddress, contractABI, signer);
-}
-
 // Like Function
 async function likeBet(betId) {
     try {
-        const contract = await getContract(); // Ambil kontrak dengan akun pengguna
-        const tx = await contract.likeBet(betId);
-        await tx.wait(); // Tunggu transaksi selesai
+        const contract = await getContract();
+        const formattedBetId = ethers.utils.formatBytes32String(betId);
+        const tx = await contract.likeBet(formattedBetId);
+        await tx.wait();
         updateLikeCount(betId);
     } catch (error) {
         console.error("Error liking bet:", error);
     }
 }
 
-// Unlike Function
 async function unlikeBet(betId) {
     try {
-        const contract = await getContract(); // Ambil kontrak dengan akun pengguna
-        const tx = await contract.unlikeBet(betId);
-        await tx.wait(); // Tunggu transaksi selesai
+        const contract = await getContract();
+        const formattedBetId = ethers.utils.formatBytes32String(betId);
+        const tx = await contract.unlikeBet(formattedBetId);
+        await tx.wait();
         updateLikeCount(betId);
     } catch (error) {
         console.error("Error unliking bet:", error);
     }
 }
 
-// Update Like Count & Daftar Likers
 async function updateLikeCount(betId) {
     try {
         const contract = await getContract();
-        const likeCount = await contract.betLikeCount(betId);
-        const likers = await contract.betLikers(betId);
+        const formattedBetId = ethers.utils.formatBytes32String(betId);
+        const likeCount = await contract.getBetLikeCount(formattedBetId);
+        const likers = await contract.getBetLikers(formattedBetId);
 
-        // Update tampilan jumlah like
-        document.getElementById(`like-count-${betId}`).textContent = `${likeCount}/${likers.length} Likes`;
-
-        // Update daftar pemain yang sudah like
+        document.getElementById(`like-count-${betId}`).textContent = `${likeCount} Likes`;
         document.getElementById(`likers-${betId}`).textContent = likers.length > 0 ? likers.join(", ") : "-";
     } catch (error) {
         console.error("Error updating like count:", error);
