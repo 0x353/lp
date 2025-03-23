@@ -1242,7 +1242,12 @@ async function checkLikeStatus(betId) {
 async function getBetLikes(betId) {
     try {
         const likeCount = await contract.methods.betLikeCount(betId).call();
-        document.getElementById(`betLikesCount-${betId}`).innerText = `Likes: ${likeCount}`;
+        const likeElement = document.getElementById(`betLikesCount-${betId}`);
+        if (likeElement) {
+            likeElement.innerText = `Likes: ${likeCount}`;
+        } else {
+            console.warn(`Elemen betLikesCount-${betId} tidak ditemukan.`);
+        }
     } catch (error) {
         console.error("Error mengambil jumlah likes:", error);
     }
@@ -1260,23 +1265,17 @@ window.onload = async function () {
             document.getElementById("disconnectWallet").style.display = "block";
 
             contract = new web3.eth.Contract(contractABI, contractAddress);
-
-            document.querySelectorAll("[id^=betLikesCount-]").forEach(async (el) => {
-                const betId = el.id.split("-")[1];
-                await getBetLikes(betId);
-                await checkLikeStatus(betId);
-            });
-        } else {
-            document.querySelectorAll("[id^=betLikesCount-]").forEach(async (el) => {
-                const betId = el.id.split("-")[1];
-                await getBetLikes(betId);
-            });
         }
-    } else {
-        document.querySelectorAll("[id^=betLikesCount-]").forEach(async (el) => {
-            const betId = el.id.split("-")[1];
-            await getBetLikes(betId);
-        });
+    }
+
+    // Pastikan likes diperbarui untuk setiap betId
+    const betElements = document.querySelectorAll("[id^=betLikesCount-]");
+    for (const el of betElements) {
+        const betId = el.id.split("-")[1];
+        await getBetLikes(betId);
+        if (userAccount) {
+            await checkLikeStatus(betId);
+        }
     }
 };
 
