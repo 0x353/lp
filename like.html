@@ -176,40 +176,51 @@ async function getBetLikes(betId) {
 
 // Status
 async function toggleLike(betId) {
-        if (!userAccount) {
-            alert("Harap koneksikan wallet terlebih dahulu!");
-            return;
+    if (!userAccount) {
+        alert("Harap koneksikan wallet terlebih dahulu!");
+        return;
+    }
+
+    const likeButton = document.getElementById("likeButton");
+    const likeStatus = document.getElementById("likeStatus");
+
+    try {
+        likeButton.disabled = true;
+        likeStatus.innerText = "Processing...";
+        likeStatus.style.color = "blue";
+
+        const likers = await contract.methods.getBetLikers(betId).call();
+        const hasLiked = likers.includes(userAccount);
+
+        let tx;
+        if (hasLiked) {
+            tx = contract.methods.unlikeBet(betId).send({ from: userAccount });
+        } else {
+            tx = contract.methods.likeBet(betId).send({ from: userAccount });
         }
 
-        const likeButton = document.getElementById("likeButton");
-        const likeStatus = document.getElementById("likeStatus");
-
-        try {
-            likeButton.disabled = true;
-            likeStatus.innerText = "Processing...";
-            likeStatus.style.color = "blue";
-
-            const likers = await contract.methods.getBetLikers(betId).call();
-            const hasLiked = likers.includes(userAccount);
-
-            if (hasLiked) {
-                await contract.methods.unlikeBet(betId).send({ from: userAccount });
-                likeStatus.innerText = "Unlike berhasil!";
-            } else {
-                await contract.methods.likeBet(betId).send({ from: userAccount });
-                likeStatus.innerText = "Like berhasil!";
-            }
-
+        // Tangani transaksi sukses
+        tx.on("receipt", async () => {
+            likeStatus.innerText = hasLiked ? "Unlike berhasil!" : "Like berhasil!";
             likeStatus.style.color = "green";
-            await updateLikeStatus(betId);
+            await getBetLikes(betId); // Perbarui jumlah likes setelah transaksi sukses
+            await checkLikeStatus(betId);
+        });
 
-        } catch (error) {
+        // Tangani transaksi gagal
+        tx.on("error", (error) => {
             console.error("Error toggling like:", error);
             likeStatus.innerText = "Gagal melakukan aksi!";
             likeStatus.style.color = "red";
-        } finally {
-            likeButton.disabled = false;
-        }
+        });
+
+    } catch (error) {
+        console.error("Unexpected error:", error);
+        likeStatus.innerText = "Gagal melakukan aksi!";
+        likeStatus.style.color = "red";
+    } finally {
+        likeButton.disabled = false;
+    }
 }
 
 // Panggil fungsi jika Metamask sudah terhubung sebelumnya
