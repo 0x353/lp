@@ -931,6 +931,15 @@ async function connectWallet() {
             updateBalance();
             loadUserBets();
             loadBetHistory();
+            loadBetLikes ();
+
+            // Update jumlah likes & status tombol setelah konek wallet
+            document.querySelectorAll("[id^=betLikesCount-]").forEach(async (el) => {
+                const betId = el.id.split("-")[1];
+                await getBetLikes(betId);
+                await checkLikeStatus(betId);
+            });
+            
         } catch (error) {
             console.error("Connection failed:", error);
             alert(`Connection failed: ${error.message}`);
@@ -986,7 +995,84 @@ function disconnectWallet() {
     document.getElementById("walletBalance").style.display = "none";
     document.getElementById("connectWallet").style.display = "block";
     document.getElementById("disconnectWallet").style.display = "none";
+    document.getElementById("likeButton").style.display = "none";
 }
+
+// Fungsi untuk toggle like/unlike
+async function toggleLike(betId) {
+    if (!userAccount) {
+        alert("Harap koneksikan wallet terlebih dahulu!");
+        return;
+    }
+
+    const likeButton = document.getElementById(`likeButton-${betId}`);
+    const likeStatus = document.getElementById(`likeStatus-${betId}`);
+
+    try {
+        likeButton.disabled = true;
+        likeStatus.innerText = "Processing...";
+        likeStatus.style.color = "blue";
+
+        const likers = await contract.methods.getBetLikers(betId).call();
+        const hasLiked = likers.includes(userAccount);
+
+        let tx;
+        if (hasLiked) {
+            tx = contract.methods.unlikeBet(betId).send({ from: userAccount });
+        } else {
+            tx = contract.methods.likeBet(betId).send({ from: userAccount });
+        }
+
+        tx.on("receipt", async () => {
+            likeStatus.innerText = hasLiked ? "Unlike berhasil!" : "Like berhasil!";
+            likeStatus.style.color = "green";
+            await getBetLikes(betId);
+            await checkLikeStatus(betId);
+        });
+
+        tx.on("error", (error) => {
+            console.error("Error toggling like:", error);
+            likeStatus.innerText = "Gagal melakukan aksi!";
+            likeStatus.style.color = "red";
+        });
+
+    } catch (error) {
+        console.error("Unexpected error:", error);
+        likeStatus.innerText = "Gagal melakukan aksi!";
+        likeStatus.style.color = "red";
+    } finally {
+        likeButton.disabled = false;
+    }
+}
+
+// Like Function
+// Fungsi untuk mengecek apakah user sudah like atau belum
+async function checkLikeStatus(betId) {
+    try {
+        const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
+        const likeButton = document.getElementById(`likeButton-${betId}`);
+        likeButton.innerText = hasLiked ? "Unlike" : "Like";
+    } catch (error) {
+        console.error("Error mengecek status like:", error);
+    }
+}
+
+// Fungsi untuk mengambil jumlah likes
+async function getBetLikes(betId) {
+    try {
+        const likeCount = await contract.methods.betLikeCount(betId).call();
+        const likeElement = document.getElementById(`betLikesCount-${betId}`);
+        if (likeElement) {
+            likeElement.innerText = `Likes: ${likeCount}`;
+        } else {
+            console.warn(`Elemen betLikesCount-${betId} tidak ditemukan.`);
+        }
+    } catch (error) {
+        console.error("Error mengambil jumlah likes:", error);
+    }
+}
+
+
 
 // **Update Balance**
 async function updateBalance() {
@@ -1143,142 +1229,6 @@ function nextUserBets() {
     loadUserBets();
 }
 
- // Like Function
- // Fungsi untuk menghubungkan wallet
-async function connectWallet() {
-    if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        try {
-            const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-            userAccount = accounts[0];
-            document.getElementById("walletAddress").innerText = `Connected: ${userAccount}`;
-            document.getElementById("connectWallet").style.display = "none";
-            document.getElementById("disconnectWallet").style.display = "block";
-
-            contract = new web3.eth.Contract(contractABI, contractAddress);
-
-            // Update jumlah likes & status tombol setelah konek wallet
-            document.querySelectorAll("[id^=betLikesCount-]").forEach(async (el) => {
-                const betId = el.id.split("-")[1];
-                await getBetLikes(betId);
-                await checkLikeStatus(betId);
-            });
-
-        } catch (error) {
-            console.error("Wallet connection failed:", error);
-        }
-    } else {
-        alert("Metamask tidak terdeteksi!");
-    }
-}
-
-// Fungsi untuk memutuskan koneksi wallet
-function disconnectWallet() {
-    userAccount = null;
-    document.getElementById("walletAddress").innerText = "Not Connected";
-    document.getElementById("connectWallet").style.display = "block";
-    document.getElementById("disconnectWallet").style.display = "none";
-}
-
-// Fungsi untuk toggle like/unlike
-async function toggleLike(betId) {
-    if (!userAccount) {
-        alert("Harap koneksikan wallet terlebih dahulu!");
-        return;
-    }
-
-    const likeButton = document.getElementById(`likeButton-${betId}`);
-    const likeStatus = document.getElementById(`likeStatus-${betId}`);
-
-    try {
-        likeButton.disabled = true;
-        likeStatus.innerText = "Processing...";
-        likeStatus.style.color = "blue";
-
-        const likers = await contract.methods.getBetLikers(betId).call();
-        const hasLiked = likers.includes(userAccount);
-
-        let tx;
-        if (hasLiked) {
-            tx = contract.methods.unlikeBet(betId).send({ from: userAccount });
-        } else {
-            tx = contract.methods.likeBet(betId).send({ from: userAccount });
-        }
-
-        tx.on("receipt", async () => {
-            likeStatus.innerText = hasLiked ? "Unlike berhasil!" : "Like berhasil!";
-            likeStatus.style.color = "green";
-            await getBetLikes(betId);
-            await checkLikeStatus(betId);
-        });
-
-        tx.on("error", (error) => {
-            console.error("Error toggling like:", error);
-            likeStatus.innerText = "Gagal melakukan aksi!";
-            likeStatus.style.color = "red";
-        });
-
-    } catch (error) {
-        console.error("Unexpected error:", error);
-        likeStatus.innerText = "Gagal melakukan aksi!";
-        likeStatus.style.color = "red";
-    } finally {
-        likeButton.disabled = false;
-    }
-}
-
-// Fungsi untuk mengecek apakah user sudah like atau belum
-async function checkLikeStatus(betId) {
-    try {
-        const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
-        const likeButton = document.getElementById(`likeButton-${betId}`);
-        likeButton.innerText = hasLiked ? "Unlike" : "Like";
-    } catch (error) {
-        console.error("Error mengecek status like:", error);
-    }
-}
-
-// Fungsi untuk mengambil jumlah likes
-async function getBetLikes(betId) {
-    try {
-        const likeCount = await contract.methods.betLikeCount(betId).call();
-        const likeElement = document.getElementById(`betLikesCount-${betId}`);
-        if (likeElement) {
-            likeElement.innerText = `Likes: ${likeCount}`;
-        } else {
-            console.warn(`Elemen betLikesCount-${betId} tidak ditemukan.`);
-        }
-    } catch (error) {
-        console.error("Error mengambil jumlah likes:", error);
-    }
-}
-
-// Panggil fungsi saat halaman dimuat
-window.onload = async function () {
-    if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        const accounts = await web3.eth.getAccounts();
-        if (accounts.length > 0) {
-            userAccount = accounts[0];
-            document.getElementById("walletAddress").innerText = `Connected: ${userAccount}`;
-            document.getElementById("connectWallet").style.display = "none";
-            document.getElementById("disconnectWallet").style.display = "block";
-
-            contract = new web3.eth.Contract(contractABI, contractAddress);
-        }
-    }
-
-    // Pastikan likes diperbarui untuk setiap betId
-    const betElements = document.querySelectorAll("[id^=betLikesCount-]");
-    for (const el of betElements) {
-        const betId = el.id.split("-")[1];
-        await getBetLikes(betId);
-        if (userAccount) {
-            await checkLikeStatus(betId);
-        }
-    }
-};
-
 // **Load Bet History (with Pagination)**
 async function loadBetHistory() {
     const bets = await contract.methods.getAllBets().call();
@@ -1394,9 +1344,9 @@ function closeResult() {
 }
         
 // Initialize saat halaman terbuka
-window.onload = () => {
+window.onload = async () => {
     if (window.ethereum) {
-        window.ethereum.on("accountsChanged", (accounts) => {
+        window.ethereum.on("accountsChanged", async (accounts) => {
             if (accounts.length > 0) {
                 userAccount = accounts[0];
                 document.getElementById("walletAddress").innerText = `Connected: ${userAccount}`;
@@ -1404,10 +1354,22 @@ window.onload = () => {
                 document.getElementById("walletBalance").style.display = "block";
                 document.getElementById("connectWallet").style.display = "none";
                 document.getElementById("disconnectWallet").style.display = "block";
-                
-                updateBalance();
-                loadUserBets();
-                loadBetHistory();
+
+                contract = new web3.eth.Contract(contractABI, contractAddress);
+
+                await updateBalance();
+                await loadUserBets();
+                await loadBetHistory();
+
+                // Ambil semua elemen likes yang terkait dengan betId
+                const betElements = document.querySelectorAll("[id^=betLikesCount-]");
+                for (const el of betElements) {
+                    const betId = el.id.split("-")[1];
+                    await getBetLikes(betId);
+                    if (userAccount) {
+                        await checkLikeStatus(betId);
+                    }
+                }
             } else {
                 disconnectWallet();
             }
