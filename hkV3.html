@@ -1445,7 +1445,7 @@ async function loadBetHistory() {
     Likes: <span id="likeCount-0x123">0</span>
 </p>
 <button class="like-button" data-bet-id="0x123">
-    <img src="img/like.svg" width="20" height="20">l</button>
+    <img src="img/like.svg" width="20" height="20"></button>
        </p><hr style="background-color: #333333; height: 1px; border: none;">`; 
     }
     
@@ -1473,33 +1473,34 @@ document.addEventListener("DOMContentLoaded", async function () {
         const accounts = await web3.eth.getAccounts();
         userAccount = accounts[0];
         contract = new web3.eth.Contract(contractABI, contractAddress);
-        loadLikes(); // Memuat jumlah like saat halaman dimuat
+        loadLikes();
     } else {
         alert("MetaMask tidak terdeteksi");
     }
 });
 
-// Fungsi untuk memuat jumlah like dan status like dari blockchain
 async function loadLikes() {
     const buttons = document.querySelectorAll(".like-button");
     for (let button of buttons) {
         let betId = button.getAttribute("data-bet-id");
+        let icon = document.getElementById(`likeIcon-${betId}`);
+
         try {
             const likeCount = await contract.methods.betLikeCount(betId).call();
             document.getElementById(`likeCount-${betId}`).innerText = likeCount;
 
             const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
-            button.innerText = hasLiked ? "Unlike" : "Like";
+            icon.src = hasLiked ? "unlike.png" : "like.png"; // Ubah ikon Like/Unlike
         } catch (error) {
             console.error(`Error loading likes for bet ${betId}:`, error);
         }
     }
 }
 
-// Fungsi untuk Like atau Unlike bet
 async function toggleLike(event) {
-    const button = event.target;
+    const button = event.target.closest(".like-button");
     const betId = button.getAttribute("data-bet-id");
+    const icon = document.getElementById(`likeIcon-${betId}`);
 
     try {
         const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
@@ -1508,14 +1509,14 @@ async function toggleLike(event) {
         const tx = await contract.methods[method](betId).send({ from: userAccount });
 
         if (tx.status) {
-            await loadLikes(); // Perbarui tampilan setelah transaksi berhasil
+            icon.src = hasLiked ? "like.png" : "unlike.png"; // Ubah ikon setelah transaksi berhasil
+            await loadLikes(); // Perbarui jumlah like
         }
     } catch (error) {
         console.error("Error toggling like:", error);
     }
 }
 
-// Tambahkan event listener ke semua tombol Like
 document.querySelectorAll(".like-button").forEach(button => {
     button.addEventListener("click", toggleLike);
 });
