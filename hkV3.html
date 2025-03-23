@@ -1444,9 +1444,9 @@ async function loadBetHistory() {
     <div id="betLikesCount-${bet.betId}">Likes: Loading...</div>
     <button id="likeButton-${bet.betId}" class="like-button" data-bet-id="${bet.betId}" style="display: none;">Loading...</button>
     <div id="likeStatus-${bet.betId}" style="color: blue; font-weight: bold;"></div>
-</p>
-        
+</p><hr style="background-color: #333333; height: 1px; border: none;">`;        
     }
+    
     document.getElementById("betHistory").innerHTML = html;
 }
 
