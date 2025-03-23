@@ -1479,20 +1479,21 @@ async function init() {
 
 // Fungsi untuk memuat jumlah like dan status like dari blockchain
 async function loadLikes() {
-    if (!contract) return;
-
-    const betElements = document.querySelectorAll("[data-bet-id]");
-    betElements.forEach(async (element) => {
-        const betId = element.getAttribute("data-bet-id");
+    const bets = document.querySelectorAll(".like-button");
+    for (let button of bets) {
+        let betId = button.getAttribute("onclick").match(/'(.+?)'/)[1];
         try {
             const likeCount = await contract.methods.betLikeCount(betId).call();
             document.getElementById(`betLikesCount-${betId}`).innerText = `Likes: ${likeCount}`;
+
+            const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
+            button.innerText = hasLiked ? "Unlike" : "Like";
+            button.style.display = "block";
         } catch (error) {
-            console.error(`Error fetching likes for bet ${betId}:`, error);
-            document.getElementById(`betLikesCount-${betId}`).innerText = "Likes: 0";
+            console.error(`Error loading likes for bet ${betId}:`, error);
         }
-    });
-}
+    }
+ }
 
 // Panggil init saat halaman dimuat
 window.onload = init;
