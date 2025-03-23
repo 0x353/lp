@@ -1441,8 +1441,12 @@ async function loadBetHistory() {
            Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
            Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
            Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
-           <p id="betLikesCount-${bet.betId}">Likes: <span id="likeCount-${bet.betId}">0</span></p>
-           <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" class="like-button">Like</button>
+           <p id="betLikesCount-0x123">
+    Likes: <span id="likeCount-0x123">0</span>
+</p>
+<button class="like-button" data-bet-id="0x123">
+    <img src="img/like.svg" alt="Like" width="20" height="20"> Like
+</button>
        </p><hr style="background-color: #333333; height: 1px; border: none;">`; 
     }
     
