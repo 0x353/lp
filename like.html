@@ -70,17 +70,20 @@ button:disabled {
 </head>
 <body>
     <h2>Bet Like System</h2>
-    
-    <!-- Tombol Connect & Disconnect Wallet -->
-    <button id="connectWallet" onclick="connectWallet()">Connect Wallet</button>
-    <button id="disconnectWallet" onclick="disconnectWallet()" style="display: none;">Disconnect Wallet</button>
-    <p id="walletAddress">Not Connected</p>
 
-    <!-- Menampilkan jumlah likes -->
-    <p id="betLikesCount">Likes: Loading...</p>
+<!-- Tombol Connect & Disconnect Wallet -->
+<button id="connectWallet" onclick="connectWallet()">Connect Wallet</button>
+<button id="disconnectWallet" onclick="disconnectWallet()" style="display: none;">Disconnect Wallet</button>
+<p id="walletAddress">Not Connected</p>
 
-    <!-- Tombol Like/Unlike -->
-    <button id="likeButton" onclick="toggleLike('0x123456789abcdef')" style="display: none;">Loading...</button>
+<!-- Menampilkan jumlah likes -->
+<p id="betLikesCount">Likes: Loading...</p>
+
+<!-- Status Like -->
+<p id="likeStatus" style="color: blue; font-weight: bold;"></p>
+
+<!-- Tombol Like/Unlike -->
+<button id="likeButton" onclick="toggleLike('0x123456789abcdef')" style="display: none;">Loading...</button>
     
     <!-- Import JavaScript -->
     <script src="app.js"></script>
@@ -167,6 +170,8 @@ async function getBetLikes(betId) {
         console.error("Error mengambil jumlah likes:", error);
     }
 }
+
+// Status
 
 // Panggil fungsi jika Metamask sudah terhubung sebelumnya
 window.onload = async function () {
