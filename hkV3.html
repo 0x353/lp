@@ -1586,7 +1586,7 @@ function closeResult() {
 }
         
 // Initialize saat halaman terbuka
-window.onload = () => {
+window.onload = async () => {
     if (window.ethereum) {
         window.ethereum.on("accountsChanged", (accounts) => {
             if (accounts.length > 0) {
@@ -1600,11 +1600,15 @@ window.onload = () => {
                 updateBalance();
                 loadUserBets();
                 loadBetHistory();
+                loadLikes(); // Memuat jumlah likes setelah bet history dimuat
             } else {
                 disconnectWallet();
             }
         });
     }
+
+    // Memastikan loadLikes() juga berjalan saat halaman pertama kali dibuka
+    await loadLikes();
 };
     </script>
        
