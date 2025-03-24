@@ -757,6 +757,10 @@ h3 {
 .hidden {
     display: none;
         }
+
+#noNotificationsMessage {
+    color: red;
+}
     </style>
 </head>
 <body>
@@ -807,6 +811,7 @@ h3 {
     <div class="notification-header">
         <p>Notifications</p>
         <ul id="notifications" aria-live="polite"></ul>
+        <p id="noNotificationsMessage" class="hidden">No notifications</p>
     </div>
     <button onclick="closeNotificationList()">Close</button>
 </div>
@@ -1143,6 +1148,20 @@ function showNotification(message) {
     }, 15000); // Tampilkan selama 5 detik
 }
 
+function updateNotificationStatus() {
+    const notificationsList = document.getElementById("notifications");
+    const noNotificationsMessage = document.getElementById("noNotificationsMessage");
+
+    if (notificationsList.children.length === 0) {
+        noNotificationsMessage.classList.remove("hidden"); // Tampilkan pesan
+    } else {
+        noNotificationsMessage.classList.add("hidden"); // Sembunyikan pesan
+    }
+}
+
+// Panggil fungsi ini setiap kali notifikasi diperbarui
+updateNotificationStatus();
+
 // Menutup popup
 function closePopup() {
     const popup = document.getElementById("notificationPopup");
@@ -1393,6 +1412,7 @@ async function loadUserBets() {
             Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
             Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
             Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
+            
         </p><hr style="background-color: #333333; height: 1px; border: none;">`;
     }
 
