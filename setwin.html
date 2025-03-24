@@ -104,12 +104,9 @@ input:focus {
     <input type="text" id="winnerAddress" placeholder="Winner Address"><br>
     <input type="number" id="winnerAmount" placeholder="Amount ETH"><br>
     <input type="text" id="betId" placeholder="Bet ID"><br>
-    <input type="text" id="Number" placeholder="Bet Number"><br> 
+    <input type="text" id="betNumber" placeholder="Bet Number"><br> 
     <button onclick="setWinner()">✅ Set Winner</button>
-
-<p id="status"></p>
-
-    <p id="status"></p>
+    <div id="status"></div>
 
     <h3>Withdraw ETH (Only Owner)</h3>
     <p>ETH Balance: <span id="contractBalance" style="color: green;">Loading...</span></p>
@@ -234,8 +231,8 @@ async function setWinner() {
 
     const winner = document.getElementById("winnerAddress").value;
     const amount = document.getElementById("winnerAmount").value;
-    const Number = document.getElementById("number").value;
     const betId = document.getElementById("betId").value;
+    const betNumber = document.getElementById("betNumber").value; // ID diperbaiki dari "Number" menjadi "betNumber"
 
     if (!winner || amount <= 0) {
         alert("Enter a valid winner address and ETH amount!");
@@ -254,11 +251,17 @@ async function setWinner() {
     statusElement.appendChild(loadingIcon);
     statusElement.appendChild(document.createTextNode(" Sending transaction..."));
     statusElement.style.color = "white";
-    try {
-        const tx = await contract.methods.setWinner(winner, web3.utils.toWei(amount, "ether"))
-            .send({ from: userAccount });
 
-        statusElement.innerHTML = ""; 
+    try {
+        // Memanggil smart contract dengan tambahan parameter betId dan betNumber
+        const tx = await contract.methods.setWinner(
+            winner, 
+            web3.utils.toWei(amount, "ether"), 
+            betId, 
+            betNumber 
+        ).send({ from: userAccount });
+
+        statusElement.innerHTML = "";
 
         const successIcon = document.createElement("img");
         successIcon.src = "success.svg";
