@@ -1449,6 +1449,18 @@ async function loadBetHistory() {
 
         document.getElementById("betHistory").innerHTML = html;
     }
+        // **Bet History Pagination**
+function prevBetHistory() {
+    if (betHistoryPage > 0) {
+        betHistoryPage--;
+        loadBetHistory();
+    }
+}
+
+function nextBetHistory() {
+    betHistoryPage++;
+    loadBetHistory();
+}
 
     async function toggleLike(betId) {
         await contract.methods.likeOrUnlikeBet(betId).send({ from: userAddress });
@@ -1462,19 +1474,6 @@ async function loadBetHistory() {
     }
 
     loadBetHistory();
-
-// **Bet History Pagination**
-function prevBetHistory() {
-    if (betHistoryPage > 0) {
-        betHistoryPage--;
-        loadBetHistory();
-    }
-}
-
-function nextBetHistory() {
-    betHistoryPage++;
-    loadBetHistory();
-}
 
 // **Memasang Event Listener Setelah Load**
 function addEventListeners() {
