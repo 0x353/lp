@@ -1440,6 +1440,8 @@ async function loadBetHistory() {
     Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
     Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
     Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
+    <p>Likes: <span id="betLikesCount-${bet.betId}">0</span></p>
+    <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" class="like-button" data-bet-id="${bet.betId}">Like</button>
 </p>
 <hr style="background-color: #333333; height: 1px; border: none;">`; 
         
@@ -1459,6 +1461,64 @@ function nextBetHistory() {
     betHistoryPage++;
     loadBetHistory();
 }
+
+// Like Function
+async function init() {
+    if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+        const accounts = await web3.eth.getAccounts();
+        userAccount = accounts[0];
+        contract = new web3.eth.Contract(contractABI, contractAddress);
+        await loadLikes(); // Ambil status like awal
+    } else {
+        alert("MetaMask tidak terdeteksi");
+    }
+}
+
+// Ambil jumlah like dan status like dari blockchain
+async function loadLikes() {
+    const bets = document.querySelectorAll(".like-button");
+
+    for (let button of bets) {
+        let betId = button.getAttribute("data-bet-id"); // Ambil ID dari data atribut
+        try {
+            // Ambil jumlah like dari blockchain
+            const likeCount = await contract.methods.getLikeCount(betId).call();
+            const likeElement = document.getElementById(`betLikesCount-${betId}`);
+            if (likeElement) likeElement.innerText = likeCount; // Pastikan elemen ada sebelum diubah
+
+            // Cek apakah user sudah like
+            const hasLiked = await contract.methods.hasUserLiked(betId, userAccount).call();
+            button.innerText = hasLiked ? "Unlike" : "Like";
+            button.classList.toggle("liked", hasLiked); // Tambahkan class untuk styling jika perlu
+        } catch (error) {
+            console.error(`Error loading likes for bet ${betId}:`, error);
+        }
+    }
+}
+
+// Fungsi untuk Like atau Unlike bet
+async function toggleLike(betId) {
+    try {
+        const hasLiked = await contract.methods.hasUserLiked(betId, userAccount).call();
+        const method = hasLiked ? "unlikeBet" : "likeBet";
+        const params = hasLiked ? [] : ["thumbs_up"];
+
+        // Kirim transaksi ke kontrak
+        const tx = await contract.methods[method](betId, ...params).send({ from: userAccount });
+
+        if (tx.status) {
+            console.log(`Transaction successful: ${tx.transactionHash}`);
+            await loadLikes(); // Ambil ulang status like setelah transaksi berhasil
+        }
+    } catch (error) {
+        console.error("Error toggling like:", error);
+    }
+}
+
+// Panggil init saat halaman dimuat
+window.onload = init;
         
 // Modal Result
 function updateHistory(newBall1) {
