@@ -1148,6 +1148,9 @@ function showNotification(message) {
     popup.style.display = "block"; // Menampilkan elemen
     popup.classList.add("show");
 
+    const audio = new Audio('bell.mp3'); // Ganti dengan file MP3 yang diinginkan
+    audio.play().catch(error => console.log('Audio tidak bisa diputar:', error));
+
     console.log("Popup shown!"); // Debugging
 
     setTimeout(() => {
