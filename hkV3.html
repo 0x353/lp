@@ -1224,10 +1224,13 @@ async function connectWallet() {
             // Tampilkan ikon notifikasi setelah wallet terhubung
             document.getElementById("notificationIcon").style.display = "block";
 
+            showLikeButtons(); // ✅ Tampilkan tombol like setelah connect
             updateBalance();
             loadUserBets();
             loadBetHistory();
             checkForWinnings();
+            loadLikes();
+
         } catch (error) {
             console.error("Connection failed:", error);
             alert(`Connection failed: ${error.message}`);
@@ -1282,6 +1285,20 @@ function disconnectWallet() {
     document.getElementById("walletBalance").style.display = "none";
     document.getElementById("connectWallet").style.display = "block";
     document.getElementById("disconnectWallet").style.display = "none";
+
+    hideLikeButtons(); // ✅ Sembunyikan tombol like setelah disconnect
+}
+
+// **Sembunyikan tombol like saat wallet disconnect**
+function hideLikeButtons() {
+    const buttons = document.querySelectorAll(".like-button");
+    buttons.forEach(button => button.style.display = "none");
+}
+
+// **Tampilkan tombol like saat wallet connect**
+function showLikeButtons() {
+    const buttons = document.querySelectorAll(".like-button");
+    buttons.forEach(button => button.style.display = "inline-block");
 }
 
 // **Update Balance**
@@ -1291,7 +1308,74 @@ async function updateBalance() {
         let balanceEth = web3.utils.fromWei(balanceWei, "ether");
         document.getElementById("walletBalance").innerText = `Balance: ${parseFloat(balanceEth).toFixed(4)} ETH`;
     }
+}
+
+// **Fungsi untuk Memuat Jumlah Like**
+async function loadLikes() {
+    const buttons = document.querySelectorAll(".like-button");
+    for (let button of buttons) {
+        let betId = button.getAttribute("data-bet-id");
+
+        try {
+            const likeCount = await contract.methods.getLikeCount(betId).call();
+            document.getElementById(`betLikesCount-${betId}`).innerText = likeCount;
+
+            const hasLiked = userAccount
+                ? await contract.methods.hasLikedBet(userAccount, betId).call()
+                : false;
+
+            button.innerText = hasLiked ? "Unlike" : "Like";
+            button.style.display = userAccount ? "inline-block" : "none"; // ✅ Tampilkan hanya jika wallet connect
+        } catch (error) {
+            console.error(`Error loading likes for bet ${betId}:`, error);
         }
+    }
+}
+
+// **Fungsi untuk Like atau Unlike bet**
+async function toggleLike(betId) {
+    try {
+        if (!userAccount) {
+            alert("Please connect your wallet first!");
+            return;
+        }
+
+        const hasLiked = await contract.methods.hasLikedBet(userAccount, betId).call();
+        const method = hasLiked ? "unlikeBet" : "likeBet";
+
+        const tx = await contract.methods[method](betId).send({ from: userAccount });
+
+        if (tx.status) {
+            loadLikes(); // Perbarui tampilan setelah transaksi berhasil
+        }
+    } catch (error) {
+        console.error("Error toggling like:", error);
+    }
+}
+
+// **Deteksi Perubahan Akun Wallet**
+window.onload = () => {
+    if (window.ethereum) {
+        window.ethereum.on("accountsChanged", (accounts) => {
+            if (accounts.length > 0) {
+                userAccount = accounts[0];
+                document.getElementById("walletAddress").innerText = `Connected: ${userAccount}`;
+                document.getElementById("walletAddress").style.display = "block";
+                document.getElementById("walletBalance").style.display = "block";
+                document.getElementById("connectWallet").style.display = "none";
+                document.getElementById("disconnectWallet").style.display = "block";
+
+                showLikeButtons(); // ✅ Tampilkan tombol like saat akun berubah
+                updateBalance();
+                loadUserBets();
+                loadBetHistory();
+                loadLikes();
+            } else {
+                disconnectWallet();
+            }
+        });
+    }
+};
        
 function updateBetPrice() {
     let betTimes = document.getElementById("betTimes").value;
@@ -1440,55 +1524,7 @@ function nextUserBets() {
 }
 
 // Like Function
-async function init() {
-    if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        await window.ethereum.request({ method: "eth_requestAccounts" });
-        const accounts = await web3.eth.getAccounts();
-        userAccount = accounts[0];
-        contract = new web3.eth.Contract(contractABI, contractAddress);
-        loadLikes(); // Muat status like awal
-    } else {
-        alert("MetaMask tidak terdeteksi");
-    }
-}
 
-// Fungsi untuk memuat jumlah like dan status like dari blockchain
-async function loadLikes() {
-    const bets = document.querySelectorAll(".like-button");
-    for (let button of bets) {
-        let betId = button.getAttribute("onclick").match(/'(.+?)'/)[1];
-        try {
-            const likeCount = await contract.methods.betLikeCount(betId).call();
-            document.getElementById(`betLikesCount-${betId}`).innerText = `Likes: ${likeCount}`;
-
-            const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
-            button.innerText = hasLiked ? "Unlike" : "Like";
-            button.style.display = "block";
-        } catch (error) {
-            console.error(`Error loading likes for bet ${betId}:`, error);
-        }
-    }
-}
-
-// Fungsi untuk Like atau Unlike bet
-async function toggleLike(betId) {
-    try {
-        const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
-        const method = hasLiked ? "unlikeBet" : "likeBet";
-
-        const tx = await contract.methods[method](betId).send({ from: userAccount });
-
-        if (tx.status) {
-            loadLikes(); // Update tampilan setelah transaksi berhasil
-        }
-    } catch (error) {
-        console.error("Error toggling like:", error);
-    }
-}
-
-// Panggil init saat halaman dimuat
-window.onload = init;
         
 // **Load Bet History (with Pagination)**
 async function loadBetHistory() {
@@ -1519,7 +1555,12 @@ async function loadBetHistory() {
     Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
     Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
     <p>Likes: <span id="betLikesCount-${bet.betId}">0</span></p>
-    <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" class="like-button" data-bet-id="${bet.betId}">Like</button>
+    <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" 
+        class="like-button" 
+        data-bet-id="${bet.betId}" 
+        style="display: ${userAccount ? 'block' : 'none'};">
+        Lik
+    </button>
     </p><hr style="background-color: #333333; height: 1px; border: none;">`;
         
     }
@@ -1602,7 +1643,7 @@ function closeResult() {
     closeModal('resultModal');
 }
         
-// Initialize saat halaman terbuka
+// **Initialize saat halaman terbuka**
 window.onload = () => {
     if (window.ethereum) {
         window.ethereum.on("accountsChanged", (accounts) => {
@@ -1614,12 +1655,36 @@ window.onload = () => {
                 document.getElementById("connectWallet").style.display = "none";
                 document.getElementById("disconnectWallet").style.display = "block";
                 
+                showLikeButtons(); // ✅ Tampilkan tombol like saat wallet terhubung
                 updateBalance();
                 loadUserBets();
                 loadBetHistory();
+                loadLikes(); // ✅ Muat jumlah like setelah wallet terhubung
             } else {
                 disconnectWallet();
             }
+        });
+
+        // **Cek jika sebelumnya sudah terhubung**
+        window.ethereum.request({ method: "eth_accounts" }).then((accounts) => {
+            if (accounts.length > 0) {
+                userAccount = accounts[0];
+                document.getElementById("walletAddress").innerText = `Connected: ${userAccount}`;
+                document.getElementById("walletAddress").style.display = "block";
+                document.getElementById("walletBalance").style.display = "block";
+                document.getElementById("connectWallet").style.display = "none";
+                document.getElementById("disconnectWallet").style.display = "block";
+                
+                showLikeButtons(); // ✅ Pastikan tombol like ditampilkan jika wallet sudah connect
+                updateBalance();
+                loadUserBets();
+                loadBetHistory();
+                loadLikes();
+            } else {
+                disconnectWallet();
+            }
+        }).catch((error) => {
+            console.error("Error checking accounts:", error);
         });
     }
 };
