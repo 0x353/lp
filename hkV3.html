@@ -1460,6 +1460,8 @@ async function loadBetHistory() {
     Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
     Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
     Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
+    <p>Likes: <span id="betLikesCount-${bet.betId}">0</span></p>
+    <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" class="like-button" data-bet-id="${bet.betId}">Like</button>
 </p>
 <hr style="background-color: #333333; height: 1px; border: none;">`; 
         
@@ -1479,6 +1481,77 @@ function nextBetHistory() {
     betHistoryPage++;
     loadBetHistory();
 }
+
+// Like Function
+let likeContract;
+let userAccount = null;
+
+async function initLikeSystem() {
+    if (window.ethereum) {
+        try {
+            const web3ForLikes = new Web3(window.ethereum);
+            likeContract = new web3ForLikes.eth.Contract(contractABI, contractAddress);
+
+            const accounts = await web3ForLikes.eth.getAccounts();
+            if (accounts.length > 0) {
+                userAccount = accounts[0];
+            }
+
+            loadLikes();
+        } catch (error) {
+            console.error("Gagal inisialisasi sistem like:", error);
+        }
+    } else {
+        console.warn("MetaMask tidak terdeteksi, tetap bisa menampilkan jumlah like.");
+        loadLikes();
+    }
+}
+
+async function loadLikes() {
+    const betElements = document.querySelectorAll(".bet-container");
+
+    for (let bet of betElements) {
+        let betId = bet.getAttribute("data-bet-id");
+        let likesSpan = document.getElementById(`betLikesCount-${betId}`);
+        let likeButton = document.getElementById(`likeButton-${betId}`);
+
+        try {
+            const likeCount = await likeContract.methods.betLikeCount(betId).call();
+            likesSpan.innerText = likeCount;
+
+            if (userAccount) {
+                const hasLiked = await likeContract.methods.betLikes(betId, userAccount).call();
+                likeButton.innerText = hasLiked ? "Unlike" : "Like";
+            } else {
+                likeButton.innerText = "Like";
+            }
+        } catch (error) {
+            console.error(`Gagal memuat likes untuk bet ${betId}:`, error);
+        }
+    }
+}
+
+async function toggleLike(betId) {
+    if (!userAccount) {
+        alert("Harap koneksikan wallet terlebih dahulu!");
+        return;
+    }
+
+    try {
+        const hasLiked = await likeContract.methods.betLikes(betId, userAccount).call();
+        const method = hasLiked ? "unlikeBet" : "likeBet";
+
+        const tx = await likeContract.methods[method](betId).send({ from: userAccount });
+
+        if (tx.status) {
+            loadLikes();
+        }
+    } catch (error) {
+        console.error("Error toggle like:", error);
+    }
+}
+
+window.onload = initLikeSystem;
         
 // Modal Result
 function updateHistory(newBall1) {
