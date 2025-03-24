@@ -1441,7 +1441,7 @@ async function loadBetHistory() {
     Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
     Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
     <p>Likes: <span id="betLikesCount-${bet.betId}">0</span></p>
-    <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" class="like-button" data-bet-id="${bet.betId}">Like</button>
+    <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" class="like-button" data-bet-id="${bet.betId}">😤</button>
 </p>
 <hr style="background-color: #333333; height: 1px; border: none;">`; 
         
@@ -1464,55 +1464,54 @@ function nextBetHistory() {
 
 // Like Function
 async function init() {
-    if (typeof window.ethereum !== "undefined") {
-        try {
-            // Buat koneksi ke MetaMask
-            web3 = new Web3(window.ethereum);
-            await window.ethereum.request({ method: "eth_requestAccounts" });
-
-            const accounts = await web3.eth.getAccounts();
-            if (accounts.length === 0) {
-                alert("MetaMask terkoneksi tetapi tidak ada akun yang dipilih.");
-                return;
-            }
-
-            userAccount = accounts[0];
-            console.log("Connected account:", userAccount);
-
-            // Inisialisasi kontrak
-            contract = new web3.eth.Contract(contractABI, contractAddress);
-
-            // Ambil data like dari blockchain
-            await loadLikes();
-        } catch (error) {
-            console.error("MetaMask connection error:", error);
-            alert("Gagal menghubungkan ke MetaMask. Pastikan sudah login.");
-        }
+    if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+        const accounts = await web3.eth.getAccounts();
+        userAccount = accounts[0];
+        contract = new web3.eth.Contract(contractABI, contractAddress);
+        loadLikes(); // Muat status like awal
     } else {
-        alert("MetaMask tidak terdeteksi. Harap instal MetaMask.");
+        alert("MetaMask tidak terdeteksi");
     }
 }
 
-// Ambil jumlah like dan status like dari blockchain
+// Fungsi untuk memuat jumlah like dan status like dari blockchain
 async function loadLikes() {
-    const buttons = document.querySelectorAll(".like-button");
-
-    for (let button of buttons) {
-        let betId = button.getAttribute("data-bet-id");
+    const bets = document.querySelectorAll(".like-button");
+    for (let button of bets) {
+        let betId = button.getAttribute("onclick").match(/'(.+?)'/)[1];
         try {
-            // Ambil jumlah like
-            const likeCount = await contract.methods.getLikeCount(betId).call();
-            document.getElementById(`betLikesCount-${betId}`).innerText = likeCount;
+            const likeCount = await contract.methods.betLikeCount(betId).call();
+            document.getElementById(`betLikesCount-${betId}`).innerText = `Likes: ${likeCount}`;
 
-            // Cek apakah user sudah like
-            const hasLiked = await contract.methods.hasUserLiked(betId, userAccount).call();
+            const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
             button.innerText = hasLiked ? "Unlike" : "Like";
-            button.classList.toggle("liked", hasLiked); // Tambahkan class untuk efek visual
+            button.style.display = "block";
         } catch (error) {
             console.error(`Error loading likes for bet ${betId}:`, error);
         }
     }
 }
+
+// Fungsi untuk Like atau Unlike bet
+async function toggleLike(betId) {
+    try {
+        const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
+        const method = hasLiked ? "unlikeBet" : "likeBet";
+
+        const tx = await contract.methods[method](betId).send({ from: userAccount });
+
+        if (tx.status) {
+            loadLikes(); // Update tampilan setelah transaksi berhasil
+        }
+    } catch (error) {
+        console.error("Error toggling like:", error);
+    }
+}
+
+// Panggil init saat halaman dimuat
+window.onload = init;
 
 // Fungsi untuk Like atau Unlike bet
 async function toggleLike(betId) {
@@ -1602,13 +1601,9 @@ function closeResult() {
 }
         
 // Initialize saat halaman terbuka
-window.onload = async () => {
+window.onload = () => {
     if (window.ethereum) {
-        try {
-            web3 = new Web3(window.ethereum);
-            await window.ethereum.request({ method: "eth_requestAccounts" });
-
-            const accounts = await web3.eth.getAccounts();
+        window.ethereum.on("accountsChanged", (accounts) => {
             if (accounts.length > 0) {
                 userAccount = accounts[0];
                 document.getElementById("walletAddress").innerText = `Connected: ${userAccount}`;
@@ -1617,46 +1612,37 @@ window.onload = async () => {
                 document.getElementById("connectWallet").style.display = "none";
                 document.getElementById("disconnectWallet").style.display = "block";
                 
-                // Inisialisasi kontrak
-                contract = new web3.eth.Contract(contractABI, contractAddress);
-
-                // Update saldo & data history
-                await updateBalance();
-                await loadUserBets();
-                await loadBetHistory();
-
-                // Ambil jumlah like dan status like
-                await loadLikes();
-
-                // Tambahkan event listener jika akun berubah
-                window.ethereum.on("accountsChanged", async (accounts) => {
-                    if (accounts.length > 0) {
-                        userAccount = accounts[0];
-                        document.getElementById("walletAddress").innerText = `Connected: ${userAccount}`;
-                        document.getElementById("walletAddress").style.display = "block";
-                        document.getElementById("walletBalance").style.display = "block";
-                        document.getElementById("connectWallet").style.display = "none";
-                        document.getElementById("disconnectWallet").style.display = "block";
-
-                        await updateBalance();
-                        await loadUserBets();
-                        await loadBetHistory();
-                        await loadLikes(); // Perbarui status like setelah akun berubah
-                    } else {
-                        disconnectWallet();
-                    }
-                });
+                updateBalance();
+                loadUserBets();
+                loadBetHistory();
+                loadAllLikesAndComments(); // 🔹 Tambahkan update likes & komentar
             } else {
                 disconnectWallet();
             }
-        } catch (error) {
-            console.error("MetaMask connection error:", error);
-            alert("Gagal menghubungkan ke MetaMask. Pastikan sudah login.");
-        }
-    } else {
-        alert("MetaMask tidak terdeteksi. Harap instal MetaMask.");
+        });
     }
 };
+
+// 🔹 Fungsi untuk update jumlah like dan komentar pada semua bet
+async function loadAllLikesAndComments() {
+    const bets = document.querySelectorAll(".bet-item"); // Ambil semua bet yang ada di halaman
+
+    for (let bet of bets) {
+        let betId = bet.getAttribute("data-bet-id");
+
+        try {
+            // 🔹 Ambil jumlah like dari kontrak
+            const likeCount = await contract.methods.getLikeCount(betId).call();
+            document.getElementById(`betLikesCount-${betId}`).innerText = likeCount;
+
+            // 🔹 Ambil jumlah komentar dari kontrak
+            const commentCount = await contract.methods.getCommentCount(betId).call();
+            document.getElementById(`betCommentCount-${betId}`).innerText = commentCount;
+        } catch (error) {
+            console.error(`Error loading likes/comments for bet ${betId}:`, error);
+        }
+    }
+}
     </script>
        
 </body>
