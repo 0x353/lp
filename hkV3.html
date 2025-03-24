@@ -1415,42 +1415,53 @@ function nextUserBets() {
         
 // **Load Bet History (with Pagination)**
 async function loadBetHistory() {
-    const bets = await contract.methods.getAllBets().call();
-    const reversedBets = bets.slice().reverse(); // Membalik urutan bets
+        const bets = await contract.methods.getAllBets().call();
+        const reversedBets = bets.slice().reverse(); // Membalik urutan bets
 
-    // **Filter hanya bets dalam 7 hari terakhir**
-    const now = Math.floor(Date.now() / 1000); // Waktu sekarang dalam detik (Unix Timestamp)
-    const sevenDaysAgo = now - 7 * 24 * 60 * 60; // 7 hari dalam detik
+        const now = Math.floor(Date.now() / 1000);
+        const sevenDaysAgo = now - 7 * 24 * 60 * 60;
 
-    const filteredBets = reversedBets.filter(bet => bet.timestamp >= sevenDaysAgo);
+        const filteredBets = reversedBets.filter(bet => bet.timestamp >= sevenDaysAgo);
 
-    const start = betHistoryPage * pageSize;
-    const end = Math.min(start + pageSize, reversedBets.length);
+        let html = "";
+        for (let bet of filteredBets) {
+            let shortPlayer = bet.player.slice(0, 10) + "..." + bet.player.slice(-10);
+            let shortTxHash = bet.txHash.slice(0, 10) + "..." + bet.txHash.slice(-10);
+            let likeCount = await contract.methods.getBetLikeCount(bet.betId).call();
+            let isLiked = await contract.methods.betLikes(bet.betId, userAddress).call();
+            let likeButtonText = isLiked ? "Dislike" : "Like";
 
-    let html = "";
-    for (let i = start; i < end; i++) {
-        let bet = reversedBets[i];
-        let shortPlayer = bet.player.slice(0, 10) + "..." + bet.player.slice(-10);
-        let shortTxHash = bet.txHash.slice(0, 10) + "..." + bet.txHash.slice(-10);
+            html += `
+                <p>
+                    Player: <span style="color: #ad5cff;">${shortPlayer}</span><br>
+                    BetID: <span style="color: #b37500; font-size: 9px;">${bet.betId}</span><br>
+                    BetNumber: <span style="color: #00FF66;">${bet.number}</span><br>
+                    BetAmount: <span style="color: #00FF66;">${bet.betAmount}</span><br>
+                    Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
+                    Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
+                    Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
+                    Likes: <span id="likeCount-${bet.betId}" style="color: #ffcc00;">${likeCount}</span><br>
+                    <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')">${likeButtonText}</button>
+                </p>
+                <hr style="background-color: #333333; height: 1px; border: none;">
+            `;
+        }
 
-       html += `<p>
-           Player: <span style="color: #ad5cff;">${shortPlayer}</span><br>
-           BetID: <span style="color: #b37500; font-size: 9px;">${bet.betId}</span><br>
-           BetNumber: <span style="color: #00FF66;">${bet.number}</span><br>
-           BetAmount: <span style="color: #00FF66;">${bet.betAmount}</span><br>
-           Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
-           Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
-           Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
-           <p id="betLikesCount-0x123">
-    Likes: <span id="likeCount-0x123">0</span>
-</p>
-<button class="like-button" data-bet-id="0x123">
-    <img src="img/like.svg" width="20" height="20">e</button>
-       </p><hr style="background-color: #333333; height: 1px; border: none;">`; 
+        document.getElementById("betHistory").innerHTML = html;
     }
-    
-    document.getElementById("betHistory").innerHTML = html;
-}
+
+    async function toggleLike(betId) {
+        await contract.methods.likeOrUnlikeBet(betId).send({ from: userAddress });
+
+        let likeCount = await contract.methods.getBetLikeCount(betId).call();
+        let isLiked = await contract.methods.betLikes(betId, userAddress).call();
+        let likeButtonText = isLiked ? "Dislike" : "Like";
+
+        document.getElementById(`likeCount-${betId}`).innerText = likeCount;
+        document.getElementById(`likeButton-${betId}`).innerText = likeButtonText;
+    }
+
+    loadBetHistory();
 
 // **Bet History Pagination**
 function prevBetHistory() {
@@ -1463,84 +1474,6 @@ function prevBetHistory() {
 function nextBetHistory() {
     betHistoryPage++;
     loadBetHistory();
-}
-
-// Like Bet 
-document.addEventListener("DOMContentLoaded", async function () {
-    if (typeof window.ethereum !== "undefined") {
-        try {
-            window.web3 = new Web3(window.ethereum);
-            await window.ethereum.request({ method: "eth_requestAccounts" });
-            const accounts = await web3.eth.getAccounts();
-            window.userAccount = accounts[0];
-            window.contract = new web3.eth.Contract(contractABI, contractAddress);
-
-            console.log("MetaMask terhubung dengan akun:", window.userAccount);
-
-            await loadLikes(); // Load data likes
-            addEventListeners(); // Tambah event listener setelah data dimuat
-        } catch (error) {
-            console.error("Error menghubungkan MetaMask:", error);
-            alert("Gagal menghubungkan MetaMask. Coba reload halaman.");
-        }
-    } else {
-        alert("MetaMask tidak terdeteksi. Silakan instal MetaMask.");
-    }
-});
-
-// **Memuat jumlah likes dari blockchain**
-async function loadLikes() {
-    const buttons = document.querySelectorAll(".like-button");
-    for (let button of buttons) {
-        let betId = button.getAttribute("data-bet-id");
-        let icon = document.getElementById(`likeIcon-${betId}`);
-        let likeCountSpan = document.getElementById(`likeCount-${betId}`);
-
-        try {
-            const likeCount = await contract.methods.betLikeCount(betId).call();
-            likeCountSpan.innerText = likeCount.toString(); // Pastikan selalu string
-
-            const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
-            icon.src = hasLiked ? "unlike.png" : "like.png"; // Ubah ikon
-
-            console.log(`Bet ID: ${betId}, Likes: ${likeCount}, Liked: ${hasLiked}`);
-        } catch (error) {
-            console.error(`Error memuat likes untuk bet ${betId}:`, error);
-        }
-    }
-}
-
-// **Fungsi Toggle Like**
-async function toggleLike(event) {
-    const button = event.target.closest(".like-button");
-    if (!button) return;
-
-    const betId = button.getAttribute("data-bet-id");
-    const icon = document.getElementById(`likeIcon-${betId}`);
-    const likeCountSpan = document.getElementById(`likeCount-${betId}`);
-
-    try {
-        const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
-        const method = hasLiked ? "unlikeBet" : "likeBet";
-
-        console.log(`Mengirim transaksi ${method} untuk bet ID: ${betId}`);
-
-        const tx = await contract.methods[method](betId).send({ from: userAccount });
-
-        if (tx.status) {
-            let currentLikes = parseInt(likeCountSpan.innerText);
-            if (hasLiked) {
-                likeCountSpan.innerText = (currentLikes - 1).toString();
-                icon.src = "like.png";
-            } else {
-                likeCountSpan.innerText = (currentLikes + 1).toString();
-                icon.src = "unlike.png";
-            }
-        }
-    } catch (error) {
-        console.error("Error saat toggle like:", error);
-        alert("Gagal mengirim transaksi. Coba lagi.");
-    }
 }
 
 // **Memasang Event Listener Setelah Load**
