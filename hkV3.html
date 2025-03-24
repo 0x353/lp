@@ -1148,17 +1148,6 @@ function showNotification(message) {
     }, 15000); // Tampilkan selama 5 detik
 }
 
-function updateNotificationStatus() {
-    const notificationsList = document.getElementById("notifications");
-    const noNotificationsMessage = document.getElementById("noNotificationsMessage");
-
-    if (notificationsList.children.length === 0) {
-        noNotificationsMessage.classList.remove("hidden"); // Tampilkan pesan
-    } else {
-        noNotificationsMessage.classList.add("hidden"); // Sembunyikan pesan
-    }
-}
-
 // Panggil fungsi ini setiap kali notifikasi diperbarui
 updateNotificationStatus();
 
