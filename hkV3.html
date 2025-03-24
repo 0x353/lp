@@ -1662,29 +1662,6 @@ window.onload = () => {
             }
         });
 
-        // **Cek jika sebelumnya sudah terhubung**
-        window.ethereum.request({ method: "eth_accounts" }).then((accounts) => {
-            if (accounts.length > 0) {
-                userAccount = accounts[0];
-                document.getElementById("walletAddress").innerText = `Connected: ${userAccount}`;
-                document.getElementById("walletAddress").style.display = "block";
-                document.getElementById("walletBalance").style.display = "block";
-                document.getElementById("connectWallet").style.display = "none";
-                document.getElementById("disconnectWallet").style.display = "block";
-                
-                showLikeButtons(); // ✅ Pastikan tombol like ditampilkan jika wallet sudah connect
-                updateBalance();
-                loadUserBets();
-                loadBetHistory();
-                loadLikes();
-            } else {
-                disconnectWallet();
-            }
-        }).catch((error) => {
-            console.error("Error checking accounts:", error);
-        });
-    }
-};
     </script>
        
 </body>
