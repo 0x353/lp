@@ -1415,40 +1415,78 @@ function nextUserBets() {
         
 // **Load Bet History (with Pagination)**
 async function loadBetHistory() {
-        const bets = await contract.methods.getAllBets().call();
-        const reversedBets = bets.slice().reverse(); // Membalik urutan bets
+        try {
+            const bets = await contract.methods.getAllBets().call();
+            const reversedBets = bets.slice().reverse();
 
-        const now = Math.floor(Date.now() / 1000);
-        const sevenDaysAgo = now - 7 * 24 * 60 * 60;
+            const now = Math.floor(Date.now() / 1000);
+            const sevenDaysAgo = now - 7 * 24 * 60 * 60;
 
-        const filteredBets = reversedBets.filter(bet => bet.timestamp >= sevenDaysAgo);
+            const filteredBets = reversedBets.filter(bet => bet.timestamp >= sevenDaysAgo);
 
-        let html = "";
-        for (let bet of filteredBets) {
-            let shortPlayer = bet.player.slice(0, 10) + "..." + bet.player.slice(-10);
-            let shortTxHash = bet.txHash.slice(0, 10) + "..." + bet.txHash.slice(-10);
-            let likeCount = await contract.methods.getBetLikeCount(bet.betId).call();
-            let isLiked = await contract.methods.betLikes(bet.betId, userAddress).call();
-            let likeButtonText = isLiked ? "Dislike" : "Like";
+            // Ambil semua data likes dalam sekali panggilan
+            const likeCounts = await Promise.all(
+                filteredBets.map(bet => contract.methods.getBetLikeCount(bet.betId).call())
+            );
 
-            html += `
-                <p>
-                    Player: <span style="color: #ad5cff;">${shortPlayer}</span><br>
-                    BetID: <span style="color: #b37500; font-size: 9px;">${bet.betId}</span><br>
-                    BetNumber: <span style="color: #00FF66;">${bet.number}</span><br>
-                    BetAmount: <span style="color: #00FF66;">${bet.betAmount}</span><br>
-                    Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
-                    Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
-                    Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
-                    Likes: <span id="likeCount-${bet.betId}" style="color: #ffcc00;">${likeCount}</span><br>
-                    <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')">${likeButtonText}</button>
-                </p>
-                <hr style="background-color: #333333; height: 1px; border: none;">
-            `;
+            const userLikes = await Promise.all(
+                filteredBets.map(bet => contract.methods.hasLikedBet(userAddress, bet.betId).call())
+            );
+
+            let html = "";
+            filteredBets.forEach((bet, index) => {
+                let shortPlayer = bet.player.slice(0, 10) + "..." + bet.player.slice(-10);
+                let shortTxHash = bet.txHash.slice(0, 10) + "..." + bet.txHash.slice(-10);
+                let likeCount = likeCounts[index];
+                let isLiked = userLikes[index];
+                let likeButtonText = isLiked ? "Dislike" : "Like";
+
+                html += `
+                    <p>
+                        Player: <span style="color: #ad5cff;">${shortPlayer}</span><br>
+                        BetID: <span style="color: #b37500; font-size: 9px;">${bet.betId}</span><br>
+                        BetNumber: <span style="color: #00FF66;">${bet.number}</span><br>
+                        BetAmount: <span style="color: #00FF66;">${bet.betAmount}</span><br>
+                        Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
+                        Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
+                        Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
+                        Likes: <span id="likeCount-${bet.betId}" style="color: #ffcc00;">${likeCount}</span><br>
+                        <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')">${likeButtonText}</button>
+                    </p>
+                    <hr style="background-color: #333333; height: 1px; border: none;">
+                `;
+            });
+
+            document.getElementById("betHistory").innerHTML = html;
+        } catch (error) {
+            console.error("Error loading bet history:", error);
         }
-
-        document.getElementById("betHistory").innerHTML = html;
     }
+
+    async function toggleLike(betId) {
+        try {
+            let isLiked = await contract.methods.hasLikedBet(userAddress, betId).call();
+
+            if (isLiked) {
+                await contract.methods.unlikeBet(betId).send({ from: userAddress });
+            } else {
+                await contract.methods.likeBet(betId).send({ from: userAddress });
+            }
+
+            // Update UI setelah transaksi berhasil
+            let likeCount = await contract.methods.getBetLikeCount(betId).call();
+            let updatedIsLiked = await contract.methods.hasLikedBet(userAddress, betId).call();
+            let likeButtonText = updatedIsLiked ? "Dislike" : "Like";
+
+            document.getElementById(`likeCount-${betId}`).innerText = likeCount;
+            document.getElementById(`likeButton-${betId}`).innerText = likeButtonText;
+        } catch (error) {
+            console.error("Error toggling like:", error);
+        }
+    }
+
+    loadBetHistory();
+        
         // **Bet History Pagination**
 function prevBetHistory() {
     if (betHistoryPage > 0) {
@@ -1461,19 +1499,6 @@ function nextBetHistory() {
     betHistoryPage++;
     loadBetHistory();
 }
-
-    async function toggleLike(betId) {
-        await contract.methods.likeOrUnlikeBet(betId).send({ from: userAddress });
-
-        let likeCount = await contract.methods.getBetLikeCount(betId).call();
-        let isLiked = await contract.methods.betLikes(betId, userAddress).call();
-        let likeButtonText = isLiked ? "Dislike" : "Like";
-
-        document.getElementById(`likeCount-${betId}`).innerText = likeCount;
-        document.getElementById(`likeButton-${betId}`).innerText = likeButtonText;
-    }
-
-    loadBetHistory();
 
 // **Memasang Event Listener Setelah Load**
 function addEventListeners() {
