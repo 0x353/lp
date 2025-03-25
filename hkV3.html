@@ -1468,7 +1468,7 @@ async function loadBetHistory() {
     Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
     Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
     <button id="likeButton" style="display: none;" onclick="toggleLike('0x123456789abcdef')">
-    Lik
+     ❌
 </button>
 <p id="likeStatus"></p>
 <p id="betLikesCount">Likes: 0</p>
@@ -1579,15 +1579,29 @@ window.onload = () => {
     </script>
 
    <script>
-       // Inisialisasi Web3 saat halaman dimuat
+       
+// Inisialisasi Web3 saat halaman dimuat
 async function init() {
     if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        await window.ethereum.request({ method: "eth_requestAccounts" });
-        const accounts = await web3.eth.getAccounts();
-        userAccount = accounts[0];
-        contract = new web3.eth.Contract(contractABI, contractAddress);
-        loadLikes(); // Muat status like awal
+        try {
+            web3 = new Web3(window.ethereum);
+            await window.ethereum.request({ method: "eth_requestAccounts" });
+            const accounts = await web3.eth.getAccounts();
+            userAccount = accounts[0];
+
+            // Pastikan contractABI dan contractAddress sudah didefinisikan
+            if (!contractABI || !contractAddress) {
+                console.error("ABI atau contract address tidak ditemukan!");
+                return;
+            }
+
+            contract = new web3.eth.Contract(contractABI, contractAddress);
+            console.log("Contract berhasil diinisialisasi:", contract);
+
+            await loadLikes(); // Muat status like awal
+        } catch (error) {
+            console.error("Gagal menginisialisasi Web3:", error);
+        }
     } else {
         alert("MetaMask tidak terdeteksi");
     }
@@ -1596,7 +1610,10 @@ async function init() {
 // Fungsi untuk mengambil jumlah likes dari smart contract
 async function getBetLikes(betId) {
     try {
-        if (!contract) return;
+        if (!contract) {
+            console.error("Contract belum diinisialisasi!");
+            return;
+        }
         const likeCount = await contract.methods.betLikeCount(betId).call();
         document.getElementById("betLikesCount").innerText = `Likes: ${likeCount}`;
     } catch (error) {
@@ -1607,7 +1624,10 @@ async function getBetLikes(betId) {
 // Periksa apakah user sudah like
 async function checkLikeStatus(betId) {
     try {
-        if (!contract || !userAccount) return;
+        if (!contract || !userAccount) {
+            console.error("Contract atau userAccount tidak ditemukan!");
+            return;
+        }
 
         const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
         userHasLiked = hasLiked;
@@ -1615,6 +1635,8 @@ async function checkLikeStatus(betId) {
         const likeButton = document.getElementById("likeButton");
         likeButton.innerText = hasLiked ? "Unlike" : "Like";
         likeButton.style.display = "block";
+
+        console.log("Status like pengguna:", hasLiked);
     } catch (error) {
         console.error("Error mengecek status like:", error);
     }
@@ -1635,6 +1657,11 @@ async function toggleLike(betId) {
         likeStatus.innerText = "Processing...";
         likeStatus.style.color = "blue";
 
+        if (!contract) {
+            console.error("Contract belum diinisialisasi!");
+            return;
+        }
+
         let tx;
         if (userHasLiked) {
             tx = contract.methods.unlikeBet(betId).send({ from: userAccount });
@@ -1648,7 +1675,8 @@ async function toggleLike(betId) {
             likeStatus.style.color = "orange";
         });
 
-        tx.on("receipt", async () => {
+        tx.on("receipt", async (receipt) => {
+            console.log("Transaksi berhasil:", receipt);
             userHasLiked = !userHasLiked;
             likeStatus.innerText = userHasLiked ? "Like berhasil!" : "Unlike berhasil!";
             likeStatus.style.color = "green";
@@ -1673,7 +1701,8 @@ async function toggleLike(betId) {
 
 // Fungsi untuk memuat status likes awal
 async function loadLikes() {
-    const betId = "0x123456789abcdef"; // Gantilah dengan betId yang sesuai
+    const betId = "0x123456789abcdef"; // Pastikan betId benar dan valid
+    console.log("Memuat likes untuk betId:", betId);
     await getBetLikes(betId);
     await checkLikeStatus(betId);
 }
@@ -1682,7 +1711,6 @@ async function loadLikes() {
 document.addEventListener("DOMContentLoaded", async () => {
     await init();
 });
-      
    </script>
        
 </body>
