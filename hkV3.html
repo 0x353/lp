@@ -1468,7 +1468,7 @@ async function loadBetHistory() {
     Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
     Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
     <p>Likes: <span id="betLikesCount-${bet.betId}">0</span></p>
-<button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" class="like-button" data-bet-id="${bet.betId}" >Like</button>
+<button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" class="like-button" data-bet-id="${bet.betId}" >L</button>
 </p>
 <hr style="background-color: #333333; height: 1px; border: none;">`;
         
@@ -1490,7 +1490,6 @@ function nextBetHistory() {
 }
 
 // Like Function
-// **1. Inisialisasi & Pemanggilan Data dari Blockchain**
 async function init() {
     if (window.ethereum) {
         web3 = new Web3(window.ethereum);
@@ -1508,36 +1507,30 @@ async function init() {
 async function loadLikes() {
     const bets = document.querySelectorAll(".like-button");
     for (let button of bets) {
-        let betId = button.dataset.betId;
+        let betId = button.getAttribute("onclick").match(/'(.+?)'/)[1];
         try {
             const likeCount = await contract.methods.betLikeCount(betId).call();
-            document.getElementById(`betLikesCount-${betId}`).innerText = likeCount;
+            document.getElementById(`betLikesCount-${betId}`).innerText = `Likes: ${likeCount}`;
 
             const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
             button.innerText = hasLiked ? "Unlike" : "Like";
             button.style.display = "block";
-
-            // Simpan status ke localStorage agar tetap ada setelah refresh
-            localStorage.setItem(`likeStatus-${betId}`, JSON.stringify({ likeCount, hasLiked }));
         } catch (error) {
             console.error(`Error loading likes for bet ${betId}:`, error);
         }
     }
 }
 
-// **2. Fungsi Interaksi dengan Smart Contract (Like/Unlike)**
+// Fungsi untuk Like atau Unlike bet
 async function toggleLike(betId) {
     try {
         const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
         const method = hasLiked ? "unlikeBet" : "likeBet";
 
-        console.log(`Mengirim transaksi ${method} untuk betId: ${betId}`);
-        
         const tx = await contract.methods[method](betId).send({ from: userAccount });
 
         if (tx.status) {
-            console.log("Transaksi berhasil:", tx);
-            await loadLikes(); // Update tampilan setelah transaksi berhasil
+            loadLikes(); // Update tampilan setelah transaksi berhasil
         }
     } catch (error) {
         console.error("Error toggling like:", error);
@@ -1545,22 +1538,7 @@ async function toggleLike(betId) {
 }
 
 // Panggil init saat halaman dimuat
-window.onload = async () => {
-    // Coba muat data dari localStorage sebelum koneksi ke blockchain
-    const bets = document.querySelectorAll(".like-button");
-    for (let button of bets) {
-        let betId = button.dataset.betId;
-        let storedData = localStorage.getItem(`likeStatus-${betId}`);
-        if (storedData) {
-            let { likeCount, hasLiked } = JSON.parse(storedData);
-            document.getElementById(`betLikesCount-${betId}`).innerText = likeCount;
-            button.innerText = hasLiked ? "Unlike" : "Like";
-            button.style.display = "block";
-        }
-    }
-
-    await init(); // Setelah itu koneksi ke blockchain
-};
+window.onload = init;
         
 // Modal Result
 function updateHistory(newBall1) {
