@@ -1467,7 +1467,7 @@ async function loadBetHistory() {
     Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
     Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
     <p>Likes: <span id="betLikesCount-${bet.betId}">0</span></p>
-    <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" class="like-button" data-bet-id="${bet.betId}">😡</button>
+    <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" class="like-button" data-bet-id="${bet.betId}">LL</button>
 </p>
 <hr style="background-color: #333333; height: 1px; border: none;">`;
         
@@ -1497,7 +1497,10 @@ async function init() {
         userAccount = accounts[0];
         contract = new web3.eth.Contract(contractABI, contractAddress);
         
-        // Muat jumlah like dan status like setelah user terhubung
+        // Tampilkan data dari local storage dulu (jika ada)
+        loadLikesFromLocalStorage();
+
+        // Lalu update dengan data dari blockchain
         await loadLikes();
 
         // Event listener jika user mengganti akun di MetaMask
@@ -1514,6 +1517,8 @@ async function init() {
 // Fungsi untuk memuat jumlah like dan status like dari blockchain
 async function loadLikes() {
     const bets = document.querySelectorAll(".like-button");
+    let likesData = {};
+
     for (let button of bets) {
         let betId = button.getAttribute("onclick").match(/'(.+?)'/)[1];
         try {
@@ -1523,8 +1528,31 @@ async function loadLikes() {
             const hasLiked = await contract.methods.hasUserLiked(betId, userAccount).call();
             button.innerText = hasLiked ? "Unlike" : "Like";
             button.style.display = "block";
+
+            // Simpan data ke local storage sebagai cache
+            likesData[betId] = { likeCount, hasLiked };
+
         } catch (error) {
             console.error(`Error loading likes for bet ${betId}:`, error);
+        }
+    }
+
+    // Update local storage setelah mendapatkan data terbaru dari blockchain
+    localStorage.setItem("likesData", JSON.stringify(likesData));
+}
+
+// Fungsi untuk memuat data dari local storage (sebelum data blockchain di-load)
+function loadLikesFromLocalStorage() {
+    const likesData = JSON.parse(localStorage.getItem("likesData")) || {};
+
+    const bets = document.querySelectorAll(".like-button");
+    for (let button of bets) {
+        let betId = button.getAttribute("onclick").match(/'(.+?)'/)[1];
+
+        if (likesData[betId]) {
+            document.getElementById(`betLikesCount-${betId}`).innerText = `Likes: ${likesData[betId].likeCount}`;
+            button.innerText = likesData[betId].hasLiked ? "Unlike" : "Like";
+            button.style.display = "block";
         }
     }
 }
