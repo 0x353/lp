@@ -1553,10 +1553,10 @@ async function toggleLike(betId) {
     }
 }
 
-async function updateLikeStatus(betId) {
+async function updateLikeStatus(betId, fromTransaction = false) {
     try {
         const likeCount = await contract.methods.getLikeCount(betId).call();
-        console.log(`Like count for ${betId}:`, likeCount); // Debug
+        console.log(`Like count for ${betId}:`, likeCount);
         document.getElementById(`likeCount-${betId}`).innerText = likeCount;
 
         const accounts = await window.ethereum.request({ method: "eth_accounts" });
@@ -1564,7 +1564,7 @@ async function updateLikeStatus(betId) {
 
         const userAccount = accounts[0];
         const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
-        console.log(`User ${userAccount} liked bet ${betId}:`, liked); // Debug
+        console.log(`User ${userAccount} liked bet ${betId}:`, liked);
 
         const button = document.getElementById(`likeButton-${betId}`);
 
@@ -1575,8 +1575,70 @@ async function updateLikeStatus(betId) {
             button.innerText = "Like";
             button.style.backgroundColor = "#66ccff";
         }
+
+        // Jika pemanggilan berasal dari transaksi, jangan ubah status tombol langsung
+        if (!fromTransaction) {
+            button.disabled = false;
+        }
     } catch (error) {
         console.error("Failed to update like status:", error);
+    }
+}
+
+async function toggleLike(betId) {
+    try {
+        if (typeof window.ethereum === "undefined") {
+            alert("MetaMask not found! Please install MetaMask.");
+            return;
+        }
+
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        if (!accounts || accounts.length === 0) {
+            alert("Please connect your MetaMask wallet.");
+            return;
+        }
+
+        const userAccount = accounts[0];
+
+        const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
+        const button = document.getElementById(`likeButton-${betId}`);
+
+        // Disable tombol agar tidak bisa diklik berkali-kali
+        button.disabled = true;
+
+        if (liked) {
+            await contract.methods.unlikeBet(betId).send({ from: userAccount })
+                .on("transactionHash", function (hash) {
+                    console.log("Transaction sent! Hash:", hash);
+                    button.innerText = "Like"; 
+                    button.style.backgroundColor = "#66ccff";
+                })
+                .on("receipt", function (receipt) {
+                    console.log("Transaction confirmed:", receipt);
+                    updateLikeStatus(betId, true); // Update status setelah transaksi selesai
+                })
+                .on("error", function (error) {
+                    console.error("Error processing unlike:", error);
+                    button.disabled = false;
+                });
+        } else {
+            await contract.methods.likeBet(betId, "👍").send({ from: userAccount }) 
+                .on("transactionHash", function (hash) {
+                    console.log("Transaction sent! Hash:", hash);
+                    button.innerText = "Dislike"; 
+                    button.style.backgroundColor = "#ff6666";
+                })
+                .on("receipt", function (receipt) {
+                    console.log("Transaction confirmed:", receipt);
+                    updateLikeStatus(betId, true); // Update status setelah transaksi selesai
+                })
+                .on("error", function (error) {
+                    console.error("Error processing like:", error);
+                    button.disabled = false;
+                });
+        }
+    } catch (error) {
+        console.error("Failed to toggle like:", error);
     }
 }
         
