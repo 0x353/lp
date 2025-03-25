@@ -1182,7 +1182,7 @@ async function loadBetHistory() {
     Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
     <p>Likes: <span id="betLikesCount-${bet.betId}">0</span></p>
 <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" class="like-button" data-bet-id="${bet.betId}">
-    Lik
+    Like
 </button>
     </p><hr style="background-color: #333333; height: 1px; border: none;">`;
         
@@ -1204,15 +1204,22 @@ function nextBetHistory() {
 }
 
 // Like Function
+// **1. Inisialisasi & Pemanggilan Data dari Blockchain**
 async function init() {
     if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        await window.ethereum.request({ method: "eth_requestAccounts" });
-        const accounts = await web3.eth.getAccounts();
-        userAccount = accounts[0];
-        contract = new web3.eth.Contract(contractABI, contractAddress);
+        try {
+            web3 = new Web3(window.ethereum);
+            await window.ethereum.request({ method: "eth_requestAccounts" });
 
-        loadLikes(); // Muat status like awal
+            const accounts = await web3.eth.getAccounts();
+            userAccount = accounts[0];
+            contract = new web3.eth.Contract(contractABI, contractAddress);
+
+            console.log("Connected Account:", userAccount);
+            loadLikes(); // Muat status like awal
+        } catch (error) {
+            console.error("Error initializing MetaMask:", error);
+        }
     } else {
         alert("MetaMask tidak terdeteksi");
     }
@@ -1231,7 +1238,7 @@ async function loadLikes() {
             button.innerText = hasLiked ? "Unlike" : "Like";
             button.style.display = "block";
 
-            // Simpan status ke localStorage agar tetap stabil setelah refresh
+            // Simpan status ke localStorage agar tetap ada setelah refresh
             localStorage.setItem(`likeStatus-${betId}`, JSON.stringify({ likeCount, hasLiked }));
         } catch (error) {
             console.error(`Error loading likes for bet ${betId}:`, error);
@@ -1239,16 +1246,19 @@ async function loadLikes() {
     }
 }
 
-// Fungsi untuk Like atau Unlike bet
+// **2. Fungsi Interaksi dengan Smart Contract (Like/Unlike)**
 async function toggleLike(betId) {
     try {
         const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
         const method = hasLiked ? "unlikeBet" : "likeBet";
 
+        console.log(`Mengirim transaksi ${method} untuk betId: ${betId}`);
+        
         const tx = await contract.methods[method](betId).send({ from: userAccount });
 
         if (tx.status) {
-            loadLikes(); // Update tampilan setelah transaksi berhasil
+            console.log("Transaksi berhasil:", tx);
+            await loadLikes(); // Update tampilan setelah transaksi berhasil
         }
     } catch (error) {
         console.error("Error toggling like:", error);
