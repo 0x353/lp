@@ -1439,41 +1439,57 @@ function nextUserBets() {
         
 // **Load Bet History (with Pagination)**
 async function loadBetHistory() {
-    const bets = await contract.methods.getAllBets().call();
-    const reversedBets = bets.slice().reverse(); // Membalik urutan bets
+    try {
+        const bets = await contract.methods.getAllBets().call();
+        if (!bets || bets.length === 0) {
+            console.warn("No bet history found.");
+            document.getElementById("betHistory").innerHTML = "<p style='color: red;'>No bets found.</p>";
+            return;
+        }
 
-    // **Filter hanya bets dalam 7 hari terakhir**
-    const now = Math.floor(Date.now() / 1000); // Waktu sekarang dalam detik (Unix Timestamp)
-    const sevenDaysAgo = now - 7 * 24 * 60 * 60; // 7 hari dalam detik
+        const reversedBets = bets.slice().reverse(); // Urutkan dari terbaru
 
-    const filteredBets = reversedBets.filter(bet => bet.timestamp >= sevenDaysAgo);
+        const start = betHistoryPage * pageSize;
+        const end = Math.min(start + pageSize, reversedBets.length);
 
-    const start = betHistoryPage * pageSize;
-    const end = Math.min(start + pageSize, reversedBets.length);
+        let html = "";
+        for (let i = start; i < end; i++) {
+            let bet = reversedBets[i];
+            if (!bet.betId) continue; // Skip jika betId tidak valid
 
-    let html = "";
-    for (let i = start; i < end; i++) {
-        let bet = reversedBets[i];
-        let shortPlayer = bet.player.slice(0, 10) + "..." + bet.player.slice(-10);
-        let shortTxHash = bet.txHash.slice(0, 10) + "..." + bet.txHash.slice(-10);
+            let shortPlayer = bet.player.slice(0, 10) + "..." + bet.player.slice(-10);
+            let shortTxHash = bet.txHash.slice(0, 10) + "..." + bet.txHash.slice(-10);
 
-       html += `<p>
-    Player: <span style="color: #ad5cff;">${shortPlayer}</span><br>
-    BetID: <span style="color: #b37500; font-size: 9px;">${bet.betId}</span><br>
-    BetNumber: <span style="color: #00FF66;">${bet.number}</span><br>
-    BetAmount: <span style="color: #00FF66;">${bet.betAmount}</span><br>
-    Payout: <span style="color: #FFD700;">${bet.payoutAmount}</span><br>
-    Is ETH: <span style="color: ${bet.isETH ? '#00FF66' : '#fe6666'};">${bet.isETH ? 'Yes' : 'No'}</span><br>
-    Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
-    Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
-    Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
-    <p>Likes: <span id="betLikesCount-${bet.betId}">0</span></p>
-    <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" class="like-button" data-bet-id="${bet.betId}">Like</button>
-</p>
-<hr style="background-color: #333333; height: 1px; border: none;">`;
-        
+            html += `<p>
+                Player: <span style="color: #ad5cff;">${shortPlayer}</span><br>
+                BetID: <span style="color: #b37500; font-size: 8px;">${bet.betId}</span><br>
+                BetNumber: <span style="color: #00FF66;">${bet.number}</span><br>
+                BetAmount: <span style="color: #00FF66;">${bet.betAmount}</span><br>
+                Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
+                Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
+                Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
+
+                <!-- Tombol Like -->
+                <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" style="background-color: #66ccff; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px;">Like</button>
+                <span id="likeCount-${bet.betId}" style="margin-left: 10px; color: #fff;">0</span> Likes
+
+            </p><hr style="background-color: #333333; height: 1px; border: none;">`;
+        }
+
+        document.getElementById("betHistory").innerHTML = html;
+
+        // Ambil jumlah like dan status like setelah bet history dimuat
+        for (let i = start; i < end; i++) {
+            let bet = reversedBets[i];
+            if (!bet.betId) continue; // Skip jika betId tidak valid
+
+            await getBetLikes(bet.betId);
+            await checkLikeStatus(bet.betId);
+        }
+    } catch (error) {
+        console.error("Error loading bet history:", error);
+        document.getElementById("betHistory").innerHTML = "<p style='color: red;'>Error loading bet history.</p>";
     }
-    document.getElementById("betHistory").innerHTML = html;
 }
 
 // **Bet History Pagination**
@@ -1490,55 +1506,57 @@ function nextBetHistory() {
 }
 
 // Like Function
-async function init() {
-    if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        await window.ethereum.request({ method: "eth_requestAccounts" });
-        const accounts = await web3.eth.getAccounts();
-        userAccount = accounts[0];
-        contract = new web3.eth.Contract(contractABI, contractAddress);
-        loadLikes(); // Muat status like awal
-    } else {
-        alert("MetaMask tidak terdeteksi");
-    }
-}
-
-// Fungsi untuk memuat jumlah like dan status like dari blockchain
-async function loadLikes() {
-    const bets = document.querySelectorAll(".like-button");
-    for (let button of bets) {
-        let betId = button.getAttribute("onclick").match(/'(.+?)'/)[1];
-        try {
-            const likeCount = await contract.methods.betLikeCount(betId).call();
-            document.getElementById(`betLikesCount-${betId}`).innerText = `Likes: ${likeCount}`;
-
-            const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
-            button.innerText = hasLiked ? "Unlike" : "Like";
-            button.style.display = "block";
-        } catch (error) {
-            console.error(`Error loading likes for bet ${betId}:`, error);
-        }
-    }
-}
-
-// Fungsi untuk Like atau Unlike bet
 async function toggleLike(betId) {
     try {
-        const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
-        const method = hasLiked ? "unlikeBet" : "likeBet";
+        if (typeof window.ethereum === "undefined") {
+            alert("MetaMask not found! Please install MetaMask.");
+            return;
+        }
 
-        const tx = await contract.methods[method](betId).send({ from: userAccount });
+        let userAccount = await checkWalletConnection();
+        if (!userAccount) {
+            const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+            userAccount = accounts[0];
+        }
 
-        if (tx.status) {
-            loadLikes(); // Update tampilan setelah transaksi berhasil
+        const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
+        const button = document.getElementById(`likeButton-${betId}`);
+
+        if (liked) {
+            // Jika sudah like, maka unlike
+            await contract.methods.unlikeBet(betId).send({ from: userAccount })
+                .on("transactionHash", function (hash) {
+                    console.log("Transaction sent! Hash:", hash);
+                    button.innerText = "Like";
+                    button.style.backgroundColor = "#66ccff"; // Warna biru kembali
+                })
+                .on("receipt", function (receipt) {
+                    console.log("Transaction confirmed:", receipt);
+                    getBetLikes(betId);
+                })
+                .on("error", function (error) {
+                    console.error("Error processing unlike:", error);
+                });
+        } else {
+            // Jika belum like, maka like
+            await contract.methods.likeBet(betId).send({ from: userAccount })
+                .on("transactionHash", function (hash) {
+                    console.log("Transaction sent! Hash:", hash);
+                    button.innerText = "Dislike";
+                    button.style.backgroundColor = "#ff6666"; // Warna merah
+                })
+                .on("receipt", function (receipt) {
+                    console.log("Transaction confirmed:", receipt);
+                    getBetLikes(betId);
+                })
+                .on("error", function (error) {
+                    console.error("Error processing like:", error);
+                });
         }
     } catch (error) {
-        console.error("Error toggling like:", error);
+        console.error("Failed to toggle like:", error);
     }
 }
-
-// Panggil init saat halaman dimuat
-window.onload = init;
         
 // Modal Result
 function updateHistory(newBall1) {
