@@ -1499,38 +1499,6 @@ function nextBetHistory() {
 }
 
 // Like Function
-async function updateLikeStatus(betId, fromTransaction = false) {
-    try {
-        const likeCount = await contract.methods.getLikeCount(betId).call();
-        console.log(`Like count for ${betId}:`, likeCount);
-        document.getElementById(`likeCount-${betId}`).innerText = likeCount;
-
-        const accounts = await window.ethereum.request({ method: "eth_accounts" });
-        if (accounts.length === 0) return;
-
-        const userAccount = accounts[0];
-        const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
-        console.log(`User ${userAccount} liked bet ${betId}:`, liked);
-
-        const button = document.getElementById(`likeButton-${betId}`);
-
-        if (liked) {
-            button.innerText = "Dislike";
-            button.style.backgroundColor = "#ff6666";
-        } else {
-            button.innerText = "Like";
-            button.style.backgroundColor = "#66ccff";
-        }
-
-        // Jika pemanggilan berasal dari transaksi, jangan ubah status tombol langsung
-        if (!fromTransaction) {
-            button.disabled = false;
-        }
-    } catch (error) {
-        console.error("Failed to update like status:", error);
-    }
-}
-
 async function toggleLike(betId) {
     try {
         if (typeof window.ethereum === "undefined") {
@@ -1549,44 +1517,54 @@ async function toggleLike(betId) {
         const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
         const button = document.getElementById(`likeButton-${betId}`);
 
-        // Disable tombol agar tidak bisa diklik berkali-kali
-        button.disabled = true;
-
         if (liked) {
+            // Jika sudah like, maka unlike
             await contract.methods.unlikeBet(betId).send({ from: userAccount })
                 .on("transactionHash", function (hash) {
                     console.log("Transaction sent! Hash:", hash);
-                    button.innerText = "Like"; 
+                    button.innerText = "Like";
                     button.style.backgroundColor = "#66ccff";
                 })
                 .on("receipt", function (receipt) {
                     console.log("Transaction confirmed:", receipt);
-                    updateLikeStatus(betId, true); // Update status setelah transaksi selesai
+                    updateLikeStatus(betId);
                 })
                 .on("error", function (error) {
                     console.error("Error processing unlike:", error);
-                    button.disabled = false;
                 });
         } else {
+            // Jika belum like, maka like
             await contract.methods.likeBet(betId, "👍").send({ from: userAccount }) 
                 .on("transactionHash", function (hash) {
                     console.log("Transaction sent! Hash:", hash);
-                    button.innerText = "Dislike"; 
+                    button.innerText = "Dislike";
                     button.style.backgroundColor = "#ff6666";
                 })
                 .on("receipt", function (receipt) {
                     console.log("Transaction confirmed:", receipt);
-                    updateLikeStatus(betId, true); // Update status setelah transaksi selesai
+                    updateLikeStatus(betId);
                 })
                 .on("error", function (error) {
                     console.error("Error processing like:", error);
-                    button.disabled = false;
                 });
         }
     } catch (error) {
         console.error("Failed to toggle like:", error);
     }
 }
+
+
+async function updateLikeStatus(betId) {
+    try {
+        const likeCount = await contract.methods.getLikeCount(betId).call();
+        document.getElementById(`likeCount-${betId}`).innerText = likeCount;
+
+        const accounts = await window.ethereum.request({ method: "eth_accounts" });
+        if (accounts.length === 0) return;
+
+        const userAccount = accounts[0];
+        const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
+        const button = document.get
         
 // Modal Result
 function updateHistory(newBall1) {
