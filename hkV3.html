@@ -1466,8 +1466,8 @@ async function loadBetHistory() {
     Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
     Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
     Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
-    <p>Likes: <span id="betLikesCount-${bet.betId}">0</span></p>
-    <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" class="like-button" data-bet-id="${bet.betId}">Like</button>
+    <button class="like-button" data-bet-id="1234" onclick="toggleLike('1234')">Lie</button>
+<span id="betLikesCount-1234">Likes: 0</span>
 </p>
 <hr style="background-color: #333333; height: 1px; border: none;">`;
         
@@ -1496,7 +1496,7 @@ async function init() {
         const accounts = await web3.eth.getAccounts();
         userAccount = accounts[0];
         contract = new web3.eth.Contract(contractABI, contractAddress);
-        loadLikes(); // Muat status like awal
+        await loadLikes(); // Muat status like awal
     } else {
         alert("MetaMask tidak terdeteksi");
     }
@@ -1504,11 +1504,13 @@ async function init() {
 
 // Fungsi untuk memuat jumlah like dan status like dari blockchain
 async function loadLikes() {
-    const bets = document.querySelectorAll(".like-button");
-    for (let button of bets) {
-        let betId = button.getAttribute("onclick").match(/'(.+?)'/)[1];
+    const buttons = document.querySelectorAll(".like-button");
+
+    for (let button of buttons) {
+        let betId = button.dataset.betId; // Ambil betId dari data-bet-id
+
         try {
-            const likeCount = await contract.methods.betLikeCount(betId).call();
+            const likeCount = await contract.methods.getLikeCount(betId).call();
             document.getElementById(`betLikesCount-${betId}`).innerText = `Likes: ${likeCount}`;
 
             const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
@@ -1529,7 +1531,7 @@ async function toggleLike(betId) {
         const tx = await contract.methods[method](betId).send({ from: userAccount });
 
         if (tx.status) {
-            loadLikes(); // Update tampilan setelah transaksi berhasil
+            await loadLikes(); // Update tampilan setelah transaksi berhasil
         }
     } catch (error) {
         console.error("Error toggling like:", error);
