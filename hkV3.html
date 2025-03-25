@@ -1553,7 +1553,6 @@ async function toggleLike(betId) {
     }
 }
 
-
 async function updateLikeStatus(betId) {
     try {
         const likeCount = await contract.methods.getLikeCount(betId).call();
@@ -1564,7 +1563,19 @@ async function updateLikeStatus(betId) {
 
         const userAccount = accounts[0];
         const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
-        const button = document.get
+        const button = document.getElementById(`likeButton-${betId}`);
+
+        if (liked) {
+            button.innerText = "Dislike";
+            button.style.backgroundColor = "#ff6666";
+        } else {
+            button.innerText = "Like";
+            button.style.backgroundColor = "#66ccff";
+        }
+    } catch (error) {
+        console.error("Failed to update like status:", error);
+    }
+}
         
 // Modal Result
 function updateHistory(newBall1) {
