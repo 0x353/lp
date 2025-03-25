@@ -1496,7 +1496,7 @@ async function init() {
         const accounts = await web3.eth.getAccounts();
         userAccount = accounts[0];
         contract = new web3.eth.Contract(contractABI, contractAddress);
-        await loadLikes(); // Muat status like awal
+        loadLikes(); // Muat status like awal setelah koneksi wallet
     } else {
         alert("MetaMask tidak terdeteksi");
     }
@@ -1507,7 +1507,7 @@ async function loadLikes() {
     const buttons = document.querySelectorAll(".like-button");
 
     for (let button of buttons) {
-        let betId = button.dataset.betId; // Ambil betId dari data-bet-id
+        let betId = button.getAttribute("onclick").match(/'(.+?)'/)[1]; // Menggunakan cara sebelumnya untuk mengambil betId
 
         try {
             const likeCount = await contract.methods.getLikeCount(betId).call();
@@ -1515,6 +1515,7 @@ async function loadLikes() {
 
             const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
             button.innerText = hasLiked ? "Unlike" : "Like";
+            button.classList.toggle("liked", hasLiked); // Menandai tombol jika sudah di-like
             button.style.display = "block";
         } catch (error) {
             console.error(`Error loading likes for bet ${betId}:`, error);
@@ -1531,7 +1532,7 @@ async function toggleLike(betId) {
         const tx = await contract.methods[method](betId).send({ from: userAccount });
 
         if (tx.status) {
-            await loadLikes(); // Update tampilan setelah transaksi berhasil
+            setTimeout(loadLikes, 2000); // Beri waktu 2 detik agar data di blockchain diperbarui sebelum diambil ulang
         }
     } catch (error) {
         console.error("Error toggling like:", error);
