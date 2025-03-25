@@ -1468,7 +1468,7 @@ async function loadBetHistory() {
     Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
     Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
     <p>Likes: <span id="betLikesCount-${bet.betId}">0</span></p>
-<button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" class="like-button" data-bet-id="${bet.betId}" >Lik</button>
+<button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" class="like-button" data-bet-id="${bet.betId}" >Like</button>
 </p>
 <hr style="background-color: #333333; height: 1px; border: none;">`;
         
@@ -1493,19 +1493,12 @@ function nextBetHistory() {
 // **1. Inisialisasi & Pemanggilan Data dari Blockchain**
 async function init() {
     if (window.ethereum) {
-        try {
-            web3 = new Web3(window.ethereum);
-            await window.ethereum.request({ method: "eth_requestAccounts" });
-
-            const accounts = await web3.eth.getAccounts();
-            userAccount = accounts[0];
-            contract = new web3.eth.Contract(contractABI, contractAddress);
-
-            console.log("Connected Account:", userAccount);
-            loadLikes(); // Muat status like awal
-        } catch (error) {
-            console.error("Error initializing MetaMask:", error);
-        }
+        web3 = new Web3(window.ethereum);
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+        const accounts = await web3.eth.getAccounts();
+        userAccount = accounts[0];
+        contract = new web3.eth.Contract(contractABI, contractAddress);
+        loadLikes(); // Muat status like awal
     } else {
         alert("MetaMask tidak terdeteksi");
     }
