@@ -1468,7 +1468,7 @@ async function loadBetHistory() {
     Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
     Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
     Likes: <span id="betLikesCount">0</span>
-<button id="likeButton" onclick="toggleLike('0x123456789abcdef')">Lke</button>
+<button id="likeButton" onclick="toggleLike('0x123456789abcdef')">Like</button>
 <span id="likeStatus" style="color: blue; font-weight: bold;"></span>
 </p>
 <hr style="background-color: #333333; height: 1px; border: none;">`;
@@ -1489,94 +1489,6 @@ function nextBetHistory() {
     betHistoryPage++;
     loadBetHistory();
 }
-
-// Like Function
-async function init() {
-    if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        await window.ethereum.request({ method: "eth_requestAccounts" });
-        const accounts = await web3.eth.getAccounts();
-        userAccount = accounts[0];
-        contract = new web3.eth.Contract(contractABI, contractAddress);
-        
-        // Tampilkan data dari local storage dulu (jika ada)
-        loadLikesFromLocalStorage();
-
-        // Lalu update dengan data dari blockchain
-        await loadLikes();
-
-        // Event listener jika user mengganti akun di MetaMask
-        window.ethereum.on("accountsChanged", async (accounts) => {
-            userAccount = accounts[0];
-            await loadLikes();
-        });
-
-    } else {
-        alert("MetaMask tidak terdeteksi");
-    }
-}
-
-// Fungsi untuk memuat jumlah like dan status like dari blockchain
-async function loadLikes() {
-    const bets = document.querySelectorAll(".like-button");
-    let likesData = {};
-
-    for (let button of bets) {
-        let betId = button.getAttribute("onclick").match(/'(.+?)'/)[1];
-        try {
-            const likeCount = await contract.methods.getLikeCount(betId).call();
-            document.getElementById(`betLikesCount-${betId}`).innerText = `Likes: ${likeCount}`;
-
-            const hasLiked = await contract.methods.hasUserLiked(betId, userAccount).call();
-            button.innerText = hasLiked ? "Unlike" : "Like";
-            button.style.display = "block";
-
-            // Simpan data ke local storage sebagai cache
-            likesData[betId] = { likeCount, hasLiked };
-
-        } catch (error) {
-            console.error(`Error loading likes for bet ${betId}:`, error);
-        }
-    }
-
-    // Update local storage setelah mendapatkan data terbaru dari blockchain
-    localStorage.setItem("likesData", JSON.stringify(likesData));
-}
-
-// Fungsi untuk memuat data dari local storage (sebelum data blockchain di-load)
-function loadLikesFromLocalStorage() {
-    const likesData = JSON.parse(localStorage.getItem("likesData")) || {};
-
-    const bets = document.querySelectorAll(".like-button");
-    for (let button of bets) {
-        let betId = button.getAttribute("onclick").match(/'(.+?)'/)[1];
-
-        if (likesData[betId]) {
-            document.getElementById(`betLikesCount-${betId}`).innerText = `Likes: ${likesData[betId].likeCount}`;
-            button.innerText = likesData[betId].hasLiked ? "Unlike" : "Like";
-            button.style.display = "block";
-        }
-    }
-}
-
-// Fungsi untuk Like atau Unlike bet
-async function toggleLike(betId) {
-    try {
-        const hasLiked = await contract.methods.hasUserLiked(betId, userAccount).call();
-        const method = hasLiked ? "unlikeBet" : "likeBet";
-
-        const tx = await contract.methods[method](betId).send({ from: userAccount });
-
-        if (tx.status) {
-            await loadLikes(); // Update tampilan setelah transaksi berhasil
-        }
-    } catch (error) {
-        console.error("Error toggling like:", error);
-    }
-}
-
-// Panggil init saat halaman dimuat
-window.onload = init;
         
 // Modal Result
 function updateHistory(newBall1) {
