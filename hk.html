@@ -1191,11 +1191,13 @@ async function loadBetHistory() {
     // Ambil jumlah like dan status like setelah bet history dimuat
     for (let i = start; i < end; i++) {
         let bet = reversedBets[i];
+        if (!bet.betId) continue; // Skip jika betId tidak valid
+
         await getBetLikes(bet.betId);
         await checkLikeStatus(bet.betId);
     }
 }
-
+    
 // **Bet History Pagination**
 function prevBetHistory() {
     if (betHistoryPage > 0) {
@@ -1210,59 +1212,55 @@ function nextBetHistory() {
 }
 
 // Like Function
-// Fungsi untuk mengambil jumlah like dari smart contract
-async function getBetLikes(betId) {
-    try {
-        const likes = await contract.methods.getBetLikes(betId).call();
-        document.getElementById(`likeCount-${betId}`).innerText = likes;
-    } catch (error) {
-        console.error("Failed to get bet likes:", error);
-    }
-}
-
-// Fungsi untuk mengecek apakah user sudah like atau belum
-async function checkLikeStatus(betId) {
-    if (!userAccount) return;
-
-    try {
-        const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
-        const button = document.getElementById(`likeButton-${betId}`);
-        
-        if (liked) {
-            button.innerText = "Dislike";
-            button.style.backgroundColor = "#ff6666"; // Warna merah untuk dislike
-        } else {
-            button.innerText = "Like";
-            button.style.backgroundColor = "#66ccff"; // Warna biru untuk like
-        }
-    } catch (error) {
-        console.error("Failed to check like status:", error);
-    }
-}
-
-// Fungsi untuk memberikan atau menghapus like
 async function toggleLike(betId) {
-    if (!userAccount) {
-        alert("Please connect your wallet first!");
-        return;
-    }
-
     try {
+        if (typeof window.ethereum === "undefined") {
+            alert("MetaMask not found! Please install MetaMask.");
+            return;
+        }
+
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        if (!accounts || accounts.length === 0) {
+            alert("Please connect your MetaMask wallet.");
+            return;
+        }
+
+        const userAccount = accounts[0];
+
         const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
         const button = document.getElementById(`likeButton-${betId}`);
 
         if (liked) {
-            await contract.methods.unlikeBet(betId).send({ from: userAccount });
-            button.innerText = "Like";
-            button.style.backgroundColor = "#66ccff"; // Warna biru kembali
+            // Jika sudah like, maka unlike
+            await contract.methods.unlikeBet(betId).send({ from: userAccount })
+                .on("transactionHash", function (hash) {
+                    console.log("Transaction sent! Hash:", hash);
+                    button.innerText = "Like";
+                    button.style.backgroundColor = "#66ccff"; // Warna biru kembali
+                })
+                .on("receipt", function (receipt) {
+                    console.log("Transaction confirmed:", receipt);
+                    getBetLikes(betId);
+                })
+                .on("error", function (error) {
+                    console.error("Error processing unlike:", error);
+                });
         } else {
-            await contract.methods.likeBet(betId).send({ from: userAccount });
-            button.innerText = "Dislike";
-            button.style.backgroundColor = "#ff6666"; // Warna merah
+            // Jika belum like, maka like
+            await contract.methods.likeBet(betId).send({ from: userAccount })
+                .on("transactionHash", function (hash) {
+                    console.log("Transaction sent! Hash:", hash);
+                    button.innerText = "Dislike";
+                    button.style.backgroundColor = "#ff6666"; // Warna merah
+                })
+                .on("receipt", function (receipt) {
+                    console.log("Transaction confirmed:", receipt);
+                    getBetLikes(betId);
+                })
+                .on("error", function (error) {
+                    console.error("Error processing like:", error);
+                });
         }
-
-        // Perbarui jumlah like
-        await getBetLikes(betId);
     } catch (error) {
         console.error("Failed to toggle like:", error);
     }
