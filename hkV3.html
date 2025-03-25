@@ -1140,6 +1140,9 @@ function showNotification(message) {
 
     console.log("Popup shown!"); // Debugging
 
+    const audio = new Audio('bell.mp3');
+    audio.play().catch(error => console.log('Audio tidak bisa diputar:', error));
+
     setTimeout(() => {
         popup.classList.remove("show");
         setTimeout(() => {
