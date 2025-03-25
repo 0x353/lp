@@ -1180,7 +1180,7 @@ async function loadBetHistory() {
     Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
     Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
     Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
-    <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" style="background-color: #66ccff; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px;">Like</button>
+    <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" style="background-color: #66ccff; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px;">Lie</button>
             <span id="likeCount-${bet.betId}" style="margin-left: 10px; color: #fff;">0</span> Likes
 
         </p><hr style="background-color: #333333; height: 1px; border: none;">`;
@@ -1191,8 +1191,6 @@ async function loadBetHistory() {
     // Ambil jumlah like dan status like setelah bet history dimuat
     for (let i = start; i < end; i++) {
         let bet = reversedBets[i];
-        if (!bet.betId) continue; // Skip jika betId tidak valid
-
         await getBetLikes(bet.betId);
         await checkLikeStatus(bet.betId);
     }
