@@ -790,7 +790,7 @@ h3 {
 </nav>
     
    <div class="container">
-        <h1>H Bet DApp</h1>
+        <h1>HK Bet DApp</h1>
         <h3>Lotto Chain Decentralizer Betting</h3>
         <br>
 
@@ -1051,11 +1051,12 @@ const SEPOLIA_CURRENCY = { name: "Ethereum", symbol: "ETH", decimals: 18 };
 // **Check Connection on Page Load**
 window.addEventListener("load", async () => {
     if (typeof window.ethereum !== "undefined") {
+        web3 = new Web3(window.ethereum);
+        await switchToSepoliaBase();
+
         const savedAccount = localStorage.getItem("walletAddress");
         if (savedAccount) {
             try {
-                web3 = new Web3(window.ethereum);
-                await switchToSepoliaBase();
                 const accounts = await web3.eth.getAccounts();
                 if (accounts.length > 0) {
                     initializeUser(accounts[0]);
@@ -1070,51 +1071,7 @@ window.addEventListener("load", async () => {
     }
 });
 
-// Like Function
-// Fungsi untuk toggle like/unlike
-async function toggleLike(betId) {
-    if (!userAccount) {
-        alert("Harap koneksikan wallet terlebih dahulu!");
-        return;
-    }
-    try {
-        if (userHasLiked) {
-            await contract.methods.unlikeBet(betId).send({ from: userAccount });
-        } else {
-            await contract.methods.likeBet(betId).send({ from: userAccount });
-        }
-        await checkLikeStatus(betId); // Perbarui status tombol setelah aksi
-        getBetLikes(betId);
-    } catch (error) {
-        console.error("Error saat toggle like:", error);
-    }
-}
-
-// Fungsi untuk mengecek apakah user sudah like atau belum
-async function checkLikeStatus(betId) {
-    try {
-        const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
-        userHasLiked = hasLiked;
-
-        const likeButton = document.getElementById("likeButton");
-        likeButton.innerText = hasLiked ? "Unlike" : "Like";
-        likeButton.style.display = "block"; // Pastikan tombol muncul
-    } catch (error) {
-        console.error("Error mengecek status like:", error);
-    }
-}
-
-// Fungsi untuk mengambil jumlah likes
-async function getBetLikes(betId) {
-    try {
-        const likeCount = await contract.methods.betLikeCount(betId).call();
-        document.getElementById("betLikesCount").innerText = `Likes: ${likeCount}`;
-    } catch (error) {
-        console.error("Error mengambil jumlah likes:", error);
-    }
-}
-
-// Status
+// **Fungsi Like**
 async function toggleLike(betId) {
     if (!userAccount) {
         alert("Harap koneksikan wallet terlebih dahulu!");
@@ -1139,15 +1096,13 @@ async function toggleLike(betId) {
             tx = contract.methods.likeBet(betId).send({ from: userAccount });
         }
 
-        // Tangani transaksi sukses
         tx.on("receipt", async () => {
             likeStatus.innerText = hasLiked ? "Unlike berhasil!" : "Like berhasil!";
             likeStatus.style.color = "green";
-            await getBetLikes(betId); // Perbarui jumlah likes setelah transaksi sukses
+            await getBetLikes(betId);
             await checkLikeStatus(betId);
         });
 
-        // Tangani transaksi gagal
         tx.on("error", (error) => {
             console.error("Error toggling like:", error);
             likeStatus.innerText = "Gagal melakukan aksi!";
@@ -1163,22 +1118,7 @@ async function toggleLike(betId) {
     }
 }
 
-//notifikasi
-// **Check Winnings**
-async function checkForWinnings() {
-    try {
-        const winnings = await contract.methods.winnings(userAccount).call();
-        if (parseInt(winnings) > 0) {
-            const ethAmount = web3.utils.fromWei(winnings, "ether");
-            showNotification(`Congratulations, You won ${ethAmount} ETH!`);
-            addNotification(`Congratulations, You won ${ethAmount} ETH Claim Now!`, "claim");
-        }
-    } catch (error) {
-        console.error("%cError checking winnings:", "color: #1a88ff;", error);
-    }
-}
-
-// **Add Notification**
+// **Fungsi Notifikasi**
 function addNotification(message, link) {
     const notifications = document.getElementById("notifications");
     const li = document.createElement("li");
@@ -1188,28 +1128,6 @@ function addNotification(message, link) {
     document.getElementById("notificationBadge").classList.add("active");
 }
 
-// **Toggle Notification List**
-function toggleNotificationList() {
-    const list = document.getElementById("notificationList");
-    list.classList.toggle("hidden");
-
-    if (!list.classList.contains("hidden")) {
-        document.getElementById("notificationBadge").classList.remove("active");
-    }
-}
-
-function updateNotificationStatus() {
-    const notificationsList = document.getElementById("notifications");
-    const noNotificationsMessage = document.getElementById("noNotificationsMessage");
-
-    if (notificationsList.children.length === 0) {
-        noNotificationsMessage.classList.remove("hidden"); // Tampilkan pesan
-    } else {
-        noNotificationsMessage.classList.add("hidden"); // Sembunyikan pesan
-    }
-}
-        
-// Menampilkan popup notifikasi dengan animasi
 function showNotification(message) {
     const popup = document.getElementById("notificationPopup");
     const messageContainer = document.getElementById("notificationMessage");
@@ -1222,45 +1140,24 @@ function showNotification(message) {
     messageContainer.innerHTML = `<span style="color: #00FF66;">${message}</span> 
         <a href="claim" target="_blank" style="color: #00b7ff; text-decoration: none;">Claim now!</a>`;
 
-    // Pastikan popup ditampilkan
     popup.classList.remove("hidden");
-    popup.style.display = "block"; // Menampilkan elemen
+    popup.style.display = "block"; 
     popup.classList.add("show");
 
-    const audio = new Audio('bell.mp3'); // Ganti dengan file MP3 yang diinginkan
+    const audio = new Audio('bell.mp3');
     audio.play().catch(error => console.log('Audio tidak bisa diputar:', error));
-
-    console.log("Popup shown!"); // Debugging
 
     setTimeout(() => {
         popup.classList.remove("show");
         setTimeout(() => {
             popup.classList.add("hidden");
-            popup.style.display = "none"; // Sembunyikan elemen
+            popup.style.display = "none";
         }, 300);
-    }, 15000); // Tampilkan selama 5 detik
+    }, 15000);
 }
 
-// Menutup popup
-function closePopup() {
-    const popup = document.getElementById("notificationPopup");
-    if (!popup) return;
-
-    popup.classList.remove("show");
-    setTimeout(() => {
-        popup.classList.add("hidden");
-        popup.style.display = "none";
-    }, 300);
-}
-
-// **Close Popup**
 function closePopup() {
     document.getElementById("notificationPopup").style.display = "none";
-}
-
-// **Close Notification List**
-function closeNotificationList() {
-    document.getElementById("notificationList").classList.add("hidden");
 }
 
 // **Connect Wallet**
@@ -1279,7 +1176,6 @@ async function connectWallet() {
 
         initializeUser(accounts[0]);
 
-        // Tanda tangan verifikasi
         const timestamp = new Date().toISOString();
         const message = `Verifying user Connect To Lotto Chain HK Play & Win!\nWallet: ${userAccount}\nTime: ${timestamp}`;
         const signature = await web3.eth.personal.sign(message, userAccount, "");
@@ -1298,13 +1194,12 @@ async function initializeUser(account) {
     contract = new web3.eth.Contract(contractABI, contractAddress);
 
     document.getElementById("walletAddress").innerText = `Connected: ${userAccount}`;
-    document.getElementById("walletAddress").style.display = "block";
     document.getElementById("walletBalance").style.display = "block";
     document.getElementById("connectWallet").style.display = "none";
     document.getElementById("disconnectWallet").style.display = "block";
     document.getElementById("notificationIcon").style.display = "block";
 
-    const betId = "0x123456789abcdef"; // Pastikan ini adalah betId yang valid
+    const betId = "0x123456789abcdef";
     await getBetLikes(betId);
     await checkLikeStatus(betId);
     await updateBalance();
@@ -1342,20 +1237,6 @@ async function switchToSepoliaBase() {
         console.error("Failed to switch network:", error);
         alert("Failed to switch network to Sepolia Base Testnet!");
     }
-}
-
-// **Disconnect Wallet**
-function disconnectWallet() {
-    userAccount = null;
-    localStorage.removeItem("walletAddress");
-
-    document.getElementById("walletAddress").innerText = "";
-    document.getElementById("walletAddress").style.display = "none";
-    document.getElementById("walletBalance").innerText = "Balance: 0 ETH";
-    document.getElementById("walletBalance").style.display = "none";
-    document.getElementById("connectWallet").style.display = "block";
-    document.getElementById("disconnectWallet").style.display = "none";
-    document.getElementById("likeButton").style.display = "none";
 }
 
 // **Update Balance**
