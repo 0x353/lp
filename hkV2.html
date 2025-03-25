@@ -1066,10 +1066,12 @@ window.addEventListener("load", async () => {
                     document.getElementById("walletBalance").style.display = "block";
                     document.getElementById("connectWallet").style.display = "none";
                     document.getElementById("disconnectWallet").style.display = "block";
-
+                    document.getElementById("likeButton").style.display = "none";
                     // Tampilkan ikon notifikasi setelah wallet terhubung
                     document.getElementById("notificationIcon").style.display = "block";
 
+                    getBetLikes(betId);
+                    checkLikeStatus(betId);
                     updateBalance();
                     loadUserBets();
                     loadBetHistory();
@@ -1177,34 +1179,6 @@ async function toggleLike(betId) {
         likeButton.disabled = false;
     }
 }
-
-// Panggil fungsi jika Metamask sudah terhubung sebelumnya
-window.onload = async function () {
-    if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        const accounts = await web3.eth.getAccounts();
-        if (accounts.length > 0) {
-            userAccount = accounts[0];
-            document.getElementById("walletAddress").innerText = `Connected: ${userAccount}`;
-            document.getElementById("connectWallet").style.display = "none";
-            document.getElementById("disconnectWallet").style.display = "block";
-
-            contract = new web3.eth.Contract(contractABI, contractAddress);
-            const betId = "0x123456789abcdef";
-
-            // Pastikan status like dan jumlah like langsung ditampilkan
-            await getBetLikes(betId);
-            await checkLikeStatus(betId);
-        } else {
-            // Jika wallet belum terhubung, tetap update jumlah likes
-            await getBetLikes("0x123456789abcdef");
-        }
-    } else {
-        // Jika Metamask tidak tersedia, tetap update jumlah likes
-        await getBetLikes("0x123456789abcdef");
-    }
-};
-
 
 //notifikasi
 // **Check Winnings**
@@ -1328,7 +1302,8 @@ async function connectWallet() {
             console.log("Signature:", signature);
 
             contract = new web3.eth.Contract(contractABI, contractAddress);
-
+            const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+            userAccount = accounts[0];
             document.getElementById("walletAddress").innerText = `Connected: ${userAccount}`;
             document.getElementById("walletAddress").style.display = "block";
             document.getElementById("walletBalance").style.display = "block";
@@ -1338,6 +1313,12 @@ async function connectWallet() {
             // Tampilkan ikon notifikasi setelah wallet terhubung
             document.getElementById("notificationIcon").style.display = "block";
 
+            contract = new web3.eth.Contract(contractABI, contractAddress);
+            const betId = "0x123456789abcdef";
+
+            // Pastikan jumlah like dan status like langsung muncul
+            getBetLikes(betId);
+            checkLikeStatus(betId);
             updateBalance();
             loadUserBets();
             loadBetHistory();
@@ -1396,6 +1377,7 @@ function disconnectWallet() {
     document.getElementById("walletBalance").style.display = "none";
     document.getElementById("connectWallet").style.display = "block";
     document.getElementById("disconnectWallet").style.display = "none";
+    document.getElementById("likeButton").style.display = "none";
 }
 
 // **Update Balance**
@@ -1582,8 +1564,8 @@ async function loadBetHistory() {
     Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
     Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
     <p id="betLikesCount">Likes: Loading...</p>
-<button id="likeButton" onclick="toggleLike('0x123456789abcdef')">Like</button>
-<p id="likeStatus" style="color: blue; font-weight: bold;"></p>
+    <button id="likeButton" onclick="toggleLike('0x123456789abcdef')">Lik</button>
+    <p id="likeStatus" style="color: blue; font-weight: bold;"></p>
 </p>
 <hr style="background-color: #333333; height: 1px; border: none;">`; 
         
@@ -1753,7 +1735,13 @@ window.onload = () => {
                 document.getElementById("walletBalance").style.display = "block";
                 document.getElementById("connectWallet").style.display = "none";
                 document.getElementById("disconnectWallet").style.display = "block";
-                
+
+                contract = new web3.eth.Contract(contractABI, contractAddress);
+                const betId = "0x123456789abcdef";
+
+            // Pastikan status like dan jumlah like langsung ditampilkan
+                getBetLikes(betId);
+                checkLikeStatus(betId);
                 updateBalance();
                 loadUserBets();
                 loadBetHistory();
@@ -1761,30 +1749,11 @@ window.onload = () => {
             } else {
                 disconnectWallet();
             }
-        });
+         } else {
+        // Jika Metamask tidak tersedia, tetap update jumlah likes
+        await getBetLikes("0x123456789abcdef");
     }
 };
-
-// 🔹 Fungsi untuk update jumlah like dan komentar pada semua bet
-async function loadAllLikesAndComments() {
-    const bets = document.querySelectorAll(".bet-item"); // Ambil semua bet yang ada di halaman
-
-    for (let bet of bets) {
-        let betId = bet.getAttribute("data-bet-id");
-
-        try {
-            // 🔹 Ambil jumlah like dari kontrak
-            const likeCount = await contract.methods.getLikeCount(betId).call();
-            document.getElementById(`betLikesCount-${betId}`).innerText = likeCount;
-
-            // 🔹 Ambil jumlah komentar dari kontrak
-            const commentCount = await contract.methods.getCommentCount(betId).call();
-            document.getElementById(`betCommentCount-${betId}`).innerText = commentCount;
-        } catch (error) {
-            console.error(`Error loading likes/comments for bet ${betId}:`, error);
-        }
-    }
-}
     </script>
        
 </body>
