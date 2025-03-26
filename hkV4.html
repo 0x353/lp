@@ -1501,10 +1501,10 @@ async function loadBetHistory() {
             Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
             Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
             Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
-            <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px; display: flex; align-items: center; gap: 5px;">
-            <img id="likeIcon-${bet.betId}" src="img/like.svg" width="16" height="16"></button>
+            <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" style="border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px; display: flex; align-items: center; gap: 5px;">
+            <img id="likeIcon-${bet.betId}" src="img/like.png" width="16" height="16"><span id="likeText-${bet.betId}">Like</span></button>
             <span id="likeCount-${bet.betId}" style="margin-left: 10px; color: #fff;">0</span> Likes
-            <p id="likeStatus-${bet.betId}"></p>
+            <p id="likeStatus-${bet.betId}" style="color: #fff;"></p>
         </p>
         <hr style="background-color: #333333; height: 1px; border: none;">`;
     }
@@ -1551,12 +1551,12 @@ async function toggleLike(betId) {
         const likeIcon = document.getElementById(`likeIcon-${betId}`);
         const statusText = document.getElementById(`likeStatus-${betId}`);
 
+        // Cek apakah pengguna sudah like
         const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
 
-        // Set status loading
-        statusText.innerText = "Loading...";
-        likeText.innerText = "processing...";
-        likeIcon.src = "loading.png";
+        // Set status ke loading
+        statusText.innerText = liked ? "Dislike processing..." : "Like processing...";
+        likeIcon.src = "img/loading.png"; // Gambar loading saat proses
 
         const gasOptions = {
             from: userAccount,
@@ -1567,34 +1567,36 @@ async function toggleLike(betId) {
         };
 
         if (liked) {
-            // Unlike
+            // Jika sudah like, maka unlike
             await contract.methods.unlikeBet(betId).send(gasOptions)
                 .on("transactionHash", function () {
-                    statusText.innerText = "Dislike processing...";
+                    statusText.innerText = "Processing dislike...";
                 })
                 .on("receipt", function () {
                     statusText.innerText = "Disliked successfully";
                     button.style.backgroundColor = "#66ccff";
                     likeText.innerText = "Like";
-                    likeIcon.src = "like.png";
+                    likeIcon.src = "img/like.png"; // Kembali ke ikon like
                 })
                 .on("error", function () {
                     statusText.innerText = "Dislike failed";
+                    likeIcon.src = "img/dislike.png"; // Kembalikan ke ikon dislike
                 });
         } else {
-            // Like
+            // Jika belum like, maka like
             await contract.methods.likeBet(betId, "👍").send(gasOptions)
                 .on("transactionHash", function () {
-                    statusText.innerText = "Liked Processing...";
+                    statusText.innerText = "Processing like...";
                 })
                 .on("receipt", function () {
                     statusText.innerText = "Liked successfully";
                     button.style.backgroundColor = "#ff6666";
                     likeText.innerText = "Dislike";
-                    likeIcon.src = "dislike.png";
+                    likeIcon.src = "img/dislike.png"; // Ubah ke ikon dislike
                 })
                 .on("error", function () {
                     statusText.innerText = "Like failed";
+                    likeIcon.src = "img/like.png"; // Kembalikan ke ikon like
                 });
         }
     } catch (error) {
