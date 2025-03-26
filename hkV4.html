@@ -227,14 +227,18 @@ th {
 }
         
 footer {
-        text-align: center;
-        margin-top: 20px;
-        padding: 10px;
-        background: #111; /* Warna gelap */
-        color: #ddd; /* Warna teks */
-        font-size: 12px;
-        width: 100%;
-    }
+    display: flex;
+    justify-content: center; /* Pusatkan horizontal */
+    align-items: center; /* Pusatkan vertikal */
+    text-align: center;
+    margin-top: 20px;
+    padding: 10px;
+    background: #111; /* Warna gelap */
+    color: #ddd; /* Warna teks */
+    font-size: 12px;
+    width: 100%;
+    height: 60px; /* Pastikan footer memiliki tinggi agar kontennya bisa ditengah */
+}
 
     .social-icons {
         margin-bottom: 10px;
@@ -520,7 +524,6 @@ h3 {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
     width: 100vw;
     z-index: 1000;
     height: 60px;
