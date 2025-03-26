@@ -1537,15 +1537,14 @@ function nextBetHistory() {
 
 // Like Function
 async function toggleLike(betId) {
-async function toggleLike(betId) {
     try {
-        if (typeof window.ethereum === "undefined") {
+        if (!window.ethereum) {
             alert("MetaMask not found! Please install MetaMask.");
             return;
         }
 
         const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-        if (!accounts || accounts.length === 0) {
+        if (accounts.length === 0) {
             alert("Please connect your MetaMask wallet.");
             return;
         }
@@ -1556,6 +1555,12 @@ async function toggleLike(betId) {
         const likeIcon = document.getElementById(`likeIcon-${betId}`);
         const likeText = document.getElementById(`likeText-${betId}`);
         const likeCount = document.getElementById(`likeCount-${betId}`);
+
+        // Pastikan kontrak sudah terhubung
+        if (!contract) {
+            alert("Smart contract not connected.");
+            return;
+        }
 
         const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
 
@@ -1591,7 +1596,7 @@ async function toggleLike(betId) {
                 });
         } else {
             // Proses Like
-            await contract.methods.likeBet(betId, "👍").send(gasOptions)
+            await contract.methods.likeBet(betId).send(gasOptions)
                 .on("transactionHash", function () {
                     statusElement.innerText = "Like processing...";
                 })
@@ -1617,11 +1622,19 @@ async function toggleLike(betId) {
 function updateLikeCount(betId, change) {
     const likeCountElement = document.getElementById(`likeCount-${betId}`);
     let currentCount = parseInt(likeCountElement.innerText, 10);
-    likeCountElement.innerText = currentCount + change;
+    if (!isNaN(currentCount)) {
+        likeCountElement.innerText = currentCount + change;
+    }
 }
         
-        async function updateLikeStatus(betId) {
+// Fungsi untuk update status like
+async function updateLikeStatus(betId) {
     try {
+        if (!contract) {
+            console.error("Contract is not initialized.");
+            return;
+        }
+
         const likeCount = await contract.methods.getLikeCount(betId).call();
         document.getElementById(`likeCount-${betId}`).innerText = likeCount;
 
@@ -1642,7 +1655,7 @@ function updateLikeCount(betId, change) {
     } catch (error) {
         console.error("Failed to update like status:", error);
     }
-        }
+ }
         
 // Gas Fee Tracker
 async function updateGasFee() {
