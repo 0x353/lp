@@ -1521,12 +1521,13 @@ async function toggleLike(betId) {
         const button = document.getElementById(`likeButton-${betId}`);
         const statusElement = document.getElementById(`likeStatus-${betId}`);
 
+        const estimatedGas = await contract.methods.likeBet(betId, "👍").estimateGas({ from: userAccount });
+
         const gasOptions = {
             from: userAccount,
-            gas: 150000,
-            gasPrice: web3.utils.toWei("0.00011", "gwei"),
-            maxFeePerGas: web3.utils.toWei("0.00011", "gwei"),
-            maxPriorityFeePerGas: web3.utils.toWei("0.000105", "gwei")
+            gas: estimatedGas + 50000, // Tambahkan buffer agar tidak gagal
+            maxFeePerGas: web3.utils.toWei("0.2", "gwei"),  
+            maxPriorityFeePerGas: web3.utils.toWei("0.15", "gwei") 
         };
 
         statusElement.innerText = "Like in progress..."; // Status 1
