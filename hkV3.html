@@ -1548,6 +1548,7 @@ async function updateLikeStatus(betId) {
 
         const userAccount = accounts[0];
 
+        // Memeriksa apakah user sudah like
         let liked;
         try {
             liked = await contract.methods.hasUserLiked(betId, userAccount).call();
@@ -1557,13 +1558,21 @@ async function updateLikeStatus(betId) {
         }
 
         const button = document.getElementById(`likeButton-${betId}`);
+        
+        if (!button) {
+            console.error(`Button likeButton-${betId} not found`);
+            return;
+        }
 
+        // Mengatur tampilan tombol berdasarkan status like
         if (liked) {
             button.innerText = "Dislike";
             button.style.backgroundColor = "#ff6666";
+            button.setAttribute("data-liked", "true");
         } else {
             button.innerText = "Like";
             button.style.backgroundColor = "#66ccff";
+            button.setAttribute("data-liked", "false");
         }
     } catch (error) {
         console.error("Failed to update like status:", error);
