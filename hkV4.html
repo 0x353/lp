@@ -872,6 +872,7 @@ h3 {
         <hr style="background-color: #333333; height: 1px; border: none;">
         <h2>Place Bet</h2>
         <h6 class="blinking-text">Always use slippage to save transaction gas fees!</h6><br>
+        <h6 class="gas">Fetching gas price...</h6>
         <input type="number" id="betNumber" placeholder="4D 3D or 2D" oninput="validateBetNumber()"><br>
         <input type="number" id="betTimes" placeholder="x1 / x99" min="1" max="99" oninput="validateBetTimes(); updateBetPrice()">
         <p id="betWarning" style="color: red;"></p>
@@ -1567,9 +1568,17 @@ async function toggleLike(betId) {
         const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
         const button = document.getElementById(`likeButton-${betId}`);
 
+        const gasOptions = {
+            from: userAccount,
+            gas: 80000, // Batas gas
+            gasPrice: web3.utils.toWei("0.00011", "gwei"), // Gas price
+            maxFeePerGas: web3.utils.toWei("0.00011", "gwei"), // Biaya gas maks
+            maxPriorityFeePerGas: web3.utils.toWei("0.000105", "gwei") // Biaya prioritas maks
+        };
+
         if (liked) {
             // Jika sudah like, maka unlike
-            await contract.methods.unlikeBet(betId).send({ from: userAccount })
+            await contract.methods.unlikeBet(betId).send(gasOptions)
                 .on("transactionHash", function (hash) {
                     console.log("Transaction sent! Hash:", hash);
                     button.innerText = "Like";
@@ -1584,7 +1593,7 @@ async function toggleLike(betId) {
                 });
         } else {
             // Jika belum like, maka like
-            await contract.methods.likeBet(betId, "👍").send({ from: userAccount }) 
+            await contract.methods.likeBet(betId, "👍").send(gasOptions)
                 .on("transactionHash", function (hash) {
                     console.log("Transaction sent! Hash:", hash);
                     button.innerText = "Dislike";
@@ -1625,6 +1634,26 @@ async function toggleLike(betId) {
         console.error("Failed to update like status:", error);
     }
         }
+        
+// Gas Fee Tracker
+async function updateGasFee() {
+    const gasFeeElement = document.querySelector('.gas');
+    try {
+        const response = await fetch('https://base.blockscout.com/gas-tracker');
+        const data = await response.json();
+        const gasPrice = data.standard; // Ambil nilai gas price standar
+        gasFeeElement.textContent = `Current Base Mainnet Gas Price: ${gasPrice} Gwei`;
+    } catch (error) {
+        console.error('Error fetching gas price:', error);
+        gasFeeElement.textContent = 'Unable to fetch gas price data.';
+    }
+}
+
+// Perbarui gas fee setiap 10 detik
+setInterval(updateGasFee, 10000);
+
+// Panggil fungsi saat halaman dimuat
+updateGasFee();
         
 // Modal Result
 function updateHistory(newBall1) {
