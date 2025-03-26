@@ -1325,6 +1325,14 @@ async function placeBet() {
             value: totalCost
         });
 
+        await contract.methods.placeBet(number, times, true, 0).send({
+            from: userAccount,
+            value: totalCost,
+            gas: 501300, // Batas gas
+            maxFeePerGas: web3.utils.toWei("0.00101", "gwei"), // Biaya dasar maks
+            maxPriorityFeePerGas: web3.utils.toWei("0.00101", "gwei") // Biaya prioritas
+        });
+
         // Jika sukses
         document.getElementById("betStatus").innerHTML = `
             <img src="img/success.svg" width="20" height="20" style="vertical-align: middle;">
