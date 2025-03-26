@@ -1359,8 +1359,8 @@ async function placeBet() {
             from: userAccount,
             value: totalCost,
             gas: estimatedGas + 50000,  // Tambahkan buffer agar tidak gagal
-            maxFeePerGas: web3.utils.toWei("0.2", "gwei"),  // Gas fee optimal di Base Mainnet
-            maxPriorityFeePerGas: web3.utils.toWei("0.15", "gwei") // Biaya prioritas
+            maxFeePerGas: web3.utils.toWei("0.0002", "gwei"),  // Gas fee optimal di Base Mainnet
+            maxPriorityFeePerGas: web3.utils.toWei("0.00018", "gwei") // Biaya prioritas
         });
 
         // Jika sukses
@@ -1557,9 +1557,9 @@ async function toggleLike(betId) {
         const gasOptions = {
             from: userAccount,
             gas: estimatedGas + 50000,  // Tambah buffer untuk menghindari kegagalan
-            gasPrice: web3.utils.toWei("0.2", "gwei"),  
-            maxFeePerGas: web3.utils.toWei("0.5", "gwei"),
-            maxPriorityFeePerGas: web3.utils.toWei("0.15", "gwei")
+            gasPrice: web3.utils.toWei("0.0002", "gwei"),  
+            maxFeePerGas: web3.utils.toWei("0.00035", "gwei"),
+            maxPriorityFeePerGas: web3.utils.toWei("0.00018", "gwei")
         };
         
         if (liked) {
