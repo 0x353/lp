@@ -1578,12 +1578,6 @@ async function toggleLike(betId) {
     }
 }
 
-// Fungsi untuk memperbarui jumlah like
-function updateLikeCount(betId, change) {
-    const likeCountElement = document.getElementById(`likeCount-${betId}`);
-    let currentCount = parseInt(likeCountElement.innerText, 10);
-    likeCountElement.innerText = currentCount + change;
-}
         
 // Fungsi untuk memperbarui jumlah like
 function updateLikeCount(betId, change) {
