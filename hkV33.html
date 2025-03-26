@@ -1543,6 +1543,7 @@ async function toggleLike(betId) {
         async function updateLikeStatus(betId) {
     try {
         const likeCount = await contract.methods.getLikeCount(betId).call();
+        console.log(`Like count for ${betId}:`, likeCount); // Debug
         document.getElementById(`likeCount-${betId}`).innerText = likeCount;
 
         const accounts = await window.ethereum.request({ method: "eth_accounts" });
@@ -1550,6 +1551,8 @@ async function toggleLike(betId) {
 
         const userAccount = accounts[0];
         const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
+        console.log(`User ${userAccount} liked bet ${betId}:`, liked); // Debug
+
         const button = document.getElementById(`likeButton-${betId}`);
 
         if (liked) {
