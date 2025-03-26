@@ -1499,6 +1499,7 @@ function nextBetHistory() {
 }
 
 // Like Function
+// Fungsi Toggle Like
 async function toggleLike(betId) {
     try {
         if (typeof window.ethereum === "undefined") {
@@ -1514,7 +1515,15 @@ async function toggleLike(betId) {
 
         const userAccount = accounts[0];
 
-        const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
+        // Cek apakah user sudah like
+        let liked;
+        try {
+            liked = await contract.methods.hasUserLiked(betId, userAccount).call();
+        } catch (error) {
+            console.warn("hasUserLiked function not found in contract. Assuming user has not liked.");
+            liked = false;
+        }
+
         const button = document.getElementById(`likeButton-${betId}`);
 
         if (liked) {
@@ -1534,7 +1543,7 @@ async function toggleLike(betId) {
                 });
         } else {
             // Jika belum like, maka like
-            await contract.methods.likeBet(betId, "👍").send({ from: userAccount }) 
+            await contract.methods.likeBet(betId).send({ from: userAccount }) 
                 .on("transactionHash", function (hash) {
                     console.log("Transaction sent! Hash:", hash);
                     button.innerText = "Dislike";
@@ -1551,9 +1560,7 @@ async function toggleLike(betId) {
     } catch (error) {
         console.error("Failed to toggle like:", error);
     }
-        }
-
-
+}
         async function updateLikeStatus(betId) {
     try {
         const likeCount = await contract.methods.getLikeCount(betId).call();
@@ -1577,7 +1584,6 @@ async function toggleLike(betId) {
         console.error("Failed to update like status:", error);
     }
         }
-        
         
 // Modal Result
 function updateHistory(newBall1) {
