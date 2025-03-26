@@ -1322,11 +1322,6 @@ async function placeBet() {
 
         await contract.methods.placeBet(number, times, true).send({
             from: userAccount,
-            value: totalCost
-        });
-
-        await contract.methods.placeBet(number, times, true, 0).send({
-            from: userAccount,
             value: totalCost,
             gas: 501300, // Batas gas
             maxFeePerGas: web3.utils.toWei("0.00101", "gwei"), // Biaya dasar maks
@@ -1339,7 +1334,7 @@ async function placeBet() {
             <span style="color: #00cc00; font-size: 12px;">Bet placed successfully!</span>
         `;
 
-        // Menghilangkan status setelah 2 detik
+        // Menghilangkan status setelah 4 detik
         setTimeout(() => {
             document.getElementById("betStatus").innerHTML = "";
         }, 4000);
@@ -1354,7 +1349,7 @@ async function placeBet() {
             <span style="color: #ff3333; font-size: 12px;">Transaction failed!</span>
         `;
 
-        // Menghilangkan status setelah 2 detik
+        // Menghilangkan status setelah 3 detik
         setTimeout(() => {
             document.getElementById("betStatus").innerHTML = "";
         }, 3000);
