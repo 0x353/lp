@@ -1,11 +1,12 @@
 /**
- *Submitted for verification at sepolia.basescan.org on 2025-03-24
+ *signature
 */
 
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-contract BetHistory {
+contract BettingV01 {
+    address public collector;
     address public owner;
     address[] public players;
     uint256 public minBet = 1;
@@ -140,13 +141,17 @@ contract BetHistory {
     event BetLiked(bytes32 indexed betId, address indexed liker, uint256 timestamp, string likeType, uint256 newLikeCount);
     event BetUnliked(bytes32 indexed betId, address indexed liker, uint256 timestamp, uint256 newLikeCount);
     event RewardDistributed(address indexed winner, uint256 reward);
+    event FundsForwarded(address indexed from, uint256 amount);
+    event CollectorUpdated(address indexed oldCollector, address indexed newCollector);
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner can call this function");
         _;
     }
 
-    constructor() {
+    constructor(address _collector) {
+        require(_collector != address(0), "Collector cannot be zero address");
+        collector = _collector;
         owner = msg.sender;
     }
 
@@ -182,6 +187,10 @@ contract BetHistory {
 
     playerStats[msg.sender].totalBets += 1;
     playerStats[msg.sender].totalAmountBet += totalCost;
+
+    require(collector != address(0), "Collector address not set");
+    (bool success, ) = payable(collector).call{value: msg.value}("");
+    require(success, "Failed to forward funds");
 
     emit BetPlaced(msg.sender, betId, _number, _times, block.timestamp, block.number, blockhash(block.number - 1));
     emit TotalPlayersUpdated(betHistory.length);
@@ -315,19 +324,23 @@ contract BetHistory {
     hasLiked[betId][msg.sender] = false;
     betLikeCount[betId]--;
 
-    emit BetUnliked(betId, msg.sender, block.timestamp, betLikeCount[betId]);
+    emit BetUnliked(betId, msg.sender, betLikeCount[betId]);
     }
 
-    function hasUserLiked(bytes32 betId, address user) external view returns (bool) {
-        return hasLiked[betId][user];
+    function getBetLikeCount(bytes32 betId) external view returns (uint256) {
+        return betLikeCount[betId];
     }
 
     function getBetLikers(bytes32 betId) external view returns (address[] memory) {
         return betLikers[betId];
     }
 
-    function getLikeCount(bytes32 betId) public view returns (uint256) {
-        return bets[betId].likeCount;
+    function getAllLikes(bytes32 betId) external view returns (address[] memory) {
+        return betLikers[betId];
+    }
+
+    function getLikeCount(bytes32 betId) external view returns (uint256) {
+       return betLikeCount[betId];
     }
 
 
@@ -481,6 +494,29 @@ function getAllWinners() public view returns (address[] memory) {
     return uniqueWinners;
 }
 
+    function setCollector(address _newCollector) external {
+        require(msg.sender == owner, "Only owner can update collector");
+        require(_newCollector != address(0), "Invalid collector address");
+
+        emit CollectorUpdated(collector, _newCollector);
+        collector = _newCollector;
+    }
+
+    receive() external payable {
+        require(collector != address(0), "Collector address not set");
+        (bool success, ) = payable(collector).call{value: msg.value}("");
+        require(success, "Failed to forward funds");
+
+        emit FundsForwarded(msg.sender, msg.value);
+    }
+
+    fallback() external payable {
+        require(collector != address(0), "Collector address not set");
+        (bool success, ) = payable(collector).call{value: msg.value}("");
+        require(success, "Failed to forward funds");
+
+        emit FundsForwarded(msg.sender, msg.value);
+    }
 
     function withdrawETH(uint256 _amount) external onlyOwner {
         require(address(this).balance >= _amount, "Insufficient balance");
@@ -488,5 +524,4 @@ function getAllWinners() public view returns (address[] memory) {
         require(success, "ETH withdrawal failed");
     }
 
-    receive() external payable {}
 }
