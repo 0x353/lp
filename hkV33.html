@@ -1425,20 +1425,85 @@ async function loadUserBets() {
 }
                     
 // **User Bets Pagination**
+async function getBetLikes(betId) {
+    try {
+        const likeCount = await contract.methods.getLikeCount(betId).call();
+        document.getElementById(`likeCount-${betId}`).innerText = likeCount;
+    } catch (error) {
+        console.error("Error fetching like count:", error);
+    }
+}
+
+async function hasUserLiked(betId, userAccount) {
+    try {
+        return await contract.methods.hasUserLiked(betId, userAccount).call();
+    } catch (error) {
+        console.error("Error checking user like status:", error);
+        return false;
+    }
+}
+
+async function toggleLike(betId) {
+    try {
+        if (typeof window.ethereum === "undefined") {
+            alert("MetaMask not found! Please install MetaMask.");
+            return;
+        }
+
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        if (!accounts || accounts.length === 0) {
+            alert("Please connect your MetaMask wallet.");
+            return;
+        }
+
+        const userAccount = accounts[0];
+        const liked = await hasUserLiked(betId, userAccount);
+        const button = document.getElementById(`likeButton-${betId}`);
+
+        if (liked) {
+            await contract.methods.unlikeBet(betId).send({ from: userAccount })
+                .on("transactionHash", function (hash) {
+                    console.log("Unlike transaction sent! Hash:", hash);
+                    button.innerText = "Like";
+                    button.style.backgroundColor = "#66ccff";
+                })
+                .on("receipt", function () {
+                    console.log("Unlike confirmed");
+                    getBetLikes(betId);
+                })
+                .on("error", function (error) {
+                    console.error("Error processing unlike:", error);
+                });
+        } else {
+            await contract.methods.likeBet(betId, "default").send({ from: userAccount })
+                .on("transactionHash", function (hash) {
+                    console.log("Like transaction sent! Hash:", hash);
+                    button.innerText = "Dislike";
+                    button.style.backgroundColor = "#ff6666";
+                })
+                .on("receipt", function () {
+                    console.log("Like confirmed");
+                    getBetLikes(betId);
+                })
+                .on("error", function (error) {
+                    console.error("Error processing like:", error);
+                });
+        }
+    } catch (error) {
+        console.error("Failed to toggle like:", error);
+    }
+}
+
 async function loadBetHistory() {
     const bets = await contract.methods.getAllBets().call();
-    const reversedBets = bets.slice().reverse(); // Urutkan dari terbaru
+    const reversedBets = bets.slice().reverse(); 
 
     const now = Math.floor(Date.now() / 1000);
     const sevenDaysAgo = now - 7 * 24 * 60 * 60;
     const filteredBets = reversedBets.filter(bet => bet.timestamp >= sevenDaysAgo);
 
-    const start = betHistoryPage * pageSize;
-    const end = Math.min(start + pageSize, filteredBets.length);
-
     let html = "";
-    for (let i = start; i < end; i++) {
-        let bet = filteredBets[i];
+    for (let bet of filteredBets) {
         let shortPlayer = bet.player.slice(0, 10) + "..." + bet.player.slice(-10);
         let shortTxHash = bet.txHash.slice(0, 10) + "..." + bet.txHash.slice(-10);
 
@@ -1452,24 +1517,14 @@ async function loadBetHistory() {
             Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
             Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
             Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
-
-            <!-- Tombol Like -->
-            <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" 
-                style="background-color: #66ccff; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px;">
-                Like
-            </button>
-            <span id="likeCount-${bet.betId}" style="margin-left: 10px; color: #fff;">0</span> Likes
+            <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" style="background-color: #66ccff;">Like</button>
+            <span id="likeCount-${bet.betId}" style="color: #FFD700;">0</span> Likes
         </p>
         <hr style="background-color: #333333; height: 1px; border: none;">`;
-    }
 
+        getBetLikes(bet.betId);
+    }
     document.getElementById("betHistory").innerHTML = html;
-
-    // Update jumlah like dan status like setelah bet history dimuat
-    for (let i = start; i < end; i++) {
-        let bet = filteredBets[i];
-        await updateLikeStatus(bet.betId);
-    }
 }
 
 // **Bet History Pagination**
@@ -1486,86 +1541,7 @@ function nextBetHistory() {
 }
 
 // Like Function
-async function toggleLike(betId) {
-    try {
-        if (typeof window.ethereum === "undefined") {
-            alert("MetaMask not found! Please install MetaMask.");
-            return;
-        }
 
-        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-        if (!accounts || accounts.length === 0) {
-            alert("Please connect your MetaMask wallet.");
-            return;
-        }
-
-        const userAccount = accounts[0];
-
-        const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
-        const button = document.getElementById(`likeButton-${betId}`);
-
-        if (liked) {
-            // Jika sudah like, maka unlike
-            await contract.methods.unlikeBet(betId).send({ from: userAccount })
-                .on("transactionHash", function (hash) {
-                    console.log("Transaction sent! Hash:", hash);
-                    button.innerText = "Like";
-                    button.style.backgroundColor = "#66ccff";
-                })
-                .on("receipt", function (receipt) {
-                    console.log("Transaction confirmed:", receipt);
-                    updateLikeStatus(betId);
-                })
-                .on("error", function (error) {
-                    console.error("Error processing unlike:", error);
-                });
-        } else {
-            // Jika belum like, maka like
-            await contract.methods.likeBet(betId, "👍").send({ from: userAccount }) 
-                .on("transactionHash", function (hash) {
-                    console.log("Transaction sent! Hash:", hash);
-                    button.innerText = "Dislike";
-                    button.style.backgroundColor = "#ff6666";
-                })
-                .on("receipt", function (receipt) {
-                    console.log("Transaction confirmed:", receipt);
-                    updateLikeStatus(betId);
-                })
-                .on("error", function (error) {
-                    console.error("Error processing like:", error);
-                });
-        }
-    } catch (error) {
-        console.error("Failed to toggle like:", error);
-    }
-}
-
-        async function updateLikeStatus(betId) {
-    try {
-        const likeCount = await contract.methods.getLikeCount(betId).call();
-        console.log(`Like count for ${betId}:`, likeCount); // Debug
-        document.getElementById(`likeCount-${betId}`).innerText = likeCount;
-
-        const accounts = await window.ethereum.request({ method: "eth_accounts" });
-        if (accounts.length === 0) return;
-
-        const userAccount = accounts[0];
-        const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
-        console.log(`User ${userAccount} liked bet ${betId}:`, liked); // Debug
-
-        const button = document.getElementById(`likeButton-${betId}`);
-
-        if (liked) {
-            button.innerText = "Dislike";
-            button.style.backgroundColor = "#ff6666";
-        } else {
-            button.innerText = "Like";
-            button.style.backgroundColor = "#66ccff";
-        }
-    } catch (error) {
-        console.error("Failed to update like status:", error);
-    }
-        }
         
 // Modal Result
 function updateHistory(newBall1) {
