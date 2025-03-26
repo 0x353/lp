@@ -1501,11 +1501,8 @@ async function loadBetHistory() {
             Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
             Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
             Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
-            <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" 
-    style="background-color: #66ccff; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px; display: flex; align-items: center; gap: 5px;">
-    <img id="likeIcon-${bet.betId}" src="img/like.png" alt="Like" width="16" height="16"> 
-    <span id="likeText-${bet.betId}">Like</span>
-</button>
+           
+    <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" class="like-button" data-bet-id="${bet.betId}">Like</button>
 
 <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p>
 
@@ -1536,94 +1533,34 @@ function nextBetHistory() {
 }
 
 // Like Function
-async function toggleLike(betId) {
-    try {
-        if (!window.ethereum) {
-            alert("MetaMask not found! Please install MetaMask.");
-            return;
-        }
-
-        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-        if (accounts.length === 0) {
-            alert("Please connect your MetaMask wallet.");
-            return;
-        }
-
-        const userAccount = accounts[0];
-        const button = document.getElementById(`likeButton-${betId}`);
-        const statusElement = document.getElementById(`likeStatus-${betId}`);
-        const likeIcon = document.getElementById(`likeIcon-${betId}`);
-        const likeText = document.getElementById(`likeText-${betId}`);
-        const likeCount = document.getElementById(`likeCount-${betId}`);
-
-        // Pastikan kontrak sudah terhubung
-        if (!contract) {
-            alert("Smart contract not connected.");
-            return;
-        }
-
-        const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
-
-        // Set status loading
-        statusElement.innerText = "Processing...";
-        likeText.innerText = "Processing...";
-        likeIcon.src = "img/loading.png";
-
-        const gasOptions = {
-            from: userAccount,
-            gas: 150000,  
-            gasPrice: web3.utils.toWei("2", "gwei"),  
-            maxFeePerGas: web3.utils.toWei("3", "gwei"),
-            maxPriorityFeePerGas: web3.utils.toWei("2", "gwei")
-        };
-
-        if (liked) {
-            // Proses Unlike
-            await contract.methods.unlikeBet(betId).send(gasOptions)
-                .on("transactionHash", function () {
-                    statusElement.innerText = "Dislike processing...";
-                })
-                .on("receipt", function () {
-                    statusElement.innerText = "Disliked successfully";
-                    button.style.backgroundColor = "#66ccff";
-                    likeText.innerText = "Like";
-                    likeIcon.src = "img/like.png";
-                    updateLikeCount(betId, -1);
-                })
-                .on("error", function () {
-                    statusElement.innerText = "Dislike failed";
-                    likeIcon.src = "img/error.png";
-                });
-        } else {
-            // Proses Like
-            await contract.methods.likeBet(betId).send(gasOptions)
-                .on("transactionHash", function () {
-                    statusElement.innerText = "Like processing...";
-                })
-                .on("receipt", function () {
-                    statusElement.innerText = "Liked successfully";
-                    button.style.backgroundColor = "#ff6666";
-                    likeText.innerText = "Dislike";
-                    likeIcon.src = "img/dislike.png";
-                    updateLikeCount(betId, 1);
-                })
-                .on("error", function () {
-                    statusElement.innerText = "Like failed";
-                    likeIcon.src = "img/error.png";
-                });
-        }
-    } catch (error) {
-        console.error("Failed to toggle like:", error);
-        document.getElementById(`likeStatus-${betId}`).innerText = "Action failed";
+async function init() {
+    if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+        const accounts = await web3.eth.getAccounts();
+        userAccount = accounts[0];
+        contract = new web3.eth.Contract(contractABI, contractAddress);
+        loadLikes(); // Muat status like awal
+    } else {
+        alert("MetaMask tidak terdeteksi");
     }
 }
 
-// Fungsi untuk memperbarui jumlah like
-function updateLikeCount(betId, change) {
-    const likeCountElement = document.getElementById(`likeCount-${betId}`);
-    let currentCount = parseInt(likeCountElement.innerText, 10);
-    if (!isNaN(currentCount)) {
-        likeCountElement.innerText = currentCount + change;
+// Fungsi untuk memuat jumlah like dan status like dari blockchain
+async function loadLikes() {
+    const bets = document.querySelectorAll(".like-button");
+    for (let button of bets) {
+        let betId = button.getAttribute("onclick").match(/'(.+?)'/)[1];
+        try {
+            const likeCount = await contract.methods.betLikeCount(betId).call();
+            document.getElementById(`betLikesCount-${betId}`).innerText = `Likes: ${likeCount}`;
+
+            const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
+            button.innerText = hasLiked ? "Unlike" : "Like";
+            button.style.display = "block";
+        } catch (error) {
+            console.error(`Error loading likes for bet ${betId}:`, error);
+        }
     }
 }
         
