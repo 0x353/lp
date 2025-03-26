@@ -1559,7 +1559,7 @@ async function toggleLike(betId) {
             gas: estimatedGas + 50000,  // Tambah buffer untuk menghindari kegagalan
             gasPrice: web3.utils.toWei("0.2", "gwei"),  
             maxFeePerGas: web3.utils.toWei("0.5", "gwei"),
-            maxPriorityFeePerGas: web3.utils.toWei("0.2", "gwei")
+            maxPriorityFeePerGas: web3.utils.toWei("0.15", "gwei")
         };
         
         if (liked) {
