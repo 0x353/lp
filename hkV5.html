@@ -1502,7 +1502,6 @@ function nextBetHistory() {
 }
 
 // Like Function
-// Fungsi Toggle Like
 async function toggleLike(betId) {
     try {
         if (typeof window.ethereum === "undefined") {
@@ -1521,14 +1520,17 @@ async function toggleLike(betId) {
         const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
         const button = document.getElementById(`likeButton-${betId}`);
 
+        const gasOptions = {
+            from: userAccount,
+            gas: 150000, // Batas gas
+            gasPrice: web3.utils.toWei("0.00011", "gwei"), // Gas price
+            maxFeePerGas: web3.utils.toWei("0.00011", "gwei"), // Biaya gas maks
+            maxPriorityFeePerGas: web3.utils.toWei("0.000105", "gwei") // Biaya prioritas maks
+        };
+
         if (liked) {
             // Jika sudah like, maka unlike
-            await contract.methods.unlikeBet(betId).send({ from: userAccount })
-                from: userAccount,
-                gas: 80000, // Batas gas
-                maxFeePerGas: web3.utils.toWei("0.00012", "gwei"), // Biaya gas maks
-                maxPriorityFeePerGas: web3.utils.toWei("0.00011", "gwei") // Biaya prioritas maks
-            })
+            await contract.methods.unlikeBet(betId).send(gasOptions)
                 .on("transactionHash", function (hash) {
                     console.log("Transaction sent! Hash:", hash);
                     button.innerText = "Like";
@@ -1543,12 +1545,7 @@ async function toggleLike(betId) {
                 });
         } else {
             // Jika belum like, maka like
-            await contract.methods.likeBet(betId, "👍").send({ from: userAccount })
-                from: userAccount,
-                gas: 80000, // Batas gas
-                maxFeePerGas: web3.utils.toWei("0.00012", "gwei"), // Biaya gas maks
-                maxPriorityFeePerGas: web3.utils.toWei("0.00011", "gwei") // Biaya prioritas maks
-            })
+            await contract.methods.likeBet(betId, "👍").send(gasOptions)
                 .on("transactionHash", function (hash) {
                     console.log("Transaction sent! Hash:", hash);
                     button.innerText = "Dislike";
