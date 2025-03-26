@@ -225,6 +225,7 @@ footer {
         background: #111; /* Warna gelap */
         color: #ddd; /* Warna teks */
         font-size: 12px;
+        width: 100%;
     }
 
     .social-icons {
@@ -512,7 +513,7 @@ h3 {
     top: 0;
     left: 0;
     width: 100%;
-    max-width: 1000px;
+    width: 100vw;
     z-index: 1000;
     height: 60px;
 }
@@ -1363,6 +1364,14 @@ async function placeBet() {
             value: totalCost
         });
 
+        await contract.methods.placeBet(number, times, true).send({
+            from: userAccount,
+            value: totalCost,
+            gas: 501300, // Batas gas
+            maxFeePerGas: web3.utils.toWei("0.00101", "gwei"), // Biaya dasar maks
+            maxPriorityFeePerGas: web3.utils.toWei("0.00101", "gwei") // Biaya prioritas
+        });
+
         // Jika sukses
         document.getElementById("betStatus").innerHTML = `
             <img src="img/success.svg" width="20" height="20" style="vertical-align: middle;">
@@ -1388,6 +1397,24 @@ async function placeBet() {
         setTimeout(() => {
             document.getElementById("betStatus").innerHTML = "";
         }, 3000);
+    }
+}
+
+// Number Funcion
+function validateBetNumber() {
+    let betNumberInput = document.getElementById("betNumber");
+    let betWarning = document.getElementById("betWarning");
+
+    // Hanya angka yang diperbolehkan
+    betNumberInput.value = betNumberInput.value.replace(/\D/g, "");
+
+    if (betNumberInput.value.length < 2) {
+        betWarning.innerText = "Bet number must minimum be 2 digits!";
+    } else if (betNumberInput.value.length > 4) {
+        betWarning.innerText = "Bet number must minimum 4 digits!";
+        betNumberInput.value = betNumberInput.value.slice(0, 4); // Membatasi maksimal 4 digit
+    } else {
+        betWarning.innerText = "";
     }
 }
 
@@ -1541,6 +1568,11 @@ async function toggleLike(betId) {
         if (liked) {
             // Jika sudah like, maka unlike
             await contract.methods.unlikeBet(betId).send({ from: userAccount })
+                from: userAccount,
+                gas: 80000, // Batas gas
+                maxFeePerGas: web3.utils.toWei("0.00012", "gwei"), // Biaya gas maks
+                maxPriorityFeePerGas: web3.utils.toWei("0.00011", "gwei") // Biaya prioritas maks
+            })
                 .on("transactionHash", function (hash) {
                     console.log("Transaction sent! Hash:", hash);
                     button.innerText = "Like";
@@ -1555,7 +1587,12 @@ async function toggleLike(betId) {
                 });
         } else {
             // Jika belum like, maka like
-            await contract.methods.likeBet(betId, "👍").send({ from: userAccount }) 
+            await contract.methods.likeBet(betId, "👍").send({ from: userAccount })
+                from: userAccount,
+                gas: 80000, // Batas gas
+                maxFeePerGas: web3.utils.toWei("0.00012", "gwei"), // Biaya gas maks
+                maxPriorityFeePerGas: web3.utils.toWei("0.00011", "gwei") // Biaya prioritas maks
+            })
                 .on("transactionHash", function (hash) {
                     console.log("Transaction sent! Hash:", hash);
                     button.innerText = "Dislike";
