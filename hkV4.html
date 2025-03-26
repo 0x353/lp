@@ -1501,13 +1501,17 @@ async function loadBetHistory() {
             Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
             Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
             Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
-           
-    <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" class="like-button" data-bet-id="${bet.betId}">Like</button>
+            <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')"
+    style="background-color: #66ccff; color: white; border: none; padding: 5px 10px; cursor: pointer; 
+    display: flex; align-items: center; gap: 5px;">
+    <img id="likeIcon-${bet.betId}" src="img/like.png" alt="Like" width="16" height="16">
+    <span id="likeText-${bet.betId}">Like</span>
+</button>
 
-<p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p>
+<p id="status-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p>
 
 <span id="likeCount-${bet.betId}" style="margin-left: 10px; color: #fff;">0</span> Likes
-        <hr style="background-color: #333333; height: 1px; border: none;">`;
+        </p><hr style="background-color: #333333; height: 1px; border: none;">`;
     }
 
     document.getElementById("betHistory").innerHTML = html;
@@ -1533,34 +1537,82 @@ function nextBetHistory() {
 }
 
 // Like Function
-async function init() {
-    if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        await window.ethereum.request({ method: "eth_requestAccounts" });
-        const accounts = await web3.eth.getAccounts();
-        userAccount = accounts[0];
-        contract = new web3.eth.Contract(contractABI, contractAddress);
-        loadLikes(); // Muat status like awal
-    } else {
-        alert("MetaMask tidak terdeteksi");
-    }
-}
-
-// Fungsi untuk memuat jumlah like dan status like dari blockchain
-async function loadLikes() {
-    const bets = document.querySelectorAll(".like-button");
-    for (let button of bets) {
-        let betId = button.getAttribute("onclick").match(/'(.+?)'/)[1];
-        try {
-            const likeCount = await contract.methods.betLikeCount(betId).call();
-            document.getElementById(`betLikesCount-${betId}`).innerText = `Likes: ${likeCount}`;
-
-            const hasLiked = await contract.methods.betLikes(betId, userAccount).call();
-            button.innerText = hasLiked ? "Unlike" : "Like";
-            button.style.display = "block";
-        } catch (error) {
-            console.error(`Error loading likes for bet ${betId}:`, error);
+async function toggleLike(betId) {
+    try {
+        if (typeof window.ethereum === "undefined") {
+            alert("MetaMask not found! Please install MetaMask.");
+            return;
         }
+
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        if (!accounts || accounts.length === 0) {
+            alert("Please connect your MetaMask wallet.");
+            return;
+        }
+
+        const userAccount = accounts[0];
+        const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
+        
+        const button = document.getElementById(`likeButton-${betId}`);
+        const statusElement = document.getElementById(`status-${betId}`);
+        const likeIcon = document.getElementById(`likeIcon-${betId}`);
+        const likeText = document.getElementById(`likeText-${betId}`);
+
+        const estimatedGas = await contract.methods.likeBet(betId, "👍").estimateGas({ from: userAccount });
+        const gasOptions = {
+            from: userAccount,
+            gas: estimatedGas + 50000,
+            gasPrice: web3.utils.toWei("0.0002", "gwei"),  
+            maxFeePerGas: web3.utils.toWei("0.00035", "gwei"),
+            maxPriorityFeePerGas: web3.utils.toWei("0.00018", "gwei")
+        };
+
+        // Set status loading
+        statusElement.innerText = "Processing...";
+        likeText.innerText = "Processing...";
+        likeIcon.src = "img/loading.png";
+
+        if (liked) {
+            await contract.methods.unlikeBet(betId).send(gasOptions)
+                .on("transactionHash", function (hash) {
+                    console.log("Transaction sent! Hash:", hash);
+                })
+                .on("receipt", function (receipt) {
+                    console.log("Transaction confirmed:", receipt);
+                    button.style.backgroundColor = "#66ccff";
+                    statusElement.innerText = "Disliked successfully";
+                    likeText.innerText = "Like";
+                    likeIcon.src = "img/like.png";
+                    updateLikeStatus(betId);
+                })
+                .on("error", function (error) {
+                    console.error("Error processing unlike:", error);
+                    statusElement.innerText = "Dislike failed";
+                    likeText.innerText = "Dislike";
+                    likeIcon.src = "img/error.png";
+                });
+        } else {
+            await contract.methods.likeBet(betId, "👍").send(gasOptions)
+                .on("transactionHash", function (hash) {
+                    console.log("Transaction sent! Hash:", hash);
+                })
+                .on("receipt", function (receipt) {
+                    console.log("Transaction confirmed:", receipt);
+                    button.style.backgroundColor = "#ff6666";
+                    statusElement.innerText = "Liked successfully";
+                    likeText.innerText = "Dislike";
+                    likeIcon.src = "img/dislike.png";
+                    updateLikeStatus(betId);
+                })
+                .on("error", function (error) {
+                    console.error("Error processing like:", error);
+                    statusElement.innerText = "Like failed";
+                    likeText.innerText = "Like";
+                    likeIcon.src = "img/error.png";
+                });
+        }
+    } catch (error) {
+        console.error("Failed to toggle like:", error);
     }
 }
         
