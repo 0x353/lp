@@ -1303,26 +1303,29 @@ async function placeBet() {
         return;
     }
 
-    const number = document.getElementById("betNumber").value.toString(); // Pastikan selalu string
+    const number = document.getElementById("betNumber").value.toString(); // Selalu dalam string
     const times = parseInt(document.getElementById("betTimes").value);
-    const betPrice = web3.utils.toBN(web3.utils.toWei("0.000256", "ether")); // Pastikan betPrice dalam BN (BigNumber)
-    const totalCost = betPrice.mul(web3.utils.toBN(times)); // Kalikan dengan BN juga
 
     if (!number || number.length < 1 || number.length > 4 || isNaN(times) || times < 1) {
         alert("Invalid bet input!");
         return;
     }
-    
+
     try {
+        // Ambil betPrice dari kontrak agar selalu sesuai
+        const betPrice = await contract.methods.betPrice().call();
+        const totalCost = web3.utils.toBN(betPrice).mul(web3.utils.toBN(times)); // Hitung biaya total dengan benar
+
         // Menampilkan status transaksi      
         document.getElementById("betStatus").innerHTML = `
             <img src="img/load.svg" width="20" height="20" style="vertical-align: middle;">
             <span style="color: #aaffaa; font-size: 12px;">Transaction in progress...</span>
         `;
 
-        await contract.methods.placeBet(number, times, true, 0).send({ // Tambahkan `_payoutAmount` = 0
+        // Kirim transaksi
+        await contract.methods.placeBet(number, times, true, 0).send({
             from: userAccount,
-            value: totalCost.toString() // Pastikan totalCost dalam format string
+            value: totalCost.toString() // Pastikan dalam format string
         });
 
         // Jika sukses
@@ -1331,12 +1334,13 @@ async function placeBet() {
             <span style="color: #00cc00; font-size: 12px;">Bet placed successfully!</span>
         `;
 
-        // Menghilangkan status setelah 2 detik
+        // Menghilangkan status setelah 4 detik
         setTimeout(() => {
             document.getElementById("betStatus").innerHTML = "";
         }, 4000);
 
-        loadUserBets();
+        loadUserBets(); // Perbarui daftar taruhan pengguna
+
     } catch (error) {
         console.error("Transaction Error:", error);
 
@@ -1346,7 +1350,7 @@ async function placeBet() {
             <span style="color: #ff3333; font-size: 12px;">Transaction failed!</span>
         `;
 
-        // Menghilangkan status setelah 2 detik
+        // Menghilangkan status setelah 3 detik
         setTimeout(() => {
             document.getElementById("betStatus").innerHTML = "";
         }, 3000);
