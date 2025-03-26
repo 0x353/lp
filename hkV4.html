@@ -32,7 +32,7 @@ body {
 
 /* Container */
 .container {
-    width: 90%; /* Menggunakan persentase agar fleksibel */
+    width: 100%; /* Menggunakan persentase agar fleksibel */
     max-width: 1200px;
     margin: auto;
     padding: 20px;
@@ -70,7 +70,7 @@ input {
     display: block;
     margin: 10px auto;
     padding: 10px;
-    width: 90%;
+    width: 90%; /* Default untuk HP */
     font-size: 14px;
     font-weight: 600;
     text-align: center;
@@ -81,6 +81,14 @@ input {
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 200, 255, 0.3);
     transition: all 0.4s ease-in-out;
+}
+
+/* Untuk layar PC (lebar minimal 768px) */
+@media screen and (min-width: 768px) {
+    input {
+        width: 50%; /* Perpendek input di mode PC */
+        max-width: 400px; /* Batas maksimal lebar input */
+    }
 }
 
 input::placeholder {
