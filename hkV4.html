@@ -504,7 +504,7 @@ h3 {
     align-items: center;
     background: rgba(255, 255, 255, 0.08);
     box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px); 
+    backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     padding: 10px 20px;
     color: white;
@@ -514,7 +514,26 @@ h3 {
     width: 100%;
     max-width: 1000px;
     z-index: 1000;
-    height: 60px; /* Tambahkan tinggi navbar agar lebih jelas */
+    height: 60px;
+}
+
+/* Responsif untuk berbagai ukuran layar PC */
+@media screen and (min-width: 1280px) {
+    .navbar {
+        max-width: 1200px;
+    }
+}
+
+@media screen and (min-width: 1600px) {
+    .navbar {
+        max-width: 1400px;
+    }
+}
+
+@media screen and (min-width: 1920px) {
+    .navbar {
+        max-width: 1600px;
+    }
 }
 
 /* Logo */
