@@ -1340,20 +1340,27 @@ async function placeBet() {
         alert("Invalid bet input!");
         return;
     }
-    
+
     try {
-        // Menampilkan status transaksi      
+        // Estimasi gas sebelum transaksi
+        const estimatedGas = await contract.methods.placeBet(number, times, true, 0).estimateGas({ 
+            from: userAccount, 
+            value: totalCost 
+        });
+
+        // Tampilkan status transaksi      
         document.getElementById("betStatus").innerHTML = `
             <img src="img/load.svg" width="20" height="20" style="vertical-align: middle;">
             <span style="color: #aaffaa; font-size: 12px;">Transaction in progress...</span>
         `;
 
+        // Kirim transaksi dengan gas yang sudah dioptimalkan
         await contract.methods.placeBet(number, times, true, 0).send({
             from: userAccount,
             value: totalCost,
-            gas: 501300, // Batas gas
-            maxFeePerGas: web3.utils.toWei("0.0012", "gwei"), // Biaya dasar maks
-            maxPriorityFeePerGas: web3.utils.toWei("0.00123", "gwei") // Biaya prioritas
+            gas: estimatedGas + 50000,  // Tambahkan buffer agar tidak gagal
+            maxFeePerGas: web3.utils.toWei("0.2", "gwei"),  // Gas fee optimal di Base Mainnet
+            maxPriorityFeePerGas: web3.utils.toWei("0.15", "gwei") // Biaya prioritas
         });
 
         // Jika sukses
@@ -1362,10 +1369,9 @@ async function placeBet() {
             <span style="color: #00cc00; font-size: 12px;">Bet placed successfully!</span>
         `;
 
-        // Menghilangkan status setelah 4 detik
         setTimeout(() => {
             document.getElementById("betStatus").innerHTML = "";
-        }, 4000);
+        }, 5000);
 
         loadUserBets();
     } catch (error) {
@@ -1377,10 +1383,9 @@ async function placeBet() {
             <span style="color: #ff3333; font-size: 12px;">Transaction failed!</span>
         `;
 
-        // Menghilangkan status setelah 3 detik
         setTimeout(() => {
             document.getElementById("betStatus").innerHTML = "";
-        }, 3000);
+        }, 4000);
     }
 }
         
@@ -1548,14 +1553,15 @@ async function toggleLike(betId) {
         const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
         const button = document.getElementById(`likeButton-${betId}`);
 
+        const estimatedGas = await contract.methods.likeBet(betId, "👍").estimateGas({ from: userAccount });
         const gasOptions = {
             from: userAccount,
-            gas: 80000, // Batas gas
-            gasPrice: web3.utils.toWei("0.00011", "gwei"), // Gas price
-            maxFeePerGas: web3.utils.toWei("0.00011", "gwei"), // Biaya gas maks
-            maxPriorityFeePerGas: web3.utils.toWei("0.000105", "gwei") // Biaya prioritas maks
+            gas: estimatedGas + 50000,  // Tambah buffer untuk menghindari kegagalan
+            gasPrice: web3.utils.toWei("0.2", "gwei"),  
+            maxFeePerGas: web3.utils.toWei("0.5", "gwei"),
+            maxPriorityFeePerGas: web3.utils.toWei("0.2", "gwei")
         };
-
+        
         if (liked) {
             // Jika sudah like, maka unlike
             await contract.methods.unlikeBet(betId).send(gasOptions)
