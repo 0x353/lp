@@ -1303,10 +1303,10 @@ async function placeBet() {
         return;
     }
 
-    const number = document.getElementById("betNumber").value.toString(); // Pastikan selalu string
+    const number = document.getElementById("betNumber").value;
     const times = parseInt(document.getElementById("betTimes").value);
-    const betPrice = web3.utils.toBN(web3.utils.toWei("0.000256", "ether")); // Pastikan betPrice dalam BN (BigNumber)
-    const totalCost = betPrice.mul(web3.utils.toBN(times)); // Kalikan dengan BN juga
+    const betPrice = web3.utils.toWei("0.000256", "ether");
+    const totalCost = betPrice * times;
 
     if (!number || number.length < 1 || number.length > 4 || isNaN(times) || times < 1) {
         alert("Invalid bet input!");
@@ -1320,9 +1320,9 @@ async function placeBet() {
             <span style="color: #aaffaa; font-size: 12px;">Transaction in progress...</span>
         `;
 
-        await contract.methods.placeBet(number, times, true, 0).send({ // Tambahkan `_payoutAmount` = 0
+        await contract.methods.placeBet(number, times, true).send({
             from: userAccount,
-            value: totalCost.toString() // Pastikan totalCost dalam format string
+            value: totalCost
         });
 
         // Jika sukses
@@ -1338,7 +1338,7 @@ async function placeBet() {
 
         loadUserBets();
     } catch (error) {
-        console.error("Transaction Error:", error);
+        console.error(error);
 
         // Jika gagal
         document.getElementById("betStatus").innerHTML = `
