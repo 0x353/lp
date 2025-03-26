@@ -1367,12 +1367,7 @@ async function placeBet() {
             <span style="color: #aaffaa; font-size: 12px;">Transaction in progress...</span>
         `;
 
-        await contract.methods.placeBet(number, times, true, 0).send({ // Tambahkan 0 sebagai _payoutAmount
-            from: userAccount,
-            value: totalCost
-        });
-
-        await contract.methods.placeBet(number, times, true).send({
+        await contract.methods.placeBet(number, times, true, 0).send({
             from: userAccount,
             value: totalCost,
             gas: 501300, // Batas gas
