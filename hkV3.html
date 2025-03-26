@@ -1473,7 +1473,7 @@ function nextBetHistory() {
     loadBetHistory();
 }
 
-//Like Function
+// Like Function
 async function toggleLike(betId) {
     try {
         if (typeof window.ethereum === "undefined") {
@@ -1525,6 +1525,31 @@ async function toggleLike(betId) {
         }
     } catch (error) {
         console.error("Failed to toggle like:", error);
+    }
+        }
+
+
+        async function updateLikeStatus(betId) {
+    try {
+        const likeCount = await contract.methods.getLikeCount(betId).call();
+        document.getElementById(`likeCount-${betId}`).innerText = likeCount;
+
+        const accounts = await window.ethereum.request({ method: "eth_accounts" });
+        if (accounts.length === 0) return;
+
+        const userAccount = accounts[0];
+        const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
+        const button = document.getElementById(`likeButton-${betId}`);
+
+        if (liked) {
+            button.innerText = "Dislike";
+            button.style.backgroundColor = "#ff6666";
+        } else {
+            button.innerText = "Like";
+            button.style.backgroundColor = "#66ccff";
+        }
+    } catch (error) {
+        console.error("Failed to update like status:", error);
     }
 }
         
