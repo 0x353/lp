@@ -1561,37 +1561,29 @@ async function toggleLike(betId) {
         console.error("Failed to toggle like:", error);
     }
 }
-        async function likeBet(betId) {
+        async function updateLikeStatus(betId) {
     try {
-        const accounts = await window.ethereum.request({ method: "eth_accounts" });
-        if (accounts.length === 0) return;
-        
-        const userAccount = accounts[0];
-        const tx = await contract.methods.likeBet(betId).send({ from: userAccount });
+        const likeCount = await contract.methods.getLikeCount(betId).call();
+        document.getElementById(`likeCount-${betId}`).innerText = likeCount;
 
-        if (tx.status) {
-            setTimeout(() => updateLikeStatus(betId), 2000); // Tambah delay 2 detik
-        }
-    } catch (error) {
-        console.error("Error liking bet:", error);
-    }
-}
-
-async function unlikeBet(betId) {
-    try {
         const accounts = await window.ethereum.request({ method: "eth_accounts" });
         if (accounts.length === 0) return;
 
         const userAccount = accounts[0];
-        const tx = await contract.methods.unlikeBet(betId).send({ from: userAccount });
+        const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
+        const button = document.getElementById(`likeButton-${betId}`);
 
-        if (tx.status) {
-            setTimeout(() => updateLikeStatus(betId), 2000); // Tambah delay 2 detik
+        if (liked) {
+            button.innerText = "Dislike";
+            button.style.backgroundColor = "#ff6666";
+        } else {
+            button.innerText = "Like";
+            button.style.backgroundColor = "#66ccff";
         }
     } catch (error) {
-        console.error("Error unliking bet:", error);
+        console.error("Failed to update like status:", error);
     }
-}
+        }
         
 // Modal Result
 function updateHistory(newBall1) {
