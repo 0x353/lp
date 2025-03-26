@@ -1501,11 +1501,9 @@ async function loadBetHistory() {
             Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
             Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
             Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
-            <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" style="border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px; display: flex; align-items: center; gap: 5px;">
-            <img id="likeIcon-${bet.betId}" src="img/like.png" width="16" height="16"><span id="likeText-${bet.betId}">Like</span></button>
+            <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" style="background-color: #66ccff; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px;">Like</button>
             <span id="likeCount-${bet.betId}" style="margin-left: 10px; color: #fff;">0</span> Likes
-            <p id="likeStatus-${bet.betId}" style="color: #fff;"></p>
-        </p>
+            <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p></p>
         <hr style="background-color: #333333; height: 1px; border: none;">`;
     }
 
@@ -1546,62 +1544,58 @@ async function toggleLike(betId) {
         }
 
         const userAccount = accounts[0];
-        const button = document.getElementById(`likeButton-${betId}`);
-        const likeText = document.getElementById(`likeText-${betId}`);
-        const likeIcon = document.getElementById(`likeIcon-${betId}`);
-        const statusText = document.getElementById(`likeStatus-${betId}`);
-
-        // Cek apakah pengguna sudah like
         const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
-
-        // Set status ke loading
-        statusText.innerText = liked ? "Dislike processing..." : "Like processing...";
-        likeIcon.src = "img/loading.png"; // Gambar loading saat proses
+        const button = document.getElementById(`likeButton-${betId}`);
+        const statusElement = document.getElementById(`likeStatus-${betId}`);
+        const likeIcon = document.getElementById(`likeIcon-${betId}`);
 
         const gasOptions = {
             from: userAccount,
-            gas: 150000,  
-            gasPrice: web3.utils.toWei("0.0002", "gwei"),  
-            maxFeePerGas: web3.utils.toWei("0.00035", "gwei"),
-            maxPriorityFeePerGas: web3.utils.toWei("0.00018", "gwei")
+            gas: 150000,
+            gasPrice: web3.utils.toWei("0.00011", "gwei"),
+            maxFeePerGas: web3.utils.toWei("0.00011", "gwei"),
+            maxPriorityFeePerGas: web3.utils.toWei("0.000105", "gwei")
         };
 
+        statusElement.innerText = "Like in progress..."; // Status 1
+
         if (liked) {
-            // Jika sudah like, maka unlike
             await contract.methods.unlikeBet(betId).send(gasOptions)
-                .on("transactionHash", function () {
-                    statusText.innerText = "Processing dislike...";
+                .on("transactionHash", function (hash) {
+                    console.log("Transaction sent! Hash:", hash);
                 })
-                .on("receipt", function () {
-                    statusText.innerText = "Disliked successfully";
+                .on("receipt", function (receipt) {
+                    console.log("Transaction confirmed:", receipt);
+                    button.innerText = "Like";
                     button.style.backgroundColor = "#66ccff";
-                    likeText.innerText = "Like";
-                    likeIcon.src = "img/like.png"; // Kembali ke ikon like
+                    likeIcon.src = "like.png"; // Kembali ke ikon Like
+                    statusElement.innerText = "Disliked successfully"; // Status 3
+                    updateLikeStatus(betId);
                 })
-                .on("error", function () {
-                    statusText.innerText = "Dislike failed";
-                    likeIcon.src = "img/dislike.png"; // Kembalikan ke ikon dislike
+                .on("error", function (error) {
+                    console.error("Error processing unlike:", error);
+                    statusElement.innerText = "Dislike failed"; // Status 5
                 });
         } else {
-            // Jika belum like, maka like
             await contract.methods.likeBet(betId, "👍").send(gasOptions)
-                .on("transactionHash", function () {
-                    statusText.innerText = "Processing like...";
+                .on("transactionHash", function (hash) {
+                    console.log("Transaction sent! Hash:", hash);
                 })
-                .on("receipt", function () {
-                    statusText.innerText = "Liked successfully";
+                .on("receipt", function (receipt) {
+                    console.log("Transaction confirmed:", receipt);
+                    button.innerText = "Dislike";
                     button.style.backgroundColor = "#ff6666";
-                    likeText.innerText = "Dislike";
-                    likeIcon.src = "img/dislike.png"; // Ubah ke ikon dislike
+                    likeIcon.src = "dislike.png"; // Ubah ikon ke Dislike
+                    statusElement.innerText = "Liked successfully"; // Status 2
+                    updateLikeStatus(betId);
                 })
-                .on("error", function () {
-                    statusText.innerText = "Like failed";
-                    likeIcon.src = "img/like.png"; // Kembalikan ke ikon like
+                .on("error", function (error) {
+                    console.error("Error processing like:", error);
+                    statusElement.innerText = "Like failed"; // Status 4
                 });
         }
     } catch (error) {
         console.error("Failed to toggle like:", error);
-        document.getElementById(`likeStatus-${betId}`).innerText = "Action failed";
     }
 }
         
