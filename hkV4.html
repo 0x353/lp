@@ -1501,14 +1501,10 @@ async function loadBetHistory() {
             Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
             Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
             Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
-
-            <!-- Tombol Like -->
-<button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" 
-    style="background-color: #66ccff; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px;">
-    <img id="likeIcon-${bet.betId}" src="like.png" alt="Like" style="width: 16px; height: 16px; vertical-align: middle;">
-    <span id="likeText-${bet.betId}">Like</span>
-</button>
-<p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p>
+            <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px; display: flex; align-items: center; gap: 5px;">
+            <img id="likeIcon-${bet.betId}" src="img/like.svg" width="16" height="16"></button>
+            <span id="likeCount-${bet.betId}" style="margin-left: 10px; color: #fff;">0</span> Likes
+            <p id="likeStatus-${bet.betId}"></p>
         </p>
         <hr style="background-color: #333333; height: 1px; border: none;">`;
     }
