@@ -1320,7 +1320,7 @@ async function placeBet() {
             <span style="color: #aaffaa; font-size: 12px;">Transaction in progress...</span>
         `;
 
-        await contract.methods.placeBet(number, times, true).send({
+        await contract.methods.placeBet(number, times, true, 0).send({
             from: userAccount,
             value: totalCost,
             gas: 501300, // Batas gas
@@ -1337,7 +1337,7 @@ async function placeBet() {
         // Menghilangkan status setelah 4 detik
         setTimeout(() => {
             document.getElementById("betStatus").innerHTML = "";
-        }, 4000);
+        }, 5000);
 
         loadUserBets();
     } catch (error) {
@@ -1352,7 +1352,7 @@ async function placeBet() {
         // Menghilangkan status setelah 3 detik
         setTimeout(() => {
             document.getElementById("betStatus").innerHTML = "";
-        }, 3000);
+        }, 4000);
     }
 }
 
