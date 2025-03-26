@@ -1518,20 +1518,12 @@ async function toggleLike(betId) {
 
         const userAccount = accounts[0];
 
-        // Cek apakah user sudah like
-        let liked;
-        try {
-            liked = await contract.methods.hasUserLiked(betId, userAccount).call();
-        } catch (error) {
-            console.warn("hasUserLiked function not found in contract. Assuming user has not liked.");
-            liked = false;
-        }
-
+        const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
         const button = document.getElementById(`likeButton-${betId}`);
 
         if (liked) {
             // Jika sudah like, maka unlike
-            await contract.methods.unlikeBet(betId).send({
+            await contract.methods.unlikeBet(betId).send({ from: userAccount })
                 from: userAccount,
                 gas: 80000, // Batas gas
                 maxFeePerGas: web3.utils.toWei("0.00012", "gwei"), // Biaya gas maks
@@ -1551,12 +1543,12 @@ async function toggleLike(betId) {
                 });
         } else {
             // Jika belum like, maka like
-            await contract.methods.likeBet(betId).send({
+            await contract.methods.likeBet(betId, "👍").send({ from: userAccount })
                 from: userAccount,
                 gas: 80000, // Batas gas
                 maxFeePerGas: web3.utils.toWei("0.00012", "gwei"), // Biaya gas maks
                 maxPriorityFeePerGas: web3.utils.toWei("0.00011", "gwei") // Biaya prioritas maks
-            }) 
+            })
                 .on("transactionHash", function (hash) {
                     console.log("Transaction sent! Hash:", hash);
                     button.innerText = "Dislike";
