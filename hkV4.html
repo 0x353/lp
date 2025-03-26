@@ -1320,7 +1320,7 @@ async function placeBet() {
             <span style="color: #aaffaa; font-size: 12px;">Transaction in progress...</span>
         `;
 
-        await contract.methods.placeBet(number, times, true).send({
+        await contract.methods.placeBet(number, times, true, 0).send({ // Tambahkan 0 sebagai _payoutAmount
             from: userAccount,
             value: totalCost
         });
@@ -1331,7 +1331,7 @@ async function placeBet() {
             <span style="color: #00cc00; font-size: 12px;">Bet placed successfully!</span>
         `;
 
-        // Menghilangkan status setelah 2 detik
+        // Menghilangkan status setelah 4 detik
         setTimeout(() => {
             document.getElementById("betStatus").innerHTML = "";
         }, 4000);
@@ -1346,28 +1346,10 @@ async function placeBet() {
             <span style="color: #ff3333; font-size: 12px;">Transaction failed!</span>
         `;
 
-        // Menghilangkan status setelah 2 detik
+        // Menghilangkan status setelah 3 detik
         setTimeout(() => {
             document.getElementById("betStatus").innerHTML = "";
         }, 3000);
-    }
-}
-
-// Number Funcion
-function validateBetNumber() {
-    let betNumberInput = document.getElementById("betNumber");
-    let betWarning = document.getElementById("betWarning");
-
-    // Hanya angka yang diperbolehkan
-    betNumberInput.value = betNumberInput.value.replace(/\D/g, "");
-
-    if (betNumberInput.value.length < 2) {
-        betWarning.innerText = "Bet number must minimum be 2 digits!";
-    } else if (betNumberInput.value.length > 4) {
-        betWarning.innerText = "Bet number must minimum 4 digits!";
-        betNumberInput.value = betNumberInput.value.slice(0, 4); // Membatasi maksimal 4 digit
-    } else {
-        betWarning.innerText = "";
     }
 }
 
