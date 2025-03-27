@@ -1640,53 +1640,35 @@ function updateLikeCount(betId, change) {
         }
 
  // Comment Function
- // Ambil komentar terbaru untuk betId
-async function loadComments(betId) {
-    try {
-        const comments = await contract.methods.getComments(betId).call();
-        let commentHtml = "";
+ async function loadComments(betId) {
+    const comments = await contract.methods.getComments(betId).call();
+    let commentHtml = "";
 
-        for (let comment of comments.slice(0, 5)) { // Tampilkan 5 komentar awal
-            if (!comment.isDeleted) {
-                let date = new Date(comment.timestamp * 1000).toLocaleString();
-                let shortCommenter = comment.commenter.slice(0, 6) + "..." + comment.commenter.slice(-4);
+    for (let comment of comments.slice(0, 5)) {  // Tampilkan 5 komentar awal
+        if (!comment.isDeleted) {
+            let date = new Date(comment.timestamp * 1000).toLocaleString();
+            let shortCommenter = comment.commenter.slice(0, 6) + "..." + comment.commenter.slice(-4);
 
-                let deleteButton = "";
-                if (typeof ethereum !== "undefined" && ethereum.selectedAddress) {
-                    if (ethereum.selectedAddress.toLowerCase() === comment.commenter.toLowerCase()) {
-                        deleteButton = `<button onclick="deleteComment('${betId}')">Hapus</button>`;
-                    }
-                }
-
-                commentHtml += `<div>
-                    <strong style="color: #ad5cff;">${shortCommenter}</strong> 
-                    <span style="color: gray; font-size: 12px;">(${date})</span><br>
-                    <p style="margin: 5px 0;">${comment.text}</p>
-                    ${deleteButton}
-                </div>
-                <hr>`;
-            }
+            commentHtml += `<div>
+                <strong style="color: #ad5cff;">${shortCommenter}</strong> 
+                <span style="color: gray; font-size: 12px;">(${date})</span><br>
+                <p style="margin: 5px 0;">${comment.text}</p>
+                <button onclick="deleteComment('${betId}', '${comment.commenter}')">Hapus</button>
+                <button onclick="editComment('${betId}', '${comment.commenter}', '${comment.text}')">Edit</button>
+            </div>
+            <hr>`;
         }
-
-        document.getElementById("commentList").innerHTML = commentHtml;
-    } catch (error) {
-        console.error("Gagal mengambil komentar:", error);
     }
-}
 
-// Buka modal komentar
+    document.getElementById("commentList").innerHTML = commentHtml;
+ }
+
 function openCommentModal(betId) {
     document.getElementById("commentModal").style.display = "block";
     document.getElementById("commentBetId").value = betId;
     loadComments(betId);  // Ambil komentar saat modal dibuka
 }
 
-// Tutup modal komentar
-function closeCommentModal() {
-    document.getElementById("commentModal").style.display = "none";
-}
-
-// Tambahkan komentar ke blockchain
 async function addComment() {
     let betId = document.getElementById("commentBetId").value;
     let commentText = document.getElementById("commentInput").value;
@@ -1700,30 +1682,22 @@ async function addComment() {
         await contract.methods.addComment(betId, commentText).send({ from: ethereum.selectedAddress });
         document.getElementById("commentInput").value = ""; // Kosongkan input setelah kirim
         loadComments(betId); // Refresh komentar
-        updateCommentCount(betId); // Update jumlah komentar
     } catch (error) {
         console.error("Gagal menambahkan komentar:", error);
     }
 }
 
-// Hapus komentar
-async function deleteComment(betId) {
+async function deleteComment(betId, commenter) {
+    if (ethereum.selectedAddress.toLowerCase() !== commenter.toLowerCase()) {
+        alert("Anda tidak bisa menghapus komentar orang lain!");
+        return;
+    }
+
     try {
         await contract.methods.deleteComment(betId).send({ from: ethereum.selectedAddress });
         loadComments(betId); // Refresh komentar setelah hapus
-        updateCommentCount(betId);
     } catch (error) {
         console.error("Gagal menghapus komentar:", error);
-    }
-}
-
-// Ambil jumlah komentar terbaru
-async function updateCommentCount(betId) {
-    try {
-        const count = await contract.methods.commentCount(betId).call();
-        document.getElementById(`commentCount-${betId}`).innerText = count;
-    } catch (error) {
-        console.error(`Gagal mengambil jumlah komentar untuk ${betId}:`, error);
     }
 }
        
