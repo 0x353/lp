@@ -1496,20 +1496,14 @@ async function loadBetHistory() {
             <span id="commentCount-${bet.betId}" style="margin-left: 10px; color: #00cc51; font-size: 15px; font-weight: bold;">0</span> Comments
         </p>
         <hr style="background-color: #333333; height: 1px; border: none;">`;
-
-        updateCommentCount(bet.betId);
-    }
-    
     }
 
     document.getElementById("betHistory").innerHTML = html;
 
-    // Update jumlah like dan status like setelah bet history dimuat
     for (let i = start; i < end; i++) {
-        let bet = filteredBets[i];
-        await updateLikeStatus(bet.betId);
+    let bet = filteredBets[i];
+    await Promise.all([updateLikeStatus(bet.betId), updateCommentCount(bet.betId)]);
     }
-        }
 
 // **Bet History Pagination**
 function prevBetHistory() {
