@@ -763,7 +763,7 @@ h3 {
 }
 
 #commentModal {
-    position: absolute; /* Agar modal muncul dekat tombol */
+    position: absolute; /* Bukan fixed agar bisa mengikuti posisi tombol */
     background: #222;
     color: white;
     padding: 15px;
@@ -772,9 +772,10 @@ h3 {
     border-radius: 8px;
     z-index: 1000;
     display: none;
-    width: 300px; /* Tambah sedikit agar lebih lega */
+    width: 300px;
+    max-width: 90%; /* Agar tidak keluar dari layar */
 }
-
+        
 #commentModal .modal-content {
     display: flex;
     flex-direction: column;
@@ -1556,9 +1557,19 @@ async function loadBetHistory() {
              <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p> 
 
              <button onclick="openCommentModal('${bet.betId}', event)">
-             <img src="img/comment.svg" alt="Komentar" style="width: 14px; height: 14px; vertical-align: middle;"> Komentar
-             </button> 
+             <img src="img/comment.svg" alt="Comment" style="width: 14px; height: 14px;"></button>
 
+             <div id="commentModal" class="modal" style="display: none;">
+             <div class="modal-content">
+             <span onclick="closeCommentModal()" 
+             style="position: absolute; right: 10px; cursor: pointer;">&times;</span>
+             <h3>Comment</h3>
+             <input type="hidden" id="commentBetId">
+             <div id="commentList"></div>
+             <textarea id="commentInput" placeholder="Tulis komentar..."></textarea><br>
+             <button onclick="addComment()">Kirim</button>
+         </div>
+     </div>
              <span id="commentCount-${bet.betId}" 
              style="margin-left: 10px; color: #00cc51; font-size: 15px; font-weight: bold;">
              0
@@ -1817,30 +1828,18 @@ async function updateCommentCount(betId) {
 }
 
 function openCommentModal(betId, event) {
-    let modal = document.getElementById("commentModal");
-    let commentBetId = document.getElementById("commentBetId");
+    const modal = document.getElementById("commentModal");
+    const rect = event.target.getBoundingClientRect(); // Ambil posisi tombol
 
-    // Simpan ID bet untuk komentar
-    commentBetId.value = betId;
-
-    // Ambil posisi tombol yang diklik
-    let rect = event.target.getBoundingClientRect();
-
-    // Atur posisi modal agar muncul di dekat tombol
-    modal.style.left = `${rect.left + window.scrollX}px`;
-    modal.style.top = `${rect.bottom + window.scrollY}px`;
-
-    // Tampilkan modal
+    // Posisi modal tetap di tengah tombol yang diklik
+    modal.style.top = `${window.scrollY + rect.top + rect.height / 2}px`;
+    modal.style.left = `${window.scrollX + rect.left + rect.width / 2 - modal.offsetWidth / 2}px`;
+    
     modal.style.display = "block";
-
-    // Load komentar
-    loadComments(betId);
+    document.getElementById("commentBetId").value = betId;
 }
 
-function closeCommentModal() {
-    document.getElementById("commentModal").style.display = "none";
-}
-
+// Fungsi untuk menutup modal
 function closeCommentModal() {
     document.getElementById("commentModal").style.display = "none";
 }
