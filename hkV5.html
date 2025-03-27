@@ -1734,6 +1734,53 @@ function closeMenu() {
 function closeResult() {
     closeModal('resultModal');
 }
+
+// Html Modal
+function createLikeModal(betId) {
+    const modal = document.createElement("div");
+    modal.id = `likeModal-${betId}`;
+    modal.className = "modal";
+    modal.style.display = "none";
+
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h3>Pilih Reaksi & Tambahkan Alasan</h3>
+
+            <!-- Dropdown Jenis Reaksi -->
+            <select id="likeType-${betId}">
+                <option value="😂">😂 (Lucu)</option>
+                <option value="♥️">♥️ (Suka)</option>
+                <option value="😥">😥 (Sedih)</option>
+                <option value="🎉">🎉 (Selamat!)</option>
+                <option value="🥹">🥹 (Terharu)</option>
+                <option value="🏆">🏆 (Hebat!)</option>
+                <option value="🔥">🔥 (Gokil!)</option>
+            </select>
+
+            <!-- Input Alasan -->
+            <input type="text" id="likeReasonInput-${betId}" placeholder="Masukkan alasan...">
+
+            <button onclick="submitLike('${betId}')">Kirim</button>
+            <button onclick="closeLikeModal('${betId}')">Batal</button>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+}
+
+// **Fungsi untuk menampilkan modal**
+function openLikeModal(betId) {
+    if (!document.getElementById(`likeModal-${betId}`)) {
+        createLikeModal(betId);
+    }
+    document.getElementById(`likeModal-${betId}`).style.display = "block";
+}
+
+// **Fungsi untuk menutup modal**
+function closeLikeModal(betId) {
+    const modal = document.getElementById(`likeModal-${betId}`);
+    if (modal) modal.style.display = "none";
+}
         
 // Initialize saat halaman terbuka
 window.onload = () => {
