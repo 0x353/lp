@@ -1502,8 +1502,9 @@ async function loadBetHistory() {
             Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
             Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
             <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" 
-            style="background-color: #000000; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px;">Lie</button>
-            <span id="likeCount-${bet.betId}" style="margin-left: 10px; color: #fff;">0</span> Likes          
+            style="background-color: #000000; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px;">
+            <img src="img/like.svg" alt="Like" style="width: 11px; height: 11px; vertical-align: middle;"></button>
+            <span id="likeCount-${bet.betId}" style="margin-left: 10px; color: #00cc51; font-size: 15px; font-weight: bold;">0</span> Likes
             <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p>
         </p><hr style="background-color: #333333; height: 1px; border: none;">`;
     }
@@ -1573,19 +1574,20 @@ async function toggleLike(betId) {
                 })
                 .on("receipt", function (receipt) {
                     console.log("Transaction confirmed:", receipt);
-                    button.innerText = "Like";
-                    button.style.backgroundColor = "#66ccff";
+                    button.style.backgroundColor = "#000000";
                     statusElement.innerText = "Disliked successfully";
-
+                    button.innerHTML = `<img src="img/like.svg" alt="Dislike" style="width: 11px; height: 11px; vertical-align: middle;">`;
                     setTimeout(() => {
-                      statusElement.innerText = "";
-                    }, 3000);
-                    
+                    statusElement.innerText = "";
+                }, 3000);
                     updateLikeStatus(betId);
                 })
                 .on("error", function (error) {
                     console.error("Error processing unlike:", error);
                     statusElement.innerText = "Dislike failed";
+                    setTimeout(() => {
+                    statusElement.innerText = "";
+                }, 3000);
                 });
         } else {
             await contract.methods.likeBet(betId, "👍").send(gasOptions)
@@ -1594,20 +1596,20 @@ async function toggleLike(betId) {
                 })
                 .on("receipt", function (receipt) {
                     console.log("Transaction confirmed:", receipt);
-                    button.innerText = "Dislike";
                     button.style.backgroundColor = "#ff1a1e";
                     statusElement.innerText = "Liked successfully";
-
+                    button.innerHTML = `<img src="img/dis.svg" alt="Dislike" style="width: 12px; height: 12px; vertical-align: middle;">`;
                     setTimeout(() => {
-                        statusElement.innerText = "";
-                    }, 3000);
-
+                    statusElement.innerText = "";
+                }, 3000);
                     updateLikeStatus(betId);
-                 })
-                
+                })
                 .on("error", function (error) {
                     console.error("Error processing like:", error);
                     statusElement.innerText = "Like failed";
+                    setTimeout(() => {
+                    statusElement.innerText = "";
+                }, 3000);
                 });
         }
     } catch (error) {
@@ -1615,14 +1617,15 @@ async function toggleLike(betId) {
     }
 }
         
-// Fungsi untuk update status like
-async function updateLikeStatus(betId) {
+// Fungsi untuk memperbarui jumlah like
+function updateLikeCount(betId, change) {
+    const likeCountElement = document.getElementById(`likeCount-${betId}`);
+    let currentCount = parseInt(likeCountElement.innerText, 10);
+    likeCountElement.innerText = currentCount + change;
+}
+        
+        async function updateLikeStatus(betId) {
     try {
-        if (!contract) {
-            console.error("Contract is not initialized.");
-            return;
-        }
-
         const likeCount = await contract.methods.getLikeCount(betId).call();
         document.getElementById(`likeCount-${betId}`).innerText = likeCount;
 
@@ -1634,16 +1637,17 @@ async function updateLikeStatus(betId) {
         const button = document.getElementById(`likeButton-${betId}`);
 
         if (liked) {
-            button.innerText = "Dislike";
-            button.style.backgroundColor = "#ff1a1e";
-        } else {
-            button.innerText = "Like";
-            button.style.backgroundColor = "#000000";
+        button.innerHTML = `<img src="img/disl.svg" alt="Dislike" style="width: 16px; height: 16px; vertical-align: middle;">`;
+        button.style.backgroundColor = "#ff1a1e";
+    } else {
+        button.innerHTML = `<img src="img/like.svg" alt="Like" style="width: 16px; height: 16px; vertical-align: middle;">`;
+         button.style.backgroundColor = "#000000";
         }
+        
     } catch (error) {
         console.error("Failed to update like status:", error);
     }
- }
+        }
         
 // Gas Fee Tracker
 async function updateGasFee() {
