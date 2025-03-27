@@ -1468,7 +1468,7 @@ async function loadBetHistory() {
             Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
             <!-- Tombol Like -->
 <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" 
-    style="background-color: #66ccff; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px;">Like
+    style="background-color: #66ccff; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px;">Lik
 </button>
 
 <!-- Status Like -->
@@ -1516,36 +1516,61 @@ async function toggleLike(betId) {
 
         const userAccount = accounts[0];
         const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
-
         const button = document.getElementById(`likeButton-${betId}`);
         const statusElement = document.getElementById(`likeStatus-${betId}`);
-        const likeIcon = document.getElementById(`likeIcon-${betId}`);
 
-        statusElement.innerText = liked ? "Dislike in progress..." : "Like in progress...";
-        likeIcon.src = "img/loading.png";
+        statusElement.innerText = "Transaction in progress...";
 
-        const method = liked ? contract.methods.unlikeBet(betId) : contract.methods.likeBet(betId, "👍");
+        let estimatedGas;
+        if (liked) {
+            estimatedGas = await contract.methods.unlikeBet(betId).estimateGas({ from: userAccount });
+        } else {
+            estimatedGas = await contract.methods.likeBet(betId, "👍").estimateGas({ from: userAccount });
+        }
 
-        method
-            .send({ from: userAccount })
-            .on("transactionHash", function (hash) {
-                console.log("Transaction sent! Hash:", hash);
-                statusElement.innerText = "Waiting for confirmation...";
-            })
-            .on("receipt", function (receipt) {
-                console.log("Transaction confirmed:", receipt);
-                button.innerText = liked ? "Like" : "Dislike";
-                button.style.backgroundColor = liked ? "#66ccff" : "#ff6666";
-                statusElement.innerText = liked ? "Disliked successfully" : "Liked successfully";
-                updateLikeStatus(betId);
-            })
-            .on("error", function (error) {
-                console.error("Transaction failed:", error);
-                statusElement.innerText = "Transaction failed";
-                likeIcon.src = "img/error.png";
-            });
+        // Menambahkan buffer agar transaksi tidak gagal
+        const gasOptions = {
+            from: userAccount,
+            gas: estimatedGas + 50000, // Tambahkan buffer
+            maxFeePerGas: web3.utils.toWei("0.2", "gwei"),  
+            maxPriorityFeePerGas: web3.utils.toWei("0.15", "gwei") 
+        };
+
+        if (liked) {
+            await contract.methods.unlikeBet(betId).send(gasOptions)
+                .on("transactionHash", function (hash) {
+                    console.log("Transaction sent! Hash:", hash);
+                })
+                .on("receipt", function (receipt) {
+                    console.log("Transaction confirmed:", receipt);
+                    button.innerText = "Like";
+                    button.style.backgroundColor = "#66ccff";
+                    statusElement.innerText = "Disliked successfully";
+                    updateLikeStatus(betId);
+                })
+                .on("error", function (error) {
+                    console.error("Error processing unlike:", error);
+                    statusElement.innerText = "Dislike failed";
+                });
+        } else {
+            await contract.methods.likeBet(betId, "👍").send(gasOptions)
+                .on("transactionHash", function (hash) {
+                    console.log("Transaction sent! Hash:", hash);
+                })
+                .on("receipt", function (receipt) {
+                    console.log("Transaction confirmed:", receipt);
+                    button.innerText = "Dislike";
+                    button.style.backgroundColor = "#ff6666";
+                    statusElement.innerText = "Liked successfully";
+                    updateLikeStatus(betId);
+                })
+                .on("error", function (error) {
+                    console.error("Error processing like:", error);
+                    statusElement.innerText = "Like failed";
+                });
+        }
     } catch (error) {
-        console.error("Error in toggleLike:", error);
+        console.error("Failed to toggle like:", error);
     }
 }
         
