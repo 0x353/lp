@@ -692,7 +692,7 @@ h3 {
 }
 
 /* Daftar Notifikasi */
-#notificationList {
+#notificationList, #commentModal {
     position: fixed;
     top: 60px;
     right: 20px;
@@ -1695,7 +1695,7 @@ function updateLikeCount(betId, change) {
             let editButton = "";
             if (typeof ethereum !== "undefined" && ethereum.selectedAddress) {
                 if (ethereum.selectedAddress.toLowerCase() === comment.commenter.toLowerCase()) {
-                    deleteButton = `<button onclick="deleteComment('${betId}', ${index})">Hapus</button>`;
+                    deleteButton = `<button onclick="deleteComment('${betId}', ${index})">Delete</button>`;
                     editButton = `<button onclick="editComment('${betId}', ${index}, '${comment.text}')">Edit</button>`;
                 }
             }
@@ -1755,8 +1755,8 @@ function editComment(betId, commentIndex, oldComment) {
     // Ganti teks komentar dengan input
     commentElement.innerHTML = `
         <input type="text" id="edit-input-${commentIndex}" value="${oldComment}" />
-        <button onclick="saveEditComment('${betId}', ${commentIndex})">Simpan</button>
-        <button onclick="cancelEdit('${commentIndex}', '${oldComment}')">Batal</button>
+        <button onclick="saveEditComment('${betId}', ${commentIndex})">Save</button>
+        <button onclick="cancelEdit('${commentIndex}', '${oldComment}')">Cancel</button>
     `;
 }
 
