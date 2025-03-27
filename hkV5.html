@@ -762,27 +762,6 @@ h3 {
     color: red;
 }
 
-.button-container {
-  position: relative;
-  display: inline-block;
-}
-
-.commentModal {
-  position: absolute;
-  bottom: 100%;
-  left: 0;
-  background: white;
-  border: 1px solid #ccc;
-  padding: 10px;
-  display: none;
-  z-index: 1000;
-  width: 250px;
-}
-
-.modal-content {
-  position: relative;
-}
-
 #commentModal textarea {
     width: 100%;
     height: 60px;
@@ -973,20 +952,28 @@ h3 {
 </div>
 
        <!-- Comment -->
-       <div class="button-container">
-  <button onclick="toggleCommentModal(this)">Comment</button>
-
-  <div class="commentModal">
+       <div id="commentModal">
     <div class="modal-content">
-      <span onclick="this.closest('.commentModal').style.display='none'" 
-            style="position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer;">×</span>
-      <h3>Comment</h3>
-      <input type="hidden" class="commentBetId">
-      <div class="commentList"></div>
-      <textarea class="commentInput" placeholder="Tulis komentar..."></textarea><br>
-      <button onclick="addComment(this)">Send</button>
+        <!-- Tombol close -->
+        <span onclick="document.getElementById('commentModal').style.display='none'" 
+              style="position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer;">
+            ×
+        </span>
+        
+        <h3>Komentar</h3>
+        
+        <!-- Input tersembunyi untuk menyimpan betId -->
+        <input type="hidden" id="commentBetId">
+        
+        <!-- Daftar komentar -->
+        <div id="commentList"></div>
+        
+        <!-- Input komentar -->
+        <textarea id="commentInput" placeholder="Tulis komentar..."></textarea><br>
+        
+        <!-- Tombol kirim komentar -->
+        <button onclick="addComment()">Kirim</button>
     </div>
-  </div>
        </div>
 
        <!-- Modal untuk menampilkan hasil -->
@@ -1905,24 +1892,6 @@ function openLikeModal(betId) {
 function closeLikeModal(betId) {
     const modal = document.getElementById(`likeModal-${betId}`);
     if (modal) modal.style.display = "none";
-}
-
-function toggleCommentModal(button) {
-  const modal = button.nextElementSibling;
-  modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
-}
-
-function addComment(btn) {
-  const container = btn.closest('.commentModal');
-  const input = container.querySelector('.commentInput');
-  const list = container.querySelector('.commentList');
-  const comment = input.value.trim();
-  if (comment) {
-    const p = document.createElement('p');
-    p.textContent = comment;
-    list.appendChild(p);
-    input.value = '';
-  }
 }
         
 // Initialize saat halaman terbuka
