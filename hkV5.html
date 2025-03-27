@@ -758,34 +758,35 @@ h3 {
     display: none;
         }
 
-#noNotificationsMessage {
-    color: red;
-}
-
-#commentModal textarea {
-    width: 100%;
-    height: 60px;
+.comment-dropdown {
+    border: 1px solid #ccc;
+    border-radius: 5px;
     padding: 5px;
-    background: #333;
-    color: white;
-    border: 1px solid #555;
-    border-radius: 4px;
+    width: 100%;
+    background-color: #f9f9f9;
+    margin-top: 10px;
 }
 
-#commentModal button:hover {
-    background: #009e3a;
-}
-
-.modal-content span {
-    color: #aaa;
+.comment-dropdown summary {
+    display: flex;
+    align-items: center;
     font-weight: bold;
-    transition: color 0.3s ease, transform 0.2s ease;
+    list-style: none;
+    padding: 5px;
 }
 
-.modal-content span:hover {
-    color: red;
-    transform: scale(1.2); /* Sedikit membesar saat dihover */
-    cursor: pointer;
+.comment-dropdown summary:hover {
+    background-color: #e0e0e0;
+}
+
+.comment-section {
+    padding: 10px;
+}
+
+.comment-list {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 5px;
 }
     </style>
 </head>
@@ -950,31 +951,6 @@ h3 {
         </table>
     </div>
 </div>
-
-       <!-- Comment -->
-       <div id="commentModal">
-    <div class="modal-content">
-        <!-- Tombol close -->
-        <span onclick="document.getElementById('commentModal').style.display='none'" 
-              style="position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer;">
-            ×
-        </span>
-        
-        <h3>Komentar</h3>
-        
-        <!-- Input tersembunyi untuk menyimpan betId -->
-        <input type="hidden" id="commentBetId">
-        
-        <!-- Daftar komentar -->
-        <div id="commentList"></div>
-        
-        <!-- Input komentar -->
-        <textarea id="commentInput" placeholder="Tulis komentar..."></textarea><br>
-        
-        <!-- Tombol kirim komentar -->
-        <button onclick="addComment()">Kirim</button>
-    </div>
-       </div>
 
        <!-- Modal untuk menampilkan hasil -->
 <div id="resultModal" class="modal">
@@ -1540,13 +1516,17 @@ async function loadBetHistory() {
 
              <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p> 
 
-             <button onclick="openCommentModal('${bet.betId}')" style="background: none; border: none; cursor: pointer;">
-             <img src="img/comment.png" alt="Komentar" style="width: 14px; height: 14px; vertical-align: middle;"></button>
-             
-             <span id="commentCount-${bet.betId}" 
-             style="margin-left: 10px; color: #00cc51; font-size: 15px; font-weight: bold;">
-             0
-             </span> Comments
+             <details class="comment-dropdown">
+    <summary style="display: flex; align-items: center; cursor: pointer;">
+        <img src="img/comment.png" alt="Komentar" style="width: 14px; height: 14px; vertical-align: middle;">
+        <span id="commentCount-${bet.betId}" style="margin-left: 10px; color: #00cc51; font-size: 15px; font-weight: bold;">0</span> Comments
+    </summary>
+    <div id="commentSection-${bet.betId}" class="comment-section">
+        <div id="commentList-${bet.betId}" class="comment-list"></div>
+        <textarea id="commentInput-${bet.betId}" placeholder="Tulis komentar..."></textarea>
+        <button onclick="addComment('${bet.betId}')">Kirim</button>
+    </div>
+</details>
         </p>
         <hr style="background-color: #333333; height: 1px; border: none;">`;
     }
@@ -1693,11 +1673,12 @@ function updateLikeCount(betId, change) {
         }
 
  // Comment Function
- async function loadComments(betId) {
+ // Fungsi untuk memuat komentar dalam dropdown
+async function loadComments(betId) {
     const comments = await contract.methods.getComments(betId).call();
     let commentHtml = "";
 
-    comments.slice(0, 5).forEach((comment, index) => {  // Tampilkan 5 komentar awal
+    comments.slice(0, 5).forEach((comment, index) => { // Tampilkan 5 komentar awal
         if (!comment.isDeleted) {
             let date = new Date(comment.timestamp * 1000).toLocaleString();
             let shortCommenter = comment.commenter.slice(0, 6) + "..." + comment.commenter.slice(-4);
@@ -1714,26 +1695,20 @@ function updateLikeCount(betId, change) {
             commentHtml += `<div>
                 <strong style="color: #ad5cff;">${shortCommenter}</strong> 
                 <span style="color: gray; font-size: 12px;">(${date})</span><br>
-                <p style="margin: 5px 0;" id="comment-${index}">${comment.text}</p>
+                <p style="margin: 5px 0;" id="comment-${betId}-${index}">${comment.text}</p>
                 ${deleteButton} ${editButton}
             </div>
             <hr>`;
         }
     });
 
-    document.getElementById("commentList").innerHTML = commentHtml;
-    updateCommentCount(betId); // Pastikan ini ada di dalam fungsi
- }
-
-function openCommentModal(betId) {
-    document.getElementById("commentModal").style.display = "block";
-    document.getElementById("commentBetId").value = betId;
-    loadComments(betId);  // Ambil komentar saat modal dibuka
+    document.getElementById(`commentList-${betId}`).innerHTML = commentHtml;
+    updateCommentCount(betId);
 }
 
-async function addComment() {
-    let betId = document.getElementById("commentBetId").value;
-    let commentText = document.getElementById("commentInput").value;
+// Fungsi untuk menambahkan komentar
+async function addComment(betId) {
+    let commentText = document.getElementById(`commentInput-${betId}`).value;
     
     if (!commentText.trim()) {
         alert("Komentar tidak boleh kosong!");
@@ -1742,7 +1717,7 @@ async function addComment() {
 
     try {
         await contract.methods.addComment(betId, commentText).send({ from: ethereum.selectedAddress });
-        document.getElementById("commentInput").value = ""; // Kosongkan input setelah kirim
+        document.getElementById(`commentInput-${betId}`).value = ""; // Kosongkan input setelah kirim
         loadComments(betId); // Refresh komentar
         updateCommentCount(betId); // Perbarui jumlah komentar
     } catch (error) {
@@ -1750,67 +1725,13 @@ async function addComment() {
     }
 }
 
-async function deleteComment(betId, commentIndex) {
-    try {
-        await contract.methods.deleteComment(betId, commentIndex).send({ from: ethereum.selectedAddress });
-        loadComments(betId); // Refresh komentar setelah hapus
-        updateCommentCount(betId); // Update jumlah komentar
-    } catch (error) {
-        console.error("Gagal menghapus komentar:", error);
-    }
-}
-
-function editComment(betId, commentIndex, oldComment) {
-    let commentElement = document.getElementById(`comment-${commentIndex}`);
-    
-    // Ganti teks komentar dengan input
-    commentElement.innerHTML = `
-        <input type="text" id="edit-input-${commentIndex}" value="${oldComment}" />
-        <button onclick="saveEditComment('${betId}', ${commentIndex})">Save</button>
-        <button onclick="cancelEdit('${commentIndex}', '${oldComment}')">Cancel</button>
-    `;
-}
-
-function cancelEdit(commentIndex, oldComment) {
-    document.getElementById(`comment-${commentIndex}`).innerHTML = oldComment;
-}
-
-async function saveEditComment(betId, commentIndex) {
-    let newComment = document.getElementById(`edit-input-${commentIndex}`).value.trim();
-    
-    if (!newComment) {
-        alert("Komentar tidak boleh kosong!");
-        return;
-    }
-
-    try {
-        await contract.methods.editComment(betId, commentIndex, newComment).send({ from: ethereum.selectedAddress });
-        loadComments(betId); // Refresh komentar setelah edit
-    } catch (error) {
-        console.error("Gagal mengedit komentar:", error);
-    }
-}
-
+// Fungsi untuk memperbarui jumlah komentar
 async function updateCommentCount(betId) {
     try {
         const count = await contract.methods.commentCount(betId).call();
         document.getElementById(`commentCount-${betId}`).innerText = count;
     } catch (error) {
         console.error(`Gagal mengambil jumlah komentar untuk ${betId}:`, error);
-    }
-}
-
-async function loadAllCommentCounts(betIds) {
-    try {
-        const counts = await Promise.all(
-            betIds.map(betId => contract.methods.commentCount(betId).call())
-        );
-        
-        betIds.forEach((betId, index) => {
-            document.getElementById(`commentCount-${betId}`).innerText = counts[index];
-        });
-    } catch (error) {
-        console.error("Gagal mengambil jumlah komentar:", error);
     }
 }
        
