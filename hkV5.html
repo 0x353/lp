@@ -1496,6 +1496,10 @@ async function loadBetHistory() {
             <span id="commentCount-${bet.betId}" style="margin-left: 10px; color: #00cc51; font-size: 15px; font-weight: bold;">0</span> Comments
         </p>
         <hr style="background-color: #333333; height: 1px; border: none;">`;
+
+        updateCommentCount(bet.betId);
+    }
+    
     }
 
     document.getElementById("betHistory").innerHTML = html;
@@ -1681,6 +1685,7 @@ function updateLikeCount(betId, change) {
         await contract.methods.addComment(betId, commentText).send({ from: ethereum.selectedAddress });
         document.getElementById("commentInput").value = ""; // Kosongkan input setelah kirim
         loadComments(betId); // Refresh komentar
+        updateCommentCount(betId); // Update jumlah komentar
     } catch (error) {
         console.error("Gagal menambahkan komentar:", error);
     }
@@ -1690,6 +1695,15 @@ async function deleteComment(betId, commenter) {
     if (ethereum.selectedAddress.toLowerCase() !== commenter.toLowerCase()) {
         alert("Anda tidak bisa menghapus komentar orang lain!");
         return;
+    }
+
+    async function updateCommentCount(betId) {
+    try {
+        const count = await contract.methods.commentCount(betId).call();
+        document.getElementById(`commentCount-${betId}`).innerText = count;
+    } catch (error) {
+        console.error(`Gagal mengambil jumlah komentar untuk ${betId}:`, error);
+    }
     }
 
     try {
