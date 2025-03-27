@@ -1471,8 +1471,9 @@ async function loadBetHistory() {
             <img src="img/like.svg" alt="Like" style="width: 11px; height: 11px; vertical-align: middle;"></button>
             <span id="likeCount-${bet.betId}" style="margin-left: 10px; color: #00cc51; font-size: 15px; font-weight: bold;">0</span> Likes
             <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p>
-
-<p id="likeDetails-{bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p>
+            <p id="likeDetails-{bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px; cursor: pointer;" onclick="openLikeModal('{bet.betId}')">
+    Klik untuk memberikan reaksi
+</p>
         </p>
         <hr style="background-color: #333333; height: 1px; border: none;">`;
     }
