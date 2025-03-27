@@ -794,7 +794,17 @@ h3 {
     background: #009e3a;
 }
 
+.modal-content span {
+    color: #aaa;
+    font-weight: bold;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
 
+.modal-content span:hover {
+    color: red;
+    transform: scale(1.2); /* Sedikit membesar saat dihover */
+    cursor: pointer;
+}
     </style>
 </head>
 <body>
@@ -960,17 +970,17 @@ h3 {
 </div>
 
        <!-- Comment -->
-       <div id="commentOverlay"></div>
-<div id="commentModal" class="modal">
+       <div id="commentModal" class="modal">
     <div class="modal-content">
-        <span onclick="closeCommentModal()" style="position: absolute; right: 10px; cursor: pointer;">&times;</span>
-        <h3>Comment</h3>
+        <span onclick="document.getElementById('commentModal').style.display='none'" 
+              style="position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer;">×</span>
+        <h3>Komentar</h3>
         <input type="hidden" id="commentBetId">
         <div id="commentList"></div>
         <textarea id="commentInput" placeholder="Tulis komentar..."></textarea><br>
         <button onclick="addComment()">Kirim</button>
     </div>
-</div>
+       </div>
 
        <!-- Modal untuk menampilkan hasil -->
 <div id="resultModal" class="modal">
@@ -1536,20 +1546,9 @@ async function loadBetHistory() {
 
              <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p> 
 
-             <button onclick="openCommentModal('${bet.betId}', event)">
-             <img src="img/comment.svg" alt="Comment" style="width: 14px; height: 14px;"></button>
-
-             <div id="commentModal" class="modal" style="display: none;">
-             <div class="modal-content">
-             <span onclick="closeCommentModal()" 
-             style="position: absolute; right: 10px; cursor: pointer;">&times;</span>
-             <h3>Comment</h3>
-             <input type="hidden" id="commentBetId">
-             <div id="commentList"></div>
-             <textarea id="commentInput" placeholder="Tulis komentar..."></textarea><br>
-             <button onclick="addComment()">Kirim</button>
-         </div>
-     </div>
+             <button onclick="openCommentModal('${bet.betId}')" style="background: none; border: none; cursor: pointer;">
+             <img src="img/comment.png" alt="Komentar" style="width: 14px; height: 14px; vertical-align: middle;"></button>
+             
              <span id="commentCount-${bet.betId}" 
              style="margin-left: 10px; color: #00cc51; font-size: 15px; font-weight: bold;">
              0
@@ -1805,33 +1804,6 @@ async function updateCommentCount(betId) {
     } catch (error) {
         console.error(`Gagal mengambil jumlah komentar untuk ${betId}:`, error);
     }
-}
-
-function openCommentModal(betId, event) {
-    const modal = document.getElementById("commentModal");
-    const overlay = document.getElementById("commentOverlay");
-    const rect = event.target.getBoundingClientRect();
-
-    // Posisi modal tetap di dekat tombol
-    modal.style.top = `${window.scrollY + rect.top + rect.height / 2}px`;
-    modal.style.left = `${window.scrollX + rect.left + rect.width / 2 - modal.offsetWidth / 2}px`;
-    
-    // Menyesuaikan overlay agar sesuai dengan modal
-    overlay.style.top = modal.style.top;
-    overlay.style.left = modal.style.left;
-    overlay.style.width = modal.offsetWidth + "px";
-    overlay.style.height = modal.offsetHeight + "px";
-    
-    modal.style.display = "block";
-    overlay.style.display = "block";
-
-    document.getElementById("commentBetId").value = betId;
-}
-
-// Fungsi untuk menutup modal dan overlay
-function closeCommentModal() {
-    document.getElementById("commentModal").style.display = "none";
-    document.getElementById("commentOverlay").style.display = "none";
 }
        
 // Modal Result
