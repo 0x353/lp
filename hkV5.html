@@ -1812,6 +1812,20 @@ async function updateCommentCount(betId) {
         console.error(`Gagal mengambil jumlah komentar untuk ${betId}:`, error);
     }
 }
+
+async function loadAllCommentCounts(betIds) {
+    try {
+        const counts = await Promise.all(
+            betIds.map(betId => contract.methods.commentCount(betId).call())
+        );
+        
+        betIds.forEach((betId, index) => {
+            document.getElementById(`commentCount-${betId}`).innerText = counts[index];
+        });
+    } catch (error) {
+        console.error("Gagal mengambil jumlah komentar:", error);
+    }
+}
        
 // Modal Result
 function updateHistory(newBall1) {
@@ -1922,7 +1936,7 @@ window.onload = () => {
                 document.getElementById("walletBalance").style.display = "block";
                 document.getElementById("connectWallet").style.display = "none";
                 document.getElementById("disconnectWallet").style.display = "block";
-                
+
                 updateBalance();
                 loadUserBets();
                 loadBetHistory();
@@ -1931,6 +1945,10 @@ window.onload = () => {
             }
         });
     }
+
+    // Panggil loadAllCommentCounts setelah halaman selesai dimuat
+    const betIds = [1, 2, 3]; // Ganti dengan daftar betId yang sesuai
+    loadAllCommentCounts(betIds);
 };
     </script>
        
