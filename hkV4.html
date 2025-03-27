@@ -1595,7 +1595,7 @@ async function toggleLike(betId) {
                 .on("receipt", function (receipt) {
                     console.log("Transaction confirmed:", receipt);
                     button.innerText = "Dislike";
-                    button.style.backgroundColor = "#ff6666";
+                    button.style.backgroundColor = "#ff1a1e";
                     statusElement.innerText = "Liked successfully";
 
                     setTimeout(() => {
@@ -1635,7 +1635,7 @@ async function updateLikeStatus(betId) {
 
         if (liked) {
             button.innerText = "Dislike";
-            button.style.backgroundColor = "#ff4d4d";
+            button.style.backgroundColor = "#ff1a1e";
         } else {
             button.innerText = "Like";
             button.style.backgroundColor = "#000000";
