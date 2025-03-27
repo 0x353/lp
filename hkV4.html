@@ -1561,8 +1561,8 @@ async function toggleLike(betId) {
             from: userAccount,
             gas: estimatedGas + 50000,
             gasPrice: web3.utils.toWei("0.00105", "gwei"),
-            maxFeePerGas: web3.utils.toWei("0.00011", "gwei"),
-            maxPriorityFeePerGas: web3.utils.toWei("0.00012", "gwei")
+            maxFeePerGas: web3.utils.toWei("0.0011", "gwei"),
+            maxPriorityFeePerGas: web3.utils.toWei("0.0012", "gwei")
         };
 
         if (liked) {
