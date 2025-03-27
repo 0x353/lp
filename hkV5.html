@@ -763,17 +763,25 @@ h3 {
 }
 
 #commentModal {
-    position: absolute; /* Supaya muncul di dekat tombol */
+    position: absolute; /* Modal tetap bisa berpindah */
     background: #222;
     color: white;
     padding: 10px;
     border: 1px solid #444;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
     border-radius: 8px;
-    z-index: 1000;
+    z-index: 1001; /* Lebih tinggi dari overlay */
     display: none;
     width: 300px;
     max-width: 90%;
+}
+
+/* Overlay hanya di sekitar modal */
+#commentOverlay {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.3); /* Transparan */
+    z-index: 1000; /* Di bawah modal */
+    display: none;
 }
         
 #commentModal .modal-content {
@@ -981,16 +989,17 @@ h3 {
 </div>
 
        <!-- Comment -->
-       <div id="commentModal" class="modal" style="display: none;">
+       <div id="commentOverlay"></div>
+<div id="commentModal" class="modal">
     <div class="modal-content">
         <span onclick="closeCommentModal()" style="position: absolute; right: 10px; cursor: pointer;">&times;</span>
-        <h3>Komentar</h3>
+        <h3>Comment</h3>
         <input type="hidden" id="commentBetId">
         <div id="commentList"></div>
         <textarea id="commentInput" placeholder="Tulis komentar..."></textarea><br>
         <button onclick="addComment()">Kirim</button>
     </div>
-       </div>
+</div>
 
        <!-- Modal untuk menampilkan hasil -->
 <div id="resultModal" class="modal">
@@ -1829,19 +1838,29 @@ async function updateCommentCount(betId) {
 
 function openCommentModal(betId, event) {
     const modal = document.getElementById("commentModal");
-    const rect = event.target.getBoundingClientRect(); // Ambil posisi tombol
+    const overlay = document.getElementById("commentOverlay");
+    const rect = event.target.getBoundingClientRect();
 
-    // Posisi modal tetap di tengah tombol yang diklik
+    // Posisi modal tetap di dekat tombol
     modal.style.top = `${window.scrollY + rect.top + rect.height / 2}px`;
     modal.style.left = `${window.scrollX + rect.left + rect.width / 2 - modal.offsetWidth / 2}px`;
     
+    // Menyesuaikan overlay agar sesuai dengan modal
+    overlay.style.top = modal.style.top;
+    overlay.style.left = modal.style.left;
+    overlay.style.width = modal.offsetWidth + "px";
+    overlay.style.height = modal.offsetHeight + "px";
+    
     modal.style.display = "block";
+    overlay.style.display = "block";
+
     document.getElementById("commentBetId").value = betId;
 }
 
-// Fungsi untuk menutup modal
+// Fungsi untuk menutup modal dan overlay
 function closeCommentModal() {
     document.getElementById("commentModal").style.display = "none";
+    document.getElementById("commentOverlay").style.display = "none";
 }
        
 // Modal Result
