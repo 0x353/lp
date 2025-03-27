@@ -763,12 +763,57 @@ h3 {
 }
 
 #commentModal {
-    width: 300px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border: 1px solid #000;
+    position: absolute; /* Agar modal muncul dekat tombol */
+    background: #222;
+    color: white;
+    padding: 15px;
+    border: 1px solid #444;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    z-index: 1000;
+    display: none;
+    width: 300px; /* Tambah sedikit agar lebih lega */
+}
+
+#commentModal .modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#commentModal textarea {
+    width: 100%;
+    height: 60px;
+    padding: 5px;
+    background: #333;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 4px;
+}
+
+#commentModal button {
+    background: #00cc51;
+    color: white;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+#commentModal button:hover {
+    background: #009e3a;
+}
+
+.modal-content span {
+    color: #aaa;
+    font-weight: bold;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.modal-content span:hover {
+    color: red;
+    transform: scale(1.2); /* Sedikit membesar saat dihover */
+    cursor: pointer;
 }
     </style>
 </head>
@@ -935,14 +980,14 @@ h3 {
 </div>
 
        <!-- Comment -->
-       <div id="commentModal" class="modal">
-           <div class="modal-content">
+       <div id="commentModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span onclick="closeCommentModal()" style="position: absolute; right: 10px; cursor: pointer;">&times;</span>
         <h3>Komentar</h3>
         <input type="hidden" id="commentBetId">
         <div id="commentList"></div>
         <textarea id="commentInput" placeholder="Tulis komentar..."></textarea><br>
         <button onclick="addComment()">Kirim</button>
-        <button onclick="document.getElementById('commentModal').style.display = 'none';">Tutup</button>
     </div>
        </div>
 
@@ -1493,8 +1538,9 @@ async function loadBetHistory() {
             <img src="img/like.svg" alt="Like" style="width: 11px; height: 11px; vertical-align: middle;">
             </button>
             <span id="likeCount-${bet.betId}" style="color: #00cc51; font-size: 15px; font-weight: bold;">0</span> Likes
-            <button onclick="openCommentModal('${bet.betId}')" style="background: none; border: none; cursor: pointer;">
-            <img src="img/comment.svg" alt="Komentar" style="width: 14px; height: 14px; vertical-align: middle;"></button>
+            <button onclick="openCommentModal('${bet.betId}', event)">
+            <img src="img/comment.svg" alt="Komentar" style="width: 14px; height: 14px; vertical-align: middle;"> Komentar
+            </button>
             <span id="commentCount-${bet.betId}" style="color: #00cc51; font-size: 15px; font-weight: bold;">0</span> Comments
             </div>
             <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p>
@@ -1749,6 +1795,31 @@ async function updateCommentCount(betId) {
     } catch (error) {
         console.error(`Gagal mengambil jumlah komentar untuk ${betId}:`, error);
     }
+}
+
+function openCommentModal(betId, event) {
+    let modal = document.getElementById("commentModal");
+    let commentBetId = document.getElementById("commentBetId");
+
+    // Simpan ID bet untuk komentar
+    commentBetId.value = betId;
+
+    // Ambil posisi tombol yang diklik
+    let rect = event.target.getBoundingClientRect();
+
+    // Atur posisi modal agar muncul di dekat tombol
+    modal.style.left = `${rect.left + window.scrollX}px`;
+    modal.style.top = `${rect.bottom + window.scrollY}px`;
+
+    // Tampilkan modal
+    modal.style.display = "block";
+
+    // Load komentar
+    loadComments(betId);
+}
+
+function closeCommentModal() {
+    document.getElementById("commentModal").style.display = "none";
 }
        
 // Modal Result
