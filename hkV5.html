@@ -1471,9 +1471,9 @@ async function loadBetHistory() {
             <img src="img/like.svg" alt="Like" style="width: 11px; height: 11px; vertical-align: middle;"></button>
             <span id="likeCount-${bet.betId}" style="margin-left: 10px; color: #00cc51; font-size: 15px; font-weight: bold;">0</span> Likes
             <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p>
-            <p id="likeDetails-{bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px; cursor: pointer;" onclick="openLikeModal('{bet.betId}')">
-    Klik untuk memberikan reaksi
-</p>
+            <p id="likeDetails-{bet.betId}" style="font-size: 12px; color: blue; margin-top: 3px; cursor: pointer;" onclick="openLikeModal('{bet.betId}')">
+            <img src="icon.png" alt="Reaksi" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 5px;">
+            Click To React</p>
         </p>
         <hr style="background-color: #333333; height: 1px; border: none;">`;
     }
@@ -1621,55 +1621,39 @@ function updateLikeCount(betId, change) {
 // Type Like
 async function submitLike(betId) {
     const likeType = document.getElementById(`likeType-${betId}`).value;
-    const likeReason = document.getElementById(`likeReasonInput-${betId}`).value.trim();
-
-    if (!likeType) {
-        alert("Pilih tipe reaksi terlebih dahulu!");
-        return;
-    }
+    const likeReason = document.getElementById(`likeReasonInput-${betId}`).value;
 
     if (!window.ethereum) {
         alert("MetaMask tidak terdeteksi!");
         return;
     }
 
-    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-    const userAddress = accounts[0];
-
     try {
+        // Meminta akses akun ke MetaMask
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const userAddress = accounts[0];
+
+        // Pastikan web3 sudah terhubung
+        const web3 = new Web3(window.ethereum);
         const contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
-        await contract.methods.likeBet(betId, likeType).send({ from: userAddress });
+
+        // Kirim transaksi ke smart contract
+        const tx = await contract.methods.likeBet(betId, likeType).send({ from: userAddress });
+
+        console.log("Like berhasil dikirim:", tx);
 
         // Perbarui tampilan jumlah like
         await updateLikeStatus(betId);
 
-        // Tambahkan alasan reaksi ke tampilan jika ada
+        // Tambahkan alasan reaksi ke tampilan
         const likeDetails = document.getElementById(`likeDetails-${betId}`);
-        const newLike = document.createElement("p");
-        newLike.innerHTML = `<strong>${userAddress}</strong>: ${likeType} ${likeReason ? `- "${likeReason}"` : ""}`;
-        likeDetails.appendChild(newLike);
+        likeDetails.innerHTML += `<p><strong>${userAddress}</strong>: ${likeType} ${likeReason}</p>`;
 
+        // Tutup modal setelah berhasil
         closeLikeModal(betId);
     } catch (error) {
         console.error("Gagal mengirim like:", error);
-    }
-}
-
-function openLikeModal(betId) {
-    document.getElementById(`likeModal-${betId}`).style.display = "block";
-}
-
-function closeLikeModal(betId) {
-    document.getElementById(`likeModal-${betId}`).style.display = "none";
-}
-
-async function updateLikeStatus(betId) {
-    try {
-        const contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
-        const likeCount = await contract.methods.getLikeCount(betId).call();
-        document.getElementById(`likeCount-${betId}`).innerText = likeCount + " Likes";
-    } catch (error) {
-        console.error("Gagal memperbarui status like:", error);
+        alert("Gagal mengirim like. Pastikan MetaMask terhubung dan saldo cukup.");
     }
 }
         
