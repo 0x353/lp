@@ -1477,20 +1477,22 @@ function closeCommentModal() {
 
 // **Mengirim Komentar ke Blockchain**
 async function sendComment() {
-    let betId = document.getElementById("commentInput").dataset.betId;
     let commentText = document.getElementById("commentInput").value.trim();
     if (!commentText) return alert("Komentar tidak boleh kosong!");
 
     try {
         let contractWithSigner = contract.connect(signer);
-        let tx = await contractWithSigner.addComment(betId, commentText);
+        let tx = await contractWithSigner.addComment(currentBetId, commentText);
         alert("Komentar sedang diproses...");
 
         await tx.wait();
         alert("Komentar berhasil!");
 
         document.getElementById("commentInput").value = "";
-        loadComments(betId, true);
+        loadComments(true);
+
+        let commentCount = await contract.methods.getCommentCount(currentBetId).call();
+        document.getElementById(`commentCount-${currentBetId}`).innerText = commentCount;
     } catch (error) {
         alert("Gagal mengirim komentar: " + error.message);
     }
@@ -1593,6 +1595,9 @@ async function loadBetHistory() {
             <span id="likeCount-${bet.betId}" style="margin-left: 10px; color: #00cc51; font-size: 15px; font-weight: bold;">0</span> Likes
             <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p>
             <button onclick="openCommentModal('${bet.betId}')">Komentar</button>
+            <button onclick="openCommentModal('${bet.betId}')">
+                💬 Komentar (<span id="commentCount-${bet.betId}">${commentCount}</span>)
+            </button>
         </p>
         <hr style="background-color: #333333; height: 1px; border: none;">`;
     }
