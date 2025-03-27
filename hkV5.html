@@ -1521,65 +1521,33 @@ async function toggleLike(betId) {
         const statusElement = document.getElementById(`likeStatus-${betId}`);
         const likeIcon = document.getElementById(`likeIcon-${betId}`);
 
-        // Estimasi gas
-        const estimatedGas = await contract.methods.likeBet(betId, "👍").estimateGas({ from: userAccount });
-        const gasOptions = {
-            from: userAccount,
-            gas: estimatedGas + 50000,
-            gasPrice: web3.utils.toWei("0.001", "gwei"),
-            maxFeePerGas: web3.utils.toWei("0.0011", "gwei"),
-            maxPriorityFeePerGas: web3.utils.toWei("0.0012", "gwei")
-        };
+        statusElement.innerText = liked ? "Dislike in progress..." : "Like in progress...";
+        likeIcon.src = "img/loading.png";
 
-        if (liked) {
-            // **Dislike (Unlike)**
-            statusElement.innerText = "Dislike in progress..."; // Status 1
-            likeIcon.src = "img/loading.png";
+        const method = liked ? contract.methods.unlikeBet(betId) : contract.methods.likeBet(betId, "👍");
 
-            await contract.methods.unlikeBet(betId).send(gasOptions)
-                .on("transactionHash", function (hash) {
-                    console.log("Transaction sent! Hash:", hash);
-                })
-                .on("receipt", function (receipt) {
-                    console.log("Transaction confirmed:", receipt);
-                    button.innerText = "Like";
-                    button.style.backgroundColor = "#66ccff";
-                    statusElement.innerText = "Disliked successfully"; // Status 3
-                    likeIcon.src = "img/like.png";
-                    updateLikeStatus(betId);
-                })
-                .on("error", function (error) {
-                    console.error("Error processing unlike:", error);
-                    statusElement.innerText = "Dislike failed"; // Status 5
-                    likeIcon.src = "img/error.png";
-                });
-        } else {
-            // **Like**
-            statusElement.innerText = "Like in progress..."; // Status 2
-            likeIcon.src = "img/loading.png";
-
-            await contract.methods.likeBet(betId, "👍").send(gasOptions)
-                .on("transactionHash", function (hash) {
-                    console.log("Transaction sent! Hash:", hash);
-                })
-                .on("receipt", function (receipt) {
-                    console.log("Transaction confirmed:", receipt);
-                    button.innerText = "Dislike";
-                    button.style.backgroundColor = "#ff6666";
-                    statusElement.innerText = "Liked successfully"; // Status 4
-                    likeIcon.src = "img/dislike.png";
-                    updateLikeStatus(betId);
-                })
-                .on("error", function (error) {
-                    console.error("Error processing like:", error);
-                    statusElement.innerText = "Like failed"; // Status 6
-                    likeIcon.src = "img/error.png";
-                });
-        }
+        method
+            .send({ from: userAccount })
+            .on("transactionHash", function (hash) {
+                console.log("Transaction sent! Hash:", hash);
+                statusElement.innerText = "Waiting for confirmation...";
+            })
+            .on("receipt", function (receipt) {
+                console.log("Transaction confirmed:", receipt);
+                button.innerText = liked ? "Like" : "Dislike";
+                button.style.backgroundColor = liked ? "#66ccff" : "#ff6666";
+                statusElement.innerText = liked ? "Disliked successfully" : "Liked successfully";
+                updateLikeStatus(betId);
+            })
+            .on("error", function (error) {
+                console.error("Transaction failed:", error);
+                statusElement.innerText = "Transaction failed";
+                likeIcon.src = "img/error.png";
+            });
     } catch (error) {
-        console.error("Failed to toggle like:", error);
+        console.error("Error in toggleLike:", error);
     }
-                    }
+}
         
 // Fungsi untuk memperbarui jumlah like
 function updateLikeCount(betId, change) {
