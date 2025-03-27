@@ -1471,9 +1471,8 @@ async function loadBetHistory() {
             <img src="img/like.svg" alt="Like" style="width: 11px; height: 11px; vertical-align: middle;"></button>
             <span id="likeCount-${bet.betId}" style="margin-left: 10px; color: #00cc51; font-size: 15px; font-weight: bold;">0</span> Likes
             <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p>
-            <p id="likeDetails-{bet.betId}" style="font-size: 12px; color: blue; margin-top: 3px; cursor: pointer;" onclick="openLikeModal('{bet.betId}')">
-            <img src="icon.png" alt="Reaksi" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 5px;">
-            Click To React</p>
+            <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p>
+            ${reactionHtml}
         </p>
         <hr style="background-color: #333333; height: 1px; border: none;">`;
     }
@@ -1619,41 +1618,109 @@ function updateLikeCount(betId, change) {
         }
 
 // Type Like
-async function submitLike(betId) {
-    const likeType = document.getElementById(`likeType-${betId}`).value;
-    const likeReason = document.getElementById(`likeReasonInput-${betId}`).value;
+async function toggleLike(betId) {
+    const userAddress = await getUserAddress();
+    const hasLiked = await contract.methods.hasUserLiked(betId, userAddress).call();
 
-    if (!window.ethereum) {
-        alert("MetaMask tidak terdeteksi!");
+    try {
+        if (hasLiked) {
+            await contract.methods.unlikeBet(betId).send({ from: userAddress });
+        } else {
+            let reaction = await showReactionPicker();
+            if (!reaction) return;
+
+            await contract.methods.likeBet(betId, reaction.id).send({ from: userAddress });
+        }
+    } catch (error) {
+        console.error("Transaksi gagal:", error);
+        alert("Gagal melakukan transaksi. Pastikan Anda mengonfirmasi di MetaMask.");
         return;
     }
 
-    try {
-        // Meminta akses akun ke MetaMask
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const userAddress = accounts[0];
+    await updateLikeStatus(betId);
+}
 
-        // Pastikan web3 sudah terhubung
-        const web3 = new Web3(window.ethereum);
-        const contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
+async function showReactionPicker() {
+    return new Promise((resolve) => {
+        if (document.getElementById("reactionPicker")) {
+            return;
+        }
 
-        // Kirim transaksi ke smart contract
-        const tx = await contract.methods.likeBet(betId, likeType).send({ from: userAddress });
+        const reactions = [
+            { id: "congrats", img: "img/congrats.png", title: "🎉 Congrats You Win" },
+            { id: "love", img: "img/love.png", title: "❤️ Love It!" },
+            { id: "fire", img: "img/fire.png", title: "🔥 Epic Win" },
+            { id: "lol", img: "img/lol.png", title: "😂 Funny" },
+            { id: "thumbs", img: "img/thumbs.png", title: "👍 Nice Move" },
+            { id: "sad", img: "img/sad.png", title: "😢 Unlucky" }
+        ];
 
-        console.log("Like berhasil dikirim:", tx);
+        let buttons = reactions.map(reaction => 
+            `<button onclick="selectReaction('${reaction.id}')" style="border: none; background: none; cursor: pointer; text-align: center; margin: 10px;">
+                <img src="${reaction.img}" alt="${reaction.title}" style="width: 50px; height: 50px; display: block;">
+                <span style="display: block; font-size: 14px; color: white;">${reaction.title}</span>
+            </button>`
+        ).join(" ");
 
-        // Perbarui tampilan jumlah like
-        await updateLikeStatus(betId);
+        let pickerHTML = `
+            <div id="reactionPicker" class="modal" 
+                style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                       background: #222; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.3);
+                       z-index: 1000; text-align: center; color: white;">
+                <h3>Pilih Reaksi</h3>
+                <div style="display: flex; justify-content: center; flex-wrap: wrap;">${buttons}</div>
+                <button onclick="closeModal()" style="margin-top: 10px; padding: 8px 12px; background: #ff4444; color: white; border: none; cursor: pointer;">
+                    Batal
+                </button>
+            </div>
+            <div id="modalBackdrop" 
+                style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5);
+                       z-index: 999;"></div>
+        `;
 
-        // Tambahkan alasan reaksi ke tampilan
-        const likeDetails = document.getElementById(`likeDetails-${betId}`);
-        likeDetails.innerHTML += `<p><strong>${userAddress}</strong>: ${likeType} ${likeReason}</p>`;
+        document.body.insertAdjacentHTML("beforeend", pickerHTML);
 
-        // Tutup modal setelah berhasil
-        closeLikeModal(betId);
-    } catch (error) {
-        console.error("Gagal mengirim like:", error);
-        alert("Gagal mengirim like. Pastikan MetaMask terhubung dan saldo cukup.");
+        window.selectReaction = (reactionId) => {
+            resolve(reactions.find(r => r.id === reactionId));
+            closeModal();
+        };
+
+        window.closeModal = () => {
+            document.getElementById("reactionPicker")?.remove();
+            document.getElementById("modalBackdrop")?.remove();
+            resolve(null);
+        };
+    });
+}
+
+async function updateLikeStatus(betId) {
+    const userAddress = await getUserAddress();
+    const hasLiked = await contract.methods.hasUserLiked(betId, userAddress).call();
+    const likeCount = await contract.methods.getLikeCount(betId).call();
+    
+    let userReaction = hasLiked ? await contract.methods.getUserLikeType(betId, userAddress).call() : "";
+    let reactionImage = "", reactionTitle = "";
+
+    const reactions = {
+        "congrats": { img: "img/congrats.png", title: "🎉 Congrats You Win" },
+        "love": { img: "img/love.png", title: "❤️ Love It!" },
+        "fire": { img: "img/fire.png", title: "🔥 Epic Win" },
+        "lol": { img: "img/lol.png", title: "😂 Funny" },
+        "thumbs": { img: "img/thumbs.png", title: "👍 Nice Move" },
+        "sad": { img: "img/sad.png", title: "😢 Unlucky" }
+    };
+
+    if (userReaction && reactions[userReaction]) {
+        reactionImage = reactions[userReaction].img;
+        reactionTitle = reactions[userReaction].title;
+    }
+
+    const likeCountElem = document.getElementById(`likeCount-${betId}`);
+    const likeStatusElem = document.getElementById(`likeStatus-${betId}`);
+
+    if (likeCountElem) likeCountElem.innerText = likeCount;
+    if (likeStatusElem) {
+        likeStatusElem.innerHTML = hasLiked ? `<img src="${reactionImage}" style="width: 20px; height: 20px;"> ${reactionTitle}` : "";
     }
 }
         
@@ -1721,37 +1788,7 @@ function closeResult() {
 }
 
 // Html Modal
-function createLikeModal(betId) {
-    const modal = document.createElement("div");
-    modal.id = `likeModal-${betId}`;
-    modal.className = "modal";
-    modal.style.display = "none";
 
-    modal.innerHTML = `
-        <div class="modal-content">
-            <h3>Pilih Reaksi & Tambahkan Alasan</h3>
-
-            <!-- Dropdown Jenis Reaksi -->
-            <select id="likeType-${betId}">
-                <option value="😂">😂 (Lucu)</option>
-                <option value="♥️">♥️ (Suka)</option>
-                <option value="😥">😥 (Sedih)</option>
-                <option value="🎉">🎉 (Selamat!)</option>
-                <option value="🥹">🥹 (Terharu)</option>
-                <option value="🏆">🏆 (Hebat!)</option>
-                <option value="🔥">🔥 (Gokil!)</option>
-            </select>
-
-            <!-- Input Alasan -->
-            <input type="text" id="likeReasonInput-${betId}" placeholder="Masukkan alasan...">
-
-            <button onclick="submitLike('${betId}')">Kirim</button>
-            <button onclick="closeLikeModal('${betId}')">Batal</button>
-        </div>
-    `;
-
-    document.body.appendChild(modal);
-}
 
 // **Fungsi untuk menampilkan modal**
 function openLikeModal(betId) {
