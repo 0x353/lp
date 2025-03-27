@@ -1466,14 +1466,11 @@ async function loadBetHistory() {
             Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
             Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
             Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
-            <!-- Tombol Like -->
-<button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" 
-    style="background-color: #66ccff; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px;">Lik
-</button>
-
-<!-- Status Like -->
-<p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p>
-<span id="likeCount-${bet.betId}" style="margin-left: 10px; color: #fff;">0</span> Likes
+            <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" 
+            style="background-color: #000000; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px;">
+            <img src="img/like.svg" alt="Like" style="width: 16px; height: 16px; vertical-align: middle;"></button>
+            <span id="likeCount-${bet.betId}" style="margin-left: 10px; color: #fff;">0</span> Likes
+          <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p>
         </p>
         <hr style="background-color: #333333; height: 1px; border: none;">`;
     }
@@ -1532,8 +1529,8 @@ async function toggleLike(betId) {
         const gasOptions = {
             from: userAccount,
             gas: estimatedGas + 50000, // Tambahkan buffer
-            maxFeePerGas: web3.utils.toWei("0.2", "gwei"),  
-            maxPriorityFeePerGas: web3.utils.toWei("0.15", "gwei") 
+            maxFeePerGas: web3.utils.toWei("0.0012", "gwei"),  
+            maxPriorityFeePerGas: web3.utils.toWei("0.0013", "gwei") 
         };
 
         if (liked) {
@@ -1543,9 +1540,12 @@ async function toggleLike(betId) {
                 })
                 .on("receipt", function (receipt) {
                     console.log("Transaction confirmed:", receipt);
-                    button.innerText = "Like";
-                    button.style.backgroundColor = "#66ccff";
+                    button.style.backgroundColor = "#000000";
                     statusElement.innerText = "Disliked successfully";
+                    button.innerHTML = `<img src="img/like.svg" alt="Dislike" style="width: 16px; height: 16px; vertical-align: middle;">`;
+                    setTimeout(() => {
+                    statusElement.innerText = "";
+                }, 3000);
                     updateLikeStatus(betId);
                 })
                 .on("error", function (error) {
@@ -1559,9 +1559,12 @@ async function toggleLike(betId) {
                 })
                 .on("receipt", function (receipt) {
                     console.log("Transaction confirmed:", receipt);
-                    button.innerText = "Dislike";
-                    button.style.backgroundColor = "#ff6666";
+                    button.style.backgroundColor = "#ff4d4d";
                     statusElement.innerText = "Liked successfully";
+                    button.innerHTML = `<img src="img/dis.svg" alt="Dislike" style="width: 16px; height: 16px; vertical-align: middle;">`;
+                    setTimeout(() => {
+                    statusElement.innerText = "";
+                }, 3000);
                     updateLikeStatus(betId);
                 })
                 .on("error", function (error) {
@@ -1595,10 +1598,10 @@ function updateLikeCount(betId, change) {
 
         if (liked) {
             button.innerText = "Dislike";
-            button.style.backgroundColor = "#ff6666";
+            button.style.backgroundColor = "#ff4d4d";
         } else {
             button.innerText = "Like";
-            button.style.backgroundColor = "#66ccff";
+            button.style.backgroundColor = "#000000";
         }
     } catch (error) {
         console.error("Failed to update like status:", error);
