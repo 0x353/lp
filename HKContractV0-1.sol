@@ -280,23 +280,24 @@ contract BetHistory {
         emit ETHClaimed(msg.sender, amount);
     }
 
-    function likeBet(bytes32 betId, string memory likeType) external {
+    function likeBet(bytes32 betId, string memory likeType, string memory likeReason) external {
         require(!hasLiked[betId][msg.sender], "You already liked this bet");
 
         LikeData memory newLike = LikeData({
-        liker: msg.sender,
-        timestamp: block.timestamp,
-        likeType: likeType
-    });
+            liker: msg.sender,
+            timestamp: block.timestamp,
+            likeType: likeType,
+            likeReason: likeReason // Tambahkan alasan ke dalam data
+        });
 
-    betLikeList[betId].push(newLike);
+        betLikeList[betId].push(newLike);
 
         betLikes[betId][msg.sender] = true;
         hasLiked[betId][msg.sender] = true;
         betLikeCount[betId]++;
 
-    emit BetLiked(betId, msg.sender, block.timestamp, likeType, betLikeCount[betId]);
-    }
+        emit BetLiked(betId, msg.sender, block.timestamp, likeType, likeReason, betLikeCount[betId]);
+   }
 
     function unlikeBet(bytes32 betId) external {
         require(hasLiked[betId][msg.sender], "You haven't liked this bet yet");
