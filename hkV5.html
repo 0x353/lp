@@ -1551,6 +1551,9 @@ async function toggleLike(betId) {
                 .on("error", function (error) {
                     console.error("Error processing unlike:", error);
                     statusElement.innerText = "Dislike failed";
+                    setTimeout(() => {
+                    statusElement.innerText = "";
+                }, 3000);
                 });
         } else {
             await contract.methods.likeBet(betId, "👍").send(gasOptions)
@@ -1570,6 +1573,9 @@ async function toggleLike(betId) {
                 .on("error", function (error) {
                     console.error("Error processing like:", error);
                     statusElement.innerText = "Like failed";
+                    setTimeout(() => {
+                    statusElement.innerText = "";
+                }, 3000);
                 });
         }
     } catch (error) {
