@@ -1468,8 +1468,7 @@ async function loadBetHistory() {
             Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
             <!-- Tombol Like -->
 <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" 
-    style="background-color: #66ccff; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px;">
-    <img id="likeIcon-${bet.betId}" src="img/like.png" alt="Like" width="16" height="16"> Like
+    style="background-color: #66ccff; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px;">Like
 </button>
 
 <!-- Status Like -->
