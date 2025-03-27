@@ -1471,8 +1471,13 @@ async function loadBetHistory() {
             <img src="img/like.svg" alt="Like" style="width: 11px; height: 11px; vertical-align: middle;"></button>
             <span id="likeCount-${bet.betId}" style="margin-left: 10px; color: #00cc51; font-size: 15px; font-weight: bold;">0</span> Likes
             <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p>
-            <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p>
-            ${reactionHtml}
+
+             <!-- Tombol Reaksi -->
+    <button id="reactionButton-${bet.betId}" onclick="toggleReaction('${bet.betId}')"
+        style="background-color: #000000; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-left: 10px;">
+        <img src="img/reaction.png" alt="Reaction" style="width: 11px; height: 11px; vertical-align: middle;">
+    </button>
+    <span id="reactionStatus-${bet.betId}" style="margin-left: 10px; color: #FFD700; font-size: 14px; font-weight: bold;"></span>
         </p>
         <hr style="background-color: #333333; height: 1px; border: none;">`;
     }
@@ -1616,6 +1621,7 @@ function updateLikeCount(betId, change) {
         console.error("Failed to update like status:", error);
     }
         }
+        
 
 // Type Like
 async function toggleLike(betId) {
