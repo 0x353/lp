@@ -1473,7 +1473,7 @@ async function loadBetHistory() {
             <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p>
 
              <!-- Tombol Reaksi -->
-    <button id="reactionButton-${bet.betId}" onclick="toggleReaction('${bet.betId}')"
+    <button id="reactionButton-${bet.betId}" onclick="toggleLike('${bet.betId}')"
         style="background-color: #000000; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-left: 10px;">
         <img src="img/reaction.png" alt="Reaction" style="width: 11px; height: 11px; vertical-align: middle;">
     </button>
@@ -1625,16 +1625,24 @@ function updateLikeCount(betId, change) {
 
 // Type Like
 async function toggleLike(betId) {
+    console.log("toggleLike dipanggil dengan betId:", betId);
+    
     const userAddress = await getUserAddress();
     const hasLiked = await contract.methods.hasUserLiked(betId, userAddress).call();
 
     try {
         if (hasLiked) {
+            console.log("Menghapus like...");
             await contract.methods.unlikeBet(betId).send({ from: userAddress });
         } else {
+            console.log("Menampilkan popup reaksi...");
             let reaction = await showReactionPicker();
-            if (!reaction) return;
+            if (!reaction) {
+                console.log("Tidak ada reaksi yang dipilih.");
+                return;
+            }
 
+            console.log("Reaksi yang dipilih:", reaction);
             await contract.methods.likeBet(betId, reaction.id).send({ from: userAddress });
         }
     } catch (error) {
@@ -1648,9 +1656,11 @@ async function toggleLike(betId) {
 
 async function showReactionPicker() {
     return new Promise((resolve) => {
-        if (document.getElementById("reactionPicker")) {
-            return;
-        }
+        console.log("showReactionPicker dipanggil"); // Debugging
+
+        // Hapus popup lama jika ada
+        document.getElementById("reactionPicker")?.remove();
+        document.getElementById("modalBackdrop")?.remove();
 
         const reactions = [
             { id: "congrats", img: "img/congrats.png", title: "🎉 Congrats You Win" },
@@ -1662,7 +1672,8 @@ async function showReactionPicker() {
         ];
 
         let buttons = reactions.map(reaction => 
-            `<button onclick="selectReaction('${reaction.id}')" style="border: none; background: none; cursor: pointer; text-align: center; margin: 10px;">
+            `<button onclick="selectReaction('${reaction.id}')" 
+                style="border: none; background: none; cursor: pointer; text-align: center; margin: 10px;">
                 <img src="${reaction.img}" alt="${reaction.title}" style="width: 50px; height: 50px; display: block;">
                 <span style="display: block; font-size: 14px; color: white;">${reaction.title}</span>
             </button>`
@@ -1675,7 +1686,8 @@ async function showReactionPicker() {
                        z-index: 1000; text-align: center; color: white;">
                 <h3>Pilih Reaksi</h3>
                 <div style="display: flex; justify-content: center; flex-wrap: wrap;">${buttons}</div>
-                <button onclick="closeModal()" style="margin-top: 10px; padding: 8px 12px; background: #ff4444; color: white; border: none; cursor: pointer;">
+                <button onclick="closeModal()" 
+                    style="margin-top: 10px; padding: 8px 12px; background: #ff4444; color: white; border: none; cursor: pointer;">
                     Batal
                 </button>
             </div>
@@ -1686,12 +1698,17 @@ async function showReactionPicker() {
 
         document.body.insertAdjacentHTML("beforeend", pickerHTML);
 
+        // Debugging
+        console.log("Popup reaksi muncul");
+
         window.selectReaction = (reactionId) => {
+            console.log("Reaction selected:", reactionId);
             resolve(reactions.find(r => r.id === reactionId));
             closeModal();
         };
 
         window.closeModal = () => {
+            console.log("Popup ditutup");
             document.getElementById("reactionPicker")?.remove();
             document.getElementById("modalBackdrop")?.remove();
             resolve(null);
@@ -1700,6 +1717,8 @@ async function showReactionPicker() {
 }
 
 async function updateLikeStatus(betId) {
+    console.log("updateLikeStatus dipanggil dengan betId:", betId);
+
     const userAddress = await getUserAddress();
     const hasLiked = await contract.methods.hasUserLiked(betId, userAddress).call();
     const likeCount = await contract.methods.getLikeCount(betId).call();
@@ -1722,7 +1741,7 @@ async function updateLikeStatus(betId) {
     }
 
     const likeCountElem = document.getElementById(`likeCount-${betId}`);
-    const likeStatusElem = document.getElementById(`likeStatus-${betId}`);
+    const likeStatusElem = document.getElementById(`reactionStatus-${betId}`);
 
     if (likeCountElem) likeCountElem.innerText = likeCount;
     if (likeStatusElem) {
