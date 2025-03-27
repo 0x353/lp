@@ -1468,7 +1468,7 @@ async function loadBetHistory() {
             Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
             <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" 
             style="background-color: #000000; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px;">
-            <img src="img/like.svg" alt="Like" style="width: 16px; height: 16px; vertical-align: middle;"></button>
+            <img src="img/like.svg" alt="Like" style="width: 13px; height: 13px; vertical-align: middle;"></button>
             <span id="likeCount-${bet.betId}" style="margin-left: 10px; color: #fff;">0</span> Likes
           <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p>
         </p>
@@ -1559,7 +1559,7 @@ async function toggleLike(betId) {
                 })
                 .on("receipt", function (receipt) {
                     console.log("Transaction confirmed:", receipt);
-                    button.style.backgroundColor = "#ff4d4d";
+                    button.style.backgroundColor = "#ff1a1e";
                     statusElement.innerText = "Liked successfully";
                     button.innerHTML = `<img src="img/dis.svg" alt="Dislike" style="width: 16px; height: 16px; vertical-align: middle;">`;
                     setTimeout(() => {
@@ -1598,7 +1598,7 @@ function updateLikeCount(betId, change) {
 
         if (liked) {
         button.innerHTML = `<img src="img/disl.svg" alt="Dislike" style="width: 16px; height: 16px; vertical-align: middle;">`;
-        button.style.backgroundColor = "#ff4d4d";
+        button.style.backgroundColor = "#ff1a1e";
     } else {
         button.innerHTML = `<img src="img/like.svg" alt="Like" style="width: 16px; height: 16px; vertical-align: middle;">`;
          button.style.backgroundColor = "#000000";
