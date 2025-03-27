@@ -1359,8 +1359,8 @@ async function placeBet() {
             from: userAccount,
             value: totalCost,
             gas: estimatedGas + 50000,  // Tambahkan buffer agar tidak gagal
-            maxFeePerGas: web3.utils.toWei("0.002", "gwei"),  // Gas fee optimal di Base Mainnet
-            maxPriorityFeePerGas: web3.utils.toWei("0.0018", "gwei") // Biaya prioritas
+            maxFeePerGas: web3.utils.toWei("0.0015", "gwei"),  // Gas fee optimal di Base Mainnet
+            maxPriorityFeePerGas: web3.utils.toWei("0.0014", "gwei") // Biaya prioritas
         });
 
         // Jika sukses
