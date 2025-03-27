@@ -762,21 +762,6 @@ h3 {
     color: red;
 }
 
-#commentModal {
-    position: fixed;
-    top: 60px;
-    right: 20px;
-    width: 250px;
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px); 
-    -webkit-backdrop-filter: blur(10px);
-    color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 10px;
-    z-index: 1000;
-}
 
 #commentModal textarea {
     width: 100%;
@@ -785,14 +770,6 @@ h3 {
     background: #333;
     color: white;
     border: 1px solid #555;
-    border-radius: 4px;
-}
-
-#commentModal button {
-    color: white;
-    border: none;
-    padding: 8px;
-    cursor: pointer;
     border-radius: 4px;
 }
 
@@ -976,7 +953,7 @@ h3 {
 </div>
 
        <!-- Comment -->
-       <div id="commentModal" class="modal">
+       <div id="commentModal">
     <div class="modal-content">
         <span onclick="document.getElementById('commentModal').style.display='none'" 
               style="position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer;">×</span>
