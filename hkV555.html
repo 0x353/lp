@@ -1755,13 +1755,11 @@ async function loadComments(betId) {
     </div>
     <p style="margin: 5px 0;" id="comment-${betId}-${index}">${comment.text}</p><br><br>
     <div style="display: flex; gap: 10px;">
-        <button style="background: red; color: white; border: none; padding: 5px 10px; 
-        border-radius: 5px; cursor: pointer;" onclick="deleteComment('${betId}', ${index})">Hapus</button>
-        
-        <button style="background: #007bff; color: white; border: none; padding: 5px 10px; 
-        border-radius: 5px; cursor: pointer;" onclick="editComment('${betId}', ${index}, '${comment.text}')">Edit</button>
+     <p id="commentText-${betId}-${index}" style="margin: 5px 0;">${comment.text}</p>
+                    ${deleteButton} ${editButton} 
     </div>
 </div>`;
+                
             }
         });
 
