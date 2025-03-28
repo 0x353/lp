@@ -1799,12 +1799,49 @@ async function addComment(betId) {
     try {
         await contract.methods.addComment(betId, commentText).send({ from: ethereum.selectedAddress });
         document.getElementById(`commentInput-${betId}`).value = ""; // Kosongkan input setelah kirim
-        loadComments(betId); // Refresh komentar
-        updateCommentCount(betId); // Perbarui jumlah komentar
+        
+        await updateAllCommentCounts(); // Update jumlah komentar setelah komentar baru
+        await reloadAllComments(); // Muat ulang semua komentar
+        
     } catch (error) {
         console.error("Gagal menambahkan komentar:", error);
     }
 }
+
+// Fungsi untuk memperbarui jumlah komentar semua betId
+async function updateAllCommentCounts() {
+    try {
+        const betIds = await contract.methods.getAllBetIds().call();
+        const updatePromises = betIds.map(async (betId) => {
+            const count = await contract.methods.commentCount(betId).call();
+            document.getElementById(`commentCount-${betId}`).innerText = count;
+        });
+
+        await Promise.all(updatePromises);
+    } catch (error) {
+        console.error("Gagal memperbarui jumlah komentar:", error);
+    }
+}
+
+// Fungsi untuk memuat ulang semua komentar
+async function reloadAllComments() {
+    try {
+        const betIds = await contract.methods.getAllBetIds().call();
+        const reloadPromises = betIds.map(async (betId) => {
+            await loadComments(betId); // Muat ulang komentar
+        });
+
+        await Promise.all(reloadPromises);
+    } catch (error) {
+        console.error("Gagal memuat ulang komentar:", error);
+    }
+}
+
+// Panggil fungsi ini setelah halaman dimuat
+document.addEventListener("DOMContentLoaded", async function () {
+    await updateAllCommentCounts(); // Update jumlah komentar saat halaman dimuat
+    await reloadAllComments(); // Muat ulang semua komentar saat halaman dimuat
+});
        
 // Modal Result
 function updateHistory(newBall1) {
