@@ -1566,15 +1566,15 @@ async function loadBetHistory() {
 
              <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p> 
 
-             <details class="comment-dropdown" data-betId="${bet.betId}">
+             <details class="comment-dropdown">
     <summary style="display: flex; align-items: center; cursor: pointer;">
-        <img src="img/comment.svg" alt="Komentar" style="width: 14px; height: 14px; vertical-align: middle;">
+        <img src="img/comment.svg" alt="Komentar" style="width: 18px; height: 18px; vertical-align: middle;">
         <span id="commentCount-${bet.betId}" style="margin-left: 10px; color: #00cc51; font-size: 15px; font-weight: bold;">0</span> Comments
     </summary>
     <div id="commentSection-${bet.betId}" class="comment-section">
         <div id="commentList-${bet.betId}" class="comment-list"></div>
         <textarea id="commentInput-${bet.betId}" placeholder="Tulis komentar..."></textarea>
-        <button onclick="addComment('${bet.betId}')">send</button>
+        <button onclick="addComment('${bet.betId}')">Kirim</button>
     </div>
 </details>
         </p>
@@ -1590,8 +1590,6 @@ async function loadBetHistory() {
     }
 }
         
-
-// **Bet History Pagination**
 // **Bet History Pagination**
 function prevBetHistory() {
     if (betHistoryPage > 0) {
@@ -1724,139 +1722,59 @@ function updateLikeCount(betId, change) {
         }
 
  // Comment Function
-let loadedComments = {}; 
-const lazyObservers = {};
+// Fungsi untuk memuat komentar dalam dropdown
+async function loadComments(betId) {
+    const comments = await contract.methods.getComments(betId).call();
+    let commentHtml = "";
 
-// Fungsi untuk memuat komentar
-async function loadComments(betId, append = false) {
-    try {
-        const comments = await contract.methods.getComments(betId).call();
+    comments.slice(0, 5).forEach((comment, index) => { // Tampilkan 5 komentar awal
+        if (!comment.isDeleted) {
+            let date = new Date(comment.timestamp * 1000).toLocaleString();
+            let shortCommenter = comment.commenter.slice(0, 6) + "..." + comment.commenter.slice(-4);
 
-        if (!append) {
-            loadedComments[betId] = 5; // Reset ke 5 jika bukan append
-        } else {
-            loadedComments[betId] += 10; // Tambah 10 komentar lagi
-        }
-
-        let commentHtml = "";
-        const visibleComments = comments.slice(0, loadedComments[betId]);
-
-        const userAddress = await getCurrentUserAddress();
-
-        visibleComments.forEach((comment, index) => {
-            if (!comment.isDeleted) {
-                let date = new Date(comment.timestamp * 1000).toLocaleString();
-                let shortCommenter = comment.commenter.slice(0, 6) + "..." + comment.commenter.slice(-4);
-
-                let deleteButton = "";
-                let editButton = "";
-
-                if (userAddress && userAddress === comment.commenter.toLowerCase()) {
+            let deleteButton = "";
+            let editButton = "";
+            if (typeof ethereum !== "undefined" && ethereum.selectedAddress) {
+                if (ethereum.selectedAddress.toLowerCase() === comment.commenter.toLowerCase()) {
                     deleteButton = `<button onclick="deleteComment('${betId}', ${index})">Delete</button>`;
                     editButton = `<button onclick="editComment('${betId}', ${index}, '${comment.text}')">Edit</button>`;
                 }
-
-                commentHtml += `<div>
-                    <strong>${shortCommenter}</strong> 
-                    <span style="color: gray; font-size: 12px;">(${date})</span><br>
-                    <p id="comment-${betId}-${index}">${comment.text}</p>
-                    ${deleteButton} ${editButton}
-                </div><hr>`;
             }
-        });
 
-        const commentList = document.getElementById(`commentList-${betId}`);
-        if (append) {
-            commentList.innerHTML += commentHtml;
-        } else {
-            commentList.innerHTML = commentHtml;
+            commentHtml += `<div>
+                <strong style="color: #ad5cff;">${shortCommenter}</strong> 
+                <span style="color: gray; font-size: 12px;">(${date})</span><br>
+                <p style="margin: 5px 0;" id="comment-${betId}-${index}">${comment.text}</p>
+                ${deleteButton} ${editButton}
+            </div>
+            <hr>`;
         }
+    });
 
-        enableLazyScroll(betId);
-        await updateCommentCount(betId);
-    } catch (error) {
-        console.error(`Gagal memuat komentar untuk ${betId}:`, error);
-    }
+    document.getElementById(`commentList-${betId}`).innerHTML = commentHtml;
+    updateCommentCount(betId);
 }
 
-// Fungsi Lazy Loading
-function enableLazyScroll(betId) {
-    const commentList = document.getElementById(`commentList-${betId}`);
-    if (!commentList || lazyObservers[betId]) return;
-
-    lazyObservers[betId] = new IntersectionObserver(async (entries, observer) => {
-        const lastComment = entries[0];
-        if (lastComment.isIntersecting) {
-            observer.unobserve(lastComment.target);
-            await loadComments(betId, true);
-
-            setTimeout(() => {
-                const newLastChild = commentList.lastElementChild;
-                if (newLastChild) observer.observe(newLastChild);
-            }, 500);
-        }
-    }, { root: commentList, threshold: 1.0 });
-
-    setTimeout(() => {
-        const lastChild = commentList.lastElementChild;
-        if (lastChild) lazyObservers[betId].observe(lastChild);
-    }, 500);
-}
-
-// Fungsi mendapatkan alamat pengguna
-async function getCurrentUserAddress() {
-    if (typeof window.ethereum !== 'undefined') {
-        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        return accounts[0]?.toLowerCase() || null;
-    }
-    return null;
-}
-
-// Fungsi menambahkan komentar
-async function addComment() {
-    let betId = document.getElementById("commentBetId").value;
-    let commentText = document.getElementById("commentInput").value;
-
+// Fungsi untuk menambahkan komentar
+async function addComment(betId) {
+    let commentText = document.getElementById(`commentInput-${betId}`).value;
+    
     if (!commentText.trim()) {
         alert("Komentar tidak boleh kosong!");
         return;
     }
 
     try {
-        const userAddress = await getCurrentUserAddress();
-        await contract.methods.addComment(betId, commentText).send({ from: userAddress });
-        document.getElementById("commentInput").value = "";
-        loadComments(betId);
+        await contract.methods.addComment(betId, commentText).send({ from: ethereum.selectedAddress });
+        document.getElementById(`commentInput-${betId}`).value = ""; // Kosongkan input setelah kirim
+        loadComments(betId); // Refresh komentar
+        updateCommentCount(betId); // Perbarui jumlah komentar
     } catch (error) {
         console.error("Gagal menambahkan komentar:", error);
     }
 }
 
-// Fungsi menghapus komentar
-async function deleteComment(betId, index) {
-    try {
-        const comments = await contract.methods.getComments(betId).call();
-        const comment = comments[index];
-
-        if (!comment || comment.isDeleted) {
-            alert("Komentar tidak ditemukan!");
-            return;
-        }
-
-        const userAddress = await getCurrentUserAddress();
-        if (userAddress !== comment.commenter.toLowerCase()) {
-            alert("Anda tidak bisa menghapus komentar orang lain!");
-            return;
-        }
-
-        await contract.methods.deleteComment(betId).send({ from: userAddress });
-        loadComments(betId);
-    } catch (error) {
-        console.error("Gagal menghapus komentar:", error);
-    }
-}
-
-// Fungsi memperbarui jumlah komentar
+// Fungsi untuk memperbarui jumlah komentar
 async function updateCommentCount(betId) {
     try {
         const count = await contract.methods.commentCount(betId).call();
@@ -1865,21 +1783,6 @@ async function updateCommentCount(betId) {
         console.error(`Gagal mengambil jumlah komentar untuk ${betId}:`, error);
     }
 }
-
-// Fungsi memuat ulang semua komentar
-async function reloadAllComments() {
-    try {
-        const betIds = await contract.methods.getAllBetIds().call();
-        await Promise.all(betIds.map(loadComments));
-    } catch (error) {
-        console.error("Gagal memuat ulang komentar:", error);
-    }
-}
-
-// Jalankan saat halaman dimuat
-document.addEventListener("DOMContentLoaded", async function () {
-    await reloadAllComments();
-});
        
 // Modal Result
 function updateHistory(newBall1) {
