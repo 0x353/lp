@@ -692,7 +692,7 @@ h3 {
 }
 
 /* Daftar Notifikasi */
-#notificationList, #editCommentModal {
+#notificationList {
     position: fixed;
     top: 60px;
     right: 20px;
@@ -817,6 +817,48 @@ textarea:focus {
     white-space: pre-wrap; /* Menjaga spasi dan enter */
     word-wrap: break-word;
     margin: 5px 0;
+}
+
+#editCommentModal {
+    position: fixed;
+    display: none;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000;
+}
+
+.modal-comment {
+    background: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    width: 250px;
+    position: absolute;
+}
+
+.close {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+textarea {
+    width: 100%;
+    height: 80px;
+    margin: 10px 0;
+}
+
+button#saveEditButton {
+    background: #00cc51;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    width: 100%;
+    border-radius: 3px;
 }
     </style>
 </head>
@@ -1960,6 +2002,41 @@ function openLikeModal(betId) {
 function closeLikeModal(betId) {
     const modal = document.getElementById(`likeModal-${betId}`);
     if (modal) modal.style.display = "none";
+}
+
+// Comment Modal
+function openEditModal(button) {
+    let modal = document.getElementById("editCommentModal");
+
+    // Dapatkan posisi tombol yang diklik
+    let rect = button.getBoundingClientRect();
+    
+    // Pastikan modal tidak keluar dari layar
+    let modalWidth = modal.offsetWidth;
+    let modalHeight = modal.offsetHeight;
+    let windowWidth = window.innerWidth;
+    let windowHeight = window.innerHeight;
+
+    let top = rect.top - modalHeight - 10;  // 10px jarak di atas tombol
+    let left = rect.left;
+
+    // Jika modal keluar dari atas layar, letakkan di bawah tombol
+    if (top < 0) {
+        top = rect.bottom + 10;
+    }
+
+    // Jika modal keluar dari kanan layar, geser ke kiri
+    if (left + modalWidth > windowWidth) {
+        left = windowWidth - modalWidth - 10;
+    }
+
+    modal.style.top = `${top}px`;
+    modal.style.left = `${left}px`;
+    modal.style.display = "block";
+}
+
+function closeEditModal() {
+    document.getElementById("editCommentModal").style.display = "none";
 }
         
 // Initialize saat halaman terbuka
