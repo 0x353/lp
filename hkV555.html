@@ -1743,8 +1743,9 @@ async function loadComments(betId) {
                 let editButton = "";
 
                 if (currentUser && currentUser === comment.commenter.toLowerCase()) {
-                deleteButton = `<button id="deleteBtn-${betId}-${index}" onclick="confirmDelete('${betId}', ${index})">Hapus</button>`;
-                     }
+                    deleteButton = `<button onclick="deleteComment('${betId}', ${index})">Delete</button>`;
+                    editButton = `<button onclick="editComment('${betId}', ${index}, '${comment.text}')">Edit</button>`;
+                }
    
                 commentHtml += `<div id="commentContainer-${betId}-${index}">
                     <strong style="color: #ad5cff;">${shortCommenter}</strong> 
@@ -1761,25 +1762,6 @@ async function loadComments(betId) {
     } catch (error) {
         console.error("Gagal memuat komentar:", error);
     }
-}
-
-function confirmDelete(betId, index) {
-    let deleteBtn = document.getElementById(`deleteBtn-${betId}-${index}`);
-    
-    // Ganti tombol hapus dengan tombol konfirmasi
-    deleteBtn.outerHTML = `
-        <span id="confirmDelete-${betId}-${index}">
-            <button onclick="deleteComment('${betId}', ${index})">Ya</button>
-            <button onclick="cancelDelete('${betId}', ${index}')">Batal</button>
-        </span>
-    `;
-}
-
-function cancelDelete(betId, index) {
-    let confirmDeleteSpan = document.getElementById(`confirmDelete-${betId}-${index}`);
-    
-    // Kembalikan tombol hapus
-    confirmDeleteSpan.outerHTML = `<button id="deleteBtn-${betId}-${index}" onclick="confirmDelete('${betId}', ${index})">Hapus</button>`;
 }
 
 // Fungsi untuk menambahkan atau menyimpan komentar (mode normal dan edit)
