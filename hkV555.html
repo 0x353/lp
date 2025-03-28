@@ -1744,9 +1744,9 @@ async function loadComments(betId) {
 
                 if (currentUser && currentUser === comment.commenter.toLowerCase()) {
                     deleteButton = `<button onclick="deleteComment('${betId}', ${index})">Delete</button>`;
-                    editButton = `<button onclick="editComment('${betId}', ${index}, '${comment.text}')">Edit</button>`;
+                    editButton = `<button id="editBtn-${betId}-${index}" onclick="enableEdit('${betId}', ${index})">Edit</button>`;
                 }
-   
+
                 commentHtml += `<div id="commentContainer-${betId}-${index}">
                     <strong style="color: #ad5cff;">${shortCommenter}</strong> 
                     <span style="color: gray; font-size: 12px;">(${date})</span><br>
