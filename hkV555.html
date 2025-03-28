@@ -1728,14 +1728,13 @@ function updateLikeCount(betId, change) {
         }
 
  // Comment Function
-// Fungsi untuk memuat komentar dalam dropdown
-async function loadComments(betId) {
-    try {
-        const comments = await contract.methods.getComments(betId).call();
+// Fungsi Lazy Load Komentar
+function loadComments(betId, limit = 5) {
+    contract.methods.getComments(betId).call().then((comments) => {
         const currentUser = ethereum.selectedAddress ? ethereum.selectedAddress.toLowerCase() : null;
-
         let commentHtml = "";
-        comments.slice(0, 5).forEach((comment, index) => { // Tampilkan 5 komentar awal
+
+        comments.slice(0, limit).forEach((comment, index) => {
             if (!comment.isDeleted) {
                 let date = new Date(comment.timestamp * 1000).toLocaleString();
                 let shortCommenter = comment.commenter.slice(0, 6) + "..." + comment.commenter.slice(-4);
@@ -1760,35 +1759,26 @@ async function loadComments(betId) {
     
     ${deleteButton} ${editButton} 
 
-    <!-- Modal Edit -->
-    <div id="modalEdit-${betId}-${index}" class="modal">
-        <div class="modal-content">
-            <textarea id="editCommentText-${betId}-${index}"></textarea>
-            <button onclick="saveEdit('${betId}', ${index})">Simpan</button>
-            <button onclick="closeModal('modalEdit-${betId}-${index}')">Batal</button>
-        </div>
-    </div>
-
-    <!-- Modal Hapus -->
-    <div id="modalDelete-${betId}-${index}" class="modal">
-        <div class="modal-content">
-            <p>Apakah Anda yakin ingin menghapus komentar ini?</p>
-            <button onclick="confirmDelete('${betId}', ${index})">Hapus</button>
-            <button onclick="closeModal('modalDelete-${betId}-${index}')">Batal</button>
-        </div>
-    </div>
-
- </div>`;
-                
+</div>`;
             }
         });
 
+        // Jika ada lebih dari `limit` komentar, tambahkan tombol "Lihat lebih banyak"
+        if (comments.length > limit) {
+            commentHtml += `<button onclick="loadComments('${betId}', ${limit + 10})">Lihat lebih banyak</button>`;
+        }
+
         document.getElementById(`commentList-${betId}`).innerHTML = commentHtml;
         updateCommentCount(betId);
-    } catch (error) {
+    }).catch((error) => {
         console.error("Gagal memuat komentar:", error);
-    }
+    });
 }
+
+// Panggil fungsi saat halaman dimuat
+window.addEventListener("load", () => {
+    loadComments("BET_ID", 5); // Mulai dengan 5 komentar
+});
 
 // Fungsi untuk menambahkan atau menyimpan komentar (mode normal dan edit)
 async function addOrUpdateComment(betId) {
