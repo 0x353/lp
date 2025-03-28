@@ -1730,7 +1730,7 @@ function updateLikeCount(betId, change) {
 
  // Comment Function
 // Fungsi Lazy Load Komentar
-function loadComments(betId, limit = 5) {
+function loadComments(betId, limit = 10) {
     contract.methods.getComments(betId).call().then((comments) => {
         const currentUser = ethereum.selectedAddress ? ethereum.selectedAddress.toLowerCase() : null;
         let commentHtml = "";
@@ -1778,7 +1778,7 @@ function loadComments(betId, limit = 5) {
 
 // Panggil fungsi saat halaman dimuat
 window.addEventListener("load", () => {
-    loadComments("BET_ID", 5); // Mulai dengan 5 komentar
+    loadComments("BET_ID", 10); // Mulai dengan 5 komentar
 });
 
 // Fungsi untuk menambahkan atau menyimpan komentar (mode normal dan edit)
@@ -1816,6 +1816,7 @@ function enableEdit(betId, index) {
     let commentTextElement = document.getElementById(`commentText-${betId}-${index}`);
     let commentInput = document.getElementById(`commentInput-${betId}`);
     let sendButton = document.getElementById(`sendBtn-${betId}`);
+    let cancelButton = document.getElementById(`cancelBtn-${betId}`);
 
     // Isi textarea dengan komentar lama dan aktifkan mode edit
     commentInput.value = commentTextElement.innerText;
@@ -1824,6 +1825,39 @@ function enableEdit(betId, index) {
 
     // Ubah tombol "Kirim" menjadi "Simpan"
     sendButton.innerText = "Simpan";
+
+    // Jika tombol batal belum ada, tambahkan ke dalam DOM
+    if (!cancelButton) {
+        cancelButton = document.createElement("button");
+        cancelButton.id = `cancelBtn-${betId}`;
+        cancelButton.innerText = "Batal";
+        cancelButton.style.marginLeft = "5px";
+        cancelButton.onclick = function () {
+            disableEdit(betId);
+        };
+
+        sendButton.parentNode.insertBefore(cancelButton, sendButton.nextSibling);
+    }
+}
+
+// Fungsi untuk membatalkan mode edit
+function disableEdit(betId) {
+    let commentInput = document.getElementById(`commentInput-${betId}`);
+    let sendButton = document.getElementById(`sendBtn-${betId}`);
+    let cancelButton = document.getElementById(`cancelBtn-${betId}`);
+
+    // Kosongkan input dan kembalikan ke mode normal
+    commentInput.value = "";
+    delete commentInput.dataset.editing;
+    delete commentInput.dataset.index;
+
+    // Ubah tombol "Simpan" kembali menjadi "Kirim"
+    sendButton.innerText = "Kirim";
+
+    // Hapus tombol batal jika ada
+    if (cancelButton) {
+        cancelButton.remove();
+    }
 }
 
 // Fungsi untuk menghapus komentar
