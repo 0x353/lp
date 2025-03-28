@@ -1763,13 +1763,13 @@ function loadComments(betId, limit = 10) {
                     editButton = `<button onclick="editComment('${betId}', ${index}, '${comment.text}')">Edit</button>`;
                 }
 
-                commentHtml += `<div>
-                    <strong style="color: #ad5cff;">${shortCommenter}</strong> 
-                    <span style="color: gray; font-size: 12px;">(${date})</span><br>
-                    <p style="margin: 5px 0;" id="comment-${betId}-${index}">${comment.text}</p>
-                    <br>${deleteButton} ${editButton}
-                </div>
-                <hr style="background-color: #333333; height: 1px; border: none;">`;
+                commentHtml += `<div style="background: #222; padding: 10px; border-radius: 8px; margin-bottom: 10px; 
+    border: 1px solid #444; box-shadow: 0 4px 8px rgba(0, 162, 255, 0.2);">
+    <strong style="color: #ad5cff;">${shortCommenter}</strong> 
+    <span style="color: gray; font-size: 12px;">(${date})</span>
+    <p style="margin: 5px 0;" id="comment-${betId}-${index}">${comment.text}</p>
+    <div style="display: flex; gap: 10px;">${deleteButton} ${editButton}</div>
+</div>`;
             }
         });
 
