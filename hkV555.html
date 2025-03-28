@@ -1597,7 +1597,7 @@ async function loadBetHistory() {
     <div id="commentSection-${bet.betId}" class="comment-section">
         <div id="commentList-${bet.betId}" class="comment-list"></div>
         <textarea id="commentInput-${bet.betId}" placeholder="Tulis komentar..."></textarea>
-        <button onclick="addComment('${bet.betId}')">Kirim</button>
+        <button id="sendBtn-${bet.betId}" onclick="addOrUpdateComment('${bet.betId}')">Kirim</button>
     </div>
 </details>
         </p>
@@ -1761,13 +1761,13 @@ async function loadComments(betId) {
 
                 if (currentUser && currentUser === comment.commenter.toLowerCase()) {
                     deleteButton = `<button onclick="deleteComment('${betId}', ${index})">Delete</button>`;
-                    editButton = `<button onclick="editComment('${betId}', ${index}, '${comment.text}')">Edit</button>`;
+                    editButton = `<button id="editBtn-${betId}-${index}" onclick="enableEdit('${betId}', ${index})">Edit</button>`;
                 }
 
-                commentHtml += `<div>
+                commentHtml += `<div id="commentContainer-${betId}-${index}">
                     <strong style="color: #ad5cff;">${shortCommenter}</strong> 
                     <span style="color: gray; font-size: 12px;">(${date})</span><br>
-                    <p style="margin: 5px 0;" id="comment-${betId}-${index}">${comment.text}</p>
+                    <p id="commentText-${betId}-${index}" style="margin: 5px 0;">${comment.text}</p>
                     ${deleteButton} ${editButton}
                 </div>
                 <hr>`;
@@ -1781,35 +1781,49 @@ async function loadComments(betId) {
     }
 }
 
-// Fungsi untuk menambahkan komentar
-async function addComment(betId) {
-    let commentText = document.getElementById(`commentInput-${betId}`).value.trim();
+// Fungsi untuk menambahkan atau menyimpan komentar (mode normal dan edit)
+async function addOrUpdateComment(betId) {
+    let commentInput = document.getElementById(`commentInput-${betId}`);
+    let saveMode = commentInput.dataset.editing === "true";
+    let commentIndex = commentInput.dataset.index;
 
-    if (!commentText) {
+    if (!commentInput.value.trim()) {
         alert("Komentar tidak boleh kosong!");
         return;
     }
 
     try {
-        await contract.methods.addComment(betId, commentText).send({ from: ethereum.selectedAddress });
-        document.getElementById(`commentInput-${betId}`).value = ""; // Kosongkan input setelah kirim
+        if (saveMode) {
+            // Mode Edit
+            await contract.methods.editComment(betId, commentIndex, commentInput.value).send({ from: ethereum.selectedAddress });
+            commentInput.dataset.editing = "false";
+            commentInput.dataset.index = "";
+        } else {
+            // Mode Tambah Komentar
+            await contract.methods.addComment(betId, commentInput.value).send({ from: ethereum.selectedAddress });
+        }
+
+        commentInput.value = ""; // Kosongkan input setelah kirim atau edit
+        document.getElementById(`sendBtn-${betId}`).innerText = "Kirim"; // Kembalikan tombol ke mode "Kirim"
         await loadComments(betId); // Refresh komentar
     } catch (error) {
-        console.error("Gagal menambahkan komentar:", error);
+        console.error("Gagal menyimpan komentar:", error);
     }
 }
 
-// Fungsi untuk mengedit komentar
-async function editComment(betId, index, oldText) {
-    let newComment = prompt("Edit komentar:", oldText);
-    if (newComment === null || newComment.trim() === "") return;
+// Fungsi untuk mengaktifkan mode edit
+function enableEdit(betId, index) {
+    let commentTextElement = document.getElementById(`commentText-${betId}-${index}`);
+    let commentInput = document.getElementById(`commentInput-${betId}`);
+    let sendButton = document.getElementById(`sendBtn-${betId}`);
 
-    try {
-        await contract.methods.editComment(betId, index, newComment).send({ from: ethereum.selectedAddress });
-        await loadComments(betId); // Refresh komentar
-    } catch (error) {
-        console.error("Gagal mengedit komentar:", error);
-    }
+    // Isi textarea dengan komentar lama dan aktifkan mode edit
+    commentInput.value = commentTextElement.innerText;
+    commentInput.dataset.editing = "true";
+    commentInput.dataset.index = index;
+
+    // Ubah tombol "Kirim" menjadi "Simpan"
+    sendButton.innerText = "Simpan";
 }
 
 // Fungsi untuk menghapus komentar
@@ -1848,8 +1862,7 @@ async function connectMetaMask() {
 }
 
 // Pastikan pengguna sudah terhubung ke MetaMask
-window.addEventListener("load", connectMetaMask);
-
+window.addEventListener("load", connectMetaMask);        
        
 // Modal Result
 function updateHistory(newBall1) {
