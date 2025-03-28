@@ -1692,40 +1692,10 @@ function updateLikeCount(betId, change) {
         }
 
  // Comment Function
-document.addEventListener("DOMContentLoaded", async function () {
-    try {
-        // Panggil fungsi ini untuk setiap betId saat halaman pertama kali dimuat
-        const allBets = await contract.methods.getAllBets().call();
-        const betIds = allBets.map(bet => bet.betId); // Ambil betId dari setiap taruhan
+// Menyimpan jumlah komentar yang sudah dimuat per betId
+let loadedComments = {}; 
 
-        for (const betId of betIds) {
-            await updateCommentCount(betId); // Pastikan jumlah komentar langsung muncul
-        }
-
-        // Gunakan MutationObserver untuk menangkap perubahan atribut "open" pada <details>
-        document.querySelectorAll(".comment-dropdown").forEach((dropdown) => {
-            const observer = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    if (mutation.attributeName === "open") {
-                        const betId = dropdown.getAttribute("data-betId");
-                        if (dropdown.hasAttribute("open")) {
-                            loadComments(betId);
-                        }
-                    }
-                });
-            });
-
-            observer.observe(dropdown, { attributes: true });
-        });
-
-    } catch (error) {
-        console.error("Gagal memuat betIds:", error);
-    }
-});
-
-// Fungsi untuk memuat komentar (lazy loading)
-let loadedComments = {}; // Menyimpan jumlah komentar yang sudah dimuat per betId
-
+// Fungsi untuk memuat komentar secara lazy loading
 async function loadComments(betId, append = false) {
     try {
         const comments = await contract.methods.getComments(betId).call();
@@ -1770,11 +1740,34 @@ async function loadComments(betId, append = false) {
             commentList.innerHTML = commentHtml;
         }
 
+        // Tambahkan event listener untuk lazy scrolling
+        enableLazyScroll(betId);
+
         // Perbarui jumlah komentar
         await updateCommentCount(betId);
     } catch (error) {
         console.error(`Gagal memuat komentar untuk ${betId}:`, error);
     }
+}
+
+// Fungsi untuk menangani lazy scrolling pada komentar
+function enableLazyScroll(betId) {
+    const commentList = document.getElementById(`commentList-${betId}`);
+
+    if (!commentList) return;
+
+    const observer = new IntersectionObserver((entries) => {
+        const lastComment = entries[0];
+        if (lastComment.isIntersecting) {
+            loadComments(betId, true); // Muat lebih banyak komentar saat pengguna menggulir ke bawah
+        }
+    }, { root: commentList, threshold: 1.0 });
+
+    // Amati elemen terakhir dalam daftar komentar
+    setTimeout(() => {
+        const lastChild = commentList.lastElementChild;
+        if (lastChild) observer.observe(lastChild);
+    }, 100);
 }
 
 // Fungsi untuk memperbarui jumlah komentar
