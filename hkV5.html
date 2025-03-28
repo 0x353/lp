@@ -1746,13 +1746,12 @@ function updateLikeCount(betId, change) {
 
  // Comment Function
 // Fungsi untuk memuat komentar dalam dropdown
-async function loadComments(betId) {
-    try {
-        const comments = await contract.methods.getComments(betId).call();
+function loadComments(betId, limit = 10) {
+    contract.methods.getComments(betId).call().then((comments) => {
         const currentUser = ethereum.selectedAddress ? ethereum.selectedAddress.toLowerCase() : null;
-
         let commentHtml = "";
-        comments.slice(0, 5).forEach((comment, index) => { // Tampilkan 5 komentar awal
+        
+        comments.slice(0, limit).forEach((comment, index) => {
             if (!comment.isDeleted) {
                 let date = new Date(comment.timestamp * 1000).toLocaleString();
                 let shortCommenter = comment.commenter.slice(0, 6) + "..." + comment.commenter.slice(-4);
@@ -1760,7 +1759,7 @@ async function loadComments(betId) {
                 let editButton = "";
 
                 if (currentUser && currentUser === comment.commenter.toLowerCase()) {
-                    deleteButton = `<button onclick="deleteComment('${betId}', ${index})">Delete</button>`;
+                    deleteButton = `<button onclick="confirmDelete('${betId}', ${index})">Hapus</button>`;
                     editButton = `<button onclick="editComment('${betId}', ${index}, '${comment.text}')">Edit</button>`;
                 }
 
@@ -1774,11 +1773,16 @@ async function loadComments(betId) {
             }
         });
 
+        // Jika ada lebih dari `limit` komentar, tambahkan tombol "Lihat lebih banyak"
+        if (comments.length > limit) {
+            commentHtml += `<button onclick="loadComments('${betId}', ${limit + 10})">Lihat lebih banyak</button>`;
+        }
+
         document.getElementById(`commentList-${betId}`).innerHTML = commentHtml;
         updateCommentCount(betId);
-    } catch (error) {
+    }).catch((error) => {
         console.error("Gagal memuat komentar:", error);
-    }
+    });
 }
 
 // Fungsi untuk menambahkan komentar
