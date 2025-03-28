@@ -1103,6 +1103,13 @@ window.addEventListener("load", async () => {
                     loadUserBets();
                     loadBetHistory();
                     checkForWinnings(); // Cek apakah user menang
+
+                    // **Tambahkan ini agar komentar langsung dimuat**
+                    const betIds = await contract.methods.getAllBetIds().call();
+                    betIds.forEach(async (betId) => {
+                        await updateCommentCount(betId); // Perbarui jumlah komentar
+                        await loadComments(betId); // Muat komentar
+                    });
                 }
             } catch (error) {
                 console.error("Auto-connect failed:", error);
@@ -1252,6 +1259,14 @@ async function connectWallet() {
             loadUserBets();
             loadBetHistory();
             checkForWinnings();
+
+            // **Tambahkan ini agar komentar langsung dimuat setelah wallet terhubung**
+            const betIds = await contract.methods.getAllBetIds().call();
+            betIds.forEach(async (betId) => {
+                await updateCommentCount(betId); // Perbarui jumlah komentar
+                await loadComments(betId); // Muat komentar
+            });
+
         } catch (error) {
             console.error("Connection failed:", error);
             alert(`Connection failed: ${error.message}`);
@@ -1861,7 +1876,7 @@ function closeLikeModal(betId) {
 }
         
 // Initialize saat halaman terbuka
-window.onload = () => {
+window.onload = async () => {
     if (window.ethereum) {
         window.ethereum.on("accountsChanged", (accounts) => {
             if (accounts.length > 0) {
@@ -1881,9 +1896,18 @@ window.onload = () => {
         });
     }
 
-    // Panggil loadAllCommentCounts setelah halaman selesai dimuat
-    const betIds = [1, 2, 3]; // Ganti dengan daftar betId yang sesuai
-    loadAllCommentCounts(betIds);
+    try {
+        // Ambil semua betId dari kontrak
+        const betIds = await contract.methods.getAllBetIds().call();
+
+        // Perbarui jumlah komentar untuk setiap betId
+        betIds.forEach(async (betId) => {
+            await updateCommentCount(betId);
+            await loadComments(betId); // Tambahkan ini agar komentar langsung dimuat saat halaman dibuka
+        });
+    } catch (error) {
+        console.error("Gagal memuat komentar saat halaman dimuat:", error);
+    }
 };
     </script>
        
