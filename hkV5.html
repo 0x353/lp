@@ -1545,12 +1545,6 @@ async function loadBetHistory() {
         <textarea id="commentInput-${bet.betId}" placeholder="Tulis komentar..."></textarea>
         <button onclick="addComment('${bet.betId}')">Kirim</button>
     </div>
-    <button id="scrollToTop-${betId}" onclick="scrollToTop('${betId}')" 
-    style="display: none; position: fixed; bottom: 20px; right: 20px; 
-    background-color: #ad5cff; color: white; border: none; 
-    padding: 10px 15px; border-radius: 5px; cursor: pointer;">
-    ↑ Scroll ke Atas
-</button>
 </details>
         </p>
         <hr style="background-color: #333333; height: 1px; border: none;">`;
@@ -1698,24 +1692,24 @@ function updateLikeCount(betId, change) {
         }
 
  // Comment Function
-// Menyimpan jumlah komentar yang sudah dimuat per betId
 let loadedComments = {}; 
 
-// Fungsi untuk memuat komentar secara lazy loading
+// Fungsi untuk memuat komentar dengan lazy loading
 async function loadComments(betId, append = false) {
     try {
         const comments = await contract.methods.getComments(betId).call();
         const totalComments = comments.length;
-        const scrollButton = document.getElementById(`scrollToTop-${betId}`);
 
         if (!append) {
-            loadedComments[betId] = 5; // Reset ke 5 jika bukan append
+            loadedComments[betId] = 5; // Awal: tampilkan 5 komentar
         } else {
-            loadedComments[betId] += 10; // Tambah 5 komentar lagi
+            // Jika semua komentar sudah dimuat, hentikan
+            if (loadedComments[betId] >= totalComments) return;
+            loadedComments[betId] += 10;
         }
 
         let commentHtml = "";
-        const visibleComments = comments.slice(0, loadedComments[betId]);
+        const visibleComments = comments.slice(-loadedComments[betId]); // Ambil dari bawah
 
         visibleComments.forEach((comment, index) => {
             if (!comment.isDeleted) {
@@ -1743,27 +1737,24 @@ async function loadComments(betId, append = false) {
 
         const commentList = document.getElementById(`commentList-${betId}`);
         if (append) {
-            commentList.innerHTML += commentHtml;
+            commentList.innerHTML = commentHtml + commentList.innerHTML; // Tambah komentar di atas
         } else {
             commentList.innerHTML = commentHtml;
         }
 
-        // Tampilkan tombol jika semua komentar sudah dimuat
-        if (loadedComments[betId] >= totalComments) {
-            scrollButton.style.display = "block";
+        // Hanya aktifkan lazy scroll jika masih ada komentar tersisa
+        if (loadedComments[betId] < totalComments) {
+            enableLazyScroll(betId);
         } else {
-            scrollButton.style.display = "none";
+            console.log(`Semua komentar untuk ${betId} sudah dimuat.`);
         }
-
-        // Tambahkan event listener untuk lazy scrolling
-        enableLazyScroll(betId);
 
         // Perbarui jumlah komentar
         await updateCommentCount(betId);
     } catch (error) {
         console.error(`Gagal memuat komentar untuk ${betId}:`, error);
     }
-        }
+                }
 
 // Fungsi untuk menangani lazy scrolling pada komentar
 function enableLazyScroll(betId) {
@@ -1785,11 +1776,6 @@ function enableLazyScroll(betId) {
         const lastChild = commentList.lastElementChild;
         if (lastChild) observer.observe(lastChild);
     }, 100);
-               }
-
-function scrollToTop(betId) {
-    const commentList = document.getElementById(`commentList-${betId}`);
-    commentList.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 // Fungsi untuk memperbarui jumlah komentar
