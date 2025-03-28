@@ -1588,12 +1588,12 @@ async function loadBetHistory() {
 
              <details class="comment-dropdown">
     <summary style="display: flex; align-items: center; cursor: pointer; justify-content: space-between; width: 100%; padding: 0 15px;">
-    <span style="display: flex; align-items: center; gap: 10px;">
-        <img src="img/comment.svg" alt="Komentar" style="width: 18px; height: 18px;" margin-right: 20px;">
-        <span id="commentCount-${bet.betId}" style="color: #00cc51; font-size: 15px; font-weight: bold;">0</span> Comments
-    </span>
-    <img src="img/clos.svg" style="width: 18px; height: 18px; margin-right: 20px;">
-</summary>
+        <span style="display: flex; align-items: center; gap: 10px;">
+            <img src="img/comment.svg" alt="Komentar" style="width: 18px; height: 18px;" margin-right: 20px;">
+            <span id="commentCount-${bet.betId}" style="color: #00cc51; font-size: 15px; font-weight: bold;">0</span> Comments
+        </span>
+        <img src="img/clos.svg" style="width: 18px; height: 18px; margin-right: 20px;">
+    </summary>
     <div id="commentSection-${bet.betId}" class="comment-section">
         <div id="commentList-${bet.betId}" class="comment-list"></div>
         <textarea id="commentInput-${bet.betId}" placeholder="Tulis komentar..."></textarea>
@@ -1745,14 +1745,13 @@ function updateLikeCount(betId, change) {
         }
 
  // Comment Function
-// Fungsi untuk memuat komentar dalam dropdown
 async function loadComments(betId) {
     try {
         const comments = await contract.methods.getComments(betId).call();
         const currentUser = ethereum.selectedAddress ? ethereum.selectedAddress.toLowerCase() : null;
 
         let commentHtml = "";
-        comments.slice(0, 5).forEach((comment, index) => { // Tampilkan 5 komentar awal
+        comments.slice(0, 5).forEach((comment, index) => {
             if (!comment.isDeleted) {
                 let date = new Date(comment.timestamp * 1000).toLocaleString();
                 let shortCommenter = comment.commenter.slice(0, 6) + "..." + comment.commenter.slice(-4);
@@ -1764,21 +1763,19 @@ async function loadComments(betId) {
                     editButton = `<button id="editBtn-${betId}-${index}" onclick="enableEdit('${betId}', ${index})">Edit</button>`;
                 }
 
-                commentHtml += `<div style="background: #222; padding: 10px; border-radius: 8px; margin-bottom: 10px; 
-    border: 1px solid #444; box-shadow: 0 4px 8px rgba(0, 162, 255, 0.2);">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <strong style="color: #ad5cff; font-size: 12px; text-align: left;">${shortCommenter}</strong> 
-        <span style="color: gray; font-size: 9px; white-space: nowrap;">(${date})</span>
-    </div>
-    <p style="margin: 5px 0;" id="comment-${betId}-${index}">${comment.text}</p><br><br>
-    <div style="display: flex; gap: 10px;">
-        <button style="background: red; color: white; border: none; padding: 5px 10px; 
-        border-radius: 5px; cursor: pointer;" onclick="deleteComment('${betId}', ${index})">Hapus</button>
-        
-        <button style="background: #007bff; color: white; border: none; padding: 5px 10px; 
-        border-radius: 5px; cursor: pointer;" onclick="editComment('${betId}', ${index}, '${comment.text}')">Edit</button>
-    </div>
-</div>`;
+                commentHtml += `
+                    <div style="background: #222; padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #444; box-shadow: 0 4px 8px rgba(0, 162, 255, 0.2);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <strong style="color: #ad5cff; font-size: 12px; text-align: left;">${shortCommenter}</strong> 
+                            <span style="color: gray; font-size: 9px; white-space: nowrap;">(${date})</span>
+                        </div>
+                        <p style="margin: 5px 0;" id="commentText-${betId}-${index}">${comment.text}</p>
+                        <br><br>
+                        <div style="display: flex; gap: 10px;">
+                            <button style="background: red; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;" onclick="deleteComment('${betId}', ${index})">Hapus</button>
+                            <button style="background: #007bff; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;" onclick="enableEdit('${betId}', ${index})">Edit</button>
+                        </div>
+                    </div>`;
             }
         });
 
@@ -1789,11 +1786,11 @@ async function loadComments(betId) {
     }
 }
 
-// Fungsi untuk menambahkan atau menyimpan komentar (mode normal dan edit)
+// Fungsi untuk menambahkan atau mengedit komentar
 async function addOrUpdateComment(betId) {
     let commentInput = document.getElementById(`commentInput-${betId}`);
     let saveMode = commentInput.dataset.editing === "true";
-    let commentIndex = commentInput.dataset.index;
+    let commentIndex = parseInt(commentInput.dataset.index);
 
     if (!commentInput.value.trim()) {
         alert("Komentar tidak boleh kosong!");
@@ -1802,18 +1799,16 @@ async function addOrUpdateComment(betId) {
 
     try {
         if (saveMode) {
-            // Mode Edit
             await contract.methods.editComment(betId, commentIndex, commentInput.value).send({ from: ethereum.selectedAddress });
-            commentInput.dataset.editing = "false";
-            commentInput.dataset.index = "";
         } else {
-            // Mode Tambah Komentar
             await contract.methods.addComment(betId, commentInput.value).send({ from: ethereum.selectedAddress });
         }
 
         commentInput.value = ""; // Kosongkan input setelah kirim atau edit
         document.getElementById(`sendBtn-${betId}`).innerText = "Kirim"; // Kembalikan tombol ke mode "Kirim"
-        await loadComments(betId); // Refresh komentar
+        commentInput.dataset.editing = "false";
+        commentInput.dataset.index = "";
+        await loadComments(betId);
     } catch (error) {
         console.error("Gagal menyimpan komentar:", error);
     }
@@ -1825,12 +1820,15 @@ function enableEdit(betId, index) {
     let commentInput = document.getElementById(`commentInput-${betId}`);
     let sendButton = document.getElementById(`sendBtn-${betId}`);
 
-    // Isi textarea dengan komentar lama dan aktifkan mode edit
+    if (!commentTextElement) {
+        console.error("Elemen komentar tidak ditemukan!");
+        return;
+    }
+
     commentInput.value = commentTextElement.innerText;
     commentInput.dataset.editing = "true";
     commentInput.dataset.index = index;
 
-    // Ubah tombol "Kirim" menjadi "Simpan"
     sendButton.innerText = "Simpan";
 }
 
@@ -1840,7 +1838,7 @@ async function deleteComment(betId, index) {
 
     try {
         await contract.methods.deleteComment(betId, index).send({ from: ethereum.selectedAddress });
-        await loadComments(betId); // Refresh komentar
+        await loadComments(betId);
     } catch (error) {
         console.error("Gagal menghapus komentar:", error);
     }
