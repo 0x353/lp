@@ -1725,42 +1725,45 @@ function updateLikeCount(betId, change) {
  // Comment Function
 // Fungsi untuk memuat komentar dalam dropdown
 async function loadComments(betId) {
-    const comments = await contract.methods.getComments(betId).call();
-    let commentHtml = "";
+    try {
+        const comments = await contract.methods.getComments(betId).call();
+        const currentUser = ethereum.selectedAddress ? ethereum.selectedAddress.toLowerCase() : null;
 
-    comments.slice(0, 5).forEach((comment, index) => { // Tampilkan 5 komentar awal
-        if (!comment.isDeleted) {
-            let date = new Date(comment.timestamp * 1000).toLocaleString();
-            let shortCommenter = comment.commenter.slice(0, 6) + "..." + comment.commenter.slice(-4);
+        let commentHtml = "";
+        comments.slice(0, 5).forEach((comment, index) => { // Tampilkan 5 komentar awal
+            if (!comment.isDeleted) {
+                let date = new Date(comment.timestamp * 1000).toLocaleString();
+                let shortCommenter = comment.commenter.slice(0, 6) + "..." + comment.commenter.slice(-4);
+                let deleteButton = "";
+                let editButton = "";
 
-            let deleteButton = "";
-            let editButton = "";
-            if (typeof ethereum !== "undefined" && ethereum.selectedAddress) {
-                if (ethereum.selectedAddress.toLowerCase() === comment.commenter.toLowerCase()) {
+                if (currentUser && currentUser === comment.commenter.toLowerCase()) {
                     deleteButton = `<button onclick="deleteComment('${betId}', ${index})">Delete</button>`;
                     editButton = `<button onclick="editComment('${betId}', ${index}, '${comment.text}')">Edit</button>`;
                 }
+
+                commentHtml += `<div>
+                    <strong style="color: #ad5cff;">${shortCommenter}</strong> 
+                    <span style="color: gray; font-size: 12px;">(${date})</span><br>
+                    <p style="margin: 5px 0;" id="comment-${betId}-${index}">${comment.text}</p>
+                    ${deleteButton} ${editButton}
+                </div>
+                <hr>`;
             }
+        });
 
-            commentHtml += `<div>
-                <strong style="color: #ad5cff;">${shortCommenter}</strong> 
-                <span style="color: gray; font-size: 12px;">(${date})</span><br>
-                <p style="margin: 5px 0;" id="comment-${betId}-${index}">${comment.text}</p>
-                ${deleteButton} ${editButton}
-            </div>
-            <hr>`;
-        }
-    });
-
-    document.getElementById(`commentList-${betId}`).innerHTML = commentHtml;
-    updateCommentCount(betId);
+        document.getElementById(`commentList-${betId}`).innerHTML = commentHtml;
+        updateCommentCount(betId);
+    } catch (error) {
+        console.error("Gagal memuat komentar:", error);
+    }
 }
 
 // Fungsi untuk menambahkan komentar
 async function addComment(betId) {
-    let commentText = document.getElementById(`commentInput-${betId}`).value;
-    
-    if (!commentText.trim()) {
+    let commentText = document.getElementById(`commentInput-${betId}`).value.trim();
+
+    if (!commentText) {
         alert("Komentar tidak boleh kosong!");
         return;
     }
@@ -1768,10 +1771,34 @@ async function addComment(betId) {
     try {
         await contract.methods.addComment(betId, commentText).send({ from: ethereum.selectedAddress });
         document.getElementById(`commentInput-${betId}`).value = ""; // Kosongkan input setelah kirim
-        loadComments(betId); // Refresh komentar
-        updateCommentCount(betId); // Perbarui jumlah komentar
+        await loadComments(betId); // Refresh komentar
     } catch (error) {
         console.error("Gagal menambahkan komentar:", error);
+    }
+}
+
+// Fungsi untuk mengedit komentar
+async function editComment(betId, index, oldText) {
+    let newComment = prompt("Edit komentar:", oldText);
+    if (newComment === null || newComment.trim() === "") return;
+
+    try {
+        await contract.methods.editComment(betId, index, newComment).send({ from: ethereum.selectedAddress });
+        await loadComments(betId); // Refresh komentar
+    } catch (error) {
+        console.error("Gagal mengedit komentar:", error);
+    }
+}
+
+// Fungsi untuk menghapus komentar
+async function deleteComment(betId, index) {
+    if (!confirm("Apakah Anda yakin ingin menghapus komentar ini?")) return;
+
+    try {
+        await contract.methods.deleteComment(betId, index).send({ from: ethereum.selectedAddress });
+        await loadComments(betId); // Refresh komentar
+    } catch (error) {
+        console.error("Gagal menghapus komentar:", error);
     }
 }
 
@@ -1784,6 +1811,22 @@ async function updateCommentCount(betId) {
         console.error(`Gagal mengambil jumlah komentar untuk ${betId}:`, error);
     }
 }
+
+// Pastikan MetaMask terhubung sebelum menggunakan fungsi-fungsi ini
+async function connectMetaMask() {
+    if (typeof window.ethereum !== "undefined") {
+        try {
+            await ethereum.request({ method: "eth_requestAccounts" });
+        } catch (error) {
+            console.error("Gagal terhubung ke MetaMask:", error);
+        }
+    } else {
+        alert("MetaMask tidak terdeteksi! Harap instal MetaMask.");
+    }
+}
+
+// Pastikan pengguna sudah terhubung ke MetaMask
+window.addEventListener("load", connectMetaMask);
        
 // Modal Result
 function updateHistory(newBall1) {
