@@ -1766,11 +1766,17 @@ function loadComments(betId, limit = 10) {
                 commentHtml += `<div style="background: #222; padding: 10px; border-radius: 8px; margin-bottom: 10px; 
     border: 1px solid #444; box-shadow: 0 4px 8px rgba(0, 162, 255, 0.2);">
     <div style="display: flex; justify-content: space-between; align-items: center;">
-        <strong style="color: #ad5cff;">${shortCommenter}</strong> 
-        <span style="color: gray; font-size: 10px;">(${date})</span>
+        <strong style="color: #ad5cff; font-size: 12px; text-align: left;">${shortCommenter}</strong> 
+        <span style="color: gray; font-size: 9px; white-space: nowrap;">(${date})</span>
     </div>
-    <p style="margin: 5px 0;" id="comment-${betId}-${index}">${comment.text}</p><br><br>
-    <div style="display: flex; gap: 10px;">${deleteButton} ${editButton}</div>
+    <p style="margin: 5px 0;" id="comment-${betId}-${index}">${comment.text}</p>
+    <div style="display: flex; gap: 10px;">
+        <button style="background: red; color: white; border: none; padding: 5px 10px; 
+        border-radius: 5px; cursor: pointer;" onclick="deleteComment('${betId}', ${index})">Hapus</button>
+        
+        <button style="background: #007bff; color: white; border: none; padding: 5px 10px; 
+        border-radius: 5px; cursor: pointer;" onclick="editComment('${betId}', ${index}, '${comment.text}')">Edit</button>
+    </div>
 </div>`;
             }
         });
