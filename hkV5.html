@@ -798,9 +798,18 @@ h3 {
     border-radius: 5px;
 }
 
+textarea {
+    width: 100%;
+    background: #222;
+    border: 1px solid #444;
+    color: white;
+    padding: 8px;
+    border-radius: 5px;
+    outline: none;
+    transition: border 0.2s; }
+
 textarea:focus {
-    border: 1px solid #6a00ff;
-}
+    border: 1px solid #6a00ff; }
 
     </style>
 </head>
@@ -1557,7 +1566,7 @@ async function loadBetHistory() {
     <div id="commentSection-${bet.betId}" class="comment-section">
         <div id="commentList-${bet.betId}" class="comment-list"></div>
         <textarea id="commentInput-${bet.betId}" placeholder="Tulis komentar..."></textarea>
-        <button onclick="addComment('${bet.betId}')">Kirim</button>
+        <button onclick="addComment('${bet.betId}')">send</button>
     </div>
 </details>
         </p>
