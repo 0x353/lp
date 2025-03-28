@@ -1765,9 +1765,11 @@ function loadComments(betId, limit = 10) {
 
                 commentHtml += `<div style="background: #222; padding: 10px; border-radius: 8px; margin-bottom: 10px; 
     border: 1px solid #444; box-shadow: 0 4px 8px rgba(0, 162, 255, 0.2);">
-    <strong style="color: #ad5cff;">${shortCommenter}</strong> 
-    <span style="color: gray; font-size: 12px;">(${date})</span>
-    <p style="margin: 5px 0;" id="comment-${betId}-${index}">${comment.text}</p>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <strong style="color: #ad5cff;">${shortCommenter}</strong> 
+        <span style="color: gray; font-size: 10px;">(${date})</span>
+    </div>
+    <p style="margin: 5px 0;" id="comment-${betId}-${index}">${comment.text}</p><br><br>
     <div style="display: flex; gap: 10px;">${deleteButton} ${editButton}</div>
 </div>`;
             }
