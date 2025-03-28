@@ -818,48 +818,6 @@ textarea:focus {
     word-wrap: break-word;
     margin: 5px 0;
 }
-
-#editCommentModal {
-    position: fixed;
-    display: none;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 10px;
-    border-radius: 5px;
-    z-index: 1000;
-}
-
-.modal-comment {
-    background: white;
-    padding: 15px;
-    border-radius: 5px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-    width: 250px;
-    position: absolute;
-}
-
-.close {
-    position: absolute;
-    top: 5px;
-    right: 10px;
-    font-size: 18px;
-    cursor: pointer;
-}
-
-textarea {
-    width: 100%;
-    height: 80px;
-    margin: 10px 0;
-}
-
-button#saveEditButton {
-    background: #00cc51;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    cursor: pointer;
-    width: 100%;
-    border-radius: 3px;
-}
     </style>
 </head>
 <body>
@@ -1842,60 +1800,28 @@ async function addComment(betId) {
 }
 
 // Fungsi untuk mengedit komentar
-let currentBetId, currentCommentIndex; // Variabel global untuk menyimpan data komentar yang diedit/dihapus
-
-// Fungsi untuk membuka modal edit komentar
-function editComment(betId, index, oldText) {
-    currentBetId = betId;
-    currentCommentIndex = index;
-    
-    document.getElementById("editCommentText").value = oldText;
-    document.getElementById("editCommentModal").style.display = "flex";
-}
-
-// Fungsi untuk menyimpan perubahan komentar
-document.getElementById("saveEditButton").addEventListener("click", async () => {
-    let newComment = document.getElementById("editCommentText").value.trim();
-    if (!newComment) {
-        alert("Komentar tidak boleh kosong!");
-        return;
-    }
+async function editComment(betId, index, oldText) {
+    let newComment = prompt("Edit komentar:", oldText);
+    if (newComment === null || newComment.trim() === "") return;
 
     try {
-        await contract.methods.editComment(currentBetId, currentCommentIndex, newComment).send({ from: ethereum.selectedAddress });
-        closeEditModal();
-        await loadComments(currentBetId);
+        await contract.methods.editComment(betId, index, newComment).send({ from: ethereum.selectedAddress });
+        await loadComments(betId); // Refresh komentar
     } catch (error) {
         console.error("Gagal mengedit komentar:", error);
     }
-});
-
-// Fungsi untuk membuka modal konfirmasi hapus
-function deleteComment(betId, index) {
-    currentBetId = betId;
-    currentCommentIndex = index;
-    document.getElementById("deleteCommentModal").style.display = "flex";
 }
 
-// Fungsi untuk menghapus komentar setelah dikonfirmasi
-document.getElementById("confirmDeleteButton").addEventListener("click", async () => {
+// Fungsi untuk menghapus komentar
+async function deleteComment(betId, index) {
+    if (!confirm("Apakah Anda yakin ingin menghapus komentar ini?")) return;
+
     try {
-        await contract.methods.deleteComment(currentBetId, currentCommentIndex).send({ from: ethereum.selectedAddress });
-        closeDeleteModal();
-        await loadComments(currentBetId);
+        await contract.methods.deleteComment(betId, index).send({ from: ethereum.selectedAddress });
+        await loadComments(betId); // Refresh komentar
     } catch (error) {
         console.error("Gagal menghapus komentar:", error);
     }
-});
-
-// Fungsi untuk menutup modal edit
-function closeEditModal() {
-    document.getElementById("editCommentModal").style.display = "none";
-}
-
-// Fungsi untuk menutup modal hapus
-function closeDeleteModal() {
-    document.getElementById("deleteCommentModal").style.display = "none";
 }
 
 // Fungsi untuk memperbarui jumlah komentar
@@ -1923,6 +1849,7 @@ async function connectMetaMask() {
 
 // Pastikan pengguna sudah terhubung ke MetaMask
 window.addEventListener("load", connectMetaMask);
+
        
 // Modal Result
 function updateHistory(newBall1) {
@@ -2005,40 +1932,7 @@ function closeLikeModal(betId) {
 }
 
 // Comment Modal
-function openEditModal(button) {
-    let modal = document.getElementById("editCommentModal");
-
-    // Dapatkan posisi tombol yang diklik
-    let rect = button.getBoundingClientRect();
-    
-    // Pastikan modal tidak keluar dari layar
-    let modalWidth = modal.offsetWidth;
-    let modalHeight = modal.offsetHeight;
-    let windowWidth = window.innerWidth;
-    let windowHeight = window.innerHeight;
-
-    let top = rect.top - modalHeight - 10;  // 10px jarak di atas tombol
-    let left = rect.left;
-
-    // Jika modal keluar dari atas layar, letakkan di bawah tombol
-    if (top < 0) {
-        top = rect.bottom + 10;
-    }
-
-    // Jika modal keluar dari kanan layar, geser ke kiri
-    if (left + modalWidth > windowWidth) {
-        left = windowWidth - modalWidth - 10;
-    }
-
-    modal.style.top = `${top}px`;
-    modal.style.left = `${left}px`;
-    modal.style.display = "block";
-}
-
-function closeEditModal() {
-    document.getElementById("editCommentModal").style.display = "none";
-}
-        
+      
 // Initialize saat halaman terbuka
 window.onload = async () => {
     if (window.ethereum) {
