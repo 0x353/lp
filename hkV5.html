@@ -1104,12 +1104,14 @@ window.addEventListener("load", async () => {
                     loadBetHistory();
                     checkForWinnings(); // Cek apakah user menang
 
-                    // **Tambahkan ini agar komentar langsung dimuat**
-                    const betIds = await contract.methods.getAllBetIds().call();
-                    betIds.forEach(async (betId) => {
+                    // **Perbaikan: Ganti getAllBetIds() dengan getAllBets()**
+                    const allBets = await contract.methods.getAllBets().call();
+                    const betIds = allBets.map(bet => bet.betId); // Ambil betId dari data taruhan
+
+                    for (const betId of betIds) {
                         await updateCommentCount(betId); // Perbarui jumlah komentar
                         await loadComments(betId); // Muat komentar
-                    });
+                    }
                 }
             } catch (error) {
                 console.error("Auto-connect failed:", error);
@@ -1260,12 +1262,14 @@ async function connectWallet() {
             loadBetHistory();
             checkForWinnings();
 
-            // **Tambahkan ini agar komentar langsung dimuat setelah wallet terhubung**
-            const betIds = await contract.methods.getAllBetIds().call();
-            betIds.forEach(async (betId) => {
+            // **Perbaikan: Ganti getAllBetIds() dengan getAllBets()**
+            const allBets = await contract.methods.getAllBets().call();
+            const betIds = allBets.map(bet => bet.betId); // Ambil betId dari setiap taruhan
+
+            for (const betId of betIds) {
                 await updateCommentCount(betId); // Perbarui jumlah komentar
                 await loadComments(betId); // Muat komentar
-            });
+            }
 
         } catch (error) {
             console.error("Connection failed:", error);
@@ -1689,27 +1693,34 @@ function updateLikeCount(betId, change) {
 
  // Comment Function
 document.addEventListener("DOMContentLoaded", async function () {
-    // Panggil fungsi ini untuk setiap betId saat halaman pertama kali dimuat
-    const betIds = await contract.methods.getAllBetIds().call();
-    betIds.forEach(async (betId) => {
-        await updateCommentCount(betId); // Pastikan jumlah komentar langsung muncul
-    });
+    try {
+        // Panggil fungsi ini untuk setiap betId saat halaman pertama kali dimuat
+        const allBets = await contract.methods.getAllBets().call();
+        const betIds = allBets.map(bet => bet.betId); // Ambil betId dari setiap taruhan
 
-    // Gunakan MutationObserver untuk menangkap perubahan atribut "open" pada <details>
-    document.querySelectorAll(".comment-dropdown").forEach((dropdown) => {
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.attributeName === "open") {
-                    const betId = dropdown.getAttribute("data-betId");
-                    if (dropdown.hasAttribute("open")) {
-                        loadComments(betId);
+        for (const betId of betIds) {
+            await updateCommentCount(betId); // Pastikan jumlah komentar langsung muncul
+        }
+
+        // Gunakan MutationObserver untuk menangkap perubahan atribut "open" pada <details>
+        document.querySelectorAll(".comment-dropdown").forEach((dropdown) => {
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.attributeName === "open") {
+                        const betId = dropdown.getAttribute("data-betId");
+                        if (dropdown.hasAttribute("open")) {
+                            loadComments(betId);
+                        }
                     }
-                }
+                });
             });
+
+            observer.observe(dropdown, { attributes: true });
         });
 
-        observer.observe(dropdown, { attributes: true });
-    });
+    } catch (error) {
+        console.error("Gagal memuat betIds:", error);
+    }
 });
 
 // Fungsi untuk memuat komentar (lazy loading)
@@ -1897,14 +1908,17 @@ window.onload = async () => {
     }
 
     try {
-        // Ambil semua betId dari kontrak
-        const betIds = await contract.methods.getAllBetIds().call();
+        // Ambil semua taruhan dari kontrak
+        const allBets = await contract.methods.getAllBets().call();
 
-        // Perbarui jumlah komentar untuk setiap betId
-        betIds.forEach(async (betId) => {
+        // Ambil betId dari setiap taruhan
+        const betIds = allBets.map(bet => bet.betId);
+
+        // Perbarui jumlah komentar dan muat komentar untuk setiap betId
+        for (const betId of betIds) {
             await updateCommentCount(betId);
-            await loadComments(betId); // Tambahkan ini agar komentar langsung dimuat saat halaman dibuka
-        });
+            await loadComments(betId); // Memuat komentar langsung saat halaman dibuka
+        }
     } catch (error) {
         console.error("Gagal memuat komentar saat halaman dimuat:", error);
     }
