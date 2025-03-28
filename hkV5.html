@@ -1767,9 +1767,9 @@ function loadComments(betId, limit = 10) {
                     <strong style="color: #ad5cff;">${shortCommenter}</strong> 
                     <span style="color: gray; font-size: 12px;">(${date})</span><br>
                     <p style="margin: 5px 0;" id="comment-${betId}-${index}">${comment.text}</p>
-                    ${deleteButton} ${editButton}
+                    <br>${deleteButton} ${editButton}
                 </div>
-                <hr>`;
+                <hr style="background-color: #333333; height: 1px; border: none;">`;
             }
         });
 
