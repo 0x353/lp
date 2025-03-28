@@ -764,7 +764,7 @@ h3 {
     color: #ccc;
     border-radius: 10px;
     padding: 10px;
-    width: 90%;
+    width: 95%;
     max-width: 500px;
     box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.05);
     transition: all 0.3s ease-in-out;
@@ -799,7 +799,7 @@ h3 {
 }
 
 textarea {
-    width: 90%;
+    width: 95%;
     background: #333333;
     border: 1px solid #444;
     color: white;
@@ -812,6 +812,12 @@ textarea {
         
 textarea:focus {
     border: 1px solid #6a00ff; }
+
+.comment-list p {
+    white-space: pre-wrap; /* Menjaga spasi dan enter */
+    word-wrap: break-word;
+    margin: 5px 0;
+}
 
     </style>
 </head>
@@ -1717,24 +1723,24 @@ function updateLikeCount(betId, change) {
         }
 
  // Comment Function
-let loadedComments = {}; 
+// Menyimpan jumlah komentar yang dimuat
+let loadedComments = {};
 
-// Fungsi untuk memuat komentar dengan lazy loading
+// Fungsi untuk memuat komentar secara lazy loading
 async function loadComments(betId, append = false) {
     try {
         const comments = await contract.methods.getComments(betId).call();
         const totalComments = comments.length;
 
         if (!append) {
-            loadedComments[betId] = 5; // Awal: tampilkan 5 komentar
+            loadedComments[betId] = 5;
         } else {
-            // Jika semua komentar sudah dimuat, hentikan
             if (loadedComments[betId] >= totalComments) return;
             loadedComments[betId] += 10;
         }
 
         let commentHtml = "";
-        const visibleComments = comments.slice(-loadedComments[betId]); // Ambil dari bawah
+        const visibleComments = comments.slice(0, loadedComments[betId]);
 
         visibleComments.forEach((comment, index) => {
             if (!comment.isDeleted) {
@@ -1750,10 +1756,10 @@ async function loadComments(betId, append = false) {
                     }
                 }
 
-                commentHtml += `<div>
+                commentHtml += `<div id="comment-${betId}-${index}">
                     <strong style="color: #ad5cff;">${shortCommenter}</strong> 
                     <span style="color: gray; font-size: 12px;">(${date})</span><br>
-                    <p style="margin: 5px 0;" id="comment-${betId}-${index}">${comment.text}</p>
+                    <p>${comment.text}</p>
                     ${deleteButton} ${editButton}
                 </div>
                 <hr>`;
@@ -1762,45 +1768,78 @@ async function loadComments(betId, append = false) {
 
         const commentList = document.getElementById(`commentList-${betId}`);
         if (append) {
-            commentList.innerHTML = commentHtml + commentList.innerHTML; // Tambah komentar di atas
+            commentList.innerHTML += commentHtml;
         } else {
             commentList.innerHTML = commentHtml;
         }
 
-        // Hanya aktifkan lazy scroll jika masih ada komentar tersisa
         if (loadedComments[betId] < totalComments) {
             enableLazyScroll(betId);
-        } else {
-            console.log(`Semua komentar untuk ${betId} sudah dimuat.`);
         }
 
-        // Perbarui jumlah komentar
         await updateCommentCount(betId);
     } catch (error) {
         console.error(`Gagal memuat komentar untuk ${betId}:`, error);
     }
-                }
+}
 
-// Fungsi untuk menangani lazy scrolling pada komentar
-function enableLazyScroll(betId) {
-    const commentList = document.getElementById(`commentList-${betId}`);
+// Fungsi untuk menambahkan komentar baru tanpa reload
+async function addComment(betId) {
+    const inputField = document.getElementById(`commentInput-${betId}`);
+    const newCommentText = inputField.value.trim();
+    
+    if (newCommentText === "") return alert("Komentar tidak boleh kosong!");
 
-    if (!commentList) return;
+    try {
+        await contract.methods.addComment(betId, newCommentText).send({ from: ethereum.selectedAddress });
 
-    const observer = new IntersectionObserver((entries, observer) => {
-        const lastComment = entries[0];
+        // Tambahkan komentar baru langsung ke daftar tanpa reload
+        const commentList = document.getElementById(`commentList-${betId}`);
+        const shortCommenter = ethereum.selectedAddress.slice(0, 6) + "..." + ethereum.selectedAddress.slice(-4);
+        const now = new Date().toLocaleString();
 
-        if (lastComment.isIntersecting) {
-            observer.unobserve(lastComment.target); // Stop observer pada komentar terakhir
-            loadComments(betId, true); // Load lebih banyak komentar
-        }
-    }, { root: commentList, threshold: 1.0 });
+        commentList.innerHTML = `<div>
+            <strong style="color: #ad5cff;">${shortCommenter}</strong> 
+            <span style="color: gray; font-size: 12px;">(${now})</span><br>
+            <p>${newCommentText}</p>
+        </div>
+        <hr>` + commentList.innerHTML;
 
-    // Amati elemen terakhir dalam daftar komentar
-    setTimeout(() => {
-        const lastChild = commentList.lastElementChild;
-        if (lastChild) observer.observe(lastChild);
-    }, 100);
+        inputField.value = "";
+        await updateCommentCount(betId);
+    } catch (error) {
+        console.error("Gagal menambahkan komentar:", error);
+    }
+}
+
+// Fungsi untuk mengedit komentar
+async function editComment(betId, index, oldText) {
+    let newText = prompt("Edit komentar:", oldText);
+    if (!newText || newText.trim() === "") return alert("Komentar tidak boleh kosong!");
+
+    try {
+        await contract.methods.editComment(betId, index, newText).send({ from: ethereum.selectedAddress });
+
+        // Update tampilan langsung
+        document.getElementById(`comment-${betId}-${index}`).querySelector("p").textContent = newText;
+    } catch (error) {
+        console.error("Gagal mengedit komentar:", error);
+    }
+}
+
+// Fungsi untuk menghapus komentar
+async function deleteComment(betId, index) {
+    if (!confirm("Yakin ingin menghapus komentar ini?")) return;
+
+    try {
+        await contract.methods.deleteComment(betId, index).send({ from: ethereum.selectedAddress });
+
+        // Hapus dari tampilan langsung
+        document.getElementById(`comment-${betId}-${index}`).remove();
+        await updateCommentCount(betId);
+    } catch (error) {
+        console.error("Gagal menghapus komentar:", error);
+    }
 }
 
 // Fungsi untuk memperbarui jumlah komentar
@@ -1809,65 +1848,29 @@ async function updateCommentCount(betId) {
         const count = await contract.methods.commentCount(betId).call();
         document.getElementById(`commentCount-${betId}`).innerText = count;
     } catch (error) {
-        console.error(`Gagal mengambil jumlah komentar untuk ${betId}:`, error);
-    }
-}
-
-// Fungsi untuk menambahkan komentar
-async function addComment(betId) {
-    let commentText = document.getElementById(`commentInput-${betId}`).value;
-    
-    if (!commentText.trim()) {
-        alert("Komentar tidak boleh kosong!");
-        return;
-    }
-
-    try {
-        await contract.methods.addComment(betId, commentText).send({ from: ethereum.selectedAddress });
-        document.getElementById(`commentInput-${betId}`).value = ""; // Kosongkan input setelah kirim
-        
-        await updateAllCommentCounts(); // Update jumlah komentar setelah komentar baru
-        await reloadAllComments(); // Muat ulang semua komentar
-        
-    } catch (error) {
-        console.error("Gagal menambahkan komentar:", error);
-    }
-}
-
-// Fungsi untuk memperbarui jumlah komentar semua betId
-async function updateAllCommentCounts() {
-    try {
-        const betIds = await contract.methods.getAllBetIds().call();
-        const updatePromises = betIds.map(async (betId) => {
-            const count = await contract.methods.commentCount(betId).call();
-            document.getElementById(`commentCount-${betId}`).innerText = count;
-        });
-
-        await Promise.all(updatePromises);
-    } catch (error) {
         console.error("Gagal memperbarui jumlah komentar:", error);
     }
 }
 
-// Fungsi untuk memuat ulang semua komentar
-async function reloadAllComments() {
-    try {
-        const betIds = await contract.methods.getAllBetIds().call();
-        const reloadPromises = betIds.map(async (betId) => {
-            await loadComments(betId); // Muat ulang komentar
-        });
+// Fungsi Lazy Scroll untuk memuat komentar tambahan saat scroll
+function enableLazyScroll(betId) {
+    const commentList = document.getElementById(`commentList-${betId}`);
+    if (!commentList) return;
 
-        await Promise.all(reloadPromises);
-    } catch (error) {
-        console.error("Gagal memuat ulang komentar:", error);
-    }
-}
+    const observer = new IntersectionObserver((entries, observer) => {
+        const lastComment = entries[0];
 
-// Panggil fungsi ini setelah halaman dimuat
-document.addEventListener("DOMContentLoaded", async function () {
-    await updateAllCommentCounts(); // Update jumlah komentar saat halaman dimuat
-    await reloadAllComments(); // Muat ulang semua komentar saat halaman dimuat
-});
+        if (lastComment.isIntersecting) {
+            observer.unobserve(lastComment.target);
+            loadComments(betId, true);
+        }
+    }, { root: commentList, threshold: 1.0 });
+
+    setTimeout(() => {
+        const lastChild = commentList.lastElementChild;
+        if (lastChild) observer.observe(lastChild);
+    }, 100);
+                    }
        
 // Modal Result
 function updateHistory(newBall1) {
