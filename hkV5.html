@@ -758,90 +758,50 @@ h3 {
     display: none;
         }
 
-/* Efek Glow dan 3D Futuristik */
+/* Style utama */
 .comment-dropdown {
-    background: linear-gradient(145deg, #0a0a0a, #121212);
-    border-radius: 12px;
-    box-shadow: 3px 3px 15px rgba(0, 255, 102, 0.3), -3px -3px 15px rgba(0, 255, 255, 0.2);
+    background: #111;
+    color: #fff;
+    border-radius: 10px;
     padding: 10px;
-    margin: 10px 0;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.05);
     transition: all 0.3s ease-in-out;
 }
 
-.comment-dropdown:hover {
-    box-shadow: 5px 5px 20px rgba(0, 255, 102, 0.6), -5px -5px 20px rgba(0, 255, 255, 0.5);
-    transform: scale(1.02);
+.comment-dropdown[open] {
+    box-shadow: 0px 0px 15px rgba(106, 0, 255, 0.5); /* Efek glow biru keunguan saat dibuka */
 }
 
-/* Summary (Header Dropdown) */
 .comment-dropdown summary {
-    color: #00cc51;
-    font-size: 18px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
     font-weight: bold;
-    text-shadow: 0 0 5px rgba(0, 255, 102, 0.6);
+    font-size: 16px;
 }
 
 .comment-dropdown summary img {
-    filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.6));
+    margin-right: 8px;
 }
 
-/* Section Komentar */
 .comment-section {
-    background: rgba(0, 0, 0, 0.8);
-    border: 1px solid rgba(0, 255, 102, 0.3);
-    border-radius: 10px;
     padding: 10px;
-    margin-top: 10px;
-    box-shadow: inset 2px 2px 8px rgba(0, 255, 102, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* List Komentar */
 .comment-list {
     max-height: 200px;
     overflow-y: auto;
     padding: 5px;
-    color: #fff;
-    font-size: 14px;
-}
-
-/* Textarea Input */
-textarea {
-    width: 100%;
-    background: #111;
-    color: #00cc51;
-    border: 1px solid #00cc51;
-    border-radius: 8px;
-    padding: 8px;
-    font-size: 14px;
-    box-shadow: inset 1px 1px 5px rgba(0, 255, 102, 0.3);
-    transition: 0.3s;
+    border-radius: 5px;
 }
 
 textarea:focus {
-    border-color: #00ffcc;
-    box-shadow: 0 0 10px rgba(0, 255, 204, 0.7);
+    border: 1px solid #6a00ff;
 }
 
-/* Tombol Kirim */
-button {
-    background: linear-gradient(145deg, #00cc51, #009944);
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    margin-top: 10px;
-    font-size: 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 2px 2px 5px rgba(0, 255, 102, 0.5);
-}
-
-button:hover {
-    background: linear-gradient(145deg, #00ff66, #00cc51);
-    box-shadow: 3px 3px 10px rgba(0, 255, 102, 0.8);
-    transform: translateY(-2px);
-}
-    
     </style>
 </head>
 <body>
