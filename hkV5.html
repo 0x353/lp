@@ -1769,7 +1769,7 @@ function loadComments(betId, limit = 10) {
         <strong style="color: #ad5cff; font-size: 12px; text-align: left;">${shortCommenter}</strong> 
         <span style="color: gray; font-size: 9px; white-space: nowrap;">(${date})</span>
     </div>
-    <p style="margin: 5px 0;" id="comment-${betId}-${index}">${comment.text}</p>
+    <p style="margin: 5px 0;" id="comment-${betId}-${index}">${comment.text}</p><br><br>
     <div style="display: flex; gap: 10px;">
         <button style="background: red; color: white; border: none; padding: 5px 10px; 
         border-radius: 5px; cursor: pointer;" onclick="deleteComment('${betId}', ${index})">Hapus</button>
