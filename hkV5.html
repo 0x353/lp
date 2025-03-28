@@ -949,6 +949,27 @@ textarea:focus {
     </div>
 </div>
 
+       <!-- Modal Edit Komentar -->
+<div id="editCommentModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditModal()">&times;</span>
+        <h3>Edit Komentar</h3>
+        <textarea id="editCommentText"></textarea>
+        <button id="saveEditButton">Simpan</button>
+    </div>
+</div>
+
+<!-- Modal Konfirmasi Hapus -->
+<div id="deleteCommentModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeDeleteModal()">&times;</span>
+        <h3>Hapus Komentar?</h3>
+        <p>Apakah Anda yakin ingin menghapus komentar ini?</p>
+        <button id="confirmDeleteButton">Hapus</button>
+        <button onclick="closeDeleteModal()">Batal</button>
+    </div>
+</div>
+
        <!-- Menu Modal -->
 <div id="menuModal" class="modal">
     <div class="modal-content">
@@ -1572,7 +1593,7 @@ async function loadBetHistory() {
         <img src="img/comment.svg" alt="Komentar" style="width: 18px; height: 18px;">
         <span id="commentCount-${bet.betId}" style="color: #00cc51; font-size: 15px; font-weight: bold;">0</span> Comments
     </span>
-    <img src="img/clos.svg" style="width: 18px; height: 18px; margin-right: 5px;">
+    <img src="img/clos.svg" style="width: 18px; height: 18px; margin-right: 20px;">
 </summary>
     <div id="commentSection-${bet.betId}" class="comment-section">
         <div id="commentList-${bet.betId}" class="comment-list"></div>
@@ -1780,28 +1801,60 @@ async function addComment(betId) {
 }
 
 // Fungsi untuk mengedit komentar
-async function editComment(betId, index, oldText) {
-    let newComment = prompt("Edit komentar:", oldText);
-    if (newComment === null || newComment.trim() === "") return;
+let currentBetId, currentCommentIndex; // Variabel global untuk menyimpan data komentar yang diedit/dihapus
+
+// Fungsi untuk membuka modal edit komentar
+function editComment(betId, index, oldText) {
+    currentBetId = betId;
+    currentCommentIndex = index;
+    
+    document.getElementById("editCommentText").value = oldText;
+    document.getElementById("editCommentModal").style.display = "flex";
+}
+
+// Fungsi untuk menyimpan perubahan komentar
+document.getElementById("saveEditButton").addEventListener("click", async () => {
+    let newComment = document.getElementById("editCommentText").value.trim();
+    if (!newComment) {
+        alert("Komentar tidak boleh kosong!");
+        return;
+    }
 
     try {
-        await contract.methods.editComment(betId, index, newComment).send({ from: ethereum.selectedAddress });
-        await loadComments(betId); // Refresh komentar
+        await contract.methods.editComment(currentBetId, currentCommentIndex, newComment).send({ from: ethereum.selectedAddress });
+        closeEditModal();
+        await loadComments(currentBetId);
     } catch (error) {
         console.error("Gagal mengedit komentar:", error);
     }
+});
+
+// Fungsi untuk membuka modal konfirmasi hapus
+function deleteComment(betId, index) {
+    currentBetId = betId;
+    currentCommentIndex = index;
+    document.getElementById("deleteCommentModal").style.display = "flex";
 }
 
-// Fungsi untuk menghapus komentar
-async function deleteComment(betId, index) {
-    if (!confirm("Apakah Anda yakin ingin menghapus komentar ini?")) return;
-
+// Fungsi untuk menghapus komentar setelah dikonfirmasi
+document.getElementById("confirmDeleteButton").addEventListener("click", async () => {
     try {
-        await contract.methods.deleteComment(betId, index).send({ from: ethereum.selectedAddress });
-        await loadComments(betId); // Refresh komentar
+        await contract.methods.deleteComment(currentBetId, currentCommentIndex).send({ from: ethereum.selectedAddress });
+        closeDeleteModal();
+        await loadComments(currentBetId);
     } catch (error) {
         console.error("Gagal menghapus komentar:", error);
     }
+});
+
+// Fungsi untuk menutup modal edit
+function closeEditModal() {
+    document.getElementById("editCommentModal").style.display = "none";
+}
+
+// Fungsi untuk menutup modal hapus
+function closeDeleteModal() {
+    document.getElementById("deleteCommentModal").style.display = "none";
 }
 
 // Fungsi untuk memperbarui jumlah komentar
