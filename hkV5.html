@@ -1600,6 +1600,7 @@ async function loadBetHistory() {
         <button id="sendBtn-${bet.betId}" onclick="addOrUpdateComment('${bet.betId}')">Kirim</button>
     </div>
 </details>
+            <div class="like-options" id="likeContainer-${bet.betId}" style="display: none;"></div>
         </p>
         <hr style="background-color: #333333; height: 1px; border: none;">`;
     }
@@ -1624,6 +1625,65 @@ function prevBetHistory() {
 function nextBetHistory() {
     betHistoryPage++;
     loadBetHistory();
+}
+
+// Reason
+async function likeBet(betId, likeType, likeReason) {
+    let hasLiked = await contract.methods.hasUserLiked(betId, userAddress).call();
+    if (hasLiked) {
+        alert("You already liked this bet.");
+        return;
+    }
+
+    await contract.methods.likeBet(betId, likeType, likeReason).send({ from: userAddress });
+
+    let container = document.getElementById(`likeContainer-${betId}`);
+    container.style.display = "block"; // Tampilkan jika ada yang like
+
+    let iconElement = document.getElementById(`${likeType}Count-${betId}`);
+    if (!iconElement) {
+        // Jika belum ada, tambahkan icon baru
+        container.innerHTML += `
+            <button onclick="likeBet('${betId}', '${likeType}', '${likeReason}')">
+                <img src="img/${likeType}.png" width="30" height="30">
+                <span id="${likeType}Count-${betId}" class="like-count">1</span>
+            </button>`;
+    } else {
+        // Jika icon sudah ada, tambahkan jumlah like
+        iconElement.innerText = parseInt(iconElement.innerText) + 1;
+    }
+}
+
+async function unlikeBet(betId) {
+    await contract.methods.unlikeBet(betId).send({ from: userAddress });
+
+    let container = document.getElementById(`likeContainer-${betId}`);
+    container.style.display = "none"; // Sembunyikan jika tidak ada like
+        }
+
+async function loadLikes(betId) {
+    let likeCount = await contract.methods.getLikeCount(betId).call();
+    if (likeCount == 0) return;
+
+    let container = document.getElementById(`likeContainer-${betId}`);
+    container.style.display = "block";
+
+    let betLikers = await contract.methods.getBetLikers(betId).call();
+    for (let liker of betLikers) {
+        let likeData = await contract.methods.getUserLikeData(betId, liker).call();
+        let likeType = likeData[0];
+        let countElement = document.getElementById(`${likeType}Count-${betId}`);
+
+        if (!countElement) {
+            container.innerHTML += `
+                <button onclick="likeBet('${betId}', '${likeType}', '')">
+                    <img src="img/${likeType}.png" width="30" height="30">
+                    <span id="${likeType}Count-${betId}" class="like-count">1</span>
+                </button>`;
+        } else {
+            countElement.innerText = parseInt(countElement.innerText) + 1;
+        }
+    }
 }
 
 // Like Function
