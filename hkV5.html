@@ -1545,6 +1545,12 @@ async function loadBetHistory() {
         <textarea id="commentInput-${bet.betId}" placeholder="Tulis komentar..."></textarea>
         <button onclick="addComment('${bet.betId}')">Kirim</button>
     </div>
+    <button id="scrollToTop-${betId}" onclick="scrollToTop('${betId}')" 
+    style="display: none; position: fixed; bottom: 20px; right: 20px; 
+    background-color: #ad5cff; color: white; border: none; 
+    padding: 10px 15px; border-radius: 5px; cursor: pointer;">
+    ↑ Scroll ke Atas
+</button>
 </details>
         </p>
         <hr style="background-color: #333333; height: 1px; border: none;">`;
@@ -1699,11 +1705,13 @@ let loadedComments = {};
 async function loadComments(betId, append = false) {
     try {
         const comments = await contract.methods.getComments(betId).call();
+        const totalComments = comments.length;
+        const scrollButton = document.getElementById(`scrollToTop-${betId}`);
 
         if (!append) {
             loadedComments[betId] = 5; // Reset ke 5 jika bukan append
         } else {
-            loadedComments[betId] += 5; // Tambah 5 komentar lagi
+            loadedComments[betId] += 10; // Tambah 5 komentar lagi
         }
 
         let commentHtml = "";
@@ -1740,6 +1748,13 @@ async function loadComments(betId, append = false) {
             commentList.innerHTML = commentHtml;
         }
 
+        // Tampilkan tombol jika semua komentar sudah dimuat
+        if (loadedComments[betId] >= totalComments) {
+            scrollButton.style.display = "block";
+        } else {
+            scrollButton.style.display = "none";
+        }
+
         // Tambahkan event listener untuk lazy scrolling
         enableLazyScroll(betId);
 
@@ -1748,7 +1763,7 @@ async function loadComments(betId, append = false) {
     } catch (error) {
         console.error(`Gagal memuat komentar untuk ${betId}:`, error);
     }
-}
+        }
 
 // Fungsi untuk menangani lazy scrolling pada komentar
 function enableLazyScroll(betId) {
@@ -1756,10 +1771,12 @@ function enableLazyScroll(betId) {
 
     if (!commentList) return;
 
-    const observer = new IntersectionObserver((entries) => {
+    const observer = new IntersectionObserver((entries, observer) => {
         const lastComment = entries[0];
+
         if (lastComment.isIntersecting) {
-            loadComments(betId, true); // Muat lebih banyak komentar saat pengguna menggulir ke bawah
+            observer.unobserve(lastComment.target); // Stop observer pada komentar terakhir
+            loadComments(betId, true); // Load lebih banyak komentar
         }
     }, { root: commentList, threshold: 1.0 });
 
@@ -1768,6 +1785,11 @@ function enableLazyScroll(betId) {
         const lastChild = commentList.lastElementChild;
         if (lastChild) observer.observe(lastChild);
     }, 100);
+               }
+
+function scrollToTop(betId) {
+    const commentList = document.getElementById(`commentList-${betId}`);
+    commentList.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 // Fungsi untuk memperbarui jumlah komentar
