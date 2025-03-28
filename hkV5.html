@@ -1734,7 +1734,7 @@ async function loadComments(betId, append = false) {
         if (!append) {
             loadedComments[betId] = 5; // Reset ke 5 jika bukan append
         } else {
-            loadedComments[betId] += 5; // Tambah 5 komentar lagi
+            loadedComments[betId] += 10; // Tambah 5 komentar lagi
         }
 
         let commentHtml = "";
@@ -1787,17 +1787,32 @@ function enableLazyScroll(betId) {
 
     if (!commentList) return;
 
-    const observer = new IntersectionObserver((entries) => {
+    // Objek untuk menyimpan observer agar tidak dibuat berkali-kali
+const lazyObservers = {};
+
+function enableLazyScroll(betId) {
+    const commentList = document.getElementById(`commentList-${betId}`);
+
+    if (!commentList || lazyObservers[betId]) return; // Cegah observer ganda
+
+    lazyObservers[betId] = new IntersectionObserver((entries, observer) => {
         const lastComment = entries[0];
         if (lastComment.isIntersecting) {
-            loadComments(betId, true); // Muat lebih banyak komentar saat pengguna menggulir ke bawah
+            observer.unobserve(lastComment.target); // Hentikan pengamatan sebelum memuat lebih banyak
+            loadComments(betId, true).then(() => {
+                // Setelah load selesai, amati elemen baru
+                setTimeout(() => {
+                    const newLastChild = commentList.lastElementChild;
+                    if (newLastChild) observer.observe(newLastChild);
+                }, 100);
+            });
         }
     }, { root: commentList, threshold: 1.0 });
 
-    // Amati elemen terakhir dalam daftar komentar
+    // Amati elemen terakhir
     setTimeout(() => {
         const lastChild = commentList.lastElementChild;
-        if (lastChild) observer.observe(lastChild);
+        if (lastChild) lazyObservers[betId].observe(lastChild);
     }, 100);
 }
 
@@ -1812,8 +1827,9 @@ async function updateCommentCount(betId) {
 }
 
 // Fungsi untuk menambahkan komentar
-async function addComment(betId) {
-    let commentText = document.getElementById(`commentInput-${betId}`).value;
+async function addComment() {
+    let betId = document.getElementById("commentBetId").value;
+    let commentText = document.getElementById("commentInput").value;
     
     if (!commentText.trim()) {
         alert("Komentar tidak boleh kosong!");
@@ -1822,15 +1838,26 @@ async function addComment(betId) {
 
     try {
         await contract.methods.addComment(betId, commentText).send({ from: ethereum.selectedAddress });
-        document.getElementById(`commentInput-${betId}`).value = ""; // Kosongkan input setelah kirim
-        
-        await updateAllCommentCounts(); // Update jumlah komentar setelah komentar baru
-        await reloadAllComments(); // Muat ulang semua komentar
-        
+        document.getElementById("commentInput").value = ""; // Kosongkan input setelah kirim
+        loadComments(betId); // Refresh komentar
     } catch (error) {
         console.error("Gagal menambahkan komentar:", error);
     }
 }
+
+async function deleteComment(betId, commenter) {
+    if (ethereum.selectedAddress.toLowerCase() !== commenter.toLowerCase()) {
+        alert("Anda tidak bisa menghapus komentar orang lain!");
+        return;
+    }
+
+    try {
+        await contract.methods.deleteComment(betId).send({ from: ethereum.selectedAddress });
+        loadComments(betId); // Refresh komentar setelah hapus
+    } catch (error) {
+        console.error("Gagal menghapus komentar:", error);
+    }
+} 
 
 // Fungsi untuk memperbarui jumlah komentar semua betId
 async function updateAllCommentCounts() {
@@ -1870,7 +1897,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 // Modal Result
 function updateHistory(newBall1) {
     let historyTable = document.getElementById("historyBody");
-    let rows = historyTable.getElementsByTagName("tr");
+   l let rows = historyTable.getElementsByTagName("tr");
 
     // Ambil nilai dari baris pertama untuk di-shift ke bawah
     let previousBall1 = rows[0].children[1].innerText;
