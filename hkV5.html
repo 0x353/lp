@@ -1749,8 +1749,8 @@ async function loadComments(betId, append = false) {
                 let editButton = "";
                 if (typeof ethereum !== "undefined" && ethereum.selectedAddress) {
                     if (ethereum.selectedAddress.toLowerCase() === comment.commenter.toLowerCase()) {
-                        deleteButton = `<button onclick="deleteComment('${betId}', ${index})">Delete</button>`;
-                        editButton = `<button onclick="editComment('${betId}', ${index}, '${comment.text}')">Edit</button>`;
+                        deleteButton = `<button style="font-size: 12px; padding: 4px 8px; margin-top: 5px;" onclick="deleteComment('${betId}', ${index})">Delete</button>`;
+                        editButton = `<button style="font-size: 12px; padding: 4px 8px; margin-top: 5px;" onclick="editComment('${betId}', ${index}, '${comment.text}')">Edit</button>`;
                     }
                 }
 
@@ -1760,7 +1760,7 @@ async function loadComments(betId, append = false) {
                     <p style="margin: 5px 0;" id="comment-${betId}-${index}">${comment.text}</p>
                     ${deleteButton} ${editButton}
                 </div>
-                <hr>`;
+                <hr style="background-color: #333333; height: 1px; border: none;">`;
             }
         });
 
