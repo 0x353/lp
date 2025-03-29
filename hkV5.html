@@ -846,31 +846,58 @@ textarea:focus {
     position: relative;
 }
 
-/* Modal */
-#postModal {
-    display: none;
-    position: absolute;
-    z-index: 1000;
-    background-color: #222;
-    color: white;
-    padding: 15px;
-    border-radius: 5px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-    max-width: 250px;
-}
-
-/* Tombol close di modal */
-#closeModal {
-    position: absolute;
-    top: 5px;
-    right: 10px;
+/* Ikon Notifikasi */
+#notificationIcon {
+    position: fixed;
+    top: 20px;
+    right: 20px;
     cursor: pointer;
-    color: white;
-    font-size: 16px;
 }
 
-#closeModal:hover {
-    color: red;
+#notificationIcon img {
+    width: 30px;
+}
+
+#notificationBadge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: red;
+    color: white;
+    font-size: 12px;
+    padding: 4px;
+    border-radius: 50%;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Popup Notifikasi */
+#notificationList {
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    background: #222;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    max-width: 300px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.notification-header {
+    font-weight: bold;
+}
+
+.notification-item {
+    padding: 5px;
+    border-bottom: 1px solid #444;
+    cursor: pointer;
+}
+
+.notification-item:hover {
+    background: #333;
 }
     </style>
 </head>
@@ -905,16 +932,20 @@ textarea:focus {
         <h3>Lotto Chain Decentralizer Betting</h3>
         <br>
 
-       <!-- Container untuk setiap postingan -->
-<div class="bet-post">
-    <!-- Ikon komentar yang memicu modal -->
-    <img src="img/comment.svg" alt="Komentar" class="comment-icon" onclick="showModal(event, '123456')">
+       <!-- Ikon Notifikasi -->
+<div id="notificationIcon" onclick="toggleNotificationList()">
+    <img src="img/bell.svg" alt="Notifications">
+    <span id="notificationBadge" class="hidden"></span>
 </div>
 
-<!-- Modal untuk menampilkan postingan -->
-<div id="postModal">
-    <span id="closeModal" onclick="closeModal()">&times;</span>
-    <div id="modalContent"></div>
+<!-- Daftar Notifikasi -->
+<div id="notificationList" class="hidden">
+    <div class="notification-header">
+        <p>Notifications</p>
+        <ul id="notifications" aria-live="polite"></ul>
+        <p id="noNotificationsMessage" class="hidden">No notifications</p>
+    </div>
+    <button onclick="closeNotificationList()">Close</button>
 </div>
 
        <!-- Notifikasi Popup -->
@@ -2084,145 +2115,76 @@ window.onload = async () => {
     </script>
 
     <script>
-        let betHistoryPage = 0;
-const pageSize = 5;
-const commenters = {}; // Simpan daftar player yang berkomentar per betId
+        // Inisialisasi Web3.js dan Ethers.js
+const web3 = new Web3(window.ethereum);
+const provider = new ethers.providers.Web3Provider(window.ethereum);
+const contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
+const ethersContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
 
-async function loadBetHistory() {
-    const bets = await contract.methods.getAllBets().call();
-    const reversedBets = bets.slice().reverse(); // Urutkan dari terbaru
+// Ambil elemen UI
+const notificationIcon = document.getElementById("notificationIcon");
+const notificationBadge = document.getElementById("notificationBadge");
+const notificationList = document.getElementById("notificationList");
+const notificationsContainer = document.getElementById("notifications");
+const noNotificationsMessage = document.getElementById("noNotificationsMessage");
 
-    const now = Math.floor(Date.now() / 1000);
-    const sevenDaysAgo = now - 7 * 24 * 60 * 60;
-    let filteredBets = reversedBets.filter(bet => bet.timestamp >= sevenDaysAgo);
+let notifications = [];
 
-    const start = betHistoryPage * pageSize;
-    const end = Math.min(start + pageSize, filteredBets.length);
-
-    let html = "";
-    for (let i = start; i < end; i++) {
-        let bet = filteredBets[i];
-        let shortPlayer = shortenAddress(bet.player);
-        let shortTxHash = shortenAddress(bet.txHash);
-
-        html += `
-        <p>
-            Player: <span style="color: #ad5cff;">${shortPlayer}</span><br>
-            BetID: <span style="color: #b37500; font-size: 9px;">${bet.betId}</span><br>
-            BetNumber: <span style="color: #00FF66;">${bet.number}</span><br>
-            BetAmount: <span style="color: #00FF66;">${bet.betAmount}</span><br>
-            Payout: <span style="color: #FFD700;">${bet.payoutAmount}</span><br>
-            Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
-            <button onclick="toggleLike('${bet.betId}')">
-                <img src="img/like.svg" alt="Like" style="width: 11px; height: 11px;"> 
-            </button> 
-            <span id="likeCount-${bet.betId}" style="color: #00cc51;">0</span> Likes 
-            <details class="comment-dropdown">
-                <summary>
-                    <img src="img/comment.svg" alt="Komentar" style="width: 18px; height: 18px;">
-                    <span id="commentCount-${bet.betId}" style="color: #00cc51;">0</span> Comments
-                </summary>
-                <div id="commentSection-${bet.betId}" class="comment-section">
-                    <div id="commentList-${bet.betId}" class="comment-list"></div>
-                    <textarea id="commentInput-${bet.betId}" placeholder="Tulis komentar..."></textarea>
-                    <button onclick="addOrUpdateComment('${bet.betId}')">Kirim</button>
-                </div>
-            </details>
-        </p>
-        <hr>`;
-    }
-
-    document.getElementById("betHistory").innerHTML = html;
-    for (let i = start; i < end; i++) {
-        let bet = filteredBets[i];
-        await updateLikeStatus(bet.betId);
-    }
+// Toggle daftar notifikasi
+function toggleNotificationList() {
+    notificationList.classList.toggle("hidden");
 }
 
-// **Mencegah postingan tenggelam**
-function bumpPost(betId) {
-    document.getElementById(`bet-${betId}`).scrollIntoView({ behavior: 'smooth' });
+// Tutup daftar notifikasi
+function closeNotificationList() {
+    notificationList.classList.add("hidden");
 }
 
-// **Fungsi Shorten Address**
-function shortenAddress(address) {
-    return address.slice(0, 6) + "..." + address.slice(-4);
+// Tambahkan notifikasi ke UI
+function addNotification(betId, message) {
+    notifications.push({ betId, message });
+
+    // Tampilkan badge jumlah notifikasi
+    notificationBadge.textContent = notifications.length;
+    notificationBadge.classList.remove("hidden");
+
+    // Tambahkan notifikasi ke daftar
+    const notifItem = document.createElement("li");
+    notifItem.classList.add("notification-item");
+    notifItem.textContent = message;
+    notifItem.onclick = () => openPost(betId);
+    notificationsContainer.appendChild(notifItem);
+
+    // Sembunyikan pesan "No notifications"
+    noNotificationsMessage.classList.add("hidden");
 }
 
-// **Fungsi Like**
-function toggleLike(betId) {
-    let likeCountElem = document.getElementById(`likeCount-${betId}`);
-    let count = parseInt(likeCountElem.textContent) || 0;
-    count++;
-    likeCountElem.textContent = count;
-    bumpPost(betId);
+// Arahkan ke postingan berdasarkan betId
+function openPost(betId) {
+    window.location.href = `/post.html?betId=${betId}`;
 }
 
-// **Fungsi Komentar & Notifikasi**
-function addOrUpdateComment(betId) {
-    let commentInput = document.getElementById(`commentInput-${betId}`);
-    let commentText = commentInput.value.trim();
-    if (commentText === "") return;
-
-    let playerAddress = getCurrentPlayerAddress();
-    if (!commenters[betId]) {
-        commenters[betId] = new Set();
-    }
-    commenters[betId].add(playerAddress);
-
-    let commentList = document.getElementById(`commentList-${betId}`);
-    let newComment = document.createElement("p");
-    newComment.innerHTML = `<span style="color: #ad5cff;">${shortenAddress(playerAddress)}</span>: ${commentText}`;
-    commentList.appendChild(newComment);
-
-    commenters[betId].forEach(player => {
-        if (player !== playerAddress) {
-            sendNotification(player, `${shortenAddress(playerAddress)} mengomentari postingan`);
-        }
+// Event listener dari smart contract (Web3.js)
+contract.events.BetLiked({ fromBlock: "latest" })
+    .on("data", function(event) {
+        const { betId, liker } = event.returnValues;
+        addNotification(betId, `${liker} menyukai postingan Anda!`);
     });
 
-    commentInput.value = "";
-}
+contract.events.BetCommented({ fromBlock: "latest" })
+    .on("data", function(event) {
+        const { betId, commenter, comment } = event.returnValues;
+        addNotification(betId, `${commenter} berkomentar: "${comment}"`);
+    });
 
-// **Fungsi Kirim Notifikasi**
-function sendNotification(player, message) {
-    console.log(`Notifikasi untuk ${player}: ${message}`);
-}
+// Event listener dari smart contract (Ethers.js)
+ethersContract.on("BetLiked", (betId, liker) => {
+    addNotification(betId, `${liker} menyukai postingan Anda!`);
+});
 
-// **Navigasi Pagination**
-function prevBetHistory() {
-    if (betHistoryPage > 0) {
-        betHistoryPage--;
-        loadBetHistory();
-    }
-}
-
-function nextBetHistory() {
-    betHistoryPage++;
-    loadBetHistory();
-        }
-
-// Modal
-function showModal(event, betId) {
-    let modal = document.getElementById("postModal");
-    let modalContent = document.getElementById("modalContent");
-
-    // Isi modal dengan detail postingan
-    modalContent.innerHTML = `<p>Detail dari bet ID: <b>${betId}</b></p>`;
-
-    // Ambil posisi ikon yang diklik
-    let rect = event.target.getBoundingClientRect();
-
-    // Set posisi modal di samping ikon
-    modal.style.top = `${rect.top + window.scrollY}px`;
-    modal.style.left = `${rect.right + window.scrollX + 10}px`;
-
-    modal.style.display = "block";
-}
-
-function closeModal() {
-    document.getElementById("postModal").style.display = "none";
-}
+ethersContract.on("BetCommented", (betId, commenter, comment) => {
+    addNotification(betId, `${commenter} berkomentar: "${comment}"`);
+});
     </script>
        
 </body>
