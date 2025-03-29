@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notifikasi Like & Komentar</title>
+    <title>Notifikasi Like Komentar</title>
     <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.2/web3.min.js"></script>
     <style>
@@ -39,53 +39,61 @@
         async function connectWallet() {
     if (window.ethereum) {
         try {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            console.log("Wallet connected:", accounts[0]);
-            return accounts[0];
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+            console.log("Wallet connected");
+
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+
+            setupEventListeners();  // Jalankan event listener setelah koneksi
         } catch (error) {
             console.error("User rejected connection", error);
         }
     } else {
         alert("Metamask atau wallet tidak terdeteksi!");
     }
-        }
+}
 
-        document.getElementById("connectWallet").addEventListener("click", connectWallet);
+document.getElementById("connectWallet").addEventListener("click", connectWallet);
 
-        let notifications = [];
+let notifications = [];
 
-        function showNotification(message) {
-            notifications.push(message);
-            document.getElementById("notificationBadge").textContent = notifications.length;
-            document.getElementById("notificationBadge").style.display = "inline";
+function showNotification(message) {
+    notifications.push(message);
+    document.getElementById("notificationBadge").textContent = notifications.length;
+    document.getElementById("notificationBadge").style.display = "inline";
 
-            const listItem = document.createElement("li");
-            listItem.textContent = message;
-            document.getElementById("notifications").appendChild(listItem);
-        }
+    const listItem = document.createElement("li");
+    listItem.textContent = message;
+    document.getElementById("notifications").appendChild(listItem);
+}
 
-        function toggleNotificationList() {
-            const list = document.getElementById("notificationList");
-            list.style.display = list.style.display === "block" ? "none" : "block";
-        }
+function toggleNotificationList() {
+    const list = document.getElementById("notificationList");
+    list.style.display = list.style.display === "block" ? "none" : "block";
+}
 
-        function closeNotificationList() {
-            document.getElementById("notificationList").style.display = "none";
-        }
+function closeNotificationList() {
+    document.getElementById("notificationList").style.display = "none";
+}
 
-        document.getElementById("notificationIcon").addEventListener("click", toggleNotificationList);
+document.getElementById("notificationIcon").addEventListener("click", toggleNotificationList);
 
-        function setupEventListeners() {
-            const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
-            
-            contract.on("BetLiked", (betId, liker) => {
-                showNotification(`${liker} menyukai postingan Anda!`);
-            });
+function setupEventListeners() {
+    if (!contract) {
+        console.error("Contract not initialized yet.");
+        return;
+    }
 
-            contract.on("BetCommented", (betId, commenter, comment) => {
-                showNotification(`${commenter} berkomentar: "${comment}"`);
-            });
-        }
+    contract.on("BetLiked", (betId, liker) => {
+        showNotification(`${liker} menyukai postingan Anda!`);
+    });
+
+    contract.on("BetCommented", (betId, commenter, comment) => {
+        showNotification(`${commenter} berkomentar: "${comment}"`);
+    });
+            }
     </script>
 
 </body>
