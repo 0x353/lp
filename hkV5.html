@@ -1758,8 +1758,8 @@ function loadComments(betId, limit = 10) {
 
     <p id="commentText-${betId}-${index}" style="margin: 5px 0;">${comment.text}</p>
     <br><br>
-    deleteButton = `<button style="background-color: rgba(255, 0, 0, 0.5); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;" onclick="deleteComment('${betId}', ${index})">Delete</button>`; ${editButton} 
-
+                   ${deleteButton} ${editButton} 
+     
 </div>`;
             }
         });
