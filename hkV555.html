@@ -1729,11 +1729,27 @@ function updateLikeCount(betId, change) {
         }
 
  // Comment Function
- function loadComments(betId, limit = 10) {
-    document.getElementById(`status-${betId}`).innerHTML = `<img src="loading.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: yellow;">Memuat komentar...</span>`;
-    
+function loadComments(betId, limit = 10) {
+    // Pastikan betId valid
+    if (!betId) {
+        console.error("betId tidak valid:", betId);
+        return;
+    }
+
+    // Cek apakah elemen status ada sebelum mengubah innerHTML
+    let statusElement = document.getElementById(`status-${betId}`);
+    if (statusElement) {
+        statusElement.innerHTML = `<img src="loading.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: yellow;">Memuat komentar...</span>`;
+    }
+
     contract.methods.getComments(betId).call().then((comments) => {
-        document.getElementById(`status-${betId}`).innerHTML = ""; 
+        if (statusElement) statusElement.innerHTML = ""; // Pastikan elemen ada sebelum mengubah innerHTML
+
+        const commentListElement = document.getElementById(`commentList-${betId}`);
+        if (!commentListElement) {
+            console.error(`Element commentList-${betId} tidak ditemukan`);
+            return;
+        }
 
         const currentUser = ethereum.selectedAddress ? ethereum.selectedAddress.toLowerCase() : null;
         let commentHtml = "";
@@ -1768,20 +1784,28 @@ function updateLikeCount(betId, change) {
             commentHtml += `<button onclick="loadComments('${betId}', ${limit + 10})">Lihat lebih banyak</button>`;
         }
 
-        document.getElementById(`commentList-${betId}`).innerHTML = commentHtml;
+        commentListElement.innerHTML = commentHtml;
         updateCommentCount(betId);
     }).catch((error) => {
-        document.getElementById(`status-${betId}`).innerHTML = `<img src="error.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: red;">Gagal memuat komentar.</span>`;
-        setTimeout(() => {
-            document.getElementById(`status-${betId}`).innerHTML = "";
-        }, 3000);
         console.error("Gagal memuat komentar:", error);
+        if (statusElement) {
+            statusElement.innerHTML = `<img src="error.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: red;">Gagal memuat komentar.</span>`;
+            setTimeout(() => {
+                statusElement.innerHTML = "";
+            }, 3000);
+        }
     });
 }
 
 async function addOrUpdateComment(betId) {
     let commentInput = document.getElementById(`commentInput-${betId}`);
     let sendButton = document.getElementById(`sendBtn-${betId}`);
+    
+    if (!commentInput || !sendButton) {
+        console.error(`Element commentInput-${betId} atau sendBtn-${betId} tidak ditemukan.`);
+        return;
+    }
+
     let saveMode = commentInput.dataset.editing === "true";
     let commentIndex = commentInput.dataset.index;
 
@@ -1790,7 +1814,11 @@ async function addOrUpdateComment(betId) {
         return;
     }
 
-    document.getElementById(`status-${betId}`).innerHTML = `<img src="sending.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: blue;">${saveMode ? "Menyimpan perubahan..." : "Mengirim komentar..."}</span>`;
+    let statusElement = document.getElementById(`status-${betId}`);
+    if (statusElement) {
+        statusElement.innerHTML = `<img src="sending.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: blue;">${saveMode ? "Menyimpan perubahan..." : "Mengirim komentar..."}</span>`;
+    }
+    
     sendButton.disabled = true;
 
     try {
@@ -1804,17 +1832,21 @@ async function addOrUpdateComment(betId) {
 
         commentInput.value = "";
         sendButton.innerText = "Kirim";
-        document.getElementById(`status-${betId}`).innerHTML = `<img src="success.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: green;">Komentar berhasil disimpan.</span>`;
-        setTimeout(() => {
-            document.getElementById(`status-${betId}`).innerHTML = "";
-        }, 3000);
+        if (statusElement) {
+            statusElement.innerHTML = `<img src="success.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: green;">Komentar berhasil disimpan.</span>`;
+            setTimeout(() => {
+                statusElement.innerHTML = "";
+            }, 3000);
+        }
         await loadComments(betId);
     } catch (error) {
-        document.getElementById(`status-${betId}`).innerHTML = `<img src="error.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: red;">Gagal menyimpan komentar.</span>`;
-        setTimeout(() => {
-            document.getElementById(`status-${betId}`).innerHTML = "";
-        }, 3000);
         console.error("Gagal menyimpan komentar:", error);
+        if (statusElement) {
+            statusElement.innerHTML = `<img src="error.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: red;">Gagal menyimpan komentar.</span>`;
+            setTimeout(() => {
+                statusElement.innerHTML = "";
+            }, 3000);
+        }
     } finally {
         sendButton.disabled = false;
     }
@@ -1823,33 +1855,44 @@ async function addOrUpdateComment(betId) {
 async function deleteComment(betId, index) {
     if (!confirm("Apakah Anda yakin ingin menghapus komentar ini?")) return;
 
-    document.getElementById(`status-${betId}`).innerHTML = `<img src="deleting.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: orange;">Menghapus komentar...</span>`;
+    let statusElement = document.getElementById(`status-${betId}`);
+    if (statusElement) {
+        statusElement.innerHTML = `<img src="deleting.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: orange;">Menghapus komentar...</span>`;
+    }
 
     try {
         await contract.methods.deleteComment(betId, index).send({ from: ethereum.selectedAddress });
-        document.getElementById(`status-${betId}`).innerHTML = `<img src="success.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: green;">Komentar berhasil dihapus.</span>`;
-        setTimeout(() => {
-            document.getElementById(`status-${betId}`).innerHTML = "";
-        }, 3000);
+        if (statusElement) {
+            statusElement.innerHTML = `<img src="success.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: green;">Komentar berhasil dihapus.</span>`;
+            setTimeout(() => {
+                statusElement.innerHTML = "";
+            }, 3000);
+        }
         await loadComments(betId);
     } catch (error) {
-        document.getElementById(`status-${betId}`).innerHTML = `<img src="error.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: red;">Gagal menghapus komentar.</span>`;
-        setTimeout(() => {
-            document.getElementById(`status-${betId}`).innerHTML = "";
-        }, 3000);
         console.error("Gagal menghapus komentar:", error);
+        if (statusElement) {
+            statusElement.innerHTML = `<img src="error.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: red;">Gagal menghapus komentar.</span>`;
+            setTimeout(() => {
+                statusElement.innerHTML = "";
+            }, 3000);
+        }
     }
 }
 
 async function updateCommentCount(betId) {
     try {
         const count = await contract.methods.commentCount(betId).call();
-        document.getElementById(`commentCount-${betId}`).innerText = count;
+        let countElement = document.getElementById(`commentCount-${betId}`);
+        if (countElement) {
+            countElement.innerText = count;
+        } else {
+            console.error(`Element commentCount-${betId} tidak ditemukan`);
+        }
     } catch (error) {
         console.error(`Gagal mengambil jumlah komentar untuk ${betId}:`, error);
     }
         }
-
        
 // Modal Result
 function updateHistory(newBall1) {
