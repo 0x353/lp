@@ -1780,7 +1780,10 @@ function loadComments(betId, limit = 10) {
 
         // Jika ada lebih dari `limit` komentar, tambahkan tombol "Lihat lebih banyak"
         if (comments.length > limit) {
-            commentHtml += `<button onclick="loadComments('${betId}', ${limit + 10})">Lihat lebih banyak</button>`;
+            commentHtml += `<button onclick="loadComments('${betId}', ${limit + 10})" 
+    style="background-color: rgba(0, 123, 255, 0.5);">
+    Lihat lebih banyak
+</button>`;
         }
 
         document.getElementById(`commentList-${betId}`).innerHTML = commentHtml;
