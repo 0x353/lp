@@ -846,60 +846,27 @@ textarea:focus {
     position: relative;
 }
 
-/* Ikon Notifikasi */
 #notificationIcons {
     position: fixed;
-    top: 15px;
-    left: 15px; /* Ubah dari right: 15px; ke left: 15px; */
+    top: 10px;
+    left: 10px; /* Pojok kiri dari sudut pandang Anda */
     cursor: pointer;
     z-index: 1000;
 }
 
-#notificationIcons img {
-    width: 30px;
-    height: 30px;
-}
-        
-#notificationBadges {
-    position: absolute;
-    top: 0;
-    right: 0;
-    background: red;
-    color: white;
-    font-size: 12px;
-    padding: 4px;
-    border-radius: 50%;
+#notificationLists {
+    position: fixed;
+    top: 50px;
+    left: 10px; /* Pastikan tetap di sisi kiri */
+    background: white;
+    border: 1px solid #ddd;
+    padding: 10px;
+    width: 300px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .hidden {
     display: none;
-}
-
-/* Popup Notifikasi */
-#notificationLists {
-    position: fixed;
-    top: 60px;
-    right: 20px;
-    background: #222;
-    color: white;
-    padding: 10px;
-    border-radius: 5px;
-    max-width: 300px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-}
-
-.notifications-header {
-    font-weight: bold;
-}
-
-.notifications-item {
-    padding: 5px;
-    border-bottom: 1px solid #444;
-    cursor: pointer;
-}
-
-.notifications-item:hover {
-    background: #333;
 }
     </style>
 </head>
@@ -936,7 +903,7 @@ textarea:focus {
 
        <!-- Ikon Notifikasi -->
 <div id="notificationIcons" onclick="toggleNotificationList()">
-    <img src="img/bell.svg" alt="Notifications">
+    <img src="img/comment.svg" alt="Notifications">
     <span id="notificationBadges" class="hidden"></span>
 </div>
 
@@ -2123,7 +2090,7 @@ const provider = new ethers.providers.Web3Provider(window.ethereum);
 const contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
 const ethersContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
 
-// Ambil elemen UI dengan ID yang telah diperbarui
+// Ambil elemen UI
 const notificationIcon = document.getElementById("notificationIcons");
 const notificationBadge = document.getElementById("notificationBadges");
 const notificationList = document.getElementById("notificationLists");
@@ -2132,21 +2099,21 @@ const noNotificationsMessage = document.getElementById("noNotificationsMessages"
 
 let notifications = [];
 
-// Toggle daftar notifikasi
+// Fungsi untuk menampilkan atau menyembunyikan daftar notifikasi
 function toggleNotificationList() {
     notificationList.classList.toggle("hidden");
 }
 
-// Tutup daftar notifikasi
+// Fungsi untuk menutup daftar notifikasi
 function closeNotificationLists() {
     notificationList.classList.add("hidden");
 }
 
-// Tambahkan notifikasi ke UI
+// Fungsi untuk menambahkan notifikasi ke dalam daftar
 function addNotification(betId, message) {
     notifications.push({ betId, message });
 
-    // Tampilkan badge jumlah notifikasi jika ada notifikasi baru
+    // Tampilkan badge jumlah notifikasi
     if (notifications.length > 0) {
         notificationBadge.textContent = notifications.length;
         notificationBadge.classList.remove("hidden");
@@ -2161,35 +2128,71 @@ function addNotification(betId, message) {
     notifItem.onclick = () => openPost(betId);
     notificationsContainer.appendChild(notifItem);
 
-    // Sembunyikan pesan "No notifications" jika ada notifikasi
+    // Sembunyikan pesan "No notifications"
     noNotificationsMessage.classList.add("hidden");
 }
 
-// Arahkan ke postingan berdasarkan betId
+// Fungsi untuk membuka postingan berdasarkan betId
 function openPost(betId) {
     window.location.href = `/post.html?betId=${betId}`;
 }
 
+// Pastikan user yang login adalah pemilik postingan sebelum menampilkan notifikasi
+async function getCurrentUser() {
+    const accounts = await ethereum.request({ method: "eth_accounts" });
+    return accounts[0]; // Mengembalikan alamat akun yang sedang digunakan
+}
+
 // Event listener dari smart contract (Web3.js)
 contract.events.BetLiked({ fromBlock: "latest" })
-    .on("data", function(event) {
+    .on("data", async function(event) {
         const { betId, liker } = event.returnValues;
-        addNotification(betId, `${liker} menyukai postingan Anda!`);
-    });
+        const currentUser = await getCurrentUser();
+        console.log("Event BetLiked diterima:", betId, liker);
+
+        // Pastikan user yang login adalah pemilik postingan
+        const postOwner = await contract.methods.getPostOwner(betId).call();
+        if (postOwner.toLowerCase() === currentUser.toLowerCase()) {
+            addNotification(betId, `${liker} menyukai postingan Anda!`);
+        }
+    })
+    .on("error", console.error);
 
 contract.events.BetCommented({ fromBlock: "latest" })
-    .on("data", function(event) {
+    .on("data", async function(event) {
         const { betId, commenter, comment } = event.returnValues;
-        addNotification(betId, `${commenter} berkomentar: "${comment}"`);
-    });
+        const currentUser = await getCurrentUser();
+        console.log("Event BetCommented diterima:", betId, commenter, comment);
+
+        // Pastikan user yang login adalah pemilik postingan
+        const postOwner = await contract.methods.getPostOwner(betId).call();
+        if (postOwner.toLowerCase() === currentUser.toLowerCase()) {
+            addNotification(betId, `${commenter} berkomentar: "${comment}"`);
+        }
+    })
+    .on("error", console.error);
 
 // Event listener dari smart contract (Ethers.js)
-ethersContract.on("BetLiked", (betId, liker) => {
-    addNotification(betId, `${liker} menyukai postingan Anda!`);
+ethersContract.on("BetLiked", async (betId, liker) => {
+    const currentUser = await getCurrentUser();
+    console.log("Event BetLiked diterima:", betId, liker);
+
+    // Pastikan user yang login adalah pemilik postingan
+    const postOwner = await contract.methods.getPostOwner(betId).call();
+    if (postOwner.toLowerCase() === currentUser.toLowerCase()) {
+        addNotification(betId, `${liker} menyukai postingan Anda!`);
+    }
 });
 
-ethersContract.on("BetCommented", (betId, commenter, comment) => {
-    addNotification(betId, `${commenter} berkomentar: "${comment}"`);
+ethersContract.on("BetCommented", async (betId, commenter, comment) => {
+    const currentUser = await getCurrentUser();
+    console.log("Event BetCommented diterima:", betId, commenter, comment);
+
+    // Pastikan user yang login adalah pemilik postingan
+    const postOwner = await contract.methods.getPostOwner(betId).call();
+    if (postOwner.toLowerCase() === currentUser.toLowerCase()) {
+        addNotification(betId, `${commenter} berkomentar: "${comment}"`);
+    }
 });
     </script>
        
