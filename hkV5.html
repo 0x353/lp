@@ -1592,14 +1592,14 @@ async function loadBetHistory() {
     </button>
 
     <div class="like-options" id="likeContainer-${bet.betId}" style="display: none;">
-        <ul>
-            <li onclick="likeBet('${bet.betId}', 'congrats')">🎉 Congrats</li>
-            <li onclick="likeBet('${bet.betId}', 'jackpot')">💴 Jackpot</li>
-            <li onclick="likeBet('${bet.betId}', 'spirit')">🔥 Spirit</li>
-            <li onclick="likeBet('${bet.betId}', 'win')">🏆 Win</li>
-            <li onclick="likeBet('${bet.betId}', 'funny')">😂 Funny</li>
-            <li onclick="likeBet('${bet.betId}', 'sad')">😥 Sad</li>
-            <li onclick="likeBet('${bet.betId}', 'angry')">😡 Angry</li>
+        <ul id="likeList-${bet.betId}">
+            <li data-betid="${bet.betId}" data-type="congrats">🎉 Congrats</li>
+            <li data-betid="${bet.betId}" data-type="jackpot">💴 Jackpot</li>
+            <li data-betid="${bet.betId}" data-type="spirit">🔥 Spirit</li>
+            <li data-betid="${bet.betId}" data-type="win">🏆 Win</li>
+            <li data-betid="${bet.betId}" data-type="funny">😂 Funny</li>
+            <li data-betid="${bet.betId}" data-type="sad">😥 Sad</li>
+            <li data-betid="${bet.betId}" data-type="angry">😡 Angry</li>
         </ul>
     </div>
 
@@ -1664,6 +1664,20 @@ function toggleLikeOptions(betId) {
     container.style.display = container.style.display === "none" ? "block" : "none";
 }
 
+// Tambahkan event listener ke setiap opsi like secara dinamis
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".like-options ul").forEach(list => {
+        list.addEventListener("click", function (event) {
+            if (event.target.tagName === "LI") {
+                let betId = event.target.dataset.betid;
+                let likeType = event.target.dataset.type;
+                likeBet(betId, likeType);
+            }
+        });
+    });
+});
+
+// Fungsi untuk mengirim transaksi like ke blockchain
 async function likeBet(betId, likeType) {
     let userHasLiked = await contract.methods.hasUserLiked(betId, userAddress).call();
     if (userHasLiked) {
@@ -1695,7 +1709,7 @@ function updateLikeUI(betId, likeType) {
     // Sembunyikan opsi setelah memilih
     document.getElementById(`likeContainer-${betId}`).style.display = "none";
 }
-
+        
 // Like Function
 async function toggleLike(betId) {
     try {
