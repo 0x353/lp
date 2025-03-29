@@ -849,15 +849,17 @@ textarea:focus {
 /* Ikon Notifikasi */
 #notificationIcon {
     position: fixed;
-    top: 20px;
-    right: 20px;
+    top: 15px;
+    left: 15px; /* Ubah dari right: 15px; ke left: 15px; */
     cursor: pointer;
+    z-index: 1000;
 }
 
 #notificationIcon img {
     width: 30px;
+    height: 30px;
 }
-
+        
 #notificationBadge {
     position: absolute;
     top: 0;
