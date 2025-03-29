@@ -1611,6 +1611,12 @@ async function loadBetHistory() {
         <div id="commentList-${bet.betId}" class="comment-list"></div>
         <textarea id="commentInput-${bet.betId}" placeholder="Tulis komentar..."></textarea>
         <button id="sendBtn-${bet.betId}" onclick="addOrUpdateComment('${bet.betId}')" style="background: rgba(0, 255, 0, 0.5); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Kirim</button>
+        <center>
+    <h6 style="color: #ff3333;">
+        <img src="img/warning.svg" width="20" style="vertical-align: middle; margin-right: 5px;">
+        "Warning: Comments stored on the blockchain are permanent and cannot be deleted. Please be wise in your comments before posting!"
+    </h6>
+</center>
     </div>
 </details>
         </p>
