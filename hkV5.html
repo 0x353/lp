@@ -847,7 +847,7 @@ textarea:focus {
 }
 
 /* Ikon Notifikasi */
-#notificationIcon {
+#notificationIcons {
     position: fixed;
     top: 15px;
     left: 15px; /* Ubah dari right: 15px; ke left: 15px; */
@@ -855,12 +855,12 @@ textarea:focus {
     z-index: 1000;
 }
 
-#notificationIcon img {
+#notificationIcons img {
     width: 30px;
     height: 30px;
 }
         
-#notificationBadge {
+#notificationBadges {
     position: absolute;
     top: 0;
     right: 0;
@@ -876,7 +876,7 @@ textarea:focus {
 }
 
 /* Popup Notifikasi */
-#notificationList {
+#notificationLists {
     position: fixed;
     top: 60px;
     right: 20px;
@@ -888,17 +888,17 @@ textarea:focus {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
-.notification-header {
+.notifications-header {
     font-weight: bold;
 }
 
-.notification-item {
+.notifications-item {
     padding: 5px;
     border-bottom: 1px solid #444;
     cursor: pointer;
 }
 
-.notification-item:hover {
+.notifications-item:hover {
     background: #333;
 }
     </style>
@@ -935,19 +935,19 @@ textarea:focus {
         <br>
 
        <!-- Ikon Notifikasi -->
-<div id="notificationIcon" onclick="toggleNotificationList()">
+<div id="notificationIcons" onclick="toggleNotificationList()">
     <img src="img/bell.svg" alt="Notifications">
-    <span id="notificationBadge" class="hidden"></span>
+    <span id="notificationBadges" class="hidden"></span>
 </div>
 
 <!-- Daftar Notifikasi -->
-<div id="notificationList" class="hidden">
-    <div class="notification-header">
+<div id="notificationLists" class="hidden">
+    <div class="notifications-header">
         <p>Notifications</p>
-        <ul id="notifications" aria-live="polite"></ul>
-        <p id="noNotificationsMessage" class="hidden">No notifications</p>
+        <ul id="notificationss" aria-live="polite"></ul>
+        <p id="noNotificationsMessages" class="hidden">No notifications</p>
     </div>
-    <button onclick="closeNotificationList()">Close</button>
+    <button onclick="closeNotificationLists()">Close</button>
 </div>
 
        <!-- Notifikasi Popup -->
@@ -2123,12 +2123,12 @@ const provider = new ethers.providers.Web3Provider(window.ethereum);
 const contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
 const ethersContract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
 
-// Ambil elemen UI
-const notificationIcon = document.getElementById("notificationIcon");
-const notificationBadge = document.getElementById("notificationBadge");
-const notificationList = document.getElementById("notificationList");
-const notificationsContainer = document.getElementById("notifications");
-const noNotificationsMessage = document.getElementById("noNotificationsMessage");
+// Ambil elemen UI dengan ID yang telah diperbarui
+const notificationIcon = document.getElementById("notificationIcons");
+const notificationBadge = document.getElementById("notificationBadges");
+const notificationList = document.getElementById("notificationLists");
+const notificationsContainer = document.getElementById("notificationss");
+const noNotificationsMessage = document.getElementById("noNotificationsMessages");
 
 let notifications = [];
 
@@ -2138,7 +2138,7 @@ function toggleNotificationList() {
 }
 
 // Tutup daftar notifikasi
-function closeNotificationList() {
+function closeNotificationLists() {
     notificationList.classList.add("hidden");
 }
 
@@ -2146,9 +2146,13 @@ function closeNotificationList() {
 function addNotification(betId, message) {
     notifications.push({ betId, message });
 
-    // Tampilkan badge jumlah notifikasi
-    notificationBadge.textContent = notifications.length;
-    notificationBadge.classList.remove("hidden");
+    // Tampilkan badge jumlah notifikasi jika ada notifikasi baru
+    if (notifications.length > 0) {
+        notificationBadge.textContent = notifications.length;
+        notificationBadge.classList.remove("hidden");
+    } else {
+        notificationBadge.classList.add("hidden");
+    }
 
     // Tambahkan notifikasi ke daftar
     const notifItem = document.createElement("li");
@@ -2157,7 +2161,7 @@ function addNotification(betId, message) {
     notifItem.onclick = () => openPost(betId);
     notificationsContainer.appendChild(notifItem);
 
-    // Sembunyikan pesan "No notifications"
+    // Sembunyikan pesan "No notifications" jika ada notifikasi
     noNotificationsMessage.classList.add("hidden");
 }
 
