@@ -1754,11 +1754,11 @@ function loadComments(betId, limit = 10) {
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <strong style="color: #ad5cff; font-size: 12px;">${shortCommenter}</strong> 
         <span style="color: gray; font-size: 9px; white-space: nowrap;">(${date})</span>
-    </div>
+    </div><br>
 
     <p id="commentText-${betId}-${index}" style="margin: 5px 0;">${comment.text}</p>
     <br><br>
-    ${deleteButton} ${editButton} 
+    deleteButton = `<button style="background-color: rgba(255, 0, 0, 0.5); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;" onclick="deleteComment('${betId}', ${index})">Delete</button>`; ${editButton} 
 
 </div>`;
             }
