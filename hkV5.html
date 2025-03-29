@@ -804,19 +804,33 @@ h3 {
 
 textarea {
     width: 95%;
-    height: 150px:
+    height: 150px;
     background: #333333;
     border: 1px solid #444;
     color: white;
     padding: 8px;
     border-radius: 5px;
     outline: none;
-    transition: border 0.2s; }
-    display: block; 
+    display: block;
     margin: 10px auto;
-        
+    transition: box-shadow 0.3s, transform 0.2s, border 0.2s;
+}
+
+/* Efek saat textarea di-hover */
+textarea:hover {
+    border: 1px solid #00a2ff;
+    box-shadow: 4px 4px 10px rgba(0, 162, 255, 0.4), 
+                -4px -4px 10px rgba(0, 162, 255, 0.2);
+    transform: translateY(-2px); /* Naik sedikit */
+}
+
+/* Efek saat textarea difokuskan */
 textarea:focus {
-    border: 1px solid #6a00ff; }
+    border: 1px solid #00a2ff;
+    box-shadow: 6px 6px 14px rgba(0, 162, 255, 0.6), 
+                -6px -6px 14px rgba(0, 162, 255, 0.3);
+    transform: translateY(-3px); /* Naik lebih tinggi */
+}
 
 .comment-list p {
     white-space: pre-wrap; /* Menjaga spasi dan enter */
