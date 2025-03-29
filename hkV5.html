@@ -804,7 +804,7 @@ h3 {
 
 textarea {
     width: 95%;
-    height: 150px;
+    height: 120px;
     background: #333333;
     border: 1px solid #444;
     color: white;
@@ -1757,7 +1757,7 @@ function loadComments(betId, limit = 10) {
                 let editButton = "";
 
                 if (currentUser && currentUser === comment.commenter.toLowerCase()) {
-                    deleteButton = `<button onclick="deleteComment('${betId}', ${index})">Delete</button>`;
+                    deleteButton = `<button onclick="deleteComment('${betId}', ${index})" style="background: rgba(255, 0, 0, 0.5); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Delete</button>`;
                     editButton = `<button id="editBtn-${betId}-${index}" onclick="enableEdit('${betId}', ${index})">Edit</button>`;
                 }
 
@@ -1768,7 +1768,7 @@ function loadComments(betId, limit = 10) {
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <strong style="color: #ad5cff; font-size: 12px;">${shortCommenter}</strong> 
         <span style="color: gray; font-size: 9px; white-space: nowrap;">(${date})</span>
-    </div><br>
+    </div>
 
     <p id="commentText-${betId}-${index}" style="margin: 5px 0;">${comment.text}</p>
     <br><br>
