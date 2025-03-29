@@ -897,11 +897,10 @@ textarea:focus {
        <button onclick="window.open('search', '_blank')"><img src="img/search.svg" alt="Lotto" style="width: 15px; height: 15px;">  Search...</button><br><br>
        <hr style="background-color: #333333; height: 1px; border: none;">
        <div id="betHistory"></div>
+       <div id="loadingMessage" style="text-align: center; display: none; color: #fff;">Loading...</div>
        <div class="button-container">
-       <button class="nav-button" onclick="prevBetHistory()">Prev</button>
-       <button class="nav-button" onclick="nextBetHistory()">Next</button>
-
-       </div>
+       <button id="loadMoreButton" class="nav-button" onclick="loadMoreBets()">Muat Lebih Banyak</button>
+     </div>
         <br>
 
        <!-- Prize Table -->
@@ -1614,18 +1613,24 @@ function nextUserBets() {
 }
         
 // **Load Bet History (with Pagination)**
+let betHistoryPage = 0;
+const pageSize = 10;
+let allBets = [];
+
 async function loadBetHistory() {
-    const bets = await contract.methods.getAllBets().call();
-    const reversedBets = bets.slice().reverse(); // Urutkan dari terbaru
+    if (allBets.length === 0) {
+        const bets = await contract.methods.getAllBets().call();
+        allBets = bets.slice().reverse(); // Urutkan dari terbaru
+    }
 
     const now = Math.floor(Date.now() / 1000);
     const sevenDaysAgo = now - 7 * 24 * 60 * 60;
-    const filteredBets = reversedBets.filter(bet => bet.timestamp >= sevenDaysAgo);
+    const filteredBets = allBets.filter(bet => bet.timestamp >= sevenDaysAgo);
 
     const start = betHistoryPage * pageSize;
     const end = Math.min(start + pageSize, filteredBets.length);
 
-    let html = "";
+    let html = document.getElementById("betHistory").innerHTML;
     for (let i = start; i < end; i++) {
         let bet = filteredBets[i];
         let shortPlayer = bet.player.slice(0, 10) + "..." + bet.player.slice(-10);
@@ -1685,25 +1690,37 @@ async function loadBetHistory() {
 
     document.getElementById("betHistory").innerHTML = html;
 
-    // Update jumlah like dan status like setelah bet history dimuat
+    // Update status like untuk setiap bet yang dimuat
     for (let i = start; i < end; i++) {
         let bet = filteredBets[i];
         await updateLikeStatus(bet.betId);
     }
-}
-        
-// **Bet History Pagination**
-function prevBetHistory() {
-    if (betHistoryPage > 0) {
-        betHistoryPage--;
-        loadBetHistory();
+
+    // Tampilkan tombol "Muat Lebih Banyak" hanya jika masih ada data
+    if (end < filteredBets.length) {
+        document.getElementById("loadMoreButton").style.display = "block";
+    } else {
+        document.getElementById("loadMoreButton").style.display = "none";
     }
 }
 
-function nextBetHistory() {
+// Fungsi untuk memuat lebih banyak data
+function loadMoreBets() {
     betHistoryPage++;
     loadBetHistory();
 }
+
+// **Lazy Load dengan IntersectionObserver**
+const observer = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) {
+        loadMoreBets();
+    }
+}, { threshold: 1.0 });
+
+observer.observe(document.getElementById("loadMoreButton"));
+
+// Panggil saat halaman dimuat
+loadBetHistory();
 
 // Like Function
 async function toggleLike(betId) {
