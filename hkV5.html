@@ -1758,7 +1758,7 @@ function loadComments(betId, limit = 10) {
 
                 if (currentUser && currentUser === comment.commenter.toLowerCase()) {
                     deleteButton = `<button onclick="deleteComment('${betId}', ${index})" style="background: rgba(255, 0, 0, 0.5); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Delete</button>`;
-                    editButton = `<button id="editBtn-${betId}-${index}" onclick="enableEdit('${betId}', ${index})">Edit</button>`;
+                    editButton = `<button id="editBtn-${betId}-${index}" onclick="enableEdit('${betId}', ${index})" style="background: rgba(0, 162, 255, 0.5); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Edit</button>`;
                 }
 
                 commentHtml += `
