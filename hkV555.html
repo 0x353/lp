@@ -1136,7 +1136,8 @@ window.addEventListener("load", async () => {
                     updateBalance();
                     loadUserBets();
                     loadBetHistory();
-                    checkForWinnings(); // Cek apakah user menang
+                    checkForWinnings();                   
+                    updateNotificationStatus();
 
                     // **Perbaikan: Ganti getAllBetIds() dengan getAllBets()**
                     const allBets = await contract.methods.getAllBets().call();
@@ -1171,6 +1172,27 @@ async function checkForWinnings() {
     }
 }
 
+// **Event Listener untuk Like & Komentar**
+async function setupEventListeners() {
+    if (!contract) return;
+    
+    contract.events.BetLiked()
+        .on("data", (event) => {
+            const { liker } = event.returnValues;
+            showNotification(`${liker} menyukai postingan Anda!`);
+            addNotification(`${liker} menyukai postingan Anda!`, "#");
+        })
+        .on("error", console.error);
+
+    contract.events.BetCommented()
+        .on("data", (event) => {
+            const { commenter, comment } = event.returnValues;
+            showNotification(`${commenter} berkomentar: "${comment}"`);
+            addNotification(`${commenter} berkomentar: "${comment}"`, "#");
+        })
+        .on("error", console.error);
+}
+
 // **Add Notification**
 function addNotification(message, link) {
     const notifications = document.getElementById("notifications");
@@ -1191,7 +1213,7 @@ function toggleNotificationList() {
     }
 }
 
-// Menampilkan popup notifikasi dengan animasi
+// **Show Notification**
 function showNotification(message) {
     const popup = document.getElementById("notificationPopup");
     const messageContainer = document.getElementById("notificationMessage");
@@ -1201,12 +1223,11 @@ function showNotification(message) {
         return;
     }
 
-    messageContainer.innerHTML = `<span style="color: #00FF66;">${message}</span> 
-        <a href="claim" target="_blank" style="color: #00b7ff; text-decoration: none;">Claim now!</a>`;
+    messageContainer.innerHTML = `<span style="color: #00FF66;">${message}</span>`;
 
-    // Pastikan popup ditampilkan
+    // Menampilkan popup
     popup.classList.remove("hidden");
-    popup.style.display = "block"; // Menampilkan elemen
+    popup.style.display = "block";
     popup.classList.add("show");
 
     console.log("Popup shown!"); // Debugging
@@ -1218,15 +1239,24 @@ function showNotification(message) {
         popup.classList.remove("show");
         setTimeout(() => {
             popup.classList.add("hidden");
-            popup.style.display = "none"; // Sembunyikan elemen
+            popup.style.display = "none";
         }, 300);
-    }, 15000); // Tampilkan selama 5 detik
+    }, 15000);
 }
 
-// Panggil fungsi ini setiap kali notifikasi diperbarui
-updateNotificationStatus();
+// **Update Notification Status**
+function updateNotificationStatus() {
+    const notificationsList = document.getElementById("notifications");
+    const noNotificationsMessage = document.getElementById("noNotificationsMessage");
 
-// Menutup popup
+    if (notificationsList.children.length === 0) {
+        noNotificationsMessage.classList.remove("hidden");
+    } else {
+        noNotificationsMessage.classList.add("hidden");
+    }
+}
+
+// **Close Popup**
 function closePopup() {
     const popup = document.getElementById("notificationPopup");
     if (!popup) return;
@@ -1238,26 +1268,14 @@ function closePopup() {
     }, 300);
 }
 
-function updateNotificationStatus() {
-    const notificationsList = document.getElementById("notifications");
-    const noNotificationsMessage = document.getElementById("noNotificationsMessage");
-
-    if (notificationsList.children.length === 0) {
-        noNotificationsMessage.classList.remove("hidden"); // Tampilkan pesan
-    } else {
-        noNotificationsMessage.classList.add("hidden"); // Sembunyikan pesan
-    }
-}
-
-// **Close Popup**
-function closePopup() {
-    document.getElementById("notificationPopup").style.display = "none";
-}
-
 // **Close Notification List**
 function closeNotificationList() {
     document.getElementById("notificationList").classList.add("hidden");
 }
+
+// **Panggil setup event setelah wallet terhubung**
+setupEventListeners();
+
 
 // **Connect Wallet**
 async function connectWallet() {
@@ -1295,6 +1313,7 @@ async function connectWallet() {
             loadUserBets();
             loadBetHistory();
             checkForWinnings();
+            updateNotificationStatus();
 
             // **Perbaikan: Ganti getAllBetIds() dengan getAllBets()**
             const allBets = await contract.methods.getAllBets().call();
