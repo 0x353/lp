@@ -1573,10 +1573,12 @@ async function loadBetHistory() {
             Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
             
             <div>
+    <!-- Tombol utama untuk membuka opsi like -->
     <button onclick="toggleLikeOptions('${bet.betId}')" id="toggleLikeBtn-${bet.betId}">
         <img src="img/like.svg" width="20" height="20"> Like
     </button>
 
+    <!-- Pilihan emoji like -->
     <div class="like-options" id="likeContainer-${bet.betId}" style="display: none;">
         <button onclick="submitLike('${bet.betId}', 'congrats')">
             <img src="img/congrats.png" width="20" height="20">
@@ -1601,6 +1603,10 @@ async function loadBetHistory() {
         </button>
     </div>
 
+    <!-- Menampilkan jumlah like -->
+    <span id="likeCount-${bet.betId}">0</span>
+
+    <!-- Status like yang diberikan user -->
     <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray;"></p>
 </div>
            
@@ -1645,7 +1651,7 @@ function nextBetHistory() {
     loadBetHistory();
 }
 
-// Reason
+// Like Reason
 async function toggleLike(betId) {
     try {
         if (typeof window.ethereum === "undefined") {
@@ -1676,7 +1682,7 @@ async function toggleLike(betId) {
             estimatedGas = await contract.methods.likeBet(betId, "👍").estimateGas({ from: userAccount });
         }
 
-        // Tambahkan buffer agar transaksi tidak gagal
+        // Tambahkan buffer gas
         const gasOptions = {
             from: userAccount,
             gas: estimatedGas + 50000, // Tambahkan buffer
@@ -1691,7 +1697,7 @@ async function toggleLike(betId) {
                     button.style.backgroundColor = "#000000"; 
                     button.innerHTML = `<img src="img/like.svg" alt="Like" style="width: 16px; height: 16px;">`;
                     statusElement.innerText = "Unlike berhasil!";
-                    updateLikeCount(betId, -1); // Kurangi jumlah like
+                    updateLikeCount(betId, -1); 
                 })
                 .on("error", function (error) {
                     console.error("Error saat unlike:", error);
@@ -1704,7 +1710,7 @@ async function toggleLike(betId) {
                     button.style.backgroundColor = "#ff1a1e"; 
                     button.innerHTML = `<img src="img/dislike.svg" alt="Unlike" style="width: 16px; height: 16px;">`;
                     statusElement.innerText = "Like berhasil!";
-                    updateLikeCount(betId, 1); // Tambah jumlah like
+                    updateLikeCount(betId, 1);
                 })
                 .on("error", function (error) {
                     console.error("Error saat like:", error);
@@ -1716,6 +1722,31 @@ async function toggleLike(betId) {
     }
 }
 
+function toggleLikeOptions(betId) {
+    const likeContainer = document.getElementById(`likeContainer-${betId}`);
+    likeContainer.style.display = (likeContainer.style.display === "none") ? "block" : "none";
+}
+
+async function submitLike(betId, reaction) {
+    try {
+        const userAddress = await getCurrentUserAddress();
+        if (!userAddress) {
+            alert("Anda harus terhubung ke MetaMask!");
+            return;
+        }
+
+        const contract = new web3.eth.Contract(contractABI, contractAddress);
+        await contract.methods.likeComment(betId, reaction).send({ from: userAddress });
+
+        document.getElementById(`likeStatus-${betId}`).innerText = `You reacted: ${reaction}`;
+        updateLikeCount(betId);
+
+        document.getElementById(`likeContainer-${betId}`).style.display = "none";
+    } catch (error) {
+        console.error("Gagal memberikan like:", error);
+    }
+}
+
 async function likeComment(betId) {
     try {
         const userAddress = await getCurrentUserAddress();
@@ -1724,23 +1755,15 @@ async function likeComment(betId) {
             return;
         }
 
+        const contract = new web3.eth.Contract(contractABI, contractAddress);
         await contract.methods.likeComment(betId).send({ from: userAddress });
 
-        updateLikeCount(betId); // Perbarui jumlah like setelah sukses
+        updateLikeCount(betId);
     } catch (error) {
         console.error("Gagal menyukai komentar:", error);
     }
 }
 
-async function updateLikeCount(betId) {
-    try {
-        const count = await contract.methods.getLikeCount(betId).call();
-        document.getElementById(`likeCount-${betId}`).innerText = count;
-    } catch (error) {
-        console.error(`Gagal mengambil jumlah like untuk ${betId}:`, error);
-    }
-}
-        
 // Fungsi untuk memperbarui jumlah like di UI
 async function updateLikeCount(betId, change = 0) {
     try {
@@ -1748,7 +1771,6 @@ async function updateLikeCount(betId, change = 0) {
         const likeCount = await contract.methods.getLikeCount(betId).call();
         const likeCountElement = document.getElementById(`likeCount-${betId}`);
 
-        // Jika ada perubahan jumlah like, update UI
         if (change !== 0) {
             let currentCount = parseInt(likeCountElement.innerText, 10);
             likeCountElement.innerText = currentCount + change;
@@ -1758,8 +1780,7 @@ async function updateLikeCount(betId, change = 0) {
     } catch (error) {
         console.error("Gagal memperbarui jumlah like:", error);
     }
-}
-
+                }
 
  // Comment Function
 async function loadComments(betId) {
