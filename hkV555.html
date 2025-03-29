@@ -1582,7 +1582,7 @@ async function loadBetHistory() {
         <textarea id="commentInput-${bet.betId}" placeholder="Tulis komentar..."></textarea>
         <button id="sendBtn-${bet.betId}" onclick="addOrUpdateComment('${bet.betId}')">Kirim</button>
     </div>
-    <div id="status-BET_ID" style="font-size: 12px;"></div>
+    <div id="status-${bet.betId}" style="font-size: 12px;"></div>
 </details>
         </p>
         <hr style="background-color: #333333; height: 1px; border: none;">`;
