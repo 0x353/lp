@@ -1716,6 +1716,31 @@ async function toggleLike(betId) {
     }
 }
 
+async function likeComment(betId) {
+    try {
+        const userAddress = await getCurrentUserAddress();
+        if (!userAddress) {
+            alert("Anda harus terhubung ke MetaMask!");
+            return;
+        }
+
+        await contract.methods.likeComment(betId).send({ from: userAddress });
+
+        updateLikeCount(betId); // Perbarui jumlah like setelah sukses
+    } catch (error) {
+        console.error("Gagal menyukai komentar:", error);
+    }
+}
+
+async function updateLikeCount(betId) {
+    try {
+        const count = await contract.methods.getLikeCount(betId).call();
+        document.getElementById(`likeCount-${betId}`).innerText = count;
+    } catch (error) {
+        console.error(`Gagal mengambil jumlah like untuk ${betId}:`, error);
+    }
+}
+        
 // Fungsi untuk memperbarui jumlah like di UI
 async function updateLikeCount(betId, change = 0) {
     try {
