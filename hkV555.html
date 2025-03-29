@@ -1180,24 +1180,73 @@ function setupEventListeners() {
 
     contract.events.BetLiked()
         .on("data", (event) => {
-            const { liker } = event.returnValues;
-            console.log("Event BetLiked diterima:", liker);
+            const { betId, liker, timestamp, likeType, likeReason, likeCount } = event.returnValues;
+            console.log(`Event BetLiked dari ${liker}: ${likeType} (${likeReason})`);
 
-            showNotification(`${liker} menyukai postingan Anda!`);
-            addNotification(`${liker} menyukai postingan Anda!`, "#");
+            showNotification(`${liker} menyukai taruhan Anda! Tipe: ${likeType}, Alasan: ${likeReason}`);
+            addNotification(`${liker} menyukai taruhan Anda!`, "#");
         })
         .on("error", console.error);
 
-    contract.events.BetCommented()
+    contract.events.CommentAdded()
         .on("data", (event) => {
-            const { commenter, comment } = event.returnValues;
-            console.log("Event BetCommented diterima:", commenter, comment);
+            const { betId, commenter, commentText, timestamp } = event.returnValues;
+            console.log(`Event CommentAdded dari ${commenter}: "${commentText}"`);
 
-            showNotification(`${commenter} berkomentar: "${comment}"`);
-            addNotification(`${commenter} berkomentar: "${comment}"`, "#");
+            showNotification(`${commenter} berkomentar: "${commentText}"`);
+            addNotification(`${commenter} berkomentar: "${commentText}"`, "#");
         })
         .on("error", console.error);
 }
+
+// 🔹 Mengecek Event Sebelumnya
+async function checkPastEvents() {
+    if (!contract) return;
+
+    const pastLikes = await contract.getPastEvents("BetLiked", { fromBlock: "latest" });
+    pastLikes.forEach(event => {
+        const { liker, likeType, likeReason } = event.returnValues;
+        showNotification(`${liker} menyukai taruhan Anda! Tipe: ${likeType}, Alasan: ${likeReason}`);
+        addNotification(`${liker} menyukai taruhan Anda!`, "#");
+    });
+
+    const pastComments = await contract.getPastEvents("CommentAdded", { fromBlock: "latest" });
+    pastComments.forEach(event => {
+        const { commenter, commentText } = event.returnValues;
+        showNotification(`${commenter} berkomentar: "${commentText}"`);
+        addNotification(`${commenter} berkomentar: "${commentText}"`, "#");
+    });
+}
+
+// 🔹 Ambil Data Jumlah Like dan Komentar
+async function updateCommentCount(betId) {
+    try {
+        const comments = await contract.methods.getComments(betId).call();
+        console.log(`Jumlah komentar untuk ${betId}: ${comments.length}`);
+    } catch (error) {
+        console.error("Gagal memperbarui jumlah komentar:", error);
+    }
+}
+
+async function getLikeCount(betId) {
+    try {
+        const likeCount = await contract.methods.getLikeCount(betId).call();
+        console.log(`Jumlah like untuk ${betId}: ${likeCount}`);
+    } catch (error) {
+        console.error("Gagal mendapatkan jumlah like:", error);
+    }
+}
+
+// 🔹 Minta Izin Notifikasi di Browser
+if (Notification.permission !== "granted") {
+    Notification.requestPermission();
+}
+
+// 🔹 Inisialisasi Listener saat Halaman Dimuat
+window.addEventListener("load", () => {
+    setupEventListeners();
+    checkPastEvents();
+});
 
 // 🔹 Mengecek Event Sebelumnya (Agar tidak ada notifikasi yang terlewat)
 async function checkPastEvents() {
