@@ -26,24 +26,80 @@
         .hidden { display: none; }
         .notification-item { cursor: pointer; padding: 5px; border-bottom: 1px solid #ddd; }
         .notification-item:hover { background: #f0f0f0; }
+
+        #notificationLists {
+    position: fixed;
+    top: 60px;
+    right: 10px;
+    width: 250px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    display: none;
+    z-index: 1000;
+}
+
+#notificationLists.hidden {
+    display: none;
+}
+
+#notificationIcons {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}
+
+#notificationIcons img {
+    width: 24px;
+    height: 24px;
+}
+
+#notificationBadges {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: red;
+    color: white;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 50%;
+}
+
+.notification-item {
+    padding: 5px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
+
+.notification-item:hover {
+    background: #f5f5f5;
+}
     </style>
 </head>
 <body>
-    <button id="connectWallet">Connect Wallet</button>
-<p id="walletAddress"></p>
-    <!-- Ikon Notifikasi -->
-    <div id="notificationIcons" onclick="toggleNotificationList()">
-        <img src="https://cdn-icons-png.flaticon.com/512/1827/1827310.png" alt="Notifications" width="30">
-        <span id="notificationBadges" class="hidden"></span>
-    </div>
 
-    <!-- Daftar Notifikasi -->
-    <div id="notificationLists">
-        <p><strong>Notifications</strong></p>
-        <ul id="notificationss"></ul>
-        <p id="noNotificationsMessages">No notifications</p>
-        <button onclick="closeNotificationLists()">Close</button>
+    <!-- Tombol Koneksi Wallet -->
+<button id="connectWallet">Connect Wallet</button>
+<p id="walletAddress"></p>
+
+<!-- Ikon Notifikasi -->
+<div id="notificationIcons">
+    <img src="img/bell.svg" alt="Notifications">
+    <span id="notificationBadges" class="hidden"></span>
+</div>
+
+<!-- Modal Daftar Notifikasi -->
+<div id="notificationLists" class="hidden">
+    <div class="notifications-header">
+        <p>Notifications</p>
+        <ul id="notificationss" aria-live="polite"></ul>
+        <p id="noNotificationsMessages" class="hidden">No notifications</p>
     </div>
+    <button onclick="closeNotificationList()">Close</button>
+</div>
 
     <script>
         let web3, provider, accounts, userAddress;
@@ -84,11 +140,16 @@ const noNotificationsMessage = document.getElementById("noNotificationsMessages"
 
 let notifications = [];
 
-// Toggle daftar notifikasi
+// Toggle daftar notifikasi sebagai modal popup
 function toggleNotificationList() {
-    notificationList.classList.toggle("hidden");
+    if (notificationList.classList.contains("hidden")) {
+        notificationList.classList.remove("hidden");
+    } else {
+        notificationList.classList.add("hidden");
+    }
 }
 
+// Tutup daftar notifikasi
 function closeNotificationList() {
     notificationList.classList.add("hidden");
 }
@@ -97,15 +158,18 @@ function closeNotificationList() {
 function addNotification(betId, message) {
     notifications.push({ betId, message });
 
+    // Tampilkan badge jumlah notifikasi
     notificationBadge.textContent = notifications.length;
     notificationBadge.classList.remove("hidden");
 
+    // Tambahkan notifikasi ke daftar
     const notifItem = document.createElement("li");
     notifItem.classList.add("notification-item");
     notifItem.textContent = message;
     notifItem.onclick = () => openPost(betId);
     notificationsContainer.appendChild(notifItem);
 
+    // Sembunyikan pesan "No notifications"
     noNotificationsMessage.classList.add("hidden");
 }
 
@@ -114,7 +178,7 @@ function openPost(betId) {
     window.location.href = `/post.html?betId=${betId}`;
 }
 
-// Setup event listener
+// Setup event listener dari smart contract
 function setupEventListeners(contract, ethersContract) {
     contract.events.BetLiked({ fromBlock: "latest" })
         .on("data", function (event) {
@@ -137,6 +201,7 @@ function setupEventListeners(contract, ethersContract) {
     });
 }
 
+notificationIcon.addEventListener("click", toggleNotificationList);
     </script>
 </body>
 </html>
