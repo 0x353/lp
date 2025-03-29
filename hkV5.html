@@ -1592,27 +1592,15 @@ async function loadBetHistory() {
     </button>
 
     <div class="like-options" id="likeContainer-${bet.betId}" style="display: none;">
-        <button onclick="likeBet('${bet.betId}', 'thumbs-up')">
-            <img src="img/thumbs-up.png" width="30" height="30">
-        </button>
-        <button onclick="likeBet('${bet.betId}', 'fire')">
-            <img src="img/fire.png" width="30" height="30">
-        </button>
-        <button onclick="likeBet('${bet.betId}', 'money-bag')">
-            <img src="img/money-bag.png" width="30" height="30">
-        </button>
-        <button onclick="likeBet('${bet.betId}', 'thinking')">
-            <img src="img/thinking.png" width="30" height="30">
-        </button>
-        <button onclick="likeBet('${bet.betId}', 'clap')">
-            <img src="img/clap.png" width="30" height="30">
-        </button>
-        <button onclick="likeBet('${bet.betId}', 'sad')">
-            <img src="img/sad.png" width="30" height="30">
-        </button>
-        <button onclick="likeBet('${bet.betId}', 'angry')">
-            <img src="img/angry.png" width="30" height="30">
-        </button>
+        <ul>
+            <li onclick="likeBet('${bet.betId}', 'congrats')">🎉 Congrats</li>
+            <li onclick="likeBet('${bet.betId}', 'jackpot')">💴 Jackpot</li>
+            <li onclick="likeBet('${bet.betId}', 'spirit')">🔥 Spirit</li>
+            <li onclick="likeBet('${bet.betId}', 'win')">🏆 Win</li>
+            <li onclick="likeBet('${bet.betId}', 'funny')">😂 Funny</li>
+            <li onclick="likeBet('${bet.betId}', 'sad')">😥 Sad</li>
+            <li onclick="likeBet('${bet.betId}', 'angry')">😡 Angry</li>
+        </ul>
     </div>
 
     <div id="likeStatus-${bet.betId}" class="like-status"></div>
@@ -1661,13 +1649,13 @@ function nextBetHistory() {
 
 // Reason
 const likeReasons = {
-    "thumbs-up": "Good bet!",
-    "fire": "Hot pick!",
-    "money-bag": "Big win potential!",
-    "thinking": "Interesting strategy!",
-    "clap": "Well played!",
-    "sad": "Unlucky bet!",
-    "angry": "Bad move!"
+    "congrats": "Congrats!",
+    "jackpot": "Big Jackpot!",
+    "spirit": "Keep the spirit!",
+    "win": "Great Win!",
+    "funny": "That's funny!",
+    "sad": "That's unfortunate.",
+    "angry": "That was bad!"
 };
 
 // Toggle opsi like (tampilkan/sembunyikan)
@@ -1686,11 +1674,16 @@ async function likeBet(betId, likeType) {
     let likeReason = likeReasons[likeType];
 
     try {
-        await contract.methods.likeBet(betId, likeType, likeReason).send({ from: userAddress });
+        const tx = await contract.methods.likeBet(betId, likeType, likeReason).send({ from: userAddress });
 
-        updateLikeUI(betId, likeType);
+        if (tx.status) {
+            updateLikeUI(betId, likeType);
+        } else {
+            alert("Transaction failed!");
+        }
     } catch (error) {
         console.error("Error liking bet:", error);
+        alert("Failed to like bet.");
     }
 }
 
