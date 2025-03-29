@@ -1730,20 +1730,18 @@ function updateLikeCount(betId, change) {
 
  // Comment Function
 function loadComments(betId, limit = 10) {
-    // Pastikan betId valid
     if (!betId) {
         console.error("betId tidak valid:", betId);
         return;
     }
 
-    // Cek apakah elemen status ada sebelum mengubah innerHTML
     let statusElement = document.getElementById(`status-${betId}`);
     if (statusElement) {
         statusElement.innerHTML = `<img src="loading.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: yellow;">Memuat komentar...</span>`;
     }
 
     contract.methods.getComments(betId).call().then((comments) => {
-        if (statusElement) statusElement.innerHTML = ""; // Pastikan elemen ada sebelum mengubah innerHTML
+        if (statusElement) statusElement.innerHTML = "";
 
         const commentListElement = document.getElementById(`commentList-${betId}`);
         if (!commentListElement) {
@@ -1774,7 +1772,6 @@ function loadComments(betId, limit = 10) {
                         <span style="color: gray; font-size: 9px; white-space: nowrap;">(${date})</span>
                     </div>
                     <p id="commentText-${betId}-${index}" style="margin: 5px 0;">${comment.text}</p>
-                    <br><br>
                     ${deleteButton} ${editButton}
                 </div>`;
             }
@@ -1789,7 +1786,7 @@ function loadComments(betId, limit = 10) {
     }).catch((error) => {
         console.error("Gagal memuat komentar:", error);
         if (statusElement) {
-            statusElement.innerHTML = `<img src="error.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: red;">Gagal memuat komentar.</span>`;
+            statusElement.innerHTML = `<span style="color: red;">Gagal memuat komentar.</span>`;
             setTimeout(() => {
                 statusElement.innerHTML = "";
             }, 3000);
@@ -1797,10 +1794,26 @@ function loadComments(betId, limit = 10) {
     });
 }
 
+function enableEdit(betId, index) {
+    let commentText = document.getElementById(`commentText-${betId}-${index}`);
+    let commentInput = document.getElementById(`commentInput-${betId}`);
+    let sendButton = document.getElementById(`sendBtn-${betId}`);
+
+    if (!commentText || !commentInput || !sendButton) {
+        console.error("Elemen tidak ditemukan");
+        return;
+    }
+
+    commentInput.value = commentText.innerText;
+    commentInput.dataset.editing = "true";
+    commentInput.dataset.index = index;
+    sendButton.innerText = "Simpan";
+}
+
 async function addOrUpdateComment(betId) {
     let commentInput = document.getElementById(`commentInput-${betId}`);
     let sendButton = document.getElementById(`sendBtn-${betId}`);
-    
+
     if (!commentInput || !sendButton) {
         console.error(`Element commentInput-${betId} atau sendBtn-${betId} tidak ditemukan.`);
         return;
@@ -1816,7 +1829,7 @@ async function addOrUpdateComment(betId) {
 
     let statusElement = document.getElementById(`status-${betId}`);
     if (statusElement) {
-        statusElement.innerHTML = `<img src="sending.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: blue;">${saveMode ? "Menyimpan perubahan..." : "Mengirim komentar..."}</span>`;
+        statusElement.innerHTML = `<span style="color: blue;">${saveMode ? "Menyimpan perubahan..." : "Mengirim komentar..."}</span>`;
     }
     
     sendButton.disabled = true;
@@ -1833,7 +1846,7 @@ async function addOrUpdateComment(betId) {
         commentInput.value = "";
         sendButton.innerText = "Kirim";
         if (statusElement) {
-            statusElement.innerHTML = `<img src="success.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: green;">Komentar berhasil disimpan.</span>`;
+            statusElement.innerHTML = `<span style="color: green;">Komentar berhasil disimpan.</span>`;
             setTimeout(() => {
                 statusElement.innerHTML = "";
             }, 3000);
@@ -1842,7 +1855,7 @@ async function addOrUpdateComment(betId) {
     } catch (error) {
         console.error("Gagal menyimpan komentar:", error);
         if (statusElement) {
-            statusElement.innerHTML = `<img src="error.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: red;">Gagal menyimpan komentar.</span>`;
+            statusElement.innerHTML = `<span style="color: red;">Gagal menyimpan komentar.</span>`;
             setTimeout(() => {
                 statusElement.innerHTML = "";
             }, 3000);
@@ -1857,13 +1870,13 @@ async function deleteComment(betId, index) {
 
     let statusElement = document.getElementById(`status-${betId}`);
     if (statusElement) {
-        statusElement.innerHTML = `<img src="deleting.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: orange;">Menghapus komentar...</span>`;
+        statusElement.innerHTML = `<span style="color: orange;">Menghapus komentar...</span>`;
     }
 
     try {
         await contract.methods.deleteComment(betId, index).send({ from: ethereum.selectedAddress });
         if (statusElement) {
-            statusElement.innerHTML = `<img src="success.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: green;">Komentar berhasil dihapus.</span>`;
+            statusElement.innerHTML = `<span style="color: green;">Komentar berhasil dihapus.</span>`;
             setTimeout(() => {
                 statusElement.innerHTML = "";
             }, 3000);
@@ -1872,7 +1885,7 @@ async function deleteComment(betId, index) {
     } catch (error) {
         console.error("Gagal menghapus komentar:", error);
         if (statusElement) {
-            statusElement.innerHTML = `<img src="error.png" width="16" height="16" style="vertical-align: middle;"> <span style="color: red;">Gagal menghapus komentar.</span>`;
+            statusElement.innerHTML = `<span style="color: red;">Gagal menghapus komentar.</span>`;
             setTimeout(() => {
                 statusElement.innerHTML = "";
             }, 3000);
