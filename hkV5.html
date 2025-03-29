@@ -1592,18 +1592,20 @@ async function loadBetHistory() {
     </button>
 
     <div class="like-options" id="likeContainer-${bet.betId}" style="display: none;">
-        <ul id="likeList-${bet.betId}">
-            <li data-betid="${bet.betId}" data-type="congrats">🎉 Congrats</li>
-            <li data-betid="${bet.betId}" data-type="jackpot">💴 Jackpot</li>
-            <li data-betid="${bet.betId}" data-type="spirit">🔥 Spirit</li>
-            <li data-betid="${bet.betId}" data-type="win">🏆 Win</li>
-            <li data-betid="${bet.betId}" data-type="funny">😂 Funny</li>
-            <li data-betid="${bet.betId}" data-type="sad">😥 Sad</li>
-            <li data-betid="${bet.betId}" data-type="angry">😡 Angry</li>
-        </ul>
+        <select id="likeType-${bet.betId}">
+            <option value="congrats">🎉 Congrats</option>
+            <option value="jackpot">💴 Jackpot</option>
+            <option value="spirit">🔥 Spirit</option>
+            <option value="win">🏆 Win</option>
+            <option value="funny">😂 Funny</option>
+            <option value="sad">😥 Sad</option>
+            <option value="angry">😡 Angry</option>
+        </select>
+        <input type="text" id="likeReason-${bet.betId}" placeholder="Tulis alasan...">
+        <button onclick="submitLike('${bet.betId}')">Submit Like</button>
     </div>
 
-    <div id="likeStatus-${bet.betId}" class="like-status"></div>
+    <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray;"></p>
 </div>
            
              <details class="comment-dropdown">
@@ -1648,66 +1650,70 @@ function nextBetHistory() {
 }
 
 // Reason
-const likeReasons = {
-    "congrats": "Congrats!",
-    "jackpot": "Big Jackpot!",
-    "spirit": "Keep the spirit!",
-    "win": "Great Win!",
-    "funny": "That's funny!",
-    "sad": "That's unfortunate.",
-    "angry": "That was bad!"
-};
-
-// Toggle opsi like (tampilkan/sembunyikan)
 function toggleLikeOptions(betId) {
-    let container = document.getElementById(`likeContainer-${betId}`);
+    const container = document.getElementById(`likeContainer-${betId}`);
     container.style.display = container.style.display === "none" ? "block" : "none";
 }
 
-// Tambahkan event listener ke setiap opsi like secara dinamis
-document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".like-options ul").forEach(list => {
-        list.addEventListener("click", function (event) {
-            if (event.target.tagName === "LI") {
-                let betId = event.target.dataset.betid;
-                let likeType = event.target.dataset.type;
-                likeBet(betId, likeType);
-            }
-        });
-    });
-});
-
-// Fungsi untuk mengirim transaksi like ke blockchain
-async function likeBet(betId, likeType) {
-    let userHasLiked = await contract.methods.hasUserLiked(betId, userAddress).call();
-    if (userHasLiked) {
-        alert("You already liked this bet.");
+async function submitLike(betId) {
+    if (typeof window.ethereum === "undefined") {
+        alert("MetaMask belum terinstal!");
         return;
     }
 
-    let likeReason = likeReasons[likeType];
+    const web3 = new Web3(window.ethereum);
+    await window.ethereum.request({ method: "eth_requestAccounts" });
+
+    const accounts = await web3.eth.getAccounts();
+    const userAddress = accounts[0];
+
+    const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+    // Cek apakah user sudah like sebelumnya
+    const hasLiked = await contract.methods.betLikes(betId, userAddress).call();
+    if (hasLiked) {
+        alert("Kamu sudah like bet ini!");
+        return;
+    }
+
+    const likeType = document.getElementById(`likeType-${betId}`).value;
+    const likeReason = document.getElementById(`likeReason-${betId}`).value || "No reason given";
+
+    // Tampilkan loading
+    document.getElementById(`likeStatus-${betId}`).innerText = "Processing...";
 
     try {
-        const tx = await contract.methods.likeBet(betId, likeType, likeReason).send({ from: userAddress });
+        const tx = await contract.methods.likeBet(betId, likeType, likeReason).send({
+            from: userAddress,
+            gas: 300000,
+        });
 
-        if (tx.status) {
-            updateLikeUI(betId, likeType);
-        } else {
-            alert("Transaction failed!");
-        }
+        console.log("Transaction Hash:", tx.transactionHash);
+        alert("Like berhasil dikirim!");
+
+        // Update UI setelah sukses
+        updateLikeStatus(betId);
+
+        // Hapus loading
+        document.getElementById(`likeStatus-${betId}`).innerText = "Like berhasil!";
     } catch (error) {
-        console.error("Error liking bet:", error);
-        alert("Failed to like bet.");
+        console.error("Gagal mengirim like:", error);
+        alert("Gagal mengirim like. Lihat console untuk detail.");
+        document.getElementById(`likeStatus-${betId}`).innerText = "Gagal!";
     }
 }
 
-// Update UI setelah like berhasil
-function updateLikeUI(betId, likeType) {
-    let statusElement = document.getElementById(`likeStatus-${betId}`);
-    statusElement.innerHTML = `<p style="color: gray;">You reacted: ${likeReasons[likeType]}</p>`;
-
-    // Sembunyikan opsi setelah memilih
-    document.getElementById(`likeContainer-${betId}`).style.display = "none";
+async function updateLikeStatus(betId) {
+    const contract = new web3.eth.Contract(contractABI, contractAddress);
+    
+    try {
+        const likeCount = await contract.methods.betLikeCount(betId).call();
+        document.getElementById(`likeStatus-${betId}`).innerHTML = `
+            Total Likes: <span style="color: #00cc51;">${likeCount}</span>
+        `;
+    } catch (error) {
+        console.error("Gagal mengambil data like:", error);
+    }
 }
         
 // Like Function
