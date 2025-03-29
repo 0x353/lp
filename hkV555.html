@@ -1688,8 +1688,8 @@ async function loadBetHistory() {
         <hr style="background-color: #333333; height: 1px; border: none;">`;
     }
 
-    document.getElementById("betHistory").innerHTML = html;
-
+    document.getElementById("betHistory").insertAdjacentHTML("beforeend", html);
+    
     // Update status like untuk setiap bet yang dimuat
     for (let i = start; i < end; i++) {
         let bet = filteredBets[i];
