@@ -1813,7 +1813,7 @@ function enableEdit(betId, index) {
 async function addOrUpdateComment(betId) {
     let commentInput = document.getElementById(`commentInput-${betId}`);
     let sendButton = document.getElementById(`sendBtn-${betId}`);
-
+    
     if (!commentInput || !sendButton) {
         console.error(`Element commentInput-${betId} atau sendBtn-${betId} tidak ditemukan.`);
         return;
@@ -1835,12 +1835,14 @@ async function addOrUpdateComment(betId) {
     sendButton.disabled = true;
 
     try {
+        const userAddress = await ensureMetamask();
+
         if (saveMode) {
-            await contract.methods.editComment(betId, commentIndex, commentInput.value).send({ from: ethereum.selectedAddress });
+            await contract.methods.editComment(betId, commentIndex, commentInput.value).send({ from: userAddress });
             commentInput.dataset.editing = "false";
             commentInput.dataset.index = "";
         } else {
-            await contract.methods.addComment(betId, commentInput.value).send({ from: ethereum.selectedAddress });
+            await contract.methods.addComment(betId, commentInput.value).send({ from: userAddress });
         }
 
         commentInput.value = "";
@@ -1874,7 +1876,9 @@ async function deleteComment(betId, index) {
     }
 
     try {
-        await contract.methods.deleteComment(betId, index).send({ from: ethereum.selectedAddress });
+        const userAddress = await ensureMetamask();
+        await contract.methods.deleteComment(betId, index).send({ from: userAddress });
+
         if (statusElement) {
             statusElement.innerHTML = `<span style="color: green;">Komentar berhasil dihapus.</span>`;
             setTimeout(() => {
@@ -1890,7 +1894,7 @@ async function deleteComment(betId, index) {
                 statusElement.innerHTML = "";
             }, 3000);
         }
-    }
+    }    
 }
 
 async function updateCommentCount(betId) {
