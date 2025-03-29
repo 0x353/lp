@@ -1824,14 +1824,23 @@ async function addOrUpdateComment(betId) {
         return;
     }
 
-    const gasOptions = {
-        from: ethereum.selectedAddress,
-        gas: 50000, // Anda bisa menyesuaikan gas limit jika diperlukan
-        maxFeePerGas: web3.utils.toWei("0.0002", "gwei"),
-        maxPriorityFeePerGas: web3.utils.toWei("0.00018", "gwei")
-    };
-
     try {
+        
+         let gasEstimate;
+        if (saveMode) {
+            gasEstimate = await contract.methods.editComment(betId, commentIndex, commentInput.value).estimateGas({ from: ethereum.selectedAddress });
+        } else {
+            gasEstimate = await contract.methods.addComment(betId, commentInput.value).estimateGas({ from: ethereum.selectedAddress });
+        }
+
+        // Gas options
+        const gasOptions = {
+            from: ethereum.selectedAddress,
+            gas: gasEstimate + 50000,  // Menambahkan buffer
+            maxFeePerGas: web3.utils.toWei("0.0002", "gwei"),
+            maxPriorityFeePerGas: web3.utils.toWei("0.00018", "gwei")
+        };
+        
         if (saveMode) {
             // Mode Edit
             await contract.methods.editComment(betId, commentIndex, commentInput.value).send({ from: ethereum.selectedAddress });
@@ -1899,19 +1908,23 @@ function disableEdit(betId) {
     }
 }
 
-// Fungsi untuk menghapus komentar
 async function deleteComment(betId, index) {
     if (!confirm("Apakah Anda yakin ingin menghapus komentar ini?")) return;
 
-    const gasOptions = {
-        from: ethereum.selectedAddress,
-        gas: 50000, // Anda bisa menyesuaikan gas limit jika diperlukan
-        maxFeePerGas: web3.utils.toWei("0.00025", "gwei"),
-        maxPriorityFeePerGas: web3.utils.toWei("0.00023", "gwei")
-    };
-
     try {
-        await contract.methods.deleteComment(betId, index).send({ from: ethereum.selectedAddress });
+        // Estimasi gas
+        const gasEstimate = await contract.methods.deleteComment(betId, index).estimateGas({ from: ethereum.selectedAddress });
+
+        // Gas options
+        const gasOptions = {
+            from: ethereum.selectedAddress,
+            gas: gasEstimate + 50000,  // Menambahkan buffer
+            maxFeePerGas: web3.utils.toWei("0.00025", "gwei"),
+            maxPriorityFeePerGas: web3.utils.toWei("0.00023", "gwei")
+        };
+
+        // Eksekusi transaksi
+        await contract.methods.deleteComment(betId, index).send(gasOptions);
         await loadComments(betId); // Refresh komentar
     } catch (error) {
         console.error("Gagal menghapus komentar:", error);
