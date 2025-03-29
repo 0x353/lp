@@ -1572,37 +1572,33 @@ async function loadBetHistory() {
             
             Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
             
-            <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" 
-            style="background-color: #000000; color: white; border: none; padding: 5px 10px; 
-               cursor: pointer; margin-top: 5px;">
-             <img src="img/like.svg" alt="Like" 
-             style="width: 11px; height: 11px; vertical-align: middle;">
-             </button> 
-
-             <span id="likeCount-${bet.betId}" 
-             style="margin-left: 10px; color: #00cc51; font-size: 15px; font-weight: bold;">
-             0
-             </span> Likes 
-
-             <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p> 
-
-             <div>
+            <div>
     <button onclick="toggleLikeOptions('${bet.betId}')" id="toggleLikeBtn-${bet.betId}">
         <img src="img/like.svg" width="20" height="20"> Like
     </button>
 
     <div class="like-options" id="likeContainer-${bet.betId}" style="display: none;">
-        <select id="likeType-${bet.betId}">
-            <option value="congrats">🎉 Congrats</option>
-            <option value="jackpot">💴 Jackpot</option>
-            <option value="spirit">🔥 Spirit</option>
-            <option value="win">🏆 Win</option>
-            <option value="funny">😂 Funny</option>
-            <option value="sad">😥 Sad</option>
-            <option value="angry">😡 Angry</option>
-        </select>
-        <input type="text" id="likeReason-${bet.betId}" placeholder="Tulis alasan...">
-        <button onclick="submitLike('${bet.betId}')">Submit Like</button>
+        <button onclick="submitLike('${bet.betId}', 'congrats')">
+            <img src="img/congrats.png" width="20" height="20">
+        </button>
+        <button onclick="submitLike('${bet.betId}', 'jackpot')">
+            <img src="img/jackpot.png" width="20" height="20">
+        </button>
+        <button onclick="submitLike('${bet.betId}', 'spirit')">
+            <img src="img/spirit.png" width="20" height="20">
+        </button>
+        <button onclick="submitLike('${bet.betId}', 'win')">
+            <img src="img/win.png" width="20" height="20">
+        </button>
+        <button onclick="submitLike('${bet.betId}', 'funny')">
+            <img src="img/funny.png" width="20" height="20">
+        </button>
+        <button onclick="submitLike('${bet.betId}', 'sad')">
+            <img src="img/sad.png" width="20" height="20">
+        </button>
+        <button onclick="submitLike('${bet.betId}', 'angry')">
+            <img src="img/angry.png" width="20" height="20">
+        </button>
     </div>
 
     <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray;"></p>
@@ -1650,71 +1646,103 @@ function nextBetHistory() {
 }
 
 // Reason
-function toggleLikeOptions(betId) {
-    const container = document.getElementById(`likeContainer-${betId}`);
-    container.style.display = container.style.display === "none" ? "block" : "none";
-}
-
-async function submitLike(betId) {
-    if (typeof window.ethereum === "undefined") {
-        alert("MetaMask belum terinstal!");
-        return;
-    }
-
-    const web3 = new Web3(window.ethereum);
-    await window.ethereum.request({ method: "eth_requestAccounts" });
-
-    const accounts = await web3.eth.getAccounts();
-    const userAddress = accounts[0];
-
-    const contract = new web3.eth.Contract(contractABI, contractAddress);
-
-    // Cek apakah user sudah like sebelumnya
-    const hasLiked = await contract.methods.betLikes(betId, userAddress).call();
-    if (hasLiked) {
-        alert("Kamu sudah like bet ini!");
-        return;
-    }
-
-    const likeType = document.getElementById(`likeType-${betId}`).value;
-    const likeReason = document.getElementById(`likeReason-${betId}`).value || "No reason given";
-
-    // Tampilkan loading
-    document.getElementById(`likeStatus-${betId}`).innerText = "Processing...";
-
+async function toggleLike(betId) {
     try {
-        const tx = await contract.methods.likeBet(betId, likeType, likeReason).send({
-            from: userAddress,
-            gas: 300000,
-        });
+        if (typeof window.ethereum === "undefined") {
+            alert("MetaMask tidak ditemukan! Silakan instal MetaMask.");
+            return;
+        }
 
-        console.log("Transaction Hash:", tx.transactionHash);
-        alert("Like berhasil dikirim!");
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        if (!accounts || accounts.length === 0) {
+            alert("Silakan hubungkan dompet MetaMask Anda.");
+            return;
+        }
 
-        // Update UI setelah sukses
-        updateLikeStatus(betId);
+        const userAccount = accounts[0];
+        const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-        // Hapus loading
-        document.getElementById(`likeStatus-${betId}`).innerText = "Like berhasil!";
+        // Cek apakah user sudah like sebelumnya
+        const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
+        const button = document.getElementById(`likeButton-${betId}`);
+        const statusElement = document.getElementById(`likeStatus-${betId}`);
+
+        statusElement.innerText = "Proses transaksi...";
+
+        let estimatedGas;
+        if (liked) {
+            estimatedGas = await contract.methods.unlikeBet(betId).estimateGas({ from: userAccount });
+        } else {
+            estimatedGas = await contract.methods.likeBet(betId, "👍").estimateGas({ from: userAccount });
+        }
+
+        // Tambahkan buffer agar transaksi tidak gagal
+        const gasOptions = {
+            from: userAccount,
+            gas: estimatedGas + 50000, // Tambahkan buffer
+            maxFeePerGas: web3.utils.toWei("0.0015", "gwei"),  
+            maxPriorityFeePerGas: web3.utils.toWei("0.0014", "gwei") 
+        };
+
+        if (liked) {
+            await contract.methods.unlikeBet(betId).send(gasOptions)
+                .on("receipt", function (receipt) {
+                    console.log("Unlike berhasil:", receipt);
+                    button.style.backgroundColor = "#000000"; 
+                    button.innerHTML = `<img src="img/like.svg" alt="Like" style="width: 16px; height: 16px;">`;
+                    statusElement.innerText = "Unlike berhasil!";
+                    updateLikeCount(betId, -1); // Kurangi jumlah like
+                })
+                .on("error", function (error) {
+                    console.error("Error saat unlike:", error);
+                    statusElement.innerText = "Unlike gagal!";
+                });
+        } else {
+            await contract.methods.likeBet(betId, "👍").send(gasOptions)
+                .on("receipt", function (receipt) {
+                    console.log("Like berhasil:", receipt);
+                    button.style.backgroundColor = "#ff1a1e"; 
+                    button.innerHTML = `<img src="img/dislike.svg" alt="Unlike" style="width: 16px; height: 16px;">`;
+                    statusElement.innerText = "Like berhasil!";
+                    updateLikeCount(betId, 1); // Tambah jumlah like
+                })
+                .on("error", function (error) {
+                    console.error("Error saat like:", error);
+                    statusElement.innerText = "Like gagal!";
+                });
+        }
     } catch (error) {
-        console.error("Gagal mengirim like:", error);
-        alert("Gagal mengirim like. Lihat console untuk detail.");
-        document.getElementById(`likeStatus-${betId}`).innerText = "Gagal!";
+        console.error("Gagal memproses like/unlike:", error);
     }
 }
 
-async function updateLikeStatus(betId) {
-    const contract = new web3.eth.Contract(contractABI, contractAddress);
-    
+// Fungsi untuk memperbarui jumlah like di UI
+async function updateLikeCount(betId, change = 0) {
     try {
-        const likeCount = await contract.methods.betLikeCount(betId).call();
-        document.getElementById(`likeStatus-${betId}`).innerHTML = `
-            Total Likes: <span style="color: #00cc51;">${likeCount}</span>
-        `;
+        const contract = new web3.eth.Contract(contractABI, contractAddress);
+        const likeCount = await contract.methods.getLikeCount(betId).call();
+        const likeCountElement = document.getElementById(`likeCount-${betId}`);
+
+        // Jika ada perubahan jumlah like, update UI
+        if (change !== 0) {
+            let currentCount = parseInt(likeCountElement.innerText, 10);
+            likeCountElement.innerText = currentCount + change;
+        } else {
+            likeCountElement.innerText = likeCount;
+        }
     } catch (error) {
-        console.error("Gagal mengambil data like:", error);
+        console.error("Gagal memperbarui jumlah like:", error);
     }
 }
+
+// Ambil jumlah like saat halaman dimuat
+window.addEventListener("load", async function() {
+    const allBetIds = document.querySelectorAll("[id^=likeCount-]");
+    allBetIds.forEach(async (element) => {
+        const betId = element.id.replace("likeCount-", "");
+        await updateLikeCount(betId);
+    });
+});
         
 // Like Function
 async function toggleLike(betId) {
