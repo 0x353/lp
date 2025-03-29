@@ -1237,9 +1237,11 @@ function showNotification(message) {
 
     console.log("Popup shown!"); // Debugging
 
-    const audio = new Audio('bell.mp3');
-    audio.play().catch(error => console.log('Audio tidak bisa diputar:', error));
-
+    let audio = document.getElementById("notificationSound");
+    if (audio) {
+        audio.play().catch(error => console.log('Audio tidak bisa diputar:', error));
+    }
+    
     setTimeout(() => {
         popup.classList.remove("show");
         setTimeout(() => {
@@ -1268,11 +1270,13 @@ function updateNotificationStatus() {
     const notificationsList = document.getElementById("notifications");
     const noNotificationsMessage = document.getElementById("noNotificationsMessage");
 
-    if (notificationsList.children.length === 0) {
-        noNotificationsMessage.classList.remove("hidden"); // Tampilkan pesan
-    } else {
-        noNotificationsMessage.classList.add("hidden"); // Sembunyikan pesan
-    }
+    setTimeout(() => {
+        if (notificationsList.children.length === 0) {
+            noNotificationsMessage.classList.remove("hidden"); // Tampilkan pesan
+        } else {
+            noNotificationsMessage.classList.add("hidden"); // Sembunyikan pesan
+        }
+    }, 100); // Delay kecil untuk memastikan elemen terupdate
 }
 
 // **Close Popup**
