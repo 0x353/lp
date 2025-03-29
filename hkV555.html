@@ -1138,6 +1138,8 @@ window.addEventListener("load", async () => {
                     loadBetHistory();
                     checkForWinnings();                   
                     updateNotificationStatus();
+                    setupEventListeners();
+                    checkPastEvents();
 
                     // **Perbaikan: Ganti getAllBetIds() dengan getAllBets()**
                     const allBets = await contract.methods.getAllBets().call();
@@ -1172,13 +1174,15 @@ async function checkForWinnings() {
     }
 }
 
-// **Event Listener untuk Like & Komentar**
-async function setupEventListeners() {
+// 🔹 Event Listener untuk Like & Komentar
+function setupEventListeners() {
     if (!contract) return;
-    
+
     contract.events.BetLiked()
         .on("data", (event) => {
             const { liker } = event.returnValues;
+            console.log("Event BetLiked diterima:", liker);
+
             showNotification(`${liker} menyukai postingan Anda!`);
             addNotification(`${liker} menyukai postingan Anda!`, "#");
         })
@@ -1187,10 +1191,31 @@ async function setupEventListeners() {
     contract.events.BetCommented()
         .on("data", (event) => {
             const { commenter, comment } = event.returnValues;
+            console.log("Event BetCommented diterima:", commenter, comment);
+
             showNotification(`${commenter} berkomentar: "${comment}"`);
             addNotification(`${commenter} berkomentar: "${comment}"`, "#");
         })
         .on("error", console.error);
+}
+
+// 🔹 Mengecek Event Sebelumnya (Agar tidak ada notifikasi yang terlewat)
+async function checkPastEvents() {
+    if (!contract) return;
+
+    const pastLikes = await contract.getPastEvents("BetLiked", { fromBlock: "latest" });
+    pastLikes.forEach(event => {
+        const { liker } = event.returnValues;
+        showNotification(`${liker} menyukai postingan Anda!`);
+        addNotification(`${liker} menyukai postingan Anda!`, "#");
+    });
+
+    const pastComments = await contract.getPastEvents("BetCommented", { fromBlock: "latest" });
+    pastComments.forEach(event => {
+        const { commenter, comment } = event.returnValues;
+        showNotification(`${commenter} berkomentar: "${comment}"`);
+        addNotification(`${commenter} berkomentar: "${comment}"`, "#");
+    });
 }
 
 // **Add Notification**
@@ -1314,6 +1339,8 @@ async function connectWallet() {
             loadBetHistory();
             checkForWinnings();
             updateNotificationStatus();
+            setupEventListeners();
+            checkPastEvents();
 
             // **Perbaikan: Ganti getAllBetIds() dengan getAllBets()**
             const allBets = await contract.methods.getAllBets().call();
