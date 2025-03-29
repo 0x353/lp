@@ -1671,8 +1671,8 @@ async function toggleLike(betId) {
         const gasOptions = {
             from: userAccount,
             gas: estimatedGas + 50000, // Tambahkan buffer
-            maxFeePerGas: web3.utils.toWei("0.0015", "gwei"),  
-            maxPriorityFeePerGas: web3.utils.toWei("0.0014", "gwei") 
+            maxFeePerGas: web3.utils.toWei("0.0002", "gwei"),  
+            maxPriorityFeePerGas: web3.utils.toWei("0.00018", "gwei") 
         };
 
         if (liked) {
@@ -1824,6 +1824,13 @@ async function addOrUpdateComment(betId) {
         return;
     }
 
+    const gasOptions = {
+        from: ethereum.selectedAddress,
+        gas: 50000, // Anda bisa menyesuaikan gas limit jika diperlukan
+        maxFeePerGas: web3.utils.toWei("0.0002", "gwei"),
+        maxPriorityFeePerGas: web3.utils.toWei("0.00018", "gwei")
+    };
+
     try {
         if (saveMode) {
             // Mode Edit
@@ -1895,6 +1902,13 @@ function disableEdit(betId) {
 // Fungsi untuk menghapus komentar
 async function deleteComment(betId, index) {
     if (!confirm("Apakah Anda yakin ingin menghapus komentar ini?")) return;
+
+    const gasOptions = {
+        from: ethereum.selectedAddress,
+        gas: 50000, // Anda bisa menyesuaikan gas limit jika diperlukan
+        maxFeePerGas: web3.utils.toWei("0.00025", "gwei"),
+        maxPriorityFeePerGas: web3.utils.toWei("0.00023", "gwei")
+    };
 
     try {
         await contract.methods.deleteComment(betId, index).send({ from: ethereum.selectedAddress });
