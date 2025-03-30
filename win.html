@@ -47,7 +47,7 @@
     </table>
 
     <script>
-        const provider = new ethers.JsonRpcProvider("https://sepolia.base.org"); // Ganti dengan RPC yang sesuai
+        const provider = new ethers.JsonRpcProvider("https://sepolia.base.org"); // Pastikan ini RPC yang valid
 
         const contractAddress = "0xA6074b47915d155B5EB097c446fc9d850A4C6E60"; // Ganti dengan alamat kontrak
         const abi = [
@@ -57,25 +57,29 @@
         const contract = new ethers.Contract(contractAddress, abi, provider);
 
         async function fetchWinners() {
-            const filter = contract.filters.WinnerSet();
-            const logs = await provider.getLogs({
-                fromBlock: "latest", // Bisa diganti dengan block awal yang diinginkan
-                toBlock: "latest",
-                address: contractAddress,
-                topics: filter.topics
-            });
+            try {
+                const logs = await contract.queryFilter("WinnerSet", 0, "latest"); // Ambil semua event dari block 0
+                console.log("Event logs:", logs);
 
-            const winners = logs.map(log => {
-                const parsed = contract.interface.parseLog(log);
-                return {
-                    betId: parsed.args.betId,
-                    winner: parsed.args.winner,
-                    amount: ethers.formatEther(parsed.args.amount),
-                    number: parsed.args.number
-                };
-            });
+                if (logs.length === 0) {
+                    document.getElementById("winnerTable").innerHTML = `<tr><td colspan="4">No winners yet</td></tr>`;
+                    return;
+                }
 
-            displayWinners(winners);
+                const winners = logs.map(log => {
+                    return {
+                        betId: log.args.betId.toString(),
+                        winner: log.args.winner,
+                        amount: ethers.formatEther(log.args.amount),
+                        number: log.args.number.toString()
+                    };
+                });
+
+                displayWinners(winners);
+            } catch (error) {
+                console.error("Error fetching winners:", error);
+                document.getElementById("winnerTable").innerHTML = `<tr><td colspan="4">Error loading winners</td></tr>`;
+            }
         }
 
         function displayWinners(winners) {
