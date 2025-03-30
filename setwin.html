@@ -371,6 +371,42 @@ async function withdrawETH() {
         statusElement.style.color = "red";
     }
 }
+
+async function getAllWinners() { try { const betCount = await contract.methods.getBetCount().call(); let winners = [];
+
+for (let i = 0; i < betCount; i++) {
+        const bet = await contract.methods.bets(i).call();
+        if (bet.winner !== "0x0000000000000000000000000000000000000000") {
+            winners.push({
+                betId: i,
+                winner: bet.winner,
+                betNumber: bet.betNumber,
+                prizeAmount: web3.utils.fromWei(bet.prizeAmount, "ether"),
+            });
+        }
+    }
+    
+    displayWinners(winners);
+} catch (error) {
+    console.error("Error fetching winners:", error);
+}
+
+}
+
+function displayWinners(winners) { const winnersList = document.getElementById("winnersList"); winnersList.innerHTML = "";
+
+winners.forEach(winner => {
+    const listItem = document.createElement("li");
+    listItem.textContent = `Bet ID: ${winner.betId} | Winner: ${winner.winner} | Bet Number: ${winner.betNumber} | Prize: ${winner.prizeAmount} ETH`;
+    winnersList.appendChild(listItem);
+});
+
+}
+
+// Panggil fungsi saat halaman dimuat atau setelah transaksi berhasil
+        document.addEventListener("DOMContentLoaded", getAllWinners);
+
+        
     </script>
 
 </body>
