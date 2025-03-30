@@ -40,11 +40,10 @@ const betChart = new Chart(ctx, {
             borderWidth: 2,
             fill: true,
             backgroundColor: (context) => {
-                const { chart } = context;
-                const { ctx, chartArea } = chart;
-                if (!chartArea) return null;
-                return createGradient(ctx, chartArea);
-            },
+    const { chart } = context;
+    if (!chart.chartArea) return 'rgba(0, 123, 255, 0.5)'; // Default warna sementara
+    return createGradient(chart.ctx, chart.chartArea);
+},
             tension: 0.2
         }]
     },
