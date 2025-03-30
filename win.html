@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,78 +26,80 @@
         }
     </style>
 </head>
-<body>
+<body><h2>Winner List</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Bet ID</th>
+            <th>Winner</th>
+            <th>Amount (ETH)</th>
+            <th>Number</th>
+        </tr>
+    </thead>
+    <tbody id="winnerTable">
+        <tr>
+            <td colspan="4">Loading...</td>
+        </tr>
+    </tbody>
+</table>
 
-    <h2>Winner List</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Bet ID</th>
-                <th>Winner</th>
-                <th>Amount (ETH)</th>
-                <th>Number</th>
-            </tr>
-        </thead>
-        <tbody id="winnerTable">
-            <tr>
-                <td colspan="4">Loading...</td>
-            </tr>
-        </tbody>
-    </table>
+<script>
+    const provider = new ethers.JsonRpcProvider("https://base-sepolia.blockpi.network/v1/rpc/public"); // Pastikan RPC valid
+    const contractAddress = "0xA6074b47915d155B5EB097c446fc9d850A4C6E60"; // Ganti dengan alamat kontrak yang benar
+    const abi = ["event WinnerSet(bytes32 betId, address winner, uint256 amount, uint256 number)"];
 
-    <script>
-        const provider = new ethers.JsonRpcProvider("https://sepolia.base.org"); // Pastikan ini RPC yang valid
+    const contract = new ethers.Contract(contractAddress, abi, provider);
 
-        const contractAddress = "0xA6074b47915d155B5EB097c446fc9d850A4C6E60"; // Ganti dengan alamat kontrak
-        const abi = [
-            "event WinnerSet(bytes32 betId, address winner, uint256 amount, uint256 number)"
-        ];
-
-        const contract = new ethers.Contract(contractAddress, abi, provider);
-
-        async function fetchWinners() {
-            try {
-                const logs = await contract.queryFilter("WinnerSet", 0, "latest"); // Ambil semua event dari block 0
-                console.log("Event logs:", logs);
-
-                if (logs.length === 0) {
-                    document.getElementById("winnerTable").innerHTML = `<tr><td colspan="4">No winners yet</td></tr>`;
-                    return;
-                }
-
-                const winners = logs.map(log => {
-                    return {
-                        betId: log.args.betId.toString(),
-                        winner: log.args.winner,
-                        amount: ethers.formatEther(log.args.amount),
-                        number: log.args.number.toString()
-                    };
-                });
-
-                displayWinners(winners);
-            } catch (error) {
-                console.error("Error fetching winners:", error);
-                document.getElementById("winnerTable").innerHTML = `<tr><td colspan="4">Error loading winners</td></tr>`;
-            }
-        }
-
-        function displayWinners(winners) {
-            const table = document.getElementById("winnerTable");
-            table.innerHTML = "";
-
-            winners.forEach(winner => {
-                const row = `<tr>
-                    <td>${winner.betId}</td>
-                    <td>${winner.winner}</td>
-                    <td>${winner.amount}</td>
-                    <td>${winner.number}</td>
-                </tr>`;
-                table.innerHTML += row;
+    async function fetchWinners() {
+        try {
+            const logs = await provider.getLogs({
+                fromBlock: 0, // Ganti dengan block awal yang sesuai jika perlu
+                toBlock: "latest",
+                address: contractAddress,
+                topics: [ethers.id("WinnerSet(bytes32,address,uint256,uint256)")] // Filter event berdasarkan topic hash
             });
-        }
 
-        fetchWinners();
-    </script>
+            console.log("Logs fetched:", logs);
+
+            if (logs.length === 0) {
+                document.getElementById("winnerTable").innerHTML = `<tr><td colspan="4">No winners yet</td></tr>`;
+                return;
+            }
+
+            const winners = logs.map(log => {
+                const parsedLog = contract.interface.parseLog(log);
+                return {
+                    betId: parsedLog.args.betId.toString(),
+                    winner: parsedLog.args.winner,
+                    amount: ethers.formatEther(parsedLog.args.amount),
+                    number: parsedLog.args.number.toString()
+                };
+            });
+
+            displayWinners(winners);
+        } catch (error) {
+            console.error("Error fetching winners:", error);
+            document.getElementById("winnerTable").innerHTML = `<tr><td colspan="4">Error loading winners</td></tr>`;
+        }
+    }
+
+    function displayWinners(winners) {
+        const table = document.getElementById("winnerTable");
+        table.innerHTML = "";
+
+        winners.forEach(winner => {
+            const row = `<tr>
+                <td>${winner.betId}</td>
+                <td>${winner.winner}</td>
+                <td>${winner.amount}</td>
+                <td>${winner.number}</td>
+            </tr>`;
+            table.innerHTML += row;
+        });
+    }
+
+    fetchWinners();
+</script>
 
 </body>
 </html>
