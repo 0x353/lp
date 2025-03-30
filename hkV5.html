@@ -848,6 +848,18 @@ textarea:focus {
 
     display: none;
 }
+
+}
+        .box {
+            width: 80%;
+            max-width: 600px;
+            height: 400px;
+            background-color: #000000;
+            box-shadow: 0 0 25px rgba(0, 0, 255, 0.3);
+            border-radius: 10px;
+            overflow-y: auto;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
@@ -922,6 +934,7 @@ textarea:focus {
        <h2>Public Bet History</h2>
        <button onclick="window.open('search', '_blank')"><img src="img/search.svg" alt="Lotto" style="width: 15px; height: 15px;">  Search...</button><br><br>
        <hr style="background-color: #333333; height: 1px; border: none;">
+       <div class="box">
        <div id="betHistory"></div>
        <div class="button-container">
        <button class="nav-button" onclick="prevBetHistory()">Prev</button>
