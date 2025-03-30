@@ -935,13 +935,13 @@ textarea:focus {
        <button onclick="window.open('search', '_blank')"><img src="img/search.svg" alt="Lotto" style="width: 15px; height: 15px;">  Search...</button><br><br>
        <hr style="background-color: #333333; height: 1px; border: none;">
        <div class="box-container">
-       <div id="betHistory">
+    <div id="betHistory" class="box">
+    </div>
+    <div class="button-container">
+        <button class="nav-button" onclick="prevBetHistory()">Prev</button>
+        <button class="nav-button" onclick="nextBetHistory()">Next</button>
+    </div>
        </div>
-       <div class="button-container">
-       <button class="nav-button" onclick="prevBetHistory()">Prev</button>
-       <button class="nav-button" onclick="nextBetHistory()">Next</button>
-       </div>
-     </div>
         <br>
 
        <!-- Prize Table -->
