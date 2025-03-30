@@ -1,24 +1,53 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Betting Chart</title>
+    <title>Live Crypto-Like Betting Chart</title>
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            max-width: 90vw;
+            max-height: 60vh;
+            margin: 20px auto;
+            display: block;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.2);
+        }
+        select {
+            padding: 10px;
+            font-size: 16px;
+            margin-top: 10px;
+            border-radius: 5px;
+            background: #0f3460;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        select:hover {
+            background: #1f4068;
+        }
+    </style>
 </head>
 <body>
-    <label for="chartType">Pilih Model Chart:</label>
-    <select id="chartType" onchange="changeChartType()">
-        <option value="line">Line Chart</option>
-        <option value="step">Step Chart (Binary-Like)</option>
+    <h1>Live Crypto Betting Chart</h1>
+    <canvas id="betChart"></canvas>
+    <br>
+    <label for="chartType">Pilih Jenis Chart:</label>
+    <select id="chartType">
+        <option value="line">Line</option>
+        <option value="bar">Bar</option>
         <option value="candlestick">Candlestick</option>
     </select>
-
-    <canvas id="betChart"></canvas>
 
     <script>
         const provider = new ethers.providers.JsonRpcProvider("https://mainnet.infura.io/v3/YOUR_INFURA_KEY");
@@ -27,88 +56,60 @@
         const contract = new ethers.Contract(contractAddress, contractABI, provider);
 
         let betData = [];
-        let candlestickData = [];
         let lastBet = 10;
 
         const ctx = document.getElementById('betChart').getContext('2d');
-        let currentChartType = "line";
-        let betChart = createChart("line");
-
-        function createChart(type) {
-            if (betChart) betChart.destroy();
-            
-            return new Chart(ctx, {
-                type: type === "candlestick" ? "candlestick" : "line",
-                data: {
-                    datasets: [{
-                        label: 'Jumlah Taruhan',
-                        data: type === "candlestick" ? candlestickData : betData,
-                        borderColor: 'blue',
-                        borderWidth: 2,
-                        fill: false,
-                        tension: type === "step" ? 0 : 0.2, // Step Chart pakai tension: 0
-                        stepped: type === "step" ? "before" : false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        x: { type: 'time', time: { unit: 'minute' }, title: { display: true, text: 'Waktu' }},
-                        y: { title: { display: true, text: 'Jumlah Taruhan' }}
-                    },
-                    plugins: { zoom: { pan: { enabled: true, mode: 'x' }, zoom: { enabled: true, mode: 'x' }}}
-                }
-            });
-        }
+        let betChart = new Chart(ctx, {
+            type: 'line',
+            data: { datasets: [{ label: 'Jumlah Taruhan', data: [], borderColor: 'cyan', borderWidth: 2, fill: false, tension: 0.2 }] },
+            options: {
+                responsive: true,
+                scales: { x: { type: 'time', time: { unit: 'minute' }, title: { display: true, text: 'Waktu' } }, y: { title: { display: true, text: 'Jumlah Taruhan' } } },
+                plugins: { zoom: { pan: { enabled: true, mode: 'x' }, zoom: { enabled: true, mode: 'x' } } }
+            }
+        });
 
         async function fetchBettingHistory() {
             const latestBlock = await provider.getBlockNumber();
             const events = await contract.queryFilter("BetPlaced", latestBlock - 5000, latestBlock);
-            
             events.forEach(event => {
                 let timestamp = new Date(event.args.timestamp * 1000);
                 let times = parseInt(event.args.times);
                 processBet(timestamp, times);
             });
-
             updateChart();
+        }
+
+        function updateChart() {
+            betChart.data.datasets[0].data = betData;
+            betChart.update();
         }
 
         function processBet(timestamp, times) {
             let currentTime = new Date(timestamp);
             let hours = currentTime.getUTCHours() + 7;
             let minutes = currentTime.getMinutes();
-            let open = lastBet;
-            let close = open + (Math.random() * 4 - 2);
-            let high = Math.max(open, close) + 2;
-            let low = Math.min(open, close) - 2;
-
             if (hours === 10 && minutes === 30) {
                 lastBet -= 5;
-                close = lastBet;
             } else {
-                lastBet = close;
+                lastBet += Math.floor(Math.random() * 5) - 2;
             }
-
             betData.push({ x: timestamp, y: lastBet });
-            candlestickData.push({ x: timestamp, o: open, h: high, l: low, c: close });
-
             updateChart();
         }
 
-        function updateChart() {
-            betChart.data.datasets[0].data = currentChartType === "candlestick" ? candlestickData : betData;
-            betChart.update();
-        }
-
-        function changeChartType() {
-            currentChartType = document.getElementById("chartType").value;
-            betChart = createChart(currentChartType);
-            updateChart();
-        }
-
-        contract.on("BetPlaced", (player, betId, number, times, timestamp) => {
+        contract.on("BetPlaced", (player, betId, number, times, timestamp, blockNumber, txHash) => {
             processBet(new Date(timestamp * 1000), times);
+        });
+
+        document.getElementById("chartType").addEventListener("change", function() {
+            let newType = this.value;
+            betChart.destroy();
+            betChart = new Chart(ctx, {
+                type: newType === "candlestick" ? "bar" : newType,
+                data: { datasets: [{ label: 'Jumlah Taruhan', data: betData, borderColor: 'cyan', borderWidth: 2, fill: false, tension: 0.2 }] },
+                options: betChart.options
+            });
         });
 
         fetchBettingHistory();
