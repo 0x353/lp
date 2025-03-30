@@ -933,9 +933,6 @@ textarea:focus {
        <br>
        <h2>Public Bet History</h2>
        <button onclick="window.open('search', '_blank')"><img src="img/search.svg" alt="Lotto" style="width: 15px; height: 15px;">  Search...</button><br><br>
-       <input type="text" id="searchInput" placeholder="Search..." oninput="searchBets()">
-<button onclick="clearSearch()">Clear</button>
-       <hr style="background-color: #333333; height: 1px; border: none;">
        <div class="box-container">
     <div id="betHistory" class="box">
     </div>
@@ -1565,29 +1562,23 @@ function nextUserBets() {
 }
         
 // **Load Bet History (with Pagination)**
-async function loadBetHistory() { const bets = await contract.methods.getAllBets().call(); const reversedBets = bets.slice().reverse(); // Urutkan dari terbaru
+async function loadBetHistory() {
+    const bets = await contract.methods.getAllBets().call();
+    const reversedBets = bets.slice().reverse(); // Urutkan dari terbaru
 
-const now = Math.floor(Date.now() / 1000);
-const sevenDaysAgo = now - 7 * 24 * 60 * 60;
-const filteredBets = reversedBets.filter(bet => bet.timestamp >= sevenDaysAgo);
+    const now = Math.floor(Date.now() / 1000);
+    const sevenDaysAgo = now - 7 * 24 * 60 * 60;
+    const filteredBets = reversedBets.filter(bet => bet.timestamp >= sevenDaysAgo);
 
-const searchQuery = document.getElementById("searchInput").value.toLowerCase();
-const searchedBets = searchQuery ? filteredBets.filter(bet => 
-    bet.player.toLowerCase().includes(searchQuery) ||
-    bet.txHash.toLowerCase().includes(searchQuery) ||
-    bet.betId.toString().includes(searchQuery) ||
-    bet.number.toString().includes(searchQuery)
-) : filteredBets;
+    const start = betHistoryPage * pageSize;
+    const end = Math.min(start + pageSize, filteredBets.length);
 
-const start = betHistoryPage * pageSize;
-const end = Math.min(start + pageSize, searchedBets.length);
-
-let html = "";
-for (let i = start; i < end; i++) {
-    let bet = searchedBets[i];
-    let shortPlayer = bet.player.slice(0, 10) + "..." + bet.player.slice(-10);
-    let shortTxHash = bet.txHash.slice(0, 10) + "..." + bet.txHash.slice(-10);
-
+    let html = "";
+    for (let i = start; i < end; i++) {
+        let bet = filteredBets[i];
+        let shortPlayer = bet.player.slice(0, 10) + "..." + bet.player.slice(-10);
+        let shortTxHash = bet.txHash.slice(0, 10) + "..." + bet.txHash.slice(-10);
+        
     html += `<p>
         Player: <span style="color: #ad5cff;">${shortPlayer}</span><br>
         BetID: <span style="color: #b37500; font-size: 9px;">${bet.betId}</span><br>
@@ -1643,24 +1634,26 @@ for (let i = start; i < end; i++) {
 
 document.getElementById("betHistory").innerHTML = html;
 
-// Update jumlah like dan status like setelah bet history dimuat
-for (let i = start; i < end; i++) {
-    let bet = searchedBets[i];
-    await updateLikeStatus(bet.betId);
+    // Update jumlah like dan status like setelah bet history dimuat
+    for (let i = start; i < end; i++) {
+        let bet = filteredBets[i];
+        await updateLikeStatus(bet.betId);
+    }
 }
-
-}
-
-// Bet History Pagination function prevBetHistory() { if (betHistoryPage > 0) { betHistoryPage--; loadBetHistory(); } }
-
-function nextBetHistory() { betHistoryPage++; loadBetHistory(); }
-
-// Search Bets Function function searchBets() { betHistoryPage = 0; // Reset ke halaman pertama setelah pencarian loadBetHistory(); }
-
-function clearSearch() { document.getElementById("searchInput").value = ""; searchBets(); }
-
         
+// **Bet History Pagination**
+function prevBetHistory() {
+    if (betHistoryPage > 0) {
+        betHistoryPage--;
+        loadBetHistory();
+    }
+}
 
+function nextBetHistory() {
+    betHistoryPage++;
+    loadBetHistory();
+}
+        
 // Like Function
 async function toggleLike(betId) {
     try {
@@ -1676,7 +1669,7 @@ async function toggleLike(betId) {
         }
 
         const userAccount = accounts[0];
-        const liked = await contract.methods.hasUserLiked(betId, userAccount).call();
+        const liked = await contract.methods.hasUserLked(betId, userAccount).call();
         const button = document.getElementById(`likeButton-${betId}`);
         const statusElement = document.getElementById(`likeStatus-${betId}`);
 
