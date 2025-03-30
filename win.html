@@ -25,11 +25,33 @@
             background-color: #f4b400;
             color: white;
         }
+        .loader {
+            margin: 20px auto;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #f4b400;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #loading {
+            display: none;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
     <h2>Winner List</h2>
+    <div id="loading">
+        <div class="loader"></div>
+        <p>Loading...</p>
+    </div>
+    
     <table>
         <thead>
             <tr>
@@ -56,6 +78,9 @@
         const contract = new ethers.Contract(contractAddress, abi, provider);
 
         async function fetchWinners() {
+            document.getElementById("loading").style.display = "block"; // Tampilkan loader
+            document.getElementById("winnerTable").innerHTML = ""; // Kosongkan tabel sementara
+
             try {
                 const eventSignature = ethers.id("WinnerSet(bytes32,address,uint256,uint256)");
                 const filter = {
@@ -87,6 +112,8 @@
             } catch (error) {
                 console.error("Error fetching winners:", error);
                 document.getElementById("winnerTable").innerHTML = `<tr><td colspan="4">Error loading winners</td></tr>`;
+            } finally {
+                document.getElementById("loading").style.display = "none"; // Sembunyikan loader setelah selesai
             }
         }
 
