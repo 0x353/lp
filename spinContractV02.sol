@@ -1,6 +1,19 @@
 // SPDX-License-Identifier: MIT pragma solidity ^0.8.19;
 
-contract SpinBet { struct Bet { address user; uint256 amount; string result; uint256 timestamp; }
+contract SpinBet {
+struct Bet {
+    address player;         // Alamat pemain
+    uint256 amount;         // Jumlah taruhan
+    string result;          // Hasil taruhan (prize)
+    uint256 timestamp;      // Waktu taruhan
+    uint256 randomNumber;   // Nomor acak yang digunakan
+    uint256 contractBalance; // Saldo kontrak saat taruhan
+    uint256 playerBetCount;  // Total taruhan pemain sebelumnya
+    uint256 totalBets;       // Total taruhan dalam kontrak
+    string highestAvailablePrize; // Hadiah terbesar yang bisa dimenangkan saat itu
+    bool prizeAvailable;     // Status hadiah (tersedia atau tidak)
+    uint256 winChance;       // Persentase peluang menang
+}
 
 mapping(address => Bet[]) private userBets;
 Bet[] public publicBets;
@@ -11,8 +24,23 @@ uint256 public dailyUsedQuota = 0;
 uint256 public lastResetTime;
 address public owner;
 mapping(string => uint256) public lastPrizeTimestamps;
+mapping(address => Bet[]) public userBets;  // Menyimpan riwayat taruhan setiap pemain
+Bet[] public publicBets;                    // Menyimpan riwayat taruhan publik
+uint256 public publicHistoryLimit = 100;    // Batas maksimal riwayat taruhan publik
 
-event BetPlaced(address indexed user, uint256 amount, string result, uint256 timestamp);
+event BetPlaced(
+    address indexed player,
+    uint256 amount,
+    string result,
+    uint256 timestamp,
+    uint256 randomNumber,
+    uint256 contractBalance,
+    uint256 playerBetCount,
+    uint256 totalBets,
+    string highestAvailablePrize,
+    bool prizeAvailable,
+    uint256 winChance
+);
 
 constructor() {
     owner = msg.sender;
@@ -27,9 +55,30 @@ modifier onlyOwner() {
 function placeBet() public payable {
     require(msg.value == spinPrice, "Incorrect ETH amount");
     resetDailyQuota();
+
+    uint256 contractBalance = address(this).balance;
+    uint256 randomNumber = uint256(keccak256(abi.encodePacked(block.timestamp, msg.sender, block.difficulty))) % 1000;
     string memory result = determinePrize();
-    
-    Bet memory newBet = Bet(msg.sender, msg.value, result, block.timestamp);
+    uint256 playerBetCount = userBets[msg.sender].length;
+    uint256 totalBets = publicBets.length + 1;
+    string memory highestAvailablePrize = getHighestAvailablePrize();
+    bool prizeAvailable = isPrizeAvailable(result, 0);
+    uint256 winChance = getWinChance(result);
+
+    Bet memory newBet = Bet(
+        msg.sender,
+        msg.value,
+        result,
+        block.timestamp,
+        randomNumber,
+        contractBalance,
+        playerBetCount,
+        totalBets,
+        highestAvailablePrize,
+        prizeAvailable,
+        winChance
+    );
+
     userBets[msg.sender].push(newBet);
     publicBets.push(newBet);
 
@@ -40,7 +89,37 @@ function placeBet() public payable {
         publicBets.pop();
     }
 
-    emit BetPlaced(msg.sender, msg.value, result, block.timestamp);
+    emit BetPlaced(
+        msg.sender,
+        msg.value,
+        result,
+        block.timestamp,
+        randomNumber,
+        contractBalance,
+        playerBetCount,
+        totalBets,
+        highestAvailablePrize,
+        prizeAvailable,
+        winChance
+    );
+}
+
+function getHighestAvailablePrize() internal view returns (string memory) {
+    if (address(this).balance >= 15 ether) return "1 ETH Jackpot";
+    if (address(this).balance >= 14 ether) return "0.7 ETH Big Win";
+    if (address(this).balance >= 12 ether) return "MacBook";
+    if (address(this).balance >= 11 ether) return "iPhone or 0.5 ETH";
+    if (address(this).balance >= 2 ether) return "0.1 ETH Monthly Prize";
+    return "Small Prize Available";
+}
+
+function getWinChance(string memory result) internal pure returns (uint256) {
+    if (keccak256(bytes(result)) == keccak256(bytes("1 ETH Jackpot"))) return 0.1;
+    if (keccak256(bytes(result)) == keccak256(bytes("0.7 ETH Big Win"))) return 0.2;
+    if (keccak256(bytes(result)) == keccak256(bytes("MacBook"))) return 0.5;
+    if (keccak256(bytes(result)) == keccak256(bytes("iPhone or 0.5 ETH"))) return 1;
+    if (keccak256(bytes(result)) == keccak256(bytes("0.1 ETH Monthly Prize"))) return 2;
+    return 10; // Hadiah kecil atau biasa
 }
 
 function determinePrize() internal returns (string memory) {
