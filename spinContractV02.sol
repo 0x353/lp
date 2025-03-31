@@ -48,85 +48,76 @@ function determinePrize() internal returns (string memory) {
     uint256 currentTime = block.timestamp;
     uint256 random = uint256(keccak256(abi.encodePacked(block.timestamp, msg.sender, block.difficulty))) % 1000;
 
-    if (contractBalance >= 15 ether && isPrizeAvailable("1 ETH Jackpot", 365 days) && random < 1) {
+    function determinePrize() internal returns (string memory) { uint256 contractBalance = address(this).balance; uint256 currentTime = block.timestamp; uint256 random = uint256(keccak256(abi.encodePacked(block.timestamp, msg.sender, block.difficulty))) % 1000;
+
+if (contractBalance >= 15 ether && isPrizeAvailable("1 ETH Jackpot", 365 days) && random < 1) {
     lastPrizeTimestamps["1 ETH Jackpot"] = currentTime;
     return "1 ETH Jackpot";
 }
-if (contractBalance >= 14 ether && isPrizeAvailable("0.7 ETH Big Win", 365 days) && random < 1) {
+if (contractBalance >= 14 ether && isPrizeAvailable("0.7 ETH Big Win", 365 days) && random < 2) {
     lastPrizeTimestamps["0.7 ETH Big Win"] = currentTime;
     return "0.7 ETH Big Win";
 }
-if (contractBalance >= 12 ether && isPrizeAvailable("MacBook", 270 days) && random < 2) {
-    require(lastPrizeTimestamps["MacBook"] + 270 days <= block.timestamp, "MacBook prize already claimed this period");
-    lastPrizeTimestamps["MacBook"] = block.timestamp;
+if (contractBalance >= 12 ether && isPrizeAvailable("MacBook", 270 days) && random < 5) {
+    lastPrizeTimestamps["MacBook"] = currentTime;
     return "Won MacBook!";
 }
-if (contractBalance >= 11 ether && isPrizeAvailable("iPhone or 0.5 ETH", 180 days) && random < 2) {
+if (contractBalance >= 11 ether && isPrizeAvailable("iPhone or 0.5 ETH", 180 days) && random < 10) {
     lastPrizeTimestamps["iPhone or 0.5 ETH"] = currentTime;
     return "iPhone or 0.5 ETH";
 }
-if (contractBalance >= 2 ether && isPrizeAvailable("0.1 ETH Monthly Prize", 30 days) && random < 3) {
+if (contractBalance >= 2 ether && isPrizeAvailable("0.1 ETH Monthly Prize", 30 days) && random < 20) {
     lastPrizeTimestamps["0.1 ETH Monthly Prize"] = currentTime;
     return "0.1 ETH Monthly Prize";
 }
-if (contractBalance >= 1.5 ether && isPrizeAvailable("0.05 ETH Monthly Prize", 30 days) && random < 3) {
+if (contractBalance >= 1.5 ether && isPrizeAvailable("0.05 ETH Monthly Prize", 30 days) && random < 30) {
     lastPrizeTimestamps["0.05 ETH Monthly Prize"] = currentTime;
     return "0.05 ETH Monthly Prize";
 }
-if (contractBalance >= 1 ether && isPrizeAvailable("0.01 ETH Bi-weekly", 14 days) && random < 4) {
+if (contractBalance >= 1 ether && isPrizeAvailable("0.01 ETH Bi-weekly", 14 days) && random < 50) {
     lastPrizeTimestamps["0.01 ETH Bi-weekly"] = currentTime;
     return "0.01 ETH Bi-weekly";
 }
-if (contractBalance >= 0.5 ether && isPrizeAvailable("0.005 ETH Weekly", 7 days) && random < 4) {
+if (contractBalance >= 0.5 ether && isPrizeAvailable("0.005 ETH Weekly", 7 days) && random < 80) {
     lastPrizeTimestamps["0.005 ETH Weekly"] = currentTime;
     return "0.005 ETH Weekly";
 }
-if (contractBalance >= 0.5 ether && isPrizeAvailable("0.001 ETH Five-day Prize", 5 days) && random < 5) {
+if (contractBalance >= 0.5 ether && isPrizeAvailable("0.001 ETH Five-day Prize", 5 days) && random < 100) {
     lastPrizeTimestamps["0.001 ETH Five-day Prize"] = currentTime;
     return "0.001 ETH Five-day Prize";
 }
-if (contractBalance >= 0.5 ether && isPrizeAvailable("0.0005 ETH Four-day Prize", 4 days) && random < 6) {
+if (contractBalance >= 0.5 ether && isPrizeAvailable("0.0005 ETH Four-day Prize", 4 days) && random < 150) {
     lastPrizeTimestamps["0.0005 ETH Four-day Prize"] = currentTime;
     return "0.0005 ETH Four-day Prize";
 }
-if (contractBalance >= 0.5 ether && isPrizeAvailable("0.000256 ETH Two-day Prize", 2 days) && random < 7) {
+if (contractBalance >= 0.5 ether && isPrizeAvailable("0.000256 ETH Two-day Prize", 2 days) && random < 200) {
     lastPrizeTimestamps["0.000256 ETH Two-day Prize"] = currentTime;
     return "0.000256 ETH Two-day Prize";
 }
-if (contractBalance >= 0.5 ether && isPrizeAvailable("0.0001 ETH Daily Prize", 1 days) && random < 8) {
+if (contractBalance >= 0.5 ether && isPrizeAvailable("0.0001 ETH Daily Prize", 1 days) && random < 250) {
     lastPrizeTimestamps["0.0001 ETH Daily Prize"] = currentTime;
     return "0.0001 ETH Daily Prize";
 }
-    if (contractBalance >= 0.1 ether && isPrizeAvailable("0.00008 ETH Daily Prize", 1 days) && random < 6) {
-        if (dailyUsedQuota + 0.00008 ether <= dailyQuota) {
-            lastPrizeTimestamps["0.00008 ETH Daily Prize"] = currentTime;
-            dailyUsedQuota += 0.00008 ether;
-            return "0.00008 ETH Daily Prize";
-        }
-    }
-    
-    if (contractBalance >= 0.1 ether && isPrizeAvailable("0.00005 ETH Daily Prize", 1 days) && random < 8) {
-        if (dailyUsedQuota + 0.00005 ether <= dailyQuota) {
-            lastPrizeTimestamps["0.00005 ETH Daily Prize"] = currentTime;
-            dailyUsedQuota += 0.00005 ether;
-            return "0.00005 ETH Daily Prize";
-        }
-    }
+if (contractBalance >= 0.1 ether && isPrizeAvailable("0.00008 ETH Daily Prize", 1 days) && random < 300) {
+    return "0.00008 ETH Daily Prize";
+}
+if (contractBalance >= 0.1 ether && isPrizeAvailable("0.00005 ETH Daily Prize", 1 days) && random < 400) {
+    return "0.00005 ETH Daily Prize";
+}
+if (random < 600) {
+    return "Won 2 LPoint";
+}
+if (random < 800) {
+    return "Won 5 LPoint";
+}
+if (random < 900) {
+    return "Won 7 LPoint";
+}
+if (random >= 900 && random < 950) {
+    return "Try Again";
+}
+return "Try Again";  // Default jika tidak ada hadiah lain yang cocok
 
-    if (random < 50) {
-        return "Won 2 LPoint";
-    }
-    if (random < 80) {
-        return "Won 5 LPoint";
-    }
-    if (random < 95) {
-        return "Won 7 LPoint";
-    }
-    if (random < 100) {
-        return "Try Again";
-    }
-
-    return "No Prize";
 }
 
 function isPrizeAvailable(string memory prize, uint256 interval) internal view returns (bool) {
