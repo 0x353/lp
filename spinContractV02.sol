@@ -13,6 +13,7 @@ struct Bet {
     string highestAvailablePrize; // Hadiah terbesar yang bisa dimenangkan saat itu
     bool prizeAvailable;     // Status hadiah (tersedia atau tidak)
     uint256 winChance;       // Persentase peluang menang
+    LPointToken public lpointToken;
 }
 
 mapping(address => Bet[]) private userBets;
@@ -42,10 +43,12 @@ event BetPlaced(
     uint256 winChance
 );
 
-constructor() {
-    owner = msg.sender;
-    lastResetTime = block.timestamp;
-}
+event LPointAwarded(address indexed player, uint256 amount);
+
+constructor(address _lpointAddress) {
+        owner = msg.sender;
+        lpointToken = LPointToken(_lpointAddress);
+    }
 
 modifier onlyOwner() {
     require(msg.sender == owner, "Not the contract owner");
@@ -64,6 +67,16 @@ function placeBet() public payable {
     string memory highestAvailablePrize = getHighestAvailablePrize();
     bool prizeAvailable = isPrizeAvailable(result, 0);
     uint256 winChance = getWinChance(result);
+
+uint256 random = uint256(keccak256(abi.encodePacked(block.timestamp, msg.sender, block.difficulty))) % 1000;
+        if (random < 600) {
+            distributeLPoint(msg.sender, 2 * 10**18);
+        } else if (random < 800) {
+            distributeLPoint(msg.sender, 5 * 10**18);
+        } else if (random < 900) {
+            distributeLPoint(msg.sender, 7 * 10**18);
+        }
+    }
 
     Bet memory newBet = Bet(
         msg.sender,
@@ -215,6 +228,22 @@ function resetDailyQuota() internal {
 
 function getUserBets() public view returns (Bet[] memory) {
     return userBets[msg.sender];
+}
+
+function distributeLPoint(address player, uint256 amount) internal {
+        require(lpointToken.balanceOf(address(this)) >= amount, "Not enough LPoint in contract");
+        lpointToken.transfer(player, amount);
+        emit LPointAwarded(player, amount);
+    }
+
+    function depositLPoint(uint256 amount) external {
+        require(lpointToken.transferFrom(msg.sender, address(this), amount), "Deposit failed");
+    }
+
+    function withdrawLPoint(uint256 amount) external {
+        require(msg.sender == owner, "Only owner can withdraw");
+        require(lpointToken.transfer(owner, amount), "Withdraw failed");
+    }
 }
 
 function getPublicBets() public view returns (Bet[] memory) {
