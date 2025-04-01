@@ -127,17 +127,38 @@ contract SpinBet {
         if (address(this).balance >= 12 ether) return "MacBook";
         if (address(this).balance >= 11 ether) return "iPhone or 0.5 ETH";
         if (address(this).balance >= 2 ether) return "0.1 ETH Monthly Prize";
+        if (address(this).balance >= 1.5 ether) return "1 ETH Jackpot";
+        if (address(this).balance >= 1 ether) return "0.7 ETH Big Win";
+        if (address(this).balance >= 1 ether) return "MacBook";
+        if (address(this).balance >= 1 ether) return "iPhone or 0.5 ETH";
+        if (address(this).balance >= 0.5 ether) return "1 ETH Jackpot";
+        if (address(this).balance >= 0.5 ether) return "0.7 ETH Big Win";
+        if (address(this).balance >= 0.5 ether) return "MacBook";
+        if (address(this).balance >= 0.1 ether) return "iPhone or 0.5 ETH";
+        if (address(this).balance >= 0.1 ether) return "0.1 ETH Monthly Prize";
         return "Small Prize Available";
     }
 
     function getWinChance(string memory result) internal pure returns (uint256) {
-        if (keccak256(bytes(result)) == keccak256(bytes("1 ETH Jackpot"))) return 0.1;
-        if (keccak256(bytes(result)) == keccak256(bytes("0.7 ETH Big Win"))) return 0.2;
-        if (keccak256(bytes(result)) == keccak256(bytes("MacBook"))) return 0.5;
-        if (keccak256(bytes(result)) == keccak256(bytes("iPhone or 0.5 ETH"))) return 1;
-        if (keccak256(bytes(result)) == keccak256(bytes("0.1 ETH Monthly Prize"))) return 2;
-        return 10; // Hadiah kecil atau biasa
-    }
+    if (keccak256(bytes(result)) == keccak256(bytes("1 ETH Jackpot"))) return 0.1;
+    if (keccak256(bytes(result)) == keccak256(bytes("0.7 ETH Big Win"))) return 0.2;
+    if (keccak256(bytes(result)) == keccak256(bytes("MacBook"))) return 0.5;
+    if (keccak256(bytes(result)) == keccak256(bytes("iPhone or 0.5 ETH"))) return 1;
+    if (keccak256(bytes(result)) == keccak256(bytes("0.1 ETH Monthly Prize"))) return 2;
+    if (keccak256(bytes(result)) == keccak256(bytes("0.05 ETH Monthly Prize"))) return 3;
+    if (keccak256(bytes(result)) == keccak256(bytes("0.01 ETH Bi-weekly"))) return 5;
+    if (keccak256(bytes(result)) == keccak256(bytes("0.005 ETH Weekly"))) return 10;
+    if (keccak256(bytes(result)) == keccak256(bytes("0.001 ETH Five-day Prize"))) return 20;
+    if (keccak256(bytes(result)) == keccak256(bytes("0.0005 ETH Four-day Prize"))) return 30;
+    if (keccak256(bytes(result)) == keccak256(bytes("0.000256 ETH Two-day Prize"))) return 40;
+    if (keccak256(bytes(result)) == keccak256(bytes("0.0001 ETH Daily Prize"))) return 50;
+    if (keccak256(bytes(result)) == keccak256(bytes("0.00008 ETH Daily Prize"))) return 60;
+    if (keccak256(bytes(result)) == keccak256(bytes("0.00005 ETH Daily Prize"))) return 70;
+    if (keccak256(bytes(result)) == keccak256(bytes("Won 2 LPoint"))) return 150;
+    if (keccak256(bytes(result)) == keccak256(bytes("Won 5 LPoint"))) return 200;
+    if (keccak256(bytes(result)) == keccak256(bytes("Won 7 LPoint"))) return 250;
+    return 1000; // Jika hadiah tidak ditemukan
+}
 
     function determinePrize() internal returns (string memory) {
         uint256 contractBalance = address(this).balance;
@@ -172,11 +193,11 @@ if (contractBalance >= 1 ether && isPrizeAvailable("0.01 ETH Bi-weekly", 14 days
     lastPrizeTimestamps["0.01 ETH Bi-weekly"] = currentTime;
     return "0.01 ETH Bi-weekly";
 }
-if (contractBalance >= 0.5 ether && isPrizeAvailable("0.005 ETH Weekly", 7 days) && random < 80) {
+if (contractBalance >= 1 ether && isPrizeAvailable("0.005 ETH Weekly", 7 days) && random < 80) {
     lastPrizeTimestamps["0.005 ETH Weekly"] = currentTime;
     return "0.005 ETH Weekly";
 }
-if (contractBalance >= 0.5 ether && isPrizeAvailable("0.001 ETH Five-day Prize", 5 days) && random < 100) {
+if (contractBalance >= 1 ether && isPrizeAvailable("0.001 ETH Five-day Prize", 5 days) && random < 100) {
     lastPrizeTimestamps["0.001 ETH Five-day Prize"] = currentTime;
     return "0.001 ETH Five-day Prize";
 }
