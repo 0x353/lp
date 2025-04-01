@@ -864,13 +864,39 @@ section,
   position: absolute;
   width: 16px;
   height: 16px;
-  border-radius: 50px;
+  border-radius: 50%;
   left: -9px;
   top: 0;
-  background: #000000;
   border: 2px solid #388dff;
 }
 
+.resume .resume-item:nth-child(1)::before {
+  background: #ff0000; /* Merah untuk item pertama */
+}
+
+.resume .resume-item:nth-child(2)::before {
+  background: #00ca09; /* Hijau untuk item kedua */
+}
+
+.resume .resume-item:nth-child(3)::before {
+  background: #0000ff; /* Biru untuk item ketiga */
+}
+
+.resume .resume-item:nth-child(4)::before {
+  background: #ffa500; /* Oranye untuk item keempat */
+}
+
+.resume .resume-item:nth-child(5)::before {
+  background: #800080; /* Ungu untuk item kelima */
+}
+
+.resume .resume-item:nth-child(6)::before {
+  background: #f4a300; /* Kuning keemasan untuk item keenam */
+}
+
+.resume .resume-item:nth-child(7)::before {
+  background: #ff4500; /* Oranye terang untuk item ketujuh */
+}
 /*--------------------------------------------------------------
 # Services Section
 --------------------------------------------------------------*/
