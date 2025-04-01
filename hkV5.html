@@ -1923,22 +1923,46 @@ async function deleteComment(betId, index) {
     if (!confirm("Apakah Anda yakin ingin menghapus komentar ini?")) return;
 
     try {
-        // Logika untuk menyembunyikan komentar di UI (off-chain)
+        // Mencari elemen komentar dengan ID unik
         const commentElement = document.getElementById(`comment-${betId}-${index}`);
-        if (commentElement) {
-            // Menyembunyikan komentar dengan mengubah gaya CSS
-            commentElement.style.display = 'none';
+        
+        // Debugging: Menampilkan ID yang dicari di konsol untuk memastikan formatnya benar
+        console.log(`Mencari komentar dengan ID: comment-${betId}-${index}`);
+        
+        if (!commentElement) {
+            console.error("Komentar tidak ditemukan. Pastikan ID elemen komentar benar.");
+            return;
         }
-        
-        // Anda juga bisa menambahkan logika untuk menandai komentar di database off-chain jika diperlukan
-        // Misalnya, Anda bisa mengupdate status komentar di database dengan flag `deleted: true`
-        // Update database logika di sini jika diperlukan
-        
-        console.log("Komentar berhasil dihapus dari UI");
+
+        // Menambahkan transisi untuk menyembunyikan komentar dengan efek memudar
+        commentElement.style.transition = 'opacity 0.5s ease-out';
+        commentElement.style.opacity = 0;
+
+        // Setelah transisi selesai, menyembunyikan elemen
+        setTimeout(() => {
+            commentElement.style.display = 'none';
+            console.log("Komentar berhasil disembunyikan.");
+        }, 500); // Waktu tunggu sesuai dengan durasi transisi
+
+        // Anda bisa menambahkan logika tambahan di sini untuk memperbarui database off-chain
+        /*
+        await fetch('/api/updateCommentStatus', {
+            method: 'POST',
+            body: JSON.stringify({
+                betId,
+                index,
+                status: 'deleted'
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        */
+
     } catch (error) {
         console.error("Gagal menghapus komentar:", error);
     }
-}
+        }
         
 // Fungsi untuk memperbarui jumlah komentar
 async function updateCommentCount(betId) {
