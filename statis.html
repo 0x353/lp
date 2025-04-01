@@ -6,7 +6,8 @@
     <title>Bet History Statistics</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        body {
+        /* Pastikan CSS sebelumnya sudah ada */
+body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
     margin: 0;
@@ -71,7 +72,7 @@ th {
     color: #333;
 }
 
-input[type="text"] {
+input[type="text"], input[type="number"] {
     padding: 5px;
     margin-right: 10px;
     width: 250px;
@@ -153,6 +154,23 @@ button:hover {
                 <p><strong>Timestamp:</strong> <span id="winnerTimestamp">-</span></p>
             </div>
         </div>
+
+        <!-- Bagian baru untuk daftar riwayat pemenang -->
+        <div class="stats-section">
+            <h2>Winner History</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Bet ID</th>
+                        <th>Winner Address</th>
+                        <th>Amount Won (ETH)</th>
+                        <th>Winning Number</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody id="winnerHistory"></tbody>
+            </table>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/web3@1.7.4/dist/web3.min.js"></script>
@@ -181,10 +199,9 @@ async function loadStats() {
         const contractBalance = await contract.methods.contractBalance().call();
         document.getElementById("contractBalance").innerText = web3.utils.fromWei(contractBalance, "ether");
 
-        // Last Winner (menggunakan getAllWinners)
-        const allWinners = await contract.methods.getAllWinners().call();
-        const lastWinner = allWinners.length > 0 ? allWinners[allWinners.length - 1] : "None";
-        document.getElementById("lastWinner").innerText = lastWinner;
+        // Last Winner
+        const lastWinner = await contract.methods.lastWinner().call();
+        document.getElementById("lastWinner").innerText = lastWinner === "0x0000000000000000000000000000000000000000" ? "None" : lastWinner;
 
         // All Players
         const allPlayers = await contract.methods.getAllPlayers().call();
@@ -192,6 +209,7 @@ async function loadStats() {
         playersList.innerHTML = allPlayers.map(player => `<li>${player}</li>`).join("");
 
         // All Winners
+        const allWinners = await contract.methods.getAllWinners().call();
         const winnersList = document.getElementById("allWinners");
         winnersList.innerHTML = allWinners.map(winner => `<li>${winner}</li>`).join("");
 
@@ -208,6 +226,32 @@ async function loadStats() {
                 <td>${bet.commentCount}</td>
             </tr>
         `).join("");
+
+        // Winner History (ambil hingga totalWinners atau batas 10 untuk efisiensi)
+        const totalWinners = await contract.methods.totalWinners().call();
+        const maxWinnersToShow = Math.min(totalWinners, 10); // Batasi ke 10 untuk performa
+        const winnerHistoryTable = document.getElementById("winnerHistory");
+        let winnerHistoryHTML = "";
+
+        for (let betId = 0; betId < maxWinnersToShow; betId++) {
+            try {
+                const winnerData = await contract.methods.getWinnerByBetId(betId).call();
+                if (winnerData.winner !== "0x0000000000000000000000000000000000000000") {
+                    winnerHistoryHTML += `
+                        <tr>
+                            <td>${betId}</td>
+                            <td>${winnerData.winner}</td>
+                            <td>${web3.utils.fromWei(winnerData.amount, "ether")}</td>
+                            <td>${winnerData.number}</td>
+                            <td>${new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString()}</td>
+                        </tr>
+                    `;
+                }
+            } catch (error) {
+                console.error(`Error fetching winner for Bet ID ${betId}:`, error);
+            }
+        }
+        winnerHistoryTable.innerHTML = winnerHistoryHTML || "<tr><td colspan='5'>No winners found</td></tr>";
 
         // Debug pemenang spesifik
         const specificWinner = "0x6ce1F5dEC54c07Bf2531716014cf790E71df24eA";
@@ -239,7 +283,7 @@ async function lookupPlayer() {
     }
 }
 
-// Fungsi baru untuk mencari pemenang berdasarkan Bet ID
+// Fungsi untuk mencari pemenang berdasarkan Bet ID
 async function lookupWinnerByBetId() {
     const betId = document.getElementById("betIdInput").value.trim();
     if (!betId || isNaN(betId) || parseInt(betId) < 0) {
