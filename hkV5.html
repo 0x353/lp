@@ -1919,28 +1919,27 @@ function disableEdit(betId) {
 }
 
 async function deleteComment(betId, index) {
+    // Menampilkan popup konfirmasi browser
     if (!confirm("Apakah Anda yakin ingin menghapus komentar ini?")) return;
 
     try {
-        // Estimasi gas
-        const gasEstimate = await contract.methods.deleteComment(betId, index).estimateGas({ from: ethereum.selectedAddress });
-
-        // Gas options
-        const gasOptions = {
-            from: ethereum.selectedAddress,
-            gas: gasEstimate + 50000,  // Menambahkan buffer
-            maxFeePerGas: web3.utils.toWei("0.00025", "gwei"),
-            maxPriorityFeePerGas: web3.utils.toWei("0.00023", "gwei")
-        };
-
-        // Eksekusi transaksi
-        await contract.methods.deleteComment(betId, index).send(gasOptions);
-        await loadComments(betId); // Refresh komentar
+        // Logika untuk menyembunyikan komentar di UI (off-chain)
+        const commentElement = document.getElementById(`comment-${betId}-${index}`);
+        if (commentElement) {
+            // Menyembunyikan komentar dengan mengubah gaya CSS
+            commentElement.style.display = 'none';
+        }
+        
+        // Anda juga bisa menambahkan logika untuk menandai komentar di database off-chain jika diperlukan
+        // Misalnya, Anda bisa mengupdate status komentar di database dengan flag `deleted: true`
+        // Update database logika di sini jika diperlukan
+        
+        console.log("Komentar berhasil dihapus dari UI");
     } catch (error) {
         console.error("Gagal menghapus komentar:", error);
     }
 }
-
+        
 // Fungsi untuk memperbarui jumlah komentar
 async function updateCommentCount(betId) {
     try {
