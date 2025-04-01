@@ -823,11 +823,41 @@ section,
   margin-bottom: 20px;
 }
 
+/* Garis vertikal default */
 .resume .resume-item {
   padding: 0 0 20px 20px;
   margin-top: -2px;
-  border-left: 2px solid #0671ff;
+  border-left: 2px solid #0671ff; /* Warna garis default biru */
   position: relative;
+}
+
+/* Warna garis vertikal berbeda untuk setiap item */
+.resume .resume-item:nth-child(1) {
+  border-left: 2px solid #0671ff;  /* Default Blue */
+}
+
+.resume .resume-item:nth-child(2) {
+  border-left: 2px solid #ff5733;  /* Orange */
+}
+
+.resume .resume-item:nth-child(3) {
+  border-left: 2px solid #33c7ff;  /* Light Blue */
+}
+
+.resume .resume-item:nth-child(4) {
+  border-left: 2px solid #1aff1a;  /* Green */
+}
+
+.resume .resume-item:nth-child(5) {
+  border-left: 2px solid #ffdb33;  /* Yellow */
+}
+
+.resume .resume-item:nth-child(6) {
+  border-left: 2px solid #c70039;  /* Red */
+}
+
+.resume .resume-item:nth-child(7) {
+  border-left: 2px solid #9b59b6;  /* Purple */
 }
 
 .resume .resume-item h4 {
