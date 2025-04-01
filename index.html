@@ -867,35 +867,54 @@ section,
   border-radius: 50%;
   left: -9px;
   top: 0;
-  border: 2px solid #388dff;
+  border: 2px solid #ccc;
+}
+
+.resume .resume-item::before {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  left: -9px;
+  top: 0;
+  background: #000000;  /* Default warna background */
+  border: 2px solid #388dff;  /* Default border */
 }
 
 .resume .resume-item:nth-child(1)::before {
-  background: #ff0000; /* Merah untuk item pertama */
+  background: #00ca09; /* Merah untuk item pertama */
+  border: 2px solid #006505; /* Oranye untuk border item pertama */
 }
 
 .resume .resume-item:nth-child(2)::before {
-  background: #00ca09; /* Hijau untuk item kedua */
+  background: #000000; /* Hijau untuk item kedua */
+  border: 2px solid #0671ff; /* Hijau terang untuk border item kedua */
 }
 
 .resume .resume-item:nth-child(3)::before {
-  background: #0000ff; /* Biru untuk item ketiga */
+  background: #000000; /* Biru untuk item ketiga */
+  border: 2px solid #0671ff; /* Biru terang untuk border item ketiga */
 }
 
 .resume .resume-item:nth-child(4)::before {
-  background: #ffa500; /* Oranye untuk item keempat */
+  background: #000000; /* Oranye untuk item keempat */
+  border: 2px solid #0671ff; /* Merah tomat untuk border item keempat */
 }
 
 .resume .resume-item:nth-child(5)::before {
-  background: #800080; /* Ungu untuk item kelima */
+  background: #000000; /* Ungu untuk item kelima */
+  border: 2px solid #0671ff; /* Ungu terang untuk border item kelima */
 }
 
 .resume .resume-item:nth-child(6)::before {
-  background: #f4a300; /* Kuning keemasan untuk item keenam */
+  background: #000000; /* Kuning keemasan untuk item keenam */
+  border: 2px solid #0671ff; /* Emas untuk border item keenam */
 }
 
 .resume .resume-item:nth-child(7)::before {
-  background: #ff4500; /* Oranye terang untuk item ketujuh */
+  background: #000000; /* Oranye terang untuk item ketujuh */
+  border: 2px solid #0671ff; /* Merah muda terang untuk border item ketujuh */
 }
 /*--------------------------------------------------------------
 # Services Section
