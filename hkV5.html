@@ -1928,18 +1928,23 @@ async function deleteComment(betId, index) {
     try {
         // Estimasi gas untuk transaksi penghapusan komentar
         const gasEstimate = await contract.methods.deleteComment(betId, index).estimateGas({ from: ethereum.selectedAddress });
+        console.log(`Gas Estimate: ${gasEstimate}`);
 
         // Gas options
         const gasOptions = {
             from: ethereum.selectedAddress,
-            gas: gasEstimate + 75000,  // Menambahkan buffer untuk gas
-            maxFeePerGas: web3.utils.toWei("0.003", "gwei"),  // Gas fee maksimal
-            maxPriorityFeePerGas: web3.utils.toWei("0.0028", "gwei")  // Prioritas fee
+            gas: gasEstimate + 100000,  // Menambahkan buffer untuk gas
+            maxFeePerGas: web3.utils.toWei("0.0025", "gwei"),  // Gas fee maksimal
+            maxPriorityFeePerGas: web3.utils.toWei("0.0023", "gwei")  // Prioritas fee
         };
+        console.log(`Gas Options: ${JSON.stringify(gasOptions)}`);
 
         // Menyampaikan transaksi ke blockchain
-        await contract.methods.deleteComment(betId, index).send(gasOptions);
-        await loadComments(betId); // Refresh daftar komentar setelah transaksi sukses
+        const transaction = await contract.methods.deleteComment(betId, index).send(gasOptions);
+        console.log(`Transaction Hash: ${transaction.transactionHash}`);
+
+        // Refresh daftar komentar setelah transaksi sukses
+        await loadComments(betId); 
     } catch (error) {
         console.error("Gagal menghapus komentar:", error);
         alert("Gagal menghapus komentar. Coba lagi.");
