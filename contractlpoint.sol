@@ -31,6 +31,14 @@ contract LPoint {
         emit ContractAllowed(_contract, _status);
     }
 
+    function mint(address _to, uint256 _value) external onlyOwner {
+    require(_to != address(0), "Invalid address");
+
+    totalSupply += _value;
+    balanceOf[_to] += _value;
+    emit Transfer(address(0), _to, _value);
+}
+
     function transfer(address _to, uint256 _value) external returns (bool) {
         require(msg.sender == owner || allowedContracts[msg.sender], "Unauthorized transfer");
         require(balanceOf[msg.sender] >= _value, "Insufficient balance");
