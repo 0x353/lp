@@ -153,7 +153,7 @@ const contractABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constru
 const web3 = new Web3(rpcUrl);
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-// Fungsi untuk memuat semua statistik saat halaman dimuat
+// Fungsi untuk memuat semua statistik
 async function loadStats() {
     try {
         // Total Bets
@@ -168,9 +168,10 @@ async function loadStats() {
         const contractBalance = await contract.methods.contractBalance().call();
         document.getElementById("contractBalance").innerText = web3.utils.fromWei(contractBalance, "ether");
 
-        // Last Winner
-        const lastWinner = await contract.methods.lastWinner().call();
-        document.getElementById("lastWinner").innerText = lastWinner === "0x0000000000000000000000000000000000000000" ? "None" : lastWinner;
+        // Last Winner (diganti dengan pemenang terakhir dari winnerHistory)
+        const allWinners = await contract.methods.getAllWinners().call();
+        const lastWinner = allWinners.length > 0 ? allWinners[allWinners.length - 1] : "None";
+        document.getElementById("lastWinner").innerText = lastWinner;
 
         // All Players
         const allPlayers = await contract.methods.getAllPlayers().call();
@@ -178,13 +179,12 @@ async function loadStats() {
         playersList.innerHTML = allPlayers.map(player => `<li>${player}</li>`).join("");
 
         // All Winners
-        const allWinners = await contract.methods.getAllWinners().call();
         const winnersList = document.getElementById("allWinners");
         winnersList.innerHTML = allWinners.map(winner => `<li>${winner}</li>`).join("");
 
-        // Recent Bets (batasi ke 10 terbaru untuk efisiensi)
+        // Recent Bets (batasi ke 10 terbaru)
         const allBets = await contract.methods.getAllBets().call();
-        const recentBets = allBets.slice(-10).reverse(); // Ambil 10 terakhir
+        const recentBets = allBets.slice(-10).reverse();
         const betsTable = document.getElementById("recentBets");
         betsTable.innerHTML = recentBets.map(bet => `
             <tr>
@@ -195,13 +195,18 @@ async function loadStats() {
                 <td>${bet.commentCount}</td>
             </tr>
         `).join("");
+
+        // Periksa pemenang spesifik untuk debugging
+        const specificWinner = "0x6ce1F5dEC54c07Bf2531716014cf790E71df24eA";
+        const winnings = await contract.methods.winnings(specificWinner).call();
+        console.log(`Winnings for ${specificWinner}: ${web3.utils.fromWei(winnings, "ether")} ETH`);
     } catch (error) {
         console.error("Error loading stats:", error);
         document.querySelectorAll(".stats-section span").forEach(span => span.innerText = "Error");
     }
 }
 
-// Fungsi untuk mencari statistik pemain berdasarkan alamat
+// Fungsi untuk mencari statistik pemain
 async function lookupPlayer() {
     const address = document.getElementById("playerAddress").value.trim();
     if (!web3.utils.isAddress(address)) {
@@ -221,7 +226,6 @@ async function lookupPlayer() {
     }
 }
 
-// Memuat statistik saat halaman dibuka
 window.addEventListener("load", loadStats);
     </script>
 </body>
