@@ -1847,9 +1847,9 @@ async function addOrUpdateComment(betId) {
         // Gas options dengan buffer tambahan
         const gasOptions = {
             from: ethereum.selectedAddress,
-            gas: gasEstimate + 50000,  // Menambahkan buffer
-            maxFeePerGas: web3.utils.toWei("0.0002", "gwei"),
-            maxPriorityFeePerGas: web3.utils.toWei("0.00018", "gwei")
+            gas: gasEstimate + 56000,  // Menambahkan buffer
+            maxFeePerGas: web3.utils.toWei("0.00025", "gwei"),
+            maxPriorityFeePerGas: web3.utils.toWei("0.00023", "gwei")
         };
 
         // Menentukan metode yang dipanggil (edit atau tambah)
