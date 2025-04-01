@@ -1,0 +1,118 @@
+<h2>Place Bet</h2>
+<h6 class="blinking-text">Always use slippage to save transaction gas fees!</h6><br>
+
+<!-- Input untuk 5 angka utama -->
+<label for="mainNumber1">Main Number 1:</label>
+<input type="number" id="mainNumber1" min="1" max="69" placeholder="1-69"><br>
+<label for="mainNumber2">Main Number 2:</label>
+<input type="number" id="mainNumber2" min="1" max="69" placeholder="1-69"><br>
+<label for="mainNumber3">Main Number 3:</label>
+<input type="number" id="mainNumber3" min="1" max="69" placeholder="1-69"><br>
+<label for="mainNumber4">Main Number 4:</label>
+<input type="number" id="mainNumber4" min="1" max="69" placeholder="1-69"><br>
+<label for="mainNumber5">Main Number 5:</label>
+<input type="number" id="mainNumber5" min="1" max="69" placeholder="1-69"><br>
+
+<!-- Input untuk Powerball -->
+<label for="powerball">Powerball (1-26):</label>
+<input type="number" id="powerball" min="1" max="26" placeholder="1-26"><br>
+
+<!-- Input untuk betTimes (Power Play multiplier) -->
+<label for="betTimes">Bet Times (Power Play multiplier):</label>
+<input type="number" id="betTimes" placeholder="1 / 2" min="1" max="2" oninput="updateBetPrice()"><br>
+
+<p id="betWarning" style="color: red;"></p>
+<p id="betPrice" style="color: #00FF66; font-weight: bold;">Cost: 0.000000 ETH</p>
+<button onclick="placeBet()">Place Bet</button>
+<p id="betStatus"></p>
+
+
+// **Place Bet**
+async function placeBet() {
+    if (!userAccount) {
+        alert("Please connect your wallet first!");
+        return;
+    }
+
+    // Ambil angka utama dan powerball
+    const mainNumbers = [
+        document.getElementById("mainNumber1").value,
+        document.getElementById("mainNumber2").value,
+        document.getElementById("mainNumber3").value,
+        document.getElementById("mainNumber4").value,
+        document.getElementById("mainNumber5").value
+    ];
+
+    const powerball = document.getElementById("powerball").value;
+    const times = parseInt(document.getElementById("betTimes").value);
+    
+    // Validasi input
+    if (mainNumbers.some(num => num < 1 || num > 69) || powerball < 1 || powerball > 26 || isNaN(times) || times < 1 || times > 2) {
+        alert("Invalid bet input!");
+        return;
+    }
+
+    const betPrice = web3.utils.toWei("0.000256", "ether");
+    const totalCost = betPrice * times;
+
+    try {
+        document.getElementById("betStatus").innerHTML = `
+            <img src="img/load.svg" width="20" height="20" style="vertical-align: middle;">
+            <span style="color: #aaffaa; font-size: 12px;">Transaction in progress...</span>
+        `;
+
+        // Estimasi gas sebelum transaksi
+        const estimatedGas = await contract.methods.placeBet(
+            mainNumbers.map(Number),  // Convert to uint8 array
+            Number(powerball), 
+            times,
+            true,  // Assuming we are using ETH
+            0 // Payout amount, set to 0 for now
+        ).estimateGas({ from: userAccount, value: totalCost });
+
+        // Kirim transaksi
+        await contract.methods.placeBet(
+            mainNumbers.map(Number), 
+            Number(powerball), 
+            times,
+            true, 
+            0
+        ).send({
+            from: userAccount,
+            value: totalCost,
+            gas: estimatedGas + 50000, // Tambahkan buffer gas
+            maxFeePerGas: web3.utils.toWei("0.0015", "gwei"),
+            maxPriorityFeePerGas: web3.utils.toWei("0.0014", "gwei")
+        });
+
+        document.getElementById("betStatus").innerHTML = `
+            <img src="img/success.svg" width="20" height="20" style="vertical-align: middle;">
+            <span style="color: #00cc00; font-size: 12px;">Bet placed successfully!</span>
+        `;
+
+        setTimeout(() => {
+            document.getElementById("betStatus").innerHTML = "";
+        }, 5000);
+
+        loadUserBets();
+    } catch (error) {
+        console.error(error);
+
+        document.getElementById("betStatus").innerHTML = `
+            <img src="img/failed.svg" width="20" height="20" style="vertical-align: middle;">
+            <span style="color: #ff3333; font-size: 12px;">Transaction failed!</span>
+        `;
+
+        setTimeout(() => {
+            document.getElementById("betStatus").innerHTML = "";
+        }, 4000);
+    }
+}
+
+// Fungsi untuk memperbarui harga taruhan (cost) berdasarkan betTimes
+function updateBetPrice() {
+    const times = parseInt(document.getElementById("betTimes").value);
+    const betPrice = web3.utils.toWei("0.000256", "ether");
+    const totalCost = betPrice * times;
+    document.getElementById("betPrice").innerHTML = `Cost: ${web3.utils.fromWei(totalCost.toString(), "ether")} ETH`;
+}
