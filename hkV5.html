@@ -848,6 +848,17 @@ textarea:focus {
 
     display: none;
 }
+
+#betHistoryContainer {
+    background-color: #000000;
+    padding: 15px;
+    border-radius: 10px;
+    max-width: 650px;
+    height: 300px; /* Sesuaikan tinggi */
+    overflow-y: auto; /* Biar bisa discroll */
+    margin: auto;
+    box-shadow: 0px 4px 10px rgba(0, 0, 255, 0.5); /* Efek 3D shadow biru yang smooth */
+}
     </style>
 </head>
 <body>
@@ -922,12 +933,13 @@ textarea:focus {
        <h2>Public Bet History</h2>
        <button onclick="window.open('search', '_blank')"><img src="img/search.svg" alt="Lotto" style="width: 15px; height: 15px;">  Search...</button><br><br>
        <hr style="background-color: #333333; height: 1px; border: none;">
-       <div id="betHistory"></div>
-       <div class="button-container">
-       <button class="nav-button" onclick="prevBetHistory()">Prev</button>
-       <button class="nav-button" onclick="nextBetHistory()">Next</button>
-
-       </div>
+       <div id="betHistoryContainer">
+    <div id="betHistory"></div>
+</div>
+<div class="button-container">
+    <button class="nav-button" onclick="prevBetHistory()">Prev</button>
+    <button class="nav-button" onclick="nextBetHistory()">Next</button>
+</div>
         <br>
 
        <!-- Prize Table -->
