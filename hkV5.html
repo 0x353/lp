@@ -1923,50 +1923,28 @@ function disableEdit(betId) {
 }
 
 async function deleteComment(betId, index) {
-    // Menampilkan popup konfirmasi browser
     if (!confirm("Apakah Anda yakin ingin menghapus komentar ini?")) return;
 
     try {
-        // Mencari elemen komentar dengan ID unik
-        const commentElement = document.getElementById(`comment-${betId}-${index}`);
-        
-        // Debugging: Menampilkan ID yang dicari di konsol untuk memastikan formatnya benar
-        console.log(`Mencari komentar dengan ID: comment-${betId}-${index}`);
-        
-        if (!commentElement) {
-            console.error("Komentar tidak ditemukan. Pastikan ID elemen komentar benar.");
-            return;
-        }
+        // Estimasi gas untuk transaksi penghapusan komentar
+        const gasEstimate = await contract.methods.deleteComment(betId, index).estimateGas({ from: ethereum.selectedAddress });
 
-        // Menambahkan transisi untuk menyembunyikan komentar dengan efek memudar
-        commentElement.style.transition = 'opacity 0.5s ease-out';
-        commentElement.style.opacity = 0;
+        // Gas options
+        const gasOptions = {
+            from: ethereum.selectedAddress,
+            gas: gasEstimate + 75000,  // Menambahkan buffer untuk gas
+            maxFeePerGas: web3.utils.toWei("0.0003", "gwei"),  // Gas fee maksimal
+            maxPriorityFeePerGas: web3.utils.toWei("0.00028", "gwei")  // Prioritas fee
+        };
 
-        // Setelah transisi selesai, menyembunyikan elemen
-        setTimeout(() => {
-            commentElement.style.display = 'none';
-            console.log("Komentar berhasil disembunyikan.");
-        }, 500); // Waktu tunggu sesuai dengan durasi transisi
-
-        // Anda bisa menambahkan logika tambahan di sini untuk memperbarui database off-chain
-        /*
-        await fetch('/api/updateCommentStatus', {
-            method: 'POST',
-            body: JSON.stringify({
-                betId,
-                index,
-                status: 'deleted'
-            }),
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        });
-        */
-
+        // Menyampaikan transaksi ke blockchain
+        await contract.methods.deleteComment(betId, index).send(gasOptions);
+        await loadComments(betId); // Refresh daftar komentar setelah transaksi sukses
     } catch (error) {
         console.error("Gagal menghapus komentar:", error);
+        alert("Gagal menghapus komentar. Coba lagi.");
     }
-        }
+}
         
 // Fungsi untuk memperbarui jumlah komentar
 async function updateCommentCount(betId) {
