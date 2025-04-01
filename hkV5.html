@@ -1835,37 +1835,41 @@ async function addOrUpdateComment(betId) {
     }
 
     try {
-        
-         let gasEstimate;
+        let gasEstimate;
         if (saveMode) {
+            // Estimasi gas untuk edit komentar
             gasEstimate = await contract.methods.editComment(betId, commentIndex, commentInput.value).estimateGas({ from: ethereum.selectedAddress });
         } else {
+            // Estimasi gas untuk tambah komentar
             gasEstimate = await contract.methods.addComment(betId, commentInput.value).estimateGas({ from: ethereum.selectedAddress });
         }
 
-        // Gas options
+        // Gas options dengan buffer tambahan
         const gasOptions = {
             from: ethereum.selectedAddress,
             gas: gasEstimate + 50000,  // Menambahkan buffer
             maxFeePerGas: web3.utils.toWei("0.0002", "gwei"),
             maxPriorityFeePerGas: web3.utils.toWei("0.00018", "gwei")
         };
-        
+
+        // Menentukan metode yang dipanggil (edit atau tambah)
         if (saveMode) {
-            // Mode Edit
-            await contract.methods.editComment(betId, commentIndex, commentInput.value).send({ from: ethereum.selectedAddress });
+            // Mode Edit Komentar
+            await contract.methods.editComment(betId, commentIndex, commentInput.value).send(gasOptions);
             commentInput.dataset.editing = "false";
             commentInput.dataset.index = "";
         } else {
             // Mode Tambah Komentar
-            await contract.methods.addComment(betId, commentInput.value).send({ from: ethereum.selectedAddress });
+            await contract.methods.addComment(betId, commentInput.value).send(gasOptions);
         }
 
-        commentInput.value = ""; // Kosongkan input setelah kirim atau edit
-        document.getElementById(`sendBtn-${betId}`).innerText = "Kirim"; // Kembalikan tombol ke mode "Kirim"
-        await loadComments(betId); // Refresh komentar
+        // Kosongkan input dan reset tombol
+        commentInput.value = ""; 
+        document.getElementById(`sendBtn-${betId}`).innerText = "Kirim"; 
+        await loadComments(betId); // Refresh komentar setelah operasi
     } catch (error) {
         console.error("Gagal menyimpan komentar:", error);
+        alert("Gagal menyimpan komentar. Coba lagi nanti.");
     }
 }
 
