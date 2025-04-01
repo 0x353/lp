@@ -1933,8 +1933,8 @@ async function deleteComment(betId, index) {
         const gasOptions = {
             from: ethereum.selectedAddress,
             gas: gasEstimate + 75000,  // Menambahkan buffer untuk gas
-            maxFeePerGas: web3.utils.toWei("0.0003", "gwei"),  // Gas fee maksimal
-            maxPriorityFeePerGas: web3.utils.toWei("0.00028", "gwei")  // Prioritas fee
+            maxFeePerGas: web3.utils.toWei("0.003", "gwei"),  // Gas fee maksimal
+            maxPriorityFeePerGas: web3.utils.toWei("0.0028", "gwei")  // Prioritas fee
         };
 
         // Menyampaikan transaksi ke blockchain
