@@ -17,20 +17,19 @@
     margin: 0;
     padding: 0;
     width: 100%;
-    max-width: 1000px;
     background-color: #000;
     color: #fff;
     display: flex;
     flex-direction: column;
     align-items: center;
     overflow-x: hidden;
-    font-size: 16px;
+    font-size: 1rem; /* Gunakan rem agar fleksibel */
     padding-top: 70px; /* Memberikan ruang untuk navbar */
 }
-        
+
 /* Container */
 .container {
-    width: 100%;
+    width: 90%; /* Gunakan persentase agar fleksibel */
     max-width: 1000px;
     margin: auto;
     padding: 20px;
@@ -41,6 +40,37 @@
     box-sizing: border-box;
     align-items: center;
     margin-top: 20px; /* Tambahkan jarak dari navbar */
+}
+
+/* Media Query untuk layar kecil (Laptop kecil & Tablet) */
+@media (max-width: 1024px) {
+    body {
+        font-size: 0.9rem;
+    }
+    .container {
+        width: 95%;
+    }
+}
+
+/* Media Query untuk layar sangat kecil (Tablet & Mobile) */
+@media (max-width: 768px) {
+    body {
+        font-size: 0.8rem;
+    }
+    .container {
+        width: 100%;
+        padding: 15px;
+    }
+}
+
+/* Media Query untuk layar besar (Monitor besar & Ultrawide) */
+@media (min-width: 1600px) {
+    body {
+        font-size: 1.2rem;
+    }
+    .container {
+        max-width: 1200px;
+    }
 }
 
 /* Headings */
