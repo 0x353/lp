@@ -194,9 +194,9 @@ tr:hover {
     border-radius: 4px;
 }
 
-/* Styling tombol agar konsisten (asumsikan ada tombol) */
+/* Styling tombol agar konsisten */
 .form-group button {
-    width: clamp(210px, 35vw, 280px);
+    width: 150px; /* Lebar tetap untuk tombol di PC */
     max-width: 100%;
     padding: 10px;
     font-size: 1rem;
@@ -236,18 +236,18 @@ tr:hover {
     .form-group {
         flex-direction: column;
         gap: 10px;
-        padding: 0; /* Hapus padding sisi yang bisa menyebabkan offset */
-        align-items: center; /* Pusatkan elemen secara horizontal */
-        justify-content: center; /* Pastikan vertikal juga terpusat jika perlu */
+        padding: 0;
+        align-items: center;
+        justify-content: center;
     }
     .form-group input,
     .form-group button,
     #betIdInput, 
     #playerAddress {
-        width: clamp(210px, 90%, 280px); /* Gunakan persentase untuk responsivitas */
+        width: clamp(210px, 90%, 280px); /* Pertahankan simetri di HP */
         min-width: 210px;
         max-width: 280px;
-        margin: 0 auto; /* Pastikan setiap elemen terpusat secara individu */
+        margin: 0 auto;
     }
 }
 
