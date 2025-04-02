@@ -186,12 +186,29 @@ const contractABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constru
 const web3 = new Web3(rpcUrl);
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-// Simpan daftar betId yang diketahui
+// Mulai dengan betId yang diketahui
 let knownBetIds = ["63782049335628205328881737524517936403896242350893662034855162823883773081217"];
 let recentBets = [];
 
+async function fetchHistoricalWinners() {
+    try {
+        // Ambil semua event WinnerSet dari block 0 hingga terbaru
+        const events = await contract.getPastEvents("WinnerSet", {
+            fromBlock: 23614303, // Ganti dengan block saat kontrak dideploy jika diketahui
+            toBlock: "latest"
+        });
+        const historicalBetIds = events.map(event => event.returnValues.betId);
+        // Gabungkan dengan knownBetIds awal, hapus duplikat
+        knownBetIds = [...new Set([...knownBetIds, ...historicalBetIds])];
+        console.log("[fetchHistoricalWinners] Historical betIds:", knownBetIds);
+    } catch (error) {
+        console.error("[fetchHistoricalWinners] Error fetching past events:", error);
+    }
+}
+
 async function loadStats() {
     try {
+        await fetchHistoricalWinners(); // Ambil betId historis dulu
         await updateGeneralStats();
         await updateWinnerHistory();
         await updateRecentBets();
@@ -214,8 +231,10 @@ async function updateGeneralStats() {
         document.getElementById("contractBalance").innerText = web3.utils.fromWei(contractBalance, "ether");
 
         const allWinners = await contract.methods.getAllWinners().call();
-        const lastWinner = allWinners.length > 0 ? allWinners[allWinners.length - 1] : "None";
-        document.getElementById("lastWinner").innerText = lastWinner;
+        
+        // Last Winner
+        const lastWinner = await contract.methods.lastWinner().call();
+        document.getElementById("lastWinner").innerText = lastWinner === "0x0000000000000000000000000000000000000000" ? "None" : lastWinner; 
 
         const totalWinners = await contract.methods.totalWinners().call();
         document.getElementById("totalWinners").innerText = totalWinners;
@@ -294,7 +313,6 @@ async function lookupPlayer() {
         let totalWins = 0;
         let totalPayout = parseFloat(web3.utils.fromWei(winnings, "ether"));
 
-        // Cek semua betId yang diketahui untuk kemenangan
         for (const betId of knownBetIds) {
             const winnerData = await contract.methods.getWinnerByBetId(betId).call();
             if (winnerData.winner.toLowerCase() === address.toLowerCase()) {
@@ -307,7 +325,7 @@ async function lookupPlayer() {
         document.getElementById("playerTotalAmountBet").innerText = web3.utils.fromWei(stats[1], "ether");
         document.getElementById("playerTotalWins").innerText = totalWins;
         document.getElementById("playerTotalPayout").innerText = totalPayout.toFixed(6);
-        console.log(`[lookupPlayer] Updated stats for ${address}:`, { totalBets: stats[0], totalWins, totalPayout });
+        console.log(`[lookupPlayer] Updated stats for ${address}`);
     } catch (error) {
         console.error("[lookupPlayer] Error:", error);
         alert("Failed to fetch player stats!");
@@ -375,7 +393,9 @@ contract.events.LastWinnerUpdated({ fromBlock: "latest" })
     })
     .on("error", (error) => console.error("[LastWinnerUpdated Event] Error:", error));
 
+// Inisialisasi saat halaman dimuat
 window.addEventListener("load", loadStats);
+
     </script>
 </body>
 </html>
