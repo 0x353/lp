@@ -801,11 +801,11 @@ async function updateWinnerHistory() {
             if (winnerData.winner !== "0x0000000000000000000000000000000000000000") {
                 winnerHistoryHTML += `
                     <tr>
-                        <td>${betId}</td>
-                        <td>${winnerData.winner}</td>
-                        <td>${web3.utils.fromWei(winnerData.amount, "ether")}(ETH)</td>
-                        <td>${winnerData.number}</td>
-                        <td>${new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString()}</td>
+                        <td style="color: #b37500;">${betId}</td>
+                        <td style="color: #ad5cff;">${winnerData.winner}</td>
+                        <td style="color: #00b7ff;">${web3.utils.fromWei(winnerData.amount, "ether")}(ETH)</td>
+                        <td style="color: #00FF66;">${winnerData.number}</td>
+                        <td style="color: orange;">${new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString()}</td>
                     </tr>
                 `;
             }
