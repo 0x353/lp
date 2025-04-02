@@ -40,6 +40,7 @@ h2 {
     font-size: 1.6em;
     color: #34495e;
     margin-bottom: 15px;
+    text-align: center;
 }
 
 /* Section styling */
@@ -48,23 +49,24 @@ section {
     border-radius: 6px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
     overflow: hidden;
 }
 
 /* General Statistics */
 .stats-section {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
-    justify-content: center;
+    padding: 10px;
 }
 
 .stats-item {
-    flex: 1;
-    min-width: 200px;
     text-align: center;
-    padding: 10px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background-color: #fafafa;
 }
 
 .stats-item strong {
@@ -83,7 +85,7 @@ section {
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
+    margin-top: 15px;
 }
 
 th, td {
@@ -110,27 +112,25 @@ tr:hover {
     background-color: #f1f1f1;
 }
 
-/* Player Lookup */
-.player-lookup {
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.player-lookup-form {
+/* Form styling umum */
+.form-group {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
+    justify-content: center;
     margin-bottom: 20px;
 }
 
-.player-lookup input {
+.form-group input {
     flex: 1;
+    min-width: 200px;
     padding: 10px;
     font-size: 1em;
     border: 1px solid #ccc;
     border-radius: 4px;
 }
 
-.player-lookup button {
+.form-group button {
     padding: 10px 20px;
     font-size: 1em;
     background-color: #3498db;
@@ -141,8 +141,14 @@ tr:hover {
     transition: background-color 0.3s;
 }
 
-.player-lookup button:hover {
+.form-group button:hover {
     background-color: #2980b9;
+}
+
+/* Player Lookup */
+.player-lookup {
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 .player-stats {
@@ -151,52 +157,18 @@ tr:hover {
 
 .player-stats p {
     margin: 8px 0;
+    font-size: 1.1em;
 }
 
 .player-stats span {
-    font-size: 1.2em;
     color: #2980b9;
     font-weight: bold;
 }
 
-/* Class untuk menyembunyikan elemen */
-.hidden {
-    display: none;
-}
-
-/* Lookup by Bet ID */
+/* Bet ID Lookup */
 .betid-lookup {
     max-width: 600px;
     margin: 0 auto;
-}
-
-.betid-lookup-form {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.betid-lookup input {
-    flex: 1;
-    padding: 10px;
-    font-size: 1em;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.betid-lookup button {
-    padding: 10px 20px;
-    font-size: 1em;
-    background-color: #3498db;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.betid-lookup button:hover {
-    background-color: #2980b9;
 }
 
 .betid-result {
@@ -205,29 +177,32 @@ tr:hover {
 
 .betid-result p {
     margin: 8px 0;
+    font-size: 1.1em;
 }
 
 .betid-result span {
-    font-size: 1.2em;
     color: #2980b9;
     font-weight: bold;
 }
 
+/* Class untuk menyembunyikan elemen */
+.hidden {
+    display: none !important;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
-    .stats-item {
-        min-width: 100%;
+    .stats-section {
+        grid-template-columns: 1fr;
     }
 
-    .player-lookup-form, .betid-lookup-form {
+    .form-group {
         flex-direction: column;
+        align-items: stretch;
     }
 
-    .player-lookup input, .betid-lookup input {
-        width: 100%;
-    }
-
-    .player-lookup button, .betid-lookup button {
+    .form-group input,
+    .form-group button {
         width: 100%;
     }
 
@@ -243,7 +218,7 @@ tr:hover {
     h2 {
         font-size: 1.4em;
     }
-        }
+}
     </style>
 </head>
 <body>
@@ -324,7 +299,7 @@ tr:hover {
         <!-- Player Lookup -->
         <section class="player-lookup">
             <h2>Player Lookup</h2>
-            <div class="player-lookup-form">
+            <div class="form-group">
                 <input type="text" id="playerAddress" placeholder="Enter player address">
                 <button onclick="lookupPlayer()">Lookup</button>
             </div>
@@ -339,13 +314,15 @@ tr:hover {
         <!-- Lookup by Bet ID -->
         <section class="betid-lookup">
             <h2>Lookup Winner by Bet ID</h2>
-            <input type="text" id="betIdInput" placeholder="Enter Bet ID">
-            <button onclick="lookupWinnerByBetId()">Lookup</button>
-            <div class="player-stats hidden">
-                <strong>Winner Address:</strong> <span id="winnerAddress">-</span>
-                <strong>Amount Won:</strong> <span id="winnerAmount">-</span>
-                <strong>Winning Number:</strong> <span id="winnerNumber">-</span>
-                <strong>Timestamp:</strong> <span id="winnerTimestamp">-</span>
+            <div class="form-group">
+                <input type="text" id="betIdInput" placeholder="Enter Bet ID">
+                <button onclick="lookupWinnerByBetId()">Lookup</button>
+            </div>
+            <div class="betid-result hidden">
+                <p><strong>Winner Address:</strong> <span id="winnerAddress">-</span></p>
+                <p><strong>Amount Won:</strong> <span id="winnerAmount">-</span></p>
+                <p><strong>Winning Number:</strong> <span id="winnerNumber">-</span></p>
+                <p><strong>Timestamp:</strong> <span id="winnerTimestamp">-</span></p>
             </div>
         </section>
         </div>
@@ -478,10 +455,15 @@ async function updateRecentBets() {
 
 async function lookupPlayer() {
     const address = document.getElementById("playerAddress").value.trim();
+    const playerStatsDiv = document.querySelector(".player-stats");
+
+    playerStatsDiv.classList.add("hidden");
+
     if (!web3.utils.isAddress(address)) {
         alert("Invalid Ethereum address!");
         return;
     }
+
     try {
         const stats = await contract.methods.getPlayerStats(address).call();
         const winnings = await contract.methods.winnings(address).call();
@@ -500,6 +482,8 @@ async function lookupPlayer() {
         document.getElementById("playerTotalAmountBet").innerText = web3.utils.fromWei(stats[1], "ether");
         document.getElementById("playerTotalWins").innerText = totalWins;
         document.getElementById("playerTotalPayout").innerText = totalPayout.toFixed(6);
+
+        playerStatsDiv.classList.remove("hidden");
         console.log(`[lookupPlayer] Updated stats for ${address}`);
     } catch (error) {
         console.error("[lookupPlayer] Error:", error);
@@ -509,13 +493,20 @@ async function lookupPlayer() {
 
 async function lookupWinnerByBetId() {
     const betId = document.getElementById("betIdInput").value.trim();
+    const betIdResultDiv = document.querySelector(".betid-result");
+
+    // Sembunyikan sebelum lookup
+    betIdResultDiv.classList.add("hidden");
+
     if (!betId) {
         alert("Please enter a valid Bet ID!");
         return;
     }
+
     try {
         const winnerData = await contract.methods.getWinnerByBetId(betId).call();
         console.log(`[lookupWinnerByBetId] Winner Data for Bet ID ${betId}:`, winnerData);
+        
         if (winnerData.winner === "0x0000000000000000000000000000000000000000") {
             document.getElementById("winnerAddress").innerText = "No winner set";
             document.getElementById("winnerAmount").innerText = "-";
@@ -527,6 +518,9 @@ async function lookupWinnerByBetId() {
             document.getElementById("winnerNumber").innerText = winnerData.number;
             document.getElementById("winnerTimestamp").innerText = new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString();
         }
+
+        // Tampilkan setelah lookup berhasil
+        betIdResultDiv.classList.remove("hidden");
     } catch (error) {
         console.error("[lookupWinnerByBetId] Error:", error);
         alert("Failed to fetch winner data!");
@@ -568,7 +562,6 @@ contract.events.LastWinnerUpdated({ fromBlock: "latest" })
     })
     .on("error", (error) => console.error("[LastWinnerUpdated Event] Error:", error));
 
-// Inisialisasi saat halaman dimuat
 window.addEventListener("load", loadStats);
 
     </script>
