@@ -427,7 +427,7 @@ async function updateWinnerHistory() {
             if (winnerData.winner !== "0x0000000000000000000000000000000000000000") {
                 winnerHistoryHTML += `
                     <tr>
-                        <td>${betId.slice(0, 6)}...</td>
+                        <td>${betId}</td>
                         <td>${winnerData.winner}</td>
                         <td>${web3.utils.fromWei(winnerData.amount, "ether")}(ETH)</td>
                         <td>${winnerData.number}</td>
