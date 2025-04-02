@@ -438,38 +438,45 @@ async function updateWinnerHistory() {
     }
 }
 
+// Listener untuk event BetPlaced dari kontrak
+contract.events.BetPlaced({}, async (error, event) => {
+    if (error) {
+        console.error("[BetPlaced Event] Error:", error);
+        return;
+    }
+
+    console.log("[BetPlaced Event] New bet detected:", event.returnValues);
+
+    // Memperbarui daftar taruhan terbaru setelah ada taruhan baru
+    await updateRecentBets();
+});
+
+// Fungsi untuk memperbarui taruhan terbaru
 async function updateRecentBets() {
     try {
-        console.log("[updateRecentBets] Fetching recent bets...");
-
         const allBets = await contract.methods.getAllBets().call();
-        if (!allBets || allBets.length === 0) {
-            console.warn("[updateRecentBets] No bets found.");
-            return;
-        }
+        const recentBets = allBets.slice(-10).reverse(); // Ambil 10 taruhan terakhir
 
-        const recentBets = allBets.slice(-10).reverse();
         const tbody = document.querySelector("#recentBets tbody");
-        tbody.innerHTML = "";
+        tbody.innerHTML = ""; // Bersihkan tabel sebelum menambahkan data baru
 
+        // Tambahkan baris baru untuk setiap taruhan terbaru
         for (const bet of recentBets) {
-            console.log("[updateRecentBets] Processing bet:", bet);
-
-            const likeCount = await contract.methods.getLikeCount(bet.id).call();
-            const comments = await contract.methods.getComments(bet.id).call();
+            const likeCount = await contract.methods.getLikeCount(bet.betId).call();
+            const comments = await contract.methods.getComments(bet.betId).call();
 
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td>${bet.player}</td>
                 <td>${bet.number}</td>
-                <td>${web3.utils.fromWei(bet.betAmount, "ether")} ETH</td>
+                <td>${bet.betAmount}</td>
                 <td>${likeCount || 0}</td>
                 <td>${comments.length || 0}</td>
             `;
-            tbody.appendChild(row);
+            tbody.appendChild(row); // Tambahkan baris baru ke tabel
         }
 
-        console.log("[updateRecentBets] Updated Recent Bets successfully.");
+        console.log("[updateRecentBets] Updated Recent Bets with Likes & Comments");
     } catch (error) {
         console.error("[updateRecentBets] Error:", error);
     }
