@@ -420,7 +420,7 @@ async function updateWinnerHistory() {
                 `;
             }
         }
-        document.getElementById("winnerHistory").innerHTML = winnerHistoryHTML || "<tr><td colspan='5'>No winners found</td></tr>";
+        document.querySelector("#winnerHistory tbody").innerHTML = winnerHistoryHTML || "<tr><td colspan='5'>No winners found</td></tr>";
         console.log("[updateWinnerHistory] Updated Winner History");
     } catch (error) {
         console.error("[updateWinnerHistory] Error:", error);
@@ -431,7 +431,7 @@ async function updateRecentBets() {
     try {
         const allBets = await contract.methods.getAllBets().call();
         recentBets = allBets.slice(-10).reverse();
-        document.getElementById("recentBets").innerHTML = recentBets.map(bet => `
+        document.querySelector("#recentBets tbody").innerHTML = recentBets.map(bet => `
             <tr>
                 <td>${bet.player}</td>
                 <td>${bet.number}</td>
