@@ -393,8 +393,9 @@ async function updateGeneralStats() {
         document.getElementById("contractBalance").innerText = web3.utils.fromWei(contractBalance, "ether");
 
         const allWinners = await contract.methods.getAllWinners().call();
-        const lastWinner = allWinners.length > 0 ? allWinners[allWinners.length - 1] : "None";
-        document.getElementById("lastWinner").innerText = lastWinner;
+        
+        const lastWinner = await contract.methods.lastWinner().call();
+        document.getElementById("lastWinner").innerText = lastWinner === "0x0000000000000000000000000000000000000000" ? "None" : lastWinner;
 
         const totalWinners = await contract.methods.totalWinners().call();
         document.getElementById("totalWinners").innerText = totalWinners;
