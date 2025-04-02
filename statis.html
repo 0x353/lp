@@ -441,17 +441,27 @@ async function updateWinnerHistory() {
 async function updateRecentBets() {
     try {
         const allBets = await contract.methods.getAllBets().call();
-        recentBets = allBets.slice(-10).reverse();
-        document.querySelector("#recentBets tbody").innerHTML = recentBets.map(bet => `
-            <tr>
+        const recentBets = allBets.slice(-10).reverse();
+
+        const tbody = document.querySelector("#recentBets tbody");
+        tbody.innerHTML = "";
+
+        for (const bet of recentBets) {
+            const likeCount = await contract.methods.getLikeCount(bet.id).call();
+            const comments = await contract.methods.getComments(bet.id).call();
+
+            const row = document.createElement("tr");
+            row.innerHTML = `
                 <td>${bet.player}</td>
                 <td>${bet.number}</td>
                 <td>${bet.betAmount}</td>
-                <td>${bet.likeCount}</td>
-                <td>${bet.commentCount}</td>
-            </tr>
-        `).join("");
-        console.log("[updateRecentBets] Updated Recent Bets");
+                <td>${likeCount || 0}</td>
+                <td>${comments.length || 0}</td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        console.log("[updateRecentBets] Updated Recent Bets with Likes & Comments");
     } catch (error) {
         console.error("[updateRecentBets] Error:", error);
     }
