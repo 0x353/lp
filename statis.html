@@ -440,13 +440,21 @@ async function updateWinnerHistory() {
 
 async function updateRecentBets() {
     try {
-        const allBets = await contract.methods.getAllBets().call();
-        const recentBets = allBets.slice(-10).reverse();
+        console.log("[updateRecentBets] Fetching recent bets...");
 
+        const allBets = await contract.methods.getAllBets().call();
+        if (!allBets || allBets.length === 0) {
+            console.warn("[updateRecentBets] No bets found.");
+            return;
+        }
+
+        const recentBets = allBets.slice(-10).reverse();
         const tbody = document.querySelector("#recentBets tbody");
         tbody.innerHTML = "";
 
         for (const bet of recentBets) {
+            console.log("[updateRecentBets] Processing bet:", bet);
+
             const likeCount = await contract.methods.getLikeCount(bet.id).call();
             const comments = await contract.methods.getComments(bet.id).call();
 
@@ -454,18 +462,31 @@ async function updateRecentBets() {
             row.innerHTML = `
                 <td>${bet.player}</td>
                 <td>${bet.number}</td>
-                <td>${bet.betAmount}</td>
+                <td>${web3.utils.fromWei(bet.betAmount, "ether")} ETH</td>
                 <td>${likeCount || 0}</td>
                 <td>${comments.length || 0}</td>
             `;
             tbody.appendChild(row);
         }
 
-        console.log("[updateRecentBets] Updated Recent Bets with Likes & Comments");
+        console.log("[updateRecentBets] Updated Recent Bets successfully.");
     } catch (error) {
         console.error("[updateRecentBets] Error:", error);
     }
 }
+
+// Panggil saat halaman pertama kali dimuat
+window.addEventListener("load", async () => {
+    await updateRecentBets();
+});
+
+// Event listener untuk update real-time
+contract.events.BetPlaced({ fromBlock: "latest" })
+    .on("data", async (event) => {
+        console.log("[BetPlaced Event] New bet detected:", event.returnValues);
+        await updateRecentBets();
+    })
+    .on("error", (error) => console.error("[BetPlaced Event] Error:", error));
 
 async function lookupPlayer() {
     const address = document.getElementById("playerAddress").value.trim();
