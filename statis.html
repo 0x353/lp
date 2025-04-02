@@ -851,11 +851,11 @@ async function updateRecentBets(newBetId) {
 
                 const row = document.createElement("tr");
                 row.innerHTML = `
-                    <td>${bet.player}</td>
-                    <td>${bet.number}</td>
-                    <td>${bet.betAmount}</td>
-                    <td>${likeCount || 0}</td>
-                    <td>${comments.length || 0}</td>
+                    <td style="color: #ad5cff;">${bet.player}</td>
+                    <td style="color: #00FF66;">${bet.number}</td>
+                    <td style="color: #00FF66;">${bet.betAmount}</td>
+                    <td style="color: orange;">${likeCount || 0}</td>
+                    <td style="color: #fcf800;">${comments.length || 0}</td>
                 `;
                 tbody.appendChild(row); // Tambahkan baris baru ke tabel
                 
