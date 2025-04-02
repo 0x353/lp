@@ -74,14 +74,21 @@ section {
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
     padding: 10px;
+    justify-content: center; /* Menengahkan secara horizontal */
+    align-content: center; /* Menengahkan secara vertikal */
+    min-height: 100vh; /* Agar bisa terpusat dalam viewport */
 }
 
 .stats-item {
+    display: flex;
+    justify-content: center; /* Pusatkan horizontal */
+    align-items: center; /* Pusatkan vertikal */
     text-align: center;
     padding: 15px;
     border: 1px solid #e0e0e0;
     border-radius: 4px;
     background-color: #fafafa;
+    min-height: 100px; /* Sesuaikan tinggi minimum agar terlihat */
 }
 
 .stats-item strong {
@@ -521,6 +528,7 @@ footer {
                 <p><strong>Total Payout:</strong> <span id="playerTotalPayout">0 ETH</span></p>
             </div>
         </section>
+        </div>
 
         <!-- Lookup by Bet ID -->
         <section class="betid-lookup">
