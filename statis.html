@@ -413,12 +413,30 @@ async function updateGeneralStats() {
     }
 }
 
+async function listenForWinnerEvents() {
+    contract.events.WinnerSet()
+        .on("data", async (event) => {
+            console.log("[WinnerSet Event] New Winner:", event.returnValues);
+
+            const betId = event.returnValues.betId;
+            if (!knownBetIds.includes(betId)) {
+                knownBetIds.push(betId);  // Tambahkan betId baru
+            }
+            
+            await updateWinnerHistory();  // Update UI otomatis
+        })
+        .on("error", (error) => {
+            console.error("[WinnerSet Event] Error:", error);
+        });
+}
+
 async function updateWinnerHistory() {
     try {
         let winnerHistoryHTML = "";
         for (const betId of knownBetIds) {
             const winnerData = await contract.methods.getWinnerByBetId(betId).call();
             console.log(`[updateWinnerHistory] Winner Data for Bet ID ${betId}:`, winnerData);
+
             if (winnerData.winner !== "0x0000000000000000000000000000000000000000") {
                 winnerHistoryHTML += `
                     <tr>
@@ -438,24 +456,57 @@ async function updateWinnerHistory() {
     }
 }
 
+// Jalankan event listener saat halaman dimuat
+listenForWinnerEvents();
+
+// Listener untuk event BetPlaced dari kontrak
+contract.events.BetPlaced({}, async (error, event) => {
+    if (error) {
+        console.error("[BetPlaced Event] Error:", error);
+        return;
+    }
+
+    console.log("[BetPlaced Event] New bet detected:", event.returnValues);
+
+    // Memperbarui daftar taruhan terbaru setelah ada taruhan baru
+    await updateRecentBets();
+});
+
+// Fungsi untuk memperbarui taruhan terbaru
 async function updateRecentBets() {
     try {
         const allBets = await contract.methods.getAllBets().call();
-        recentBets = allBets.slice(-10).reverse();
-        document.querySelector("#recentBets tbody").innerHTML = recentBets.map(bet => `
-            <tr>
+        const recentBets = allBets.slice(-10).reverse(); // Ambil 10 taruhan terakhir
+
+        const tbody = document.querySelector("#recentBets tbody");
+        tbody.innerHTML = ""; // Bersihkan tabel sebelum menambahkan data baru
+
+        // Tambahkan baris baru untuk setiap taruhan terbaru
+        for (const bet of recentBets) {
+            const likeCount = await contract.methods.getLikeCount(bet.betId).call();
+            const comments = await contract.methods.getComments(bet.betId).call();
+
+            const row = document.createElement("tr");
+            row.innerHTML = `
                 <td>${bet.player}</td>
                 <td>${bet.number}</td>
                 <td>${bet.betAmount}</td>
-                <td>${bet.likeCount}</td>
-                <td>${bet.commentCount}</td>
-            </tr>
-        `).join("");
-        console.log("[updateRecentBets] Updated Recent Bets");
+                <td>${likeCount || 0}</td>
+                <td>${comments.length || 0}</td>
+            `;
+            tbody.appendChild(row); // Tambahkan baris baru ke tabel
+        }
+
+        console.log("[updateRecentBets] Updated Recent Bets with Likes & Comments");
     } catch (error) {
         console.error("[updateRecentBets] Error:", error);
     }
 }
+
+// Jika kamu juga ingin menggunakan polling (misalnya 5 detik sekali) untuk memastikan pembaruan, bisa menambahkan interval:
+setInterval(async () => {
+    await updateRecentBets();  // Update setiap 5 detik
+}, 5000);  // Interval 5 detik
 
 async function lookupPlayer() {
     const address = document.getElementById("playerAddress").value.trim();
