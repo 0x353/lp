@@ -220,6 +220,43 @@ tr:hover {
     }
 }
 
+/* Container untuk menggulir tabel horizontal */
+.table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Untuk smooth scrolling di iOS */
+    margin-top: 15px;
+}
+
+/* Styling tabel */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+th {
+    background-color: #3498db;
+    color: #fff;
+    font-weight: 600;
+}
+
+td {
+    font-size: 0.95em;
+}
+
+tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
 /* Navbar */
 .navbar {
     display: flex;
