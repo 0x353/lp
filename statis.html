@@ -438,6 +438,9 @@ async function updateWinnerHistory() {
     }
 }
 
+// Array untuk melacak betId yang sudah ditampilkan
+let displayedBetIds = [];
+
 // Listener untuk event BetPlaced dari kontrak
 contract.events.BetPlaced({}, async (error, event) => {
     if (error) {
@@ -448,11 +451,11 @@ contract.events.BetPlaced({}, async (error, event) => {
     console.log("[BetPlaced Event] New bet detected:", event.returnValues);
 
     // Memperbarui daftar taruhan terbaru setelah ada taruhan baru
-    await updateRecentBets();
+    await updateRecentBets(event.returnValues.betId);
 });
 
 // Fungsi untuk memperbarui taruhan terbaru
-async function updateRecentBets() {
+async function updateRecentBets(newBetId) {
     try {
         const allBets = await contract.methods.getAllBets().call();
         const recentBets = allBets.slice(-10).reverse(); // Ambil 10 taruhan terakhir
@@ -462,18 +465,24 @@ async function updateRecentBets() {
 
         // Tambahkan baris baru untuk setiap taruhan terbaru
         for (const bet of recentBets) {
-            const likeCount = await contract.methods.getLikeCount(bet.betId).call();
-            const comments = await contract.methods.getComments(bet.betId).call();
+            // Pastikan betId belum ditampilkan sebelumnya
+            if (!displayedBetIds.includes(bet.betId)) {
+                const likeCount = await contract.methods.getLikeCount(bet.betId).call();
+                const comments = await contract.methods.getComments(bet.betId).call();
 
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${bet.player}</td>
-                <td>${bet.number}</td>
-                <td>${bet.betAmount}</td>
-                <td>${likeCount || 0}</td>
-                <td>${comments.length || 0}</td>
-            `;
-            tbody.appendChild(row); // Tambahkan baris baru ke tabel
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${bet.player}</td>
+                    <td>${bet.number}</td>
+                    <td>${bet.betAmount}</td>
+                    <td>${likeCount || 0}</td>
+                    <td>${comments.length || 0}</td>
+                `;
+                tbody.appendChild(row); // Tambahkan baris baru ke tabel
+                
+                // Tambahkan betId ke array displayedBetIds
+                displayedBetIds.push(bet.betId);
+            }
         }
 
         console.log("[updateRecentBets] Updated Recent Bets with Likes & Comments");
@@ -481,20 +490,7 @@ async function updateRecentBets() {
         console.error("[updateRecentBets] Error:", error);
     }
 }
-
-// Panggil saat halaman pertama kali dimuat
-window.addEventListener("load", async () => {
-    await updateRecentBets();
-});
-
-// Event listener untuk update real-time
-contract.events.BetPlaced({ fromBlock: "latest" })
-    .on("data", async (event) => {
-        console.log("[BetPlaced Event] New bet detected:", event.returnValues);
-        await updateRecentBets();
-    })
-    .on("error", (error) => console.error("[BetPlaced Event] Error:", error));
-
+        
 async function lookupPlayer() {
     const address = document.getElementById("playerAddress").value.trim();
     const playerStatsDiv = document.querySelector(".player-stats");
