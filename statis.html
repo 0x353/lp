@@ -249,13 +249,21 @@ async function lookupPlayer() {
         alert("Invalid Ethereum address!");
         return;
     }
-
     try {
+        // Ambil data dari playerStats
         const stats = await contract.methods.getPlayerStats(address).call();
+        const winnings = await contract.methods.winnings(address).call();
+        const totalWinners = await contract.methods.totalWinners().call();
+
+        // Hitung Total Wins berdasarkan winnings (asumsi 1 kemenangan = ada winnings)
+        const totalWins = winnings > 0 ? 1 : 0; // Sederhana, bisa disesuaikan jika ada logika lain
+        const totalPayout = web3.utils.fromWei(winnings, "ether");
+
         document.getElementById("playerTotalBets").innerText = stats[0];
         document.getElementById("playerTotalAmountBet").innerText = web3.utils.fromWei(stats[1], "ether");
-        document.getElementById("playerTotalWins").innerText = stats[2];
-        document.getElementById("playerTotalPayout").innerText = web3.utils.fromWei(stats[3], "ether");
+        document.getElementById("playerTotalWins").innerText = totalWins;
+        document.getElementById("playerTotalPayout").innerText = totalPayout;
+        console.log(`Player Stats for ${address}:`, stats, `Winnings: ${totalPayout} ETH`);
     } catch (error) {
         console.error("Error fetching player stats:", error);
         alert("Failed to fetch player stats!");
