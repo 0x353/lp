@@ -112,6 +112,20 @@ section {
         inset 0 -3px 6px rgba(0, 0, 0, 0.24); /* Inner shadow lebih dalam (turun dari 0.4 ke 0.24) */
 }
         
+/* Section styling */
+section {
+    background-color: #1a1a1a;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+    overflow: hidden;
+    box-shadow: 
+        0 5px 10px rgba(0, 255, 255, 0.12),
+        0 10px 20px rgba(0, 255, 255, 0.18),
+        inset 0 2px 4px rgba(255, 255, 255, 0.06),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.24);
+}
+
 /* General Statistics */
 .stats-section {
     display: grid;
@@ -133,6 +147,20 @@ section {
     overflow: hidden;
 }
 
+/* Styling ikon dengan background bundar */
+.icon-circle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px; /* Ukuran lingkaran */
+    height: 40px;
+    background-color: #007bff; /* Biru */
+    border-radius: 50%; /* Membuat bundar */
+    color: #ffffff; /* Warna ikon putih */
+    font-size: 20px; /* Ukuran ikon */
+    margin: 0 auto 10px auto; /* Posisi di atas judul dan terpusat */
+}
+
 /* Efek hover */
 .stats-item:hover {
     transform: scale(1.05);
@@ -142,7 +170,6 @@ section {
     border-color: rgba(0, 183, 255, 0.9);
 }
 
-/* Efek glow tambahan */
 .stats-item::before {
     content: "";
     position: absolute;
@@ -615,33 +642,40 @@ footer {
         <section class="stats-section">
             <h3>General Statistics</h3>
             <div class="stats-item">
-                <strong style="color: #F0F0F0;">Total Bets</strong>
-                <span id="totalBets">0</span>
-            </div>
-            <div class="stats-item">
-                <strong style="color: #F0F0F0;">Total Payout</strong>
-                <span id="totalPayout">0 ETH</span>
-            </div>
-            <div class="stats-item">
-                <strong style="color: #F0F0F0;">Total Winners</strong>
-                <span id="totalWinners">0</span>
-            </div>
-            <div class="stats-item">
-                <strong style="color: #F0F0F0;">Last Winner</strong>
-                <span id="lastWinner">None</span>
-            </div>
-            <div class="stats-item">
-                <strong style="color: #F0F0F0;">Total Players</strong>
-                <span id="totalPlayers">0</span>
-            </div>
-            <div class="stats-item">
-                <strong style="color: #F0F0F0;">Average Bet Amount</strong>
-                <span id="averageBetAmount">0 ETH</span>
-            </div>
-            <div class="stats-item">
-                <strong style="color: #F0F0F0;">Top Bettor</strong>
-                <span id="topBettor">None</span>
-            </div>
+    <i class="fas fa-dice icon-circle"></i>
+    <strong style="color: #F0F0F0;">Total Bets</strong>
+    <span id="totalBets">0</span>
+</div>
+<div class="stats-item">
+    <i class="fas fa-coins icon-circle"></i>
+    <strong style="color: #F0F0F0;">Total Payout</strong>
+    <span id="totalPayout">0 ETH</span>
+</div>
+<div class="stats-item">
+    <i class="fas fa-trophy icon-circle"></i>
+    <strong style="color: #F0F0F0;">Total Winners</strong>
+    <span id="totalWinners">0</span>
+</div>
+<div class="stats-item">
+    <i class="fas fa-medal icon-circle"></i>
+    <strong style="color: #F0F0F0;">Last Winner</strong>
+    <span id="lastWinner">None</span>
+</div>
+<div class="stats-item">
+    <i class="fas fa-users icon-circle"></i>
+    <strong style="color: #F0F0F0;">Total Players</strong>
+    <span id="totalPlayers">0</span>
+</div>
+<div class="stats-item">
+    <i class="fas fa-calculator icon-circle"></i>
+    <strong style="color: #F0F0F0;">Average Bet Amount</strong>
+    <span id="averageBetAmount">0 ETH</span>
+</div>
+<div class="stats-item">
+    <i class="fas fa-crown icon-circle"></i>
+    <strong style="color: #F0F0F0;">Top Bettor</strong>
+    <span id="topBettor">None</span>
+</div>
         </section>
 
         <!-- Winner History -->
