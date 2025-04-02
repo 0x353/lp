@@ -19,7 +19,7 @@
     width: 100%;
     max-width: 1000px;
     background-color: #000;
-    color: #ccc;
+    color: #fff;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -149,21 +149,18 @@ tr:hover {
 
 /* Centering the input fields */
 #betIdInput, #playerAddress {
-    display: block; /* Supaya input ada di bawah satu sama lain */
-    margin: 10px auto; /* Posisikan di tengah horizontal */
     width: 200px;
     max-width: 250px;
     padding: 10px;
     font-size: 1em;
     border: 1px solid rgba(255, 255, 255, 0.3); /* Efek kaca */
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.5); /* Transparansi 50% */
+    background: rgba(255, 255, 255, 0.15); /* Transparansi 85% */
     backdrop-filter: blur(10px); /* Blur untuk efek kaca */
     box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1), 
                 inset 0 1px 2px rgba(255, 255, 255, 0.2);
     color: white; /* Warna teks agar tetap terlihat */
     transition: all 0.3s ease-in-out;
-    text-align: center; /* Posisikan teks di tengah */
 }
 
 /* Efek hover futuristik */
@@ -172,7 +169,7 @@ tr:hover {
                 0 0 30px rgba(0, 183, 255, 0.5);
     border-color: rgba(0, 183, 255, 0.8); /* Warna biru neon */
     transform: scale(1.05); /* Efek sedikit membesar */
-        }
+}
 
 .form-group button {
     padding: 10px 20px;
