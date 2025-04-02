@@ -258,6 +258,7 @@ tr:hover {
             <div class="stats-item">
                 <strong>Last Winner</strong>
                 <span id="lastWinner">None</span>
+                <span id="lastPrize">None</span>
             </div>
             <div class="stats-item">
                 <strong>Total Players</strong>
@@ -394,22 +395,15 @@ async function updateGeneralStats() {
 
         const allWinners = await contract.methods.getAllWinners().call();
         
-        async function getLastWinnerAndPrize() {
-    // Mendapatkan last winner
-    const lastWinner = await contract.methods.lastWinner().call();
-    // Mendapatkan last prize (asumsi ada method lastPrize)
-    const lastPrize = await contract.methods.lastPrize().call();
-    
-    // Format display
-    const winnerText = lastWinner === "0x0000000000000000000000000000000000000000" 
-        ? "None" 
-        : `${lastWinner} (Prize: ${web3.utils.fromWei(lastPrize, 'ether')} ETH)`;
-    
-    document.getElementById("lastWinner").innerText = winnerText;
-}
+        const lastWinner = await contract.methods.lastWinner().call();
+const lastPrize = await contract.methods.lastPrize().call();
 
-// Panggil fungsi
-getLastWinnerAndPrize();
+document.getElementById("lastWinner").innerText = lastWinner === "0x0000000000000000000000000000000000000000" 
+    ? "None" 
+    : lastWinner;
+document.getElementById("lastPrize").innerText = lastWinner === "0x0000000000000000000000000000000000000000" 
+    ? "No prize yet" 
+    : `Last Prize: ${web3.utils.fromWei(lastPrize, 'ether')} ETH`;
         
         const totalWinners = await contract.methods.totalWinners().call();
         document.getElementById("totalWinners").innerText = totalWinners;
