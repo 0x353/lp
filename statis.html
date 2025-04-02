@@ -362,19 +362,13 @@ const contractABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constru
 const web3 = new Web3(rpcUrl);
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-// Mulai dengan betId yang diketahui
 let knownBetIds = ["63782049335628205328881737524517936403896242350893662034855162823883773081217"];
 let recentBets = [];
 
 async function fetchHistoricalWinners() {
     try {
-        // Ambil semua event WinnerSet dari block 0 hingga terbaru
-        const events = await contract.getPastEvents("WinnerSet", {
-            fromBlock: 23614303, // Ganti dengan block saat kontrak dideploy jika diketahui
-            toBlock: "latest"
-        });
+        const events = await contract.getPastEvents("WinnerSet", { fromBlock: 23614303, toBlock: "latest" });
         const historicalBetIds = events.map(event => event.returnValues.betId);
-        // Gabungkan dengan knownBetIds awal, hapus duplikat
         knownBetIds = [...new Set([...knownBetIds, ...historicalBetIds])];
         console.log("[fetchHistoricalWinners] Historical betIds:", knownBetIds);
     } catch (error) {
@@ -384,7 +378,7 @@ async function fetchHistoricalWinners() {
 
 async function loadStats() {
     try {
-        await fetchHistoricalWinners(); // Ambil betId historis dulu
+        await fetchHistoricalWinners();
         await updateGeneralStats();
         await updateWinnerHistory();
         await updateRecentBets();
@@ -407,10 +401,8 @@ async function updateGeneralStats() {
         document.getElementById("contractBalance").innerText = web3.utils.fromWei(contractBalance, "ether");
 
         const allWinners = await contract.methods.getAllWinners().call();
-        
-        // Last Winner
-        const lastWinner = await contract.methods.lastWinner().call();
-        document.getElementById("lastWinner").innerText = lastWinner === "0x0000000000000000000000000000000000000000" ? "None" : lastWinner; 
+        const lastWinner = allWinners.length > 0 ? allWinners[allWinners.length - 1] : "None";
+        document.getElementById("lastWinner").innerText = lastWinner;
 
         const totalWinners = await contract.methods.totalWinners().call();
         document.getElementById("totalWinners").innerText = totalWinners;
@@ -519,7 +511,6 @@ async function lookupWinnerByBetId() {
     const betId = document.getElementById("betIdInput").value.trim();
     const betIdResultDiv = document.querySelector(".betid-result");
 
-    // Sembunyikan sebelum lookup
     betIdResultDiv.classList.add("hidden");
 
     if (!betId) {
@@ -543,12 +534,23 @@ async function lookupWinnerByBetId() {
             document.getElementById("winnerTimestamp").innerText = new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString();
         }
 
-        // Tampilkan setelah lookup berhasil
         betIdResultDiv.classList.remove("hidden");
     } catch (error) {
         console.error("[lookupWinnerByBetId] Error:", error);
         alert("Failed to fetch winner data!");
     }
+}
+
+// Tab switching function
+function openTab(tabId) {
+    const contents = document.querySelectorAll(".tab-content");
+    const buttons = document.querySelectorAll(".tab-button");
+
+    contents.forEach(content => content.classList.remove("active"));
+    buttons.forEach(button => button.classList.remove("active"));
+
+    document.getElementById(tabId).classList.add("active");
+    document.querySelector(`.tab-button[onclick="openTab('${tabId}')"]`).classList.add("active");
 }
 
 // Event Listeners untuk Real-Time Updates
