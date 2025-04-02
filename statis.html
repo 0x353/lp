@@ -429,7 +429,7 @@ async function updateWinnerHistory() {
                     <tr>
                         <td>${betId}</td>
                         <td>${winnerData.winner}</td>
-                        <td>${web3.utils.fromWei(winnerData.amount, "ether")} (ETH)</td>
+                        <td>${web3.utils.fromWei(winnerData.amount, "ether")}(ETH)</td>
                         <td>${winnerData.number}</td>
                         <td>${new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString()}</td>
                     </tr>
