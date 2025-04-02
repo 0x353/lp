@@ -173,12 +173,12 @@ tr:hover {
 .form-group {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px; /* Jarak antar elemen */
+    gap: 15px;
     justify-content: center;
     margin-bottom: 20px;
     align-items: center;
     width: 100%;
-    max-width: 600px; /* Batasi lebar maksimum lebih ketat untuk PC */
+    max-width: 600px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -186,7 +186,7 @@ tr:hover {
 /* Styling input agar responsif */
 .form-group input {
     flex: 1;
-    width: clamp(210px, 35vw, 280px); /* Minimum 210px, maksimum 280px */
+    width: clamp(210px, 35vw, 280px);
     max-width: 100%;
     padding: 10px;
     font-size: 1rem;
@@ -196,7 +196,7 @@ tr:hover {
 
 /* Centering & styling khusus */
 #betIdInput, #playerAddress {
-    width: clamp(210px, 35vw, 280px); /* Minimum 210px untuk HP */
+    width: clamp(210px, 35vw, 280px);
     max-width: 100%;
     padding: 10px;
     font-size: 1rem;
@@ -223,12 +223,15 @@ tr:hover {
     .form-group {
         flex-direction: column;
         gap: 10px;
-        padding: 0 10px; /* Ruang sisi */
+        padding: 0 10px;
+        align-items: center; /* Pusatkan elemen secara horizontal di mode column */
     }
     #betIdInput, #playerAddress {
-        width: calc(100% - 20px); /* Lebar penuh dikurangi 20px untuk sisi */
-        min-width: 210px; /* Pastikan minimal 210px di HP */
-        max-width: 280px; /* Batasi maksimum */
+        width: calc(100% - 20px);
+        min-width: 210px;
+        max-width: 280px;
+        margin-left: auto; /* Tambahan untuk memastikan centering */
+        margin-right: auto;
     }
 }
 
