@@ -101,38 +101,10 @@ h3 {
 /* Section styling */
 section {
     background-color: #111;
-    border-radius: 6px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 6px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
     padding: 20px;
     margin-bottom: 30px;
     overflow: hidden;
-    position: relative;
-    transition: all 0.4s ease-in-out;
-}
-
-/* Efek Hover Futuristik */
-section:hover {
-    transform: scale(1.02); /* Efek membesar sedikit */
-    box-shadow: 0 0 15px rgba(0, 183, 255, 0.8), 
-                0 0 40px rgba(255, 0, 255, 0.6), 
-                0 0 60px rgba(0, 255, 150, 0.5);
-}
-
-/* Efek Glow di Sisi Luar */
-section::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 6px;
-    background: linear-gradient(90deg, rgba(0, 183, 255, 0.5), rgba(255, 0, 255, 0.5));
-    z-index: -1;
-    filter: blur(15px);
-    opacity: 0;
-    transition: opacity 0.4s ease-in-out;
-}
-
-section:hover::before {
-    opacity: 1;
 }
 
 /* General Statistics */
