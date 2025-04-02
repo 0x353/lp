@@ -180,29 +180,30 @@ tr:hover {
     width: 100%;
 }
 
+/* Styling input agar responsif */
 .form-group input {
     flex: 1;
-    min-width: 200px;
+    width: clamp(200px, 50vw, 320px); /* Menyesuaikan ukuran input */
+    max-width: 100%; /* Mencegah input terlalu besar di layar kecil */
     padding: 10px;
-    font-size: 1em;
+    font-size: 1rem;
     border: 1px solid #ccc;
     border-radius: 4px;
 }
 
-/* Centering the input fields */
+/* Centering & styling khusus */
 #betIdInput, #playerAddress {
-    width: 310px;
-    max-width: 310px;
-    align-items: center;
+    width: clamp(200px, 50vw, 320px);
+    max-width: 100%;
     padding: 10px;
-    font-size: 1em;
-    border: 1px solid rgba(255, 255, 255, 0.3); /* Efek kaca */
+    font-size: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.15); /* Transparansi 85% */
-    backdrop-filter: blur(10px); /* Blur untuk efek kaca */
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
     box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1), 
                 inset 0 1px 2px rgba(255, 255, 255, 0.2);
-    color: white; /* Warna teks agar tetap terlihat */
+    color: white;
     transition: all 0.3s ease-in-out;
 }
 
@@ -210,8 +211,18 @@ tr:hover {
 #betIdInput:hover, #playerAddress:hover {
     box-shadow: 0 0 15px rgba(0, 183, 255, 0.8), 
                 0 0 30px rgba(0, 183, 255, 0.5);
-    border-color: rgba(0, 183, 255, 0.8); /* Warna biru neon */
-    transform: scale(1.05); /* Efek sedikit membesar */
+    border-color: rgba(0, 183, 255, 0.8);
+    transform: scale(1.05);
+}
+
+/* Menyesuaikan untuk layar kecil */
+@media (max-width: 480px) {
+    .form-group {
+        flex-direction: column; /* Agar input tidak terlalu panjang */
+    }
+    #betIdInput, #playerAddress {
+        width: 90%; /* Lebih fleksibel di layar kecil */
+    }
 }
 
 button {
