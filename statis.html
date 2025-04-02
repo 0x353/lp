@@ -186,8 +186,22 @@ const contractABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constru
 const web3 = new Web3(rpcUrl);
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-// Fungsi untuk memuat semua statistik
+// Simpan daftar betId yang diketahui
+let knownBetIds = ["63782049335628205328881737524517936403896242350893662034855162823883773081217"];
+let recentBets = [];
+
 async function loadStats() {
+    try {
+        await updateGeneralStats();
+        await updateWinnerHistory();
+        await updateRecentBets();
+    } catch (error) {
+        console.error("[loadStats] Error:", error);
+        document.querySelectorAll(".stats-section span").forEach(span => span.innerText = "Error");
+    }
+}
+
+async function updateGeneralStats() {
     try {
         const totalBets = await contract.methods.totalPlayers().call();
         document.getElementById("totalBets").innerText = totalBets;
@@ -200,35 +214,59 @@ async function loadStats() {
         document.getElementById("contractBalance").innerText = web3.utils.fromWei(contractBalance, "ether");
 
         const allWinners = await contract.methods.getAllWinners().call();
-        
-        // Last Winner
-        const lastWinner = await contract.methods.lastWinner().call();
-        document.getElementById("lastWinner").innerText = lastWinner === "0x0000000000000000000000000000000000000000" ? "None" : lastWinner;
+        const lastWinner = allWinners.length > 0 ? allWinners[allWinners.length - 1] : "None";
+        document.getElementById("lastWinner").innerText = lastWinner;
 
-        // Tambahan: Total Winners
         const totalWinners = await contract.methods.totalWinners().call();
         document.getElementById("totalWinners").innerText = totalWinners;
 
-        // Tambahan: Total Players
         const allPlayers = await contract.methods.getAllPlayers().call();
         document.getElementById("totalPlayers").innerText = allPlayers.length;
 
-        // Tambahan: Average Bet Amount
         const averageBetAmount = totalBets > 0 ? (parseFloat(totalPayoutEth) / parseInt(totalBets)).toFixed(6) : 0;
         document.getElementById("averageBetAmount").innerText = averageBetAmount;
 
-        // Tambahan: Top Bettor
         const topBettorData = await contract.methods.topBettor().call();
         const topBettor = topBettorData.player === "0x0000000000000000000000000000000000000000" 
             ? "None" 
             : `${topBettorData.player} (${topBettorData.totalBets} bets)`;
         document.getElementById("topBettor").innerText = topBettor;
 
-        document.getElementById("allPlayers").innerHTML = allPlayers.map(player => `<li>${player}</li>`).join("");
-        document.getElementById("allWinners").innerHTML = allWinners.map(winner => `<li>${winner}</li>`).join("");
+        console.log("[updateGeneralStats] Updated General Statistics");
+    } catch (error) {
+        console.error("[updateGeneralStats] Error:", error);
+    }
+}
 
+async function updateWinnerHistory() {
+    try {
+        let winnerHistoryHTML = "";
+        for (const betId of knownBetIds) {
+            const winnerData = await contract.methods.getWinnerByBetId(betId).call();
+            console.log(`[updateWinnerHistory] Winner Data for Bet ID ${betId}:`, winnerData);
+            if (winnerData.winner !== "0x0000000000000000000000000000000000000000") {
+                winnerHistoryHTML += `
+                    <tr>
+                        <td>${betId.slice(0, 6)}...</td>
+                        <td>${winnerData.winner}</td>
+                        <td>${web3.utils.fromWei(winnerData.amount, "ether")}</td>
+                        <td>${winnerData.number}</td>
+                        <td>${new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString()}</td>
+                    </tr>
+                `;
+            }
+        }
+        document.getElementById("winnerHistory").innerHTML = winnerHistoryHTML || "<tr><td colspan='5'>No winners found</td></tr>";
+        console.log("[updateWinnerHistory] Updated Winner History");
+    } catch (error) {
+        console.error("[updateWinnerHistory] Error:", error);
+    }
+}
+
+async function updateRecentBets() {
+    try {
         const allBets = await contract.methods.getAllBets().call();
-        const recentBets = allBets.slice(-10).reverse();
+        recentBets = allBets.slice(-10).reverse();
         document.getElementById("recentBets").innerHTML = recentBets.map(bet => `
             <tr>
                 <td>${bet.player}</td>
@@ -238,34 +276,12 @@ async function loadStats() {
                 <td>${bet.commentCount}</td>
             </tr>
         `).join("");
-
-        // Cek betId spesifik dari transaksi
-        const specificBetId = "63782049335628205328881737524517936403896242350893662034855162823883773081217";
-        const winnerData = await contract.methods.getWinnerByBetId(specificBetId).call();
-        console.log(`Winner Data for Bet ID ${specificBetId}:`, winnerData);
-        let winnerHistoryHTML = "";
-        if (winnerData.winner !== "0x0000000000000000000000000000000000000000") {
-            winnerHistoryHTML = `
-                <tr>
-                    <td>${specificBetId.slice(0, 6)}...</td>
-                    <td>${winnerData.winner}</td>
-                    <td>${web3.utils.fromWei(winnerData.amount, "ether")}</td>
-                    <td>${winnerData.number}</td>
-                    <td>${new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString()}</td>
-                </tr>
-            `;
-        }
-        document.getElementById("winnerHistory").innerHTML = winnerHistoryHTML || "<tr><td colspan='5'>No winners found</td></tr>";
-
-        const winnings = await contract.methods.winnings("0x6ce1F5dEC54c07Bf2531716014cf790E71df24eA").call();
-        console.log(`Winnings for 0x6ce1F5dEC54c07Bf2531716014cf790E71df24eA: ${web3.utils.fromWei(winnings, "ether")} ETH`);
+        console.log("[updateRecentBets] Updated Recent Bets");
     } catch (error) {
-        console.error("Error loading stats:", error);
-        document.querySelectorAll(".stats-section span").forEach(span => span.innerText = "Error");
+        console.error("[updateRecentBets] Error:", error);
     }
 }
 
-// Fungsi untuk mencari statistik pemain
 async function lookupPlayer() {
     const address = document.getElementById("playerAddress").value.trim();
     if (!web3.utils.isAddress(address)) {
@@ -273,34 +289,17 @@ async function lookupPlayer() {
         return;
     }
     try {
-        // Ambil data dasar dari playerStats
         const stats = await contract.methods.getPlayerStats(address).call();
         const winnings = await contract.methods.winnings(address).call();
-        
-        // Gunakan BigNumber untuk betId
-        const specificBetId = "63782049335628205328881737524517936403896242350893662034855162823883773081217";
-        const winnerData = await contract.methods.getWinnerByBetId(specificBetId).call();
-
-        // Log debugging
-        console.log(`[lookupPlayer] Address: ${address}`);
-        console.log(`[lookupPlayer] Player Stats:`, stats);
-        console.log(`[lookupPlayer] Winnings (unclaimed): ${winnings} wei`);
-        console.log(`[lookupPlayer] Winner Data for Bet ID ${specificBetId}:`, winnerData);
-        console.log(`[lookupPlayer] Comparing winner (${winnerData.winner.toLowerCase()}) with address (${address.toLowerCase()})`);
-
         let totalWins = 0;
         let totalPayout = parseFloat(web3.utils.fromWei(winnings, "ether"));
 
-        // Cek kecocokan alamat
-        if (winnerData.winner.toLowerCase() === address.toLowerCase()) {
-            console.log(`[lookupPlayer] Match found for ${address} in winnerHistory!`);
-            totalWins = 1;
-            totalPayout = parseFloat(web3.utils.fromWei(winnerData.amount, "ether"));
-        } else {
-            console.log(`[lookupPlayer] No match found for ${address} in winnerHistory`);
-            if (winnings > 0) {
-                console.log(`[lookupPlayer] Winnings > 0, counting as a win`);
-                totalWins = 1;
+        // Cek semua betId yang diketahui untuk kemenangan
+        for (const betId of knownBetIds) {
+            const winnerData = await contract.methods.getWinnerByBetId(betId).call();
+            if (winnerData.winner.toLowerCase() === address.toLowerCase()) {
+                totalWins += 1;
+                totalPayout += parseFloat(web3.utils.fromWei(winnerData.amount, "ether"));
             }
         }
 
@@ -308,23 +307,22 @@ async function lookupPlayer() {
         document.getElementById("playerTotalAmountBet").innerText = web3.utils.fromWei(stats[1], "ether");
         document.getElementById("playerTotalWins").innerText = totalWins;
         document.getElementById("playerTotalPayout").innerText = totalPayout.toFixed(6);
+        console.log(`[lookupPlayer] Updated stats for ${address}:`, { totalBets: stats[0], totalWins, totalPayout });
     } catch (error) {
         console.error("[lookupPlayer] Error:", error);
-        alert("Failed to fetch player stats! Check console for details.");
+        alert("Failed to fetch player stats!");
     }
 }
-      
-// Fungsi untuk mencari pemenang berdasarkan Bet ID
+
 async function lookupWinnerByBetId() {
     const betId = document.getElementById("betIdInput").value.trim();
-    if (!betId || isNaN(betId) || parseInt(betId) < 0) {
+    if (!betId) {
         alert("Please enter a valid Bet ID!");
         return;
     }
-
     try {
         const winnerData = await contract.methods.getWinnerByBetId(betId).call();
-        console.log(`Winner Data for Bet ID ${betId}:`, winnerData);
+        console.log(`[lookupWinnerByBetId] Winner Data for Bet ID ${betId}:`, winnerData);
         if (winnerData.winner === "0x0000000000000000000000000000000000000000") {
             document.getElementById("winnerAddress").innerText = "No winner set";
             document.getElementById("winnerAmount").innerText = "-";
@@ -337,10 +335,45 @@ async function lookupWinnerByBetId() {
             document.getElementById("winnerTimestamp").innerText = new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString();
         }
     } catch (error) {
-        console.error("Error fetching winner by Bet ID:", error);
+        console.error("[lookupWinnerByBetId] Error:", error);
         alert("Failed to fetch winner data!");
     }
 }
+
+// Event Listeners untuk Real-Time Updates
+contract.events.BetPlaced({ fromBlock: "latest" })
+    .on("data", async (event) => {
+        console.log("[BetPlaced Event] New bet placed:", event.returnValues);
+        await updateGeneralStats();
+        await updateRecentBets();
+    })
+    .on("error", (error) => console.error("[BetPlaced Event] Error:", error));
+
+contract.events.WinnerSet({ fromBlock: "latest" })
+    .on("data", async (event) => {
+        const betId = event.returnValues.betId;
+        console.log("[WinnerSet Event] New winner set:", event.returnValues);
+        if (!knownBetIds.includes(betId)) {
+            knownBetIds.push(betId);
+        }
+        await updateGeneralStats();
+        await updateWinnerHistory();
+    })
+    .on("error", (error) => console.error("[WinnerSet Event] Error:", error));
+
+contract.events.ETHClaimed({ fromBlock: "latest" })
+    .on("data", async (event) => {
+        console.log("[ETHClaimed Event] ETH claimed:", event.returnValues);
+        await updateGeneralStats();
+    })
+    .on("error", (error) => console.error("[ETHClaimed Event] Error:", error));
+
+contract.events.LastWinnerUpdated({ fromBlock: "latest" })
+    .on("data", async (event) => {
+        console.log("[LastWinnerUpdated Event] Last winner updated:", event.returnValues);
+        await updateGeneralStats();
+    })
+    .on("error", (error) => console.error("[LastWinnerUpdated Event] Error:", error));
 
 window.addEventListener("load", loadStats);
     </script>
