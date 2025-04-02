@@ -185,38 +185,28 @@ const contract = new web3.eth.Contract(contractABI, contractAddress);
 // Fungsi untuk memuat semua statistik
 async function loadStats() {
     try {
-        // Total Bets
         const totalBets = await contract.methods.totalPlayers().call();
         document.getElementById("totalBets").innerText = totalBets;
 
-        // Total Payout
         const totalPayout = await contract.methods.totalPayout().call();
         document.getElementById("totalPayout").innerText = web3.utils.fromWei(totalPayout, "ether");
 
-        // Contract Balance
         const contractBalance = await contract.methods.contractBalance().call();
         document.getElementById("contractBalance").innerText = web3.utils.fromWei(contractBalance, "ether");
 
-        // Last Winner
         const allWinners = await contract.methods.getAllWinners().call();
         const lastWinner = allWinners.length > 0 ? allWinners[allWinners.length - 1] : "None";
         document.getElementById("lastWinner").innerText = lastWinner;
         console.log("All Winners:", allWinners);
 
-        // All Players
         const allPlayers = await contract.methods.getAllPlayers().call();
-        const playersList = document.getElementById("allPlayers");
-        playersList.innerHTML = allPlayers.map(player => `<li>${player}</li>`).join("");
+        document.getElementById("allPlayers").innerHTML = allPlayers.map(player => `<li>${player}</li>`).join("");
 
-        // All Winners
-        const winnersList = document.getElementById("allWinners");
-        winnersList.innerHTML = allWinners.map(winner => `<li>${winner}</li>`).join("");
+        document.getElementById("allWinners").innerHTML = allWinners.map(winner => `<li>${winner}</li>`).join("");
 
-        // Recent Bets (batasi ke 10 terbaru)
         const allBets = await contract.methods.getAllBets().call();
         const recentBets = allBets.slice(-10).reverse();
-        const betsTable = document.getElementById("recentBets");
-        betsTable.innerHTML = recentBets.map(bet => `
+        document.getElementById("recentBets").innerHTML = recentBets.map(bet => `
             <tr>
                 <td>${bet.player}</td>
                 <td>${bet.number}</td>
@@ -226,38 +216,26 @@ async function loadStats() {
             </tr>
         `).join("");
 
-        // Winner History
-        const totalWinners = await contract.methods.totalWinners().call();
-        console.log("Total Winners:", totalWinners);
-        const maxWinnersToShow = Math.min(totalWinners, 10); // Batasi ke 10 untuk performa
-        const winnerHistoryTable = document.getElementById("winnerHistory");
+        // Cek betId spesifik dari transaksi
+        const specificBetId = "63782049335628205328881737524517936403896242350893662034855162823883773081217";
+        const winnerData = await contract.methods.getWinnerByBetId(specificBetId).call();
+        console.log(`Winner Data for Bet ID ${specificBetId}:`, winnerData);
         let winnerHistoryHTML = "";
-
-        for (let betId = 0; betId < maxWinnersToShow; betId++) {
-            try {
-                const winnerData = await contract.methods.getWinnerByBetId(betId).call();
-                console.log(`Winner Data for Bet ID ${betId}:`, winnerData);
-                if (winnerData.winner !== "0x0000000000000000000000000000000000000000") {
-                    winnerHistoryHTML += `
-                        <tr>
-                            <td>${betId}</td>
-                            <td>${winnerData.winner}</td>
-                            <td>${web3.utils.fromWei(winnerData.amount, "ether")}</td>
-                            <td>${winnerData.number}</td>
-                            <td>${new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString()}</td>
-                        </tr>
-                    `;
-                }
-            } catch (error) {
-                console.error(`Error fetching winner for Bet ID ${betId}:`, error);
-            }
+        if (winnerData.winner !== "0x0000000000000000000000000000000000000000") {
+            winnerHistoryHTML = `
+                <tr>
+                    <td>${specificBetId.slice(0, 6)}...</td>
+                    <td>${winnerData.winner}</td>
+                    <td>${web3.utils.fromWei(winnerData.amount, "ether")}</td>
+                    <td>${winnerData.number}</td>
+                    <td>${new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString()}</td>
+                </tr>
+            `;
         }
-        winnerHistoryTable.innerHTML = winnerHistoryHTML || "<tr><td colspan='5'>No winners found</td></tr>";
+        document.getElementById("winnerHistory").innerHTML = winnerHistoryHTML || "<tr><td colspan='5'>No winners found</td></tr>";
 
-        // Debug pemenang spesifik
-        const specificWinner = "0x6ce1F5dEC54c07Bf2531716014cf790E71df24eA";
-        const winnings = await contract.methods.winnings(specificWinner).call();
-        console.log(`Winnings for ${specificWinner}: ${web3.utils.fromWei(winnings, "ether")} ETH`);
+        const winnings = await contract.methods.winnings("0x6ce1F5dEC54c07Bf2531716014cf790E71df24eA").call();
+        console.log(`Winnings for 0x6ce1F5dEC54c07Bf2531716014cf790E71df24eA: ${web3.utils.fromWei(winnings, "ether")} ETH`);
     } catch (error) {
         console.error("Error loading stats:", error);
         document.querySelectorAll(".stats-section span").forEach(span => span.innerText = "Error");
