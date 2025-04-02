@@ -141,8 +141,7 @@ button:hover {
                 <p><strong>Total Payout:</strong> <span id="playerTotalPayout">-</span> ETH</p>
             </div>
         </div>
-        
-        <!-- Bagian baru untuk Get Winner by Bet ID -->
+
         <div class="stats-section">
             <h2>Winner by Bet ID</h2>
             <input type="number" id="betIdInput" placeholder="Enter Bet ID" min="0">
@@ -155,7 +154,6 @@ button:hover {
             </div>
         </div>
 
-        <!-- Bagian baru untuk daftar riwayat pemenang -->
         <div class="stats-section">
             <h2>Winner History</h2>
             <table>
@@ -200,8 +198,10 @@ async function loadStats() {
         document.getElementById("contractBalance").innerText = web3.utils.fromWei(contractBalance, "ether");
 
         // Last Winner
-        const lastWinner = await contract.methods.lastWinner().call();
-        document.getElementById("lastWinner").innerText = lastWinner === "0x0000000000000000000000000000000000000000" ? "None" : lastWinner;
+        const allWinners = await contract.methods.getAllWinners().call();
+        const lastWinner = allWinners.length > 0 ? allWinners[allWinners.length - 1] : "None";
+        document.getElementById("lastWinner").innerText = lastWinner;
+        console.log("All Winners:", allWinners);
 
         // All Players
         const allPlayers = await contract.methods.getAllPlayers().call();
@@ -209,7 +209,6 @@ async function loadStats() {
         playersList.innerHTML = allPlayers.map(player => `<li>${player}</li>`).join("");
 
         // All Winners
-        const allWinners = await contract.methods.getAllWinners().call();
         const winnersList = document.getElementById("allWinners");
         winnersList.innerHTML = allWinners.map(winner => `<li>${winner}</li>`).join("");
 
@@ -227,8 +226,9 @@ async function loadStats() {
             </tr>
         `).join("");
 
-        // Winner History (ambil hingga totalWinners atau batas 10 untuk efisiensi)
+        // Winner History
         const totalWinners = await contract.methods.totalWinners().call();
+        console.log("Total Winners:", totalWinners);
         const maxWinnersToShow = Math.min(totalWinners, 10); // Batasi ke 10 untuk performa
         const winnerHistoryTable = document.getElementById("winnerHistory");
         let winnerHistoryHTML = "";
@@ -236,6 +236,7 @@ async function loadStats() {
         for (let betId = 0; betId < maxWinnersToShow; betId++) {
             try {
                 const winnerData = await contract.methods.getWinnerByBetId(betId).call();
+                console.log(`Winner Data for Bet ID ${betId}:`, winnerData);
                 if (winnerData.winner !== "0x0000000000000000000000000000000000000000") {
                     winnerHistoryHTML += `
                         <tr>
@@ -293,6 +294,7 @@ async function lookupWinnerByBetId() {
 
     try {
         const winnerData = await contract.methods.getWinnerByBetId(betId).call();
+        console.log(`Winner Data for Bet ID ${betId}:`, winnerData);
         if (winnerData.winner === "0x0000000000000000000000000000000000000000") {
             document.getElementById("winnerAddress").innerText = "No winner set";
             document.getElementById("winnerAmount").innerText = "-";
