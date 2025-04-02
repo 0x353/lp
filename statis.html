@@ -49,7 +49,7 @@ section {
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
     padding: 20px;
     margin-bottom: 25px;
-    overflow: hidden; /* Mencegah tumpang tindih konten */
+    overflow: hidden;
 }
 
 /* General Statistics */
@@ -159,6 +159,11 @@ tr:hover {
     font-weight: bold;
 }
 
+/* Class untuk menyembunyikan elemen */
+.hidden {
+    display: none;
+}
+
 /* Lookup by Bet ID */
 .betid-lookup {
     max-width: 600px;
@@ -238,7 +243,7 @@ tr:hover {
     h2 {
         font-size: 1.4em;
     }
-} 
+        }
     </style>
 </head>
 <body>
@@ -319,13 +324,15 @@ tr:hover {
         <!-- Player Lookup -->
         <section class="player-lookup">
             <h2>Player Lookup</h2>
-            <input type="text" id="playerAddress" placeholder="Enter player address">
-            <button onclick="lookupPlayer()">Lookup</button>
-            <div class="player-stats">
-                <strong>Total Bets:</strong> <span id="playerTotalBets">0</span>
-                <strong>Total Amount Bet:</strong> <span id="playerTotalAmountBet">0 ETH</span>
-                <strong>Total Wins:</strong> <span id="playerTotalWins">0</span>
-                <strong>Total Payout:</strong> <span id="playerTotalPayout">0 ETH</span>
+            <div class="player-lookup-form">
+                <input type="text" id="playerAddress" placeholder="Enter player address">
+                <button onclick="lookupPlayer()">Lookup</button>
+            </div>
+            <div class="player-stats hidden">
+                <p><strong>Total Bets:</strong> <span id="playerTotalBets">0</span></p>
+                <p><strong>Total Amount Bet:</strong> <span id="playerTotalAmountBet">0 ETH</span></p>
+                <p><strong>Total Wins:</strong> <span id="playerTotalWins">0</span></p>
+                <p><strong>Total Payout:</strong> <span id="playerTotalPayout">0 ETH</span></p>
             </div>
         </section>
 
@@ -334,7 +341,7 @@ tr:hover {
             <h2>Lookup Winner by Bet ID</h2>
             <input type="text" id="betIdInput" placeholder="Enter Bet ID">
             <button onclick="lookupWinnerByBetId()">Lookup</button>
-            <div class="betid-result">
+            <div class="player-stats hidden">
                 <strong>Winner Address:</strong> <span id="winnerAddress">-</span>
                 <strong>Amount Won:</strong> <span id="winnerAmount">-</span>
                 <strong>Winning Number:</strong> <span id="winnerNumber">-</span>
