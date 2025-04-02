@@ -200,9 +200,10 @@ async function loadStats() {
         document.getElementById("contractBalance").innerText = web3.utils.fromWei(contractBalance, "ether");
 
         const allWinners = await contract.methods.getAllWinners().call();
-        const lastWinner = allWinners.length > 0 ? allWinners[allWinners.length - 1] : "None";
-        document.getElementById("lastWinner").innerText = lastWinner;
-        console.log("All Winners:", allWinners);
+        
+        // Last Winner
+        const lastWinner = await contract.methods.lastWinner().call();
+        document.getElementById("lastWinner").innerText = lastWinner === "0x0000000000000000000000000000000000000000" ? "None" : lastWinner;
 
         // Tambahan: Total Winners
         const totalWinners = await contract.methods.totalWinners().call();
