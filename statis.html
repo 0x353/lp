@@ -282,7 +282,7 @@ tr:hover {
                 <tr>
                     <th>BetID</th>
                     <th>Address</th>
-                    <th>Prizes (ETH)</th>
+                    <th>Prizes</th>
                     <th>WinNumber</th>
                     <th>Timestamp</th>
                 </tr>
@@ -429,7 +429,7 @@ async function updateWinnerHistory() {
                     <tr>
                         <td>${betId.slice(0, 6)}...</td>
                         <td>${winnerData.winner}</td>
-                        <td>${web3.utils.fromWei(winnerData.amount, "ether")}</td>
+                        <td>${web3.utils.fromWei(winnerData.amount, "ether")} ETH</td>
                         <td>${winnerData.number}</td>
                         <td>${new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString()}</td>
                     </tr>
