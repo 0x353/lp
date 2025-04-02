@@ -33,7 +33,7 @@ h1 {
     font-size: 2.2em;
     color: #2c3e50;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
 h2 {
@@ -43,49 +43,14 @@ h2 {
     text-align: center;
 }
 
-/* Tab navigation */
-.tab-nav {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #e0e0e0;
-}
-
-.tab-button {
-    padding: 10px 20px;
-    font-size: 1.1em;
-    background-color: #fff;
-    border: 1px solid #e0e0e0;
-    border-bottom: none;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
-    margin: 0 5px -1px 5px;
-    border-radius: 4px 4px 0 0;
-}
-
-.tab-button.active {
-    background-color: #3498db;
-    color: #fff;
-    border-color: #3498db;
-}
-
-.tab-button:hover:not(.active) {
-    background-color: #f1f1f1;
-}
-
-/* Tab content */
-.tab-content {
-    display: none;
+/* Section styling */
+section {
     background-color: #fff;
     border-radius: 6px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
     padding: 20px;
     margin-bottom: 30px;
-}
-
-.tab-content.active {
-    display: block;
+    overflow: hidden;
 }
 
 /* General Statistics */
@@ -116,7 +81,7 @@ h2 {
     font-weight: bold;
 }
 
-/* Table styling */
+/* Table styling untuk Winner History dan Recent Bets */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -147,7 +112,7 @@ tr:hover {
     background-color: #f1f1f1;
 }
 
-/* Form styling */
+/* Form styling umum */
 .form-group {
     display: flex;
     flex-wrap: wrap;
@@ -180,17 +145,42 @@ tr:hover {
     background-color: #2980b9;
 }
 
-/* Lookup results */
-.player-stats, .betid-result {
+/* Player Lookup */
+.player-lookup {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.player-stats {
     text-align: center;
 }
 
-.player-stats p, .betid-result p {
+.player-stats p {
     margin: 8px 0;
     font-size: 1.1em;
 }
 
-.player-stats span, .betid-result span {
+.player-stats span {
+    color: #2980b9;
+    font-weight: bold;
+}
+
+/* Bet ID Lookup */
+.betid-lookup {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.betid-result {
+    text-align: center;
+}
+
+.betid-result p {
+    margin: 8px 0;
+    font-size: 1.1em;
+}
+
+.betid-result span {
     color: #2980b9;
     font-weight: bold;
 }
@@ -216,12 +206,6 @@ tr:hover {
         width: 100%;
     }
 
-    .tab-button {
-        flex: 1;
-        margin: 5px;
-        border-radius: 4px;
-    }
-
     th, td {
         padding: 8px 10px;
         font-size: 0.9em;
@@ -241,55 +225,45 @@ tr:hover {
         <div class="container">
         <h1>Bet History Dashboard</h1>
 
-        <!-- Tab Navigation -->
-        <div class="tab-nav">
-            <button class="tab-button active" onclick="openTab('stats')">General Statistics</button>
-            <button class="tab-button" onclick="openTab('winner')">Winner History</button>
-            <button class="tab-button" onclick="openTab('bets')">Recent Bets</button>
-            <button class="tab-button" onclick="openTab('player')">Player Lookup</button>
-            <button class="tab-button" onclick="openTab('betid')">Bet ID Lookup</button>
-        </div>
-
-        <!-- Tab Content -->
-        <div id="stats" class="tab-content active">
+        <!-- General Statistics -->
+        <section class="stats-section">
             <h2>General Statistics</h2>
-            <div class="stats-section">
-                <div class="stats-item">
-                    <strong>Total Bets</strong>
-                    <span id="totalBets">0</span>
-                </div>
-                <div class="stats-item">
-                    <strong>Total Payout</strong>
-                    <span id="totalPayout">0 ETH</span>
-                </div>
-                <div class="stats-item">
-                    <strong>Contract Balance</strong>
-                    <span id="contractBalance">0 ETH</span>
-                </div>
-                <div class="stats-item">
-                    <strong>Last Winner</strong>
-                    <span id="lastWinner">None</span>
-                </div>
-                <div class="stats-item">
-                    <strong>Total Winners</strong>
-                    <span id="totalWinners">0</span>
-                </div>
-                <div class="stats-item">
-                    <strong>Total Players</strong>
-                    <span id="totalPlayers">0</span>
-                </div>
-                <div class="stats-item">
-                    <strong>Average Bet Amount</strong>
-                    <span id="averageBetAmount">0 ETH</span>
-                </div>
-                <div class="stats-item">
-                    <strong>Top Bettor</strong>
-                    <span id="topBettor">None</span>
-                </div>
+            <div class="stats-item">
+                <strong>Total Bets</strong>
+                <span id="totalBets">0</span>
             </div>
-        </div>
+            <div class="stats-item">
+                <strong>Total Payout</strong>
+                <span id="totalPayout">0 ETH</span>
+            </div>
+            <div class="stats-item">
+                <strong>Contract Balance</strong>
+                <span id="contractBalance">0 ETH</span>
+            </div>
+            <div class="stats-item">
+                <strong>Last Winner</strong>
+                <span id="lastWinner">None</span>
+            </div>
+            <div class="stats-item">
+                <strong>Total Winners</strong>
+                <span id="totalWinners">0</span>
+            </div>
+            <div class="stats-item">
+                <strong>Total Players</strong>
+                <span id="totalPlayers">0</span>
+            </div>
+            <div class="stats-item">
+                <strong>Average Bet Amount</strong>
+                <span id="averageBetAmount">0 ETH</span>
+            </div>
+            <div class="stats-item">
+                <strong>Top Bettor</strong>
+                <span id="topBettor">None</span>
+            </div>
+        </section>
 
-        <div id="winner" class="tab-content">
+        <!-- Winner History -->
+        <section>
             <h2>Winner History</h2>
             <table id="winnerHistory">
                 <thead>
@@ -303,9 +277,10 @@ tr:hover {
                 </thead>
                 <tbody></tbody>
             </table>
-        </div>
+        </section>
 
-        <div id="bets" class="tab-content">
+        <!-- Recent Bets -->
+        <section>
             <h2>Recent Bets</h2>
             <table id="recentBets">
                 <thead>
@@ -319,9 +294,10 @@ tr:hover {
                 </thead>
                 <tbody></tbody>
             </table>
-        </div>
+        </section>
 
-        <div id="player" class="tab-content">
+        <!-- Player Lookup -->
+        <section class="player-lookup">
             <h2>Player Lookup</h2>
             <div class="form-group">
                 <input type="text" id="playerAddress" placeholder="Enter player address">
@@ -333,10 +309,11 @@ tr:hover {
                 <p><strong>Total Wins:</strong> <span id="playerTotalWins">0</span></p>
                 <p><strong>Total Payout:</strong> <span id="playerTotalPayout">0 ETH</span></p>
             </div>
-        </div>
+        </section>
 
-        <div id="betid" class="tab-content">
-            <h2>Bet ID Lookup</h2>
+        <!-- Lookup by Bet ID -->
+        <section class="betid-lookup">
+            <h2>Lookup Winner by Bet ID</h2>
             <div class="form-group">
                 <input type="text" id="betIdInput" placeholder="Enter Bet ID">
                 <button onclick="lookupWinnerByBetId()">Lookup</button>
@@ -347,8 +324,8 @@ tr:hover {
                 <p><strong>Winning Number:</strong> <span id="winnerNumber">-</span></p>
                 <p><strong>Timestamp:</strong> <span id="winnerTimestamp">-</span></p>
             </div>
+        </section>
         </div>
-    </div>
 
 
     <script src="https://cdn.jsdelivr.net/npm/web3@1.7.0/dist/web3.min.js"></script>
@@ -511,6 +488,7 @@ async function lookupWinnerByBetId() {
     const betId = document.getElementById("betIdInput").value.trim();
     const betIdResultDiv = document.querySelector(".betid-result");
 
+    // Sembunyikan sebelum lookup
     betIdResultDiv.classList.add("hidden");
 
     if (!betId) {
@@ -534,23 +512,12 @@ async function lookupWinnerByBetId() {
             document.getElementById("winnerTimestamp").innerText = new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString();
         }
 
+        // Tampilkan setelah lookup berhasil
         betIdResultDiv.classList.remove("hidden");
     } catch (error) {
         console.error("[lookupWinnerByBetId] Error:", error);
         alert("Failed to fetch winner data!");
     }
-}
-
-// Tab switching function
-function openTab(tabId) {
-    const contents = document.querySelectorAll(".tab-content");
-    const buttons = document.querySelectorAll(".tab-button");
-
-    contents.forEach(content => content.classList.remove("active"));
-    buttons.forEach(button => button.classList.remove("active"));
-
-    document.getElementById(tabId).classList.add("active");
-    document.querySelector(`.tab-button[onclick="openTab('${tabId}')"]`).classList.add("active");
 }
 
 // Event Listeners untuk Real-Time Updates
