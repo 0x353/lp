@@ -175,28 +175,30 @@ tr:hover {
     flex-wrap: wrap;
     gap: 10px;
     justify-content: center;
-    margin-bottom: 20px;
     align-items: center;
+    margin-bottom: 20px;
     width: 100%;
 }
 
-/* Styling input agar responsif */
+/* Input responsif dan tetap sejajar di PC */
 .form-group input {
     flex: 1;
-    width: clamp(210px, 50vw, 320px); /* Menyesuaikan ukuran input */
-    max-width: 100%; /* Mencegah input terlalu besar di layar kecil */
+    width: clamp(220px, 40vw, 300px); /* Lebih stabil di semua ukuran layar */
+    max-width: 100%;
     padding: 10px;
     font-size: 1rem;
     border: 1px solid #ccc;
     border-radius: 4px;
+    text-align: center;
 }
 
-/* Centering & styling khusus */
+/* Centering khusus dan efek futuristik */
 #betIdInput, #playerAddress {
-    width: clamp(210px, 50vw, 320px);
+    width: clamp(220px, 40vw, 300px);
     max-width: 100%;
     padding: 10px;
     font-size: 1rem;
+    text-align: center;
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.15);
@@ -207,7 +209,7 @@ tr:hover {
     transition: all 0.3s ease-in-out;
 }
 
-/* Efek hover futuristik */
+/* Efek hover */
 #betIdInput:hover, #playerAddress:hover {
     box-shadow: 0 0 15px rgba(0, 183, 255, 0.8), 
                 0 0 30px rgba(0, 183, 255, 0.5);
@@ -215,10 +217,27 @@ tr:hover {
     transform: scale(1.05);
 }
 
-/* Menyesuaikan untuk layar kecil */
+/* Pastikan tombol tetap sejajar di PC */
+.form-group button {
+    padding: 10px 15px;
+    font-size: 1rem;
+    border-radius: 8px;
+    background: #03a9f4;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.form-group button:hover {
+    background: #f441a5;
+}
+
+/* Untuk layar kecil */
 @media (max-width: 480px) {
     .form-group {
-        flex-direction: column; /* Agar input tidak terlalu panjang */
+        flex-direction: column; /* Input & tombol tersusun ke bawah */
+        align-items: center;
     }
     #betIdInput, #playerAddress {
         width: 90%; /* Lebih fleksibel di layar kecil */
