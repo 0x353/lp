@@ -194,6 +194,19 @@ tr:hover {
     border-radius: 4px;
 }
 
+/* Styling tombol agar konsisten (asumsikan ada tombol) */
+.form-group button {
+    width: clamp(210px, 35vw, 280px);
+    max-width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff; /* Contoh warna tombol */
+    color: white;
+    cursor: pointer;
+}
+
 /* Centering & styling khusus */
 #betIdInput, #playerAddress {
     width: clamp(210px, 35vw, 280px);
@@ -223,15 +236,18 @@ tr:hover {
     .form-group {
         flex-direction: column;
         gap: 10px;
-        padding: 0 10px;
-        align-items: center; /* Pusatkan elemen secara horizontal di mode column */
+        padding: 0; /* Hapus padding sisi yang bisa menyebabkan offset */
+        align-items: center; /* Pusatkan elemen secara horizontal */
+        justify-content: center; /* Pastikan vertikal juga terpusat jika perlu */
     }
-    #betIdInput, #playerAddress {
-        width: calc(100% - 20px);
+    .form-group input,
+    .form-group button,
+    #betIdInput, 
+    #playerAddress {
+        width: clamp(210px, 90%, 280px); /* Gunakan persentase untuk responsivitas */
         min-width: 210px;
         max-width: 280px;
-        margin-left: auto; /* Tambahan untuk memastikan centering */
-        margin-right: auto;
+        margin: 0 auto; /* Pastikan setiap elemen terpusat secara individu */
     }
 }
 
