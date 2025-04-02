@@ -273,26 +273,47 @@ async function lookupPlayer() {
         return;
     }
     try {
-        // Ambil data dari playerStats
+        // Ambil data dasar dari playerStats
         const stats = await contract.methods.getPlayerStats(address).call();
         const winnings = await contract.methods.winnings(address).call();
-        const totalWinners = await contract.methods.totalWinners().call();
+        
+        // Gunakan BigNumber untuk betId
+        const specificBetId = "63782049335628205328881737524517936403896242350893662034855162823883773081217";
+        const winnerData = await contract.methods.getWinnerByBetId(specificBetId).call();
 
-        // Hitung Total Wins berdasarkan winnings (asumsi 1 kemenangan = ada winnings)
-        const totalWins = winnings > 0 ? 1 : 0; // Sederhana, bisa disesuaikan jika ada logika lain
-        const totalPayout = web3.utils.fromWei(winnings, "ether");
+        // Log debugging
+        console.log(`[lookupPlayer] Address: ${address}`);
+        console.log(`[lookupPlayer] Player Stats:`, stats);
+        console.log(`[lookupPlayer] Winnings (unclaimed): ${winnings} wei`);
+        console.log(`[lookupPlayer] Winner Data for Bet ID ${specificBetId}:`, winnerData);
+        console.log(`[lookupPlayer] Comparing winner (${winnerData.winner.toLowerCase()}) with address (${address.toLowerCase()})`);
+
+        let totalWins = 0;
+        let totalPayout = parseFloat(web3.utils.fromWei(winnings, "ether"));
+
+        // Cek kecocokan alamat
+        if (winnerData.winner.toLowerCase() === address.toLowerCase()) {
+            console.log(`[lookupPlayer] Match found for ${address} in winnerHistory!`);
+            totalWins = 1;
+            totalPayout = parseFloat(web3.utils.fromWei(winnerData.amount, "ether"));
+        } else {
+            console.log(`[lookupPlayer] No match found for ${address} in winnerHistory`);
+            if (winnings > 0) {
+                console.log(`[lookupPlayer] Winnings > 0, counting as a win`);
+                totalWins = 1;
+            }
+        }
 
         document.getElementById("playerTotalBets").innerText = stats[0];
         document.getElementById("playerTotalAmountBet").innerText = web3.utils.fromWei(stats[1], "ether");
         document.getElementById("playerTotalWins").innerText = totalWins;
-        document.getElementById("playerTotalPayout").innerText = totalPayout;
-        console.log(`Player Stats for ${address}:`, stats, `Winnings: ${totalPayout} ETH`);
+        document.getElementById("playerTotalPayout").innerText = totalPayout.toFixed(6);
     } catch (error) {
-        console.error("Error fetching player stats:", error);
-        alert("Failed to fetch player stats!");
+        console.error("[lookupPlayer] Error:", error);
+        alert("Failed to fetch player stats! Check console for details.");
     }
 }
-
+      
 // Fungsi untuk mencari pemenang berdasarkan Bet ID
 async function lookupWinnerByBetId() {
     const betId = document.getElementById("betIdInput").value.trim();
