@@ -6,55 +6,68 @@
     <title>Bet History Statistics</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* Pastikan CSS sebelumnya sudah ada */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    /* Reset default styles */
+* {
     margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Body styling */
+body {
+    background-color: #f4f4f9;
+    color: #333;
+    line-height: 1.6;
     padding: 20px;
 }
 
+/* Container untuk semua section */
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Heading styling */
+h1, h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    text-align: center;
 }
 
 h1 {
-    text-align: center;
-    color: #333;
-}
-
-.stats-section {
-    margin: 20px 0;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    font-size: 2.5em;
 }
 
 h2 {
-    color: #555;
-    margin-bottom: 10px;
+    font-size: 1.8em;
 }
 
-p {
-    margin: 5px 0;
-    color: #666;
+/* Section styling */
+section {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 30px;
 }
 
-ul {
-    list-style: none;
-    padding: 0;
+/* General Statistics */
+.stats-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    text-align: center;
 }
 
-ul li {
-    padding: 5px 0;
-    color: #444;
+.stats-section span {
+    display: block;
+    font-size: 1.2em;
+    color: #2980b9;
+    margin-top: 5px;
 }
 
+/* Table styling untuk Winner History dan Recent Bets */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -62,34 +75,133 @@ table {
 }
 
 th, td {
-    padding: 10px;
+    padding: 12px;
     text-align: left;
     border-bottom: 1px solid #ddd;
 }
 
 th {
-    background-color: #f0f0f0;
-    color: #333;
+    background-color: #3498db;
+    color: #fff;
+    font-weight: bold;
 }
 
-input[type="text"], input[type="number"] {
-    padding: 5px;
-    margin-right: 10px;
-    width: 250px;
+tr:nth-child(even) {
+    background-color: #f9f9f9;
 }
 
-button {
-    padding: 5px 10px;
-    background-color: #007bff;
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Player Lookup */
+.player-lookup {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.player-lookup input {
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+}
+
+.player-lookup button {
+    padding: 10px;
+    font-size: 1em;
+    background-color: #3498db;
     color: #fff;
     border: none;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-button:hover {
-    background-color: #0056b3;
+.player-lookup button:hover {
+    background-color: #2980b9;
 }
+
+.player-stats {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.player-stats span {
+    display: block;
+    font-size: 1.2em;
+    color: #2980b9;
+    margin: 5px 0;
+}
+
+/* Lookup by Bet ID */
+.betid-lookup {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.betid-lookup input {
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+}
+
+.betid-lookup button {
+    padding: 10px;
+    font-size: 1em;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.betid-lookup button:hover {
+    background-color: #2980b9;
+}
+
+.betid-result {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.betid-result span {
+    display: block;
+    font-size: 1.2em;
+    color: #2980b9;
+    margin: 5px 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .stats-section {
+        grid-template-columns: 1fr;
+    }
+
+    th, td {
+        font-size: 0.9em;
+        padding: 8px;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    h2 {
+        font-size: 1.5em;
+    }
+}
+
     </style>
 </head>
 <body>
