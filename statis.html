@@ -258,7 +258,6 @@ tr:hover {
             <div class="stats-item">
                 <strong>Last Winner</strong>
                 <span id="lastWinner">None</span>
-                <span id="lastPrize">None</span>
             </div>
             <div class="stats-item">
                 <strong>Total Players</strong>
@@ -396,14 +395,7 @@ async function updateGeneralStats() {
         const allWinners = await contract.methods.getAllWinners().call();
         
         const lastWinner = await contract.methods.lastWinner().call();
-const lastPrize = await contract.methods.lastPrize().call();
-
-document.getElementById("lastWinner").innerText = lastWinner === "0x0000000000000000000000000000000000000000" 
-    ? "None" 
-    : lastWinner;
-document.getElementById("lastPrize").innerText = lastWinner === "0x0000000000000000000000000000000000000000" 
-    ? "No prize yet" 
-    : `Last Prize: ${web3.utils.fromWei(lastPrize, 'ether')} ETH`;
+        document.getElementById("lastWinner").innerText = lastWinner === "0x0000000000000000000000000000000000000000" ? "None" : lastWinner;
         
         const totalWinners = await contract.methods.totalWinners().call();
         document.getElementById("totalWinners").innerText = totalWinners;
