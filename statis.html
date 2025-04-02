@@ -394,50 +394,22 @@ async function updateGeneralStats() {
 
         const allWinners = await contract.methods.getAllWinners().call();
         
-        async function updateLastWinner() {
-    try {
-        // Ambil data pemenang terakhir
-        const lastWinner = await contract.methods.lastWinner().call();
+        async function getLastWinnerAndPrize() {
+    // Mendapatkan last winner
+    const lastWinner = await contract.methods.lastWinner().call();
+    // Mendapatkan last prize (asumsi ada method lastPrize)
+    const lastPrize = await contract.methods.lastPrize().call();
+    
+    // Format display
+    const winnerText = lastWinner === "0x0000000000000000000000000000000000000000" 
+        ? "None" 
+        : `${lastWinner} (Prize: ${web3.utils.fromWei(lastPrize, 'ether')} ETH)`;
+    
+    document.getElementById("lastWinner").innerText = winnerText;
+}
 
-        // Jika ada pemenang, ambil hadiah terakhir mereka
-        let prizeAmount = "0";
-        let betAmount = "0";
-        let winnerTime = "N/A";
-        let status = "Pending";
-
-        if (lastWinner !== "0x0000000000000000000000000000000000000000") {
-            prizeAmount = await contract.methods.getPrizeForWinner(lastWinner).call(); // Ambil jumlah hadiah untuk pemenang terakhir
-            betAmount = await contract.methods.getBetAmountForWinner(lastWinner).call(); // Ambil jumlah taruhan pemenang
-            winnerTime = await contract.methods.getWinnerTime(lastWinner).call(); // Ambil waktu pemenang
-            status = await contract.methods.getBetStatus(lastWinner).call(); // Ambil status taruhan
-        }
-
-        // Periksa apakah ada pemenang yang valid
-        if (lastWinner === "0x0000000000000000000000000000000000000000") {
-            document.getElementById("lastWinner").innerHTML = "None";
-        } else {
-            // Konversi hadiah dari Wei ke Ether dan taruhan juga
-            const prizeInEther = web3.utils.fromWei(prizeAmount, "ether");
-            const betAmountInEther = web3.utils.fromWei(betAmount, "ether");
-
-            // Konversi waktu menjadi format yang lebih mudah dibaca
-            const formattedTime = new Date(winnerTime * 1000).toLocaleString(); // Anggap waktu dalam detik, konversi ke milidetik
-
-            // Tampilkan informasi pemenang, hadiah, jumlah taruhan, dan waktu pemenang
-            document.getElementById("lastWinner").innerHTML = `
-                ${lastWinner}<br>
-                Prize: ${prizeInEther} ETH<br>
-                Bet Amount: ${betAmountInEther} ETH<br>
-                Status: ${status}<br>
-                Winner Time: ${formattedTime}
-            `;
-        }
-
-        console.log("[updateLastWinner] Last Winner and Prize Updated");
-    } catch (error) {
-        console.error("[updateLastWinner] Error:", error);
-    }
-        }
+// Panggil fungsi
+getLastWinnerAndPrize();
         
         const totalWinners = await contract.methods.totalWinners().call();
         document.getElementById("totalWinners").innerText = totalWinners;
