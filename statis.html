@@ -98,10 +98,14 @@ button:hover {
         
         <div class="stats-section">
             <h2>General Statistics</h2>
-            <p><strong>Total Bets:</strong> <span id="totalBets">Loading...</span></p>
-            <p><strong>Total Amount Bet:</strong> <span id="totalPayout">Loading...</span> ETH</p>
-            <p><strong>Contract Balance:</strong> <span id="contractBalance">Loading...</span> ETH</p>
-            <p><strong>Last Winner:</strong> <span id="lastWinner">Loading...</span></p>
+    <p><strong>Total Bets:</strong> <span id="totalBets">Loading...</span></p>
+    <p><strong>Total Amount Bet:</strong> <span id="totalPayout">Loading...</span> ETH</p>
+    <p><strong>Contract Balance:</strong> <span id="contractBalance">Loading...</span> ETH</p>
+    <p><strong>Last Winner:</strong> <span id="lastWinner">Loading...</span></p>
+    <p><strong>Total Winners:</strong> <span id="totalWinners">Loading...</span></p>
+    <p><strong>Total Players:</strong> <span id="totalPlayers">Loading...</span></p>
+    <p><strong>Average Bet Amount:</strong> <span id="averageBetAmount">Loading...</span> ETH</p>
+            <p><strong>Top Bettor:</strong> <span id="topBettor">Loading...</span></p>
         </div>
 
         <div class="stats-section">
@@ -189,7 +193,8 @@ async function loadStats() {
         document.getElementById("totalBets").innerText = totalBets;
 
         const totalPayout = await contract.methods.totalPayout().call();
-        document.getElementById("totalPayout").innerText = web3.utils.fromWei(totalPayout, "ether");
+        const totalPayoutEth = web3.utils.fromWei(totalPayout, "ether");
+        document.getElementById("totalPayout").innerText = totalPayoutEth;
 
         const contractBalance = await contract.methods.contractBalance().call();
         document.getElementById("contractBalance").innerText = web3.utils.fromWei(contractBalance, "ether");
@@ -199,9 +204,26 @@ async function loadStats() {
         document.getElementById("lastWinner").innerText = lastWinner;
         console.log("All Winners:", allWinners);
 
-        const allPlayers = await contract.methods.getAllPlayers().call();
-        document.getElementById("allPlayers").innerHTML = allPlayers.map(player => `<li>${player}</li>`).join("");
+        // Tambahan: Total Winners
+        const totalWinners = await contract.methods.totalWinners().call();
+        document.getElementById("totalWinners").innerText = totalWinners;
 
+        // Tambahan: Total Players
+        const allPlayers = await contract.methods.getAllPlayers().call();
+        document.getElementById("totalPlayers").innerText = allPlayers.length;
+
+        // Tambahan: Average Bet Amount
+        const averageBetAmount = totalBets > 0 ? (parseFloat(totalPayoutEth) / parseInt(totalBets)).toFixed(6) : 0;
+        document.getElementById("averageBetAmount").innerText = averageBetAmount;
+
+        // Tambahan: Top Bettor
+        const topBettorData = await contract.methods.topBettor().call();
+        const topBettor = topBettorData.player === "0x0000000000000000000000000000000000000000" 
+            ? "None" 
+            : `${topBettorData.player} (${topBettorData.totalBets} bets)`;
+        document.getElementById("topBettor").innerText = topBettor;
+
+        document.getElementById("allPlayers").innerHTML = allPlayers.map(player => `<li>${player}</li>`).join("");
         document.getElementById("allWinners").innerHTML = allWinners.map(winner => `<li>${winner}</li>`).join("");
 
         const allBets = await contract.methods.getAllBets().call();
