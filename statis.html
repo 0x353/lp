@@ -100,11 +100,16 @@ h3 {
 
 /* Section styling */
 section {
-    background-color: #111;
-    border-radius: 6px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    background-color: #1a1a1a;
+    border-radius: 10px;
     padding: 20px;
     margin-bottom: 30px;
     overflow: hidden;
+    box-shadow: 
+        0 5px 10px rgba(0, 255, 255, 0.2), /* Soft cyan outer glow */
+        0 10px 20px rgba(0, 255, 255, 0.3), /* Lebih besar */
+        inset 0 2px 4px rgba(255, 255, 255, 0.1), /* Efek inner highlight */
+        inset 0 -3px 6px rgba(0, 0, 0, 0.4); /* Inner shadow lebih dalam */
 }
 
 /* General Statistics */
@@ -113,28 +118,6 @@ section {
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
     padding: 10px;
-}
-
-.stats-item {
-    text-align: center;
-    padding: 15px;
-    border-radius: 8px;
-    background: linear-gradient(145deg, #0a0a0a, #1a1a1a);
-    box-shadow: 
-        0 4px 6px rgba(255, 255, 255, 0.05), /* Cahaya luar */
-        0 6px 15px rgba(0, 255, 255, 0.2), /* Efek neon */
-        inset 0 2px 4px rgba(255, 255, 255, 0.05), /* Efek dalam */
-        inset 0 -3px 5px rgba(0, 255, 255, 0.15); /* Efek glow bawah */
-    transition: all 0.3s ease-in-out;
-}
-
-.stats-item:hover {
-    box-shadow: 
-        0 6px 12px rgba(0, 255, 255, 0.3), 
-        0 10px 25px rgba(0, 255, 255, 0.4), 
-        inset 0 3px 6px rgba(255, 255, 255, 0.1), 
-        inset 0 -4px 6px rgba(0, 255, 255, 0.25);
-    transform: translateY(-4px) scale(1.03);
 }
 
 .stats-item {
