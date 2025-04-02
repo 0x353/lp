@@ -323,7 +323,7 @@ tr:hover {
     top: 0;
     left: 0;
     width: 100%;
-    max-width: 1250px;
+    max-width: 1240px;
     z-index: 1000;
     height: 60px; /* Tambahkan tinggi navbar agar lebih jelas */
 }
@@ -480,10 +480,6 @@ footer {
                 <span id="totalPayout">0 ETH</span>
             </div>
             <div class="stats-item">
-                <strong>Contract Balance</strong>
-                <span id="contractBalance">0 ETH</span>
-            </div>
-            <div class="stats-item">
                 <strong>Total Winners</strong>
                 <span id="totalWinners">0</span>
             </div>
@@ -631,9 +627,6 @@ async function updateGeneralStats() {
         const totalPayout = await contract.methods.totalPayout().call();
         const totalPayoutEth = web3.utils.fromWei(totalPayout, "ether");
         document.getElementById("totalPayout").innerText = totalPayoutEth;
-
-        const contractBalance = await contract.methods.contractBalance().call();
-        document.getElementById("contractBalance").innerText = web3.utils.fromWei(contractBalance, "ether");
 
         const allWinners = await contract.methods.getAllWinners().call();
         
