@@ -353,11 +353,11 @@ table {
 th, td {
     padding: 12px 15px;
     text-align: left;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 0.5px solid #ccc;
 }
 
 th {
-    background-color: #007bff;
+    background-color: linear-gradient(90deg, #03a9f4, #f441a5);
     color: #fff;
     font-weight: 600;
 }
@@ -536,7 +536,7 @@ footer {
 
         <!-- General Statistics -->
         <section class="stats-section">
-            <h2>General Statistics</h2>
+            <h3>General Statistics</h3>
             <div class="stats-item">
                 <strong>Total Bets</strong>
                 <span id="totalBets">0</span>
@@ -569,7 +569,7 @@ footer {
 
         <!-- Winner History -->
 <section>
-    <h2>Winner History</h2>
+    <h3>Winner History</h3>
     <div class="table-container">
         <table id="winnerHistory">
             <thead>
@@ -588,7 +588,7 @@ footer {
 
 <!-- Recent Bets -->
 <section>
-    <h2>Recent Bets</h2>
+    <h3>Recent Bets</h3>
     <div class="table-container">
         <table id="recentBets">
             <thead>
@@ -607,7 +607,7 @@ footer {
 
         <!-- Player Lookup -->
         <section class="player-lookup">
-            <h2>Player Lookup</h2>
+            <h3>Player Lookup</h3>
             <div class="form-group">
                 <input type="text" id="playerAddress" placeholder="Enter player address">
                 <button onclick="lookupPlayer()">Lookup</button>
@@ -622,7 +622,7 @@ footer {
 
         <!-- Lookup by Bet ID -->
         <section class="betid-lookup">
-            <h2>Lookup Winner by Bet ID</h2>
+            <h3>Lookup Winner by Bet ID</h3>
             <div class="form-group">
                 <input type="text" id="betIdInput" placeholder="Enter Bet ID">
                 <button onclick="lookupWinnerByBetId()">Lookup</button>
