@@ -205,74 +205,50 @@ tr:hover {
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Bet History Statistics</h1>
-        
-        <div class="stats-section">
+        <div class="container">
+        <h1>Bet History Dashboard</h1>
+
+        <!-- General Statistics -->
+        <section class="stats-section">
             <h2>General Statistics</h2>
-    <p><strong>Total Bets:</strong> <span id="totalBets">Loading...</span></p>
-    <p><strong>Total Amount Bet:</strong> <span id="totalPayout">Loading...</span> ETH</p>
-    <p><strong>Contract Balance:</strong> <span id="contractBalance">Loading...</span> ETH</p>
-    <p><strong>Last Winner:</strong> <span id="lastWinner">Loading...</span></p>
-    <p><strong>Total Winners:</strong> <span id="totalWinners">Loading...</span></p>
-    <p><strong>Total Players:</strong> <span id="totalPlayers">Loading...</span></p>
-    <p><strong>Average Bet Amount:</strong> <span id="averageBetAmount">Loading...</span> ETH</p>
-            <p><strong>Top Bettor:</strong> <span id="topBettor">Loading...</span></p>
-        </div>
-
-        <div class="stats-section">
-            <h2>All Players</h2>
-            <ul id="allPlayers"></ul>
-        </div>
-
-        <div class="stats-section">
-            <h2>All Winners</h2>
-            <ul id="allWinners"></ul>
-        </div>
-
-        <div class="stats-section">
-            <h2>Recent Bets</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Player</th>
-                        <th>Number</th>
-                        <th>Bet Amount</th>
-                        <th>Likes</th>
-                        <th>Comments</th>
-                    </tr>
-                </thead>
-                <tbody id="recentBets"></tbody>
-            </table>
-        </div>
-
-        <div class="stats-section">
-            <h2>Player Lookup</h2>
-            <input type="text" id="playerAddress" placeholder="Enter player address">
-            <button onclick="lookupPlayer()">Lookup</button>
-            <div id="playerStats">
-                <p><strong>Total Bets:</strong> <span id="playerTotalBets">-</span></p>
-                <p><strong>Total Amount Bet:</strong> <span id="playerTotalAmountBet">-</span> ETH</p>
-                <p><strong>Total Wins:</strong> <span id="playerTotalWins">-</span></p>
-                <p><strong>Total Payout:</strong> <span id="playerTotalPayout">-</span> ETH</p>
+            <div>
+                <strong>Total Bets:</strong>
+                <span id="totalBets">0</span>
             </div>
-        </div>
-
-        <div class="stats-section">
-            <h2>Winner by Bet ID</h2>
-            <input type="number" id="betIdInput" placeholder="Enter Bet ID" min="0">
-            <button onclick="lookupWinnerByBetId()">Lookup</button>
-            <div id="winnerByBetId">
-                <p><strong>Winner Address:</strong> <span id="winnerAddress">-</span></p>
-                <p><strong>Amount Won:</strong> <span id="winnerAmount">-</span> ETH</p>
-                <p><strong>Winning Number:</strong> <span id="winnerNumber">-</span></p>
-                <p><strong>Timestamp:</strong> <span id="winnerTimestamp">-</span></p>
+            <div>
+                <strong>Total Payout:</strong>
+                <span id="totalPayout">0 ETH</span>
             </div>
-        </div>
+            <div>
+                <strong>Contract Balance:</strong>
+                <span id="contractBalance">0 ETH</span>
+            </div>
+            <div>
+                <strong>Last Winner:</strong>
+                <span id="lastWinner">None</span>
+            </div>
+            <div>
+                <strong>Total Winners:</strong>
+                <span id="totalWinners">0</span>
+            </div>
+            <div>
+                <strong>Total Players:</strong>
+                <span id="totalPlayers">0</span>
+            </div>
+            <div>
+                <strong>Average Bet Amount:</strong>
+                <span id="averageBetAmount">0 ETH</span>
+            </div>
+            <div>
+                <strong>Top Bettor:</strong>
+                <span id="topBettor">None</span>
+            </div>
+        </section>
 
-        <div class="stats-section">
+        <!-- Winner History -->
+        <section>
             <h2>Winner History</h2>
-            <table>
+            <table id="winnerHistory">
                 <thead>
                     <tr>
                         <th>Bet ID</th>
@@ -282,12 +258,55 @@ tr:hover {
                         <th>Timestamp</th>
                     </tr>
                 </thead>
-                <tbody id="winnerHistory"></tbody>
+                <tbody></tbody>
             </table>
-        </div>
-    </div>
+        </section>
 
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.7.4/dist/web3.min.js"></script>
+        <!-- Recent Bets -->
+        <section>
+            <h2>Recent Bets</h2>
+            <table id="recentBets">
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        <th>Number</th>
+                        <th>Bet Amount</th>
+                        <th>Likes</th>
+                        <th>Comments</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+
+        <!-- Player Lookup -->
+        <section class="player-lookup">
+            <h2>Player Lookup</h2>
+            <input type="text" id="playerAddress" placeholder="Enter player address">
+            <button onclick="lookupPlayer()">Lookup</button>
+            <div class="player-stats">
+                <strong>Total Bets:</strong> <span id="playerTotalBets">0</span>
+                <strong>Total Amount Bet:</strong> <span id="playerTotalAmountBet">0 ETH</span>
+                <strong>Total Wins:</strong> <span id="playerTotalWins">0</span>
+                <strong>Total Payout:</strong> <span id="playerTotalPayout">0 ETH</span>
+            </div>
+        </section>
+
+        <!-- Lookup by Bet ID -->
+        <section class="betid-lookup">
+            <h2>Lookup Winner by Bet ID</h2>
+            <input type="text" id="betIdInput" placeholder="Enter Bet ID">
+            <button onclick="lookupWinnerByBetId()">Lookup</button>
+            <div class="betid-result">
+                <strong>Winner Address:</strong> <span id="winnerAddress">-</span>
+                <strong>Amount Won:</strong> <span id="winnerAmount">-</span>
+                <strong>Winning Number:</strong> <span id="winnerNumber">-</span>
+                <strong>Timestamp:</strong> <span id="winnerTimestamp">-</span>
+            </div>
+        </section>
+        </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.7.0/dist/web3.min.js"></script>
     <script src="script.js"></script>
     <script>
         // Konfigurasi Web3 dan kontrak
