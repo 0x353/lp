@@ -173,32 +173,33 @@ tr:hover {
 .form-group {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 15px; /* Jarak antar elemen */
     justify-content: center;
-    align-items: center;
     margin-bottom: 20px;
+    align-items: center;
     width: 100%;
+    max-width: 600px; /* Batasi lebar maksimum lebih ketat untuk PC */
+    margin-left: auto;
+    margin-right: auto;
 }
 
-/* Input responsif dan tetap sejajar di PC */
+/* Styling input agar responsif */
 .form-group input {
     flex: 1;
-    width: clamp(220px, 40vw, 300px); /* Lebih stabil di semua ukuran layar */
+    width: clamp(210px, 35vw, 280px); /* Minimum 210px, maksimum 280px */
     max-width: 100%;
     padding: 10px;
     font-size: 1rem;
     border: 1px solid #ccc;
     border-radius: 4px;
-    text-align: center;
 }
 
-/* Centering khusus dan efek futuristik */
+/* Centering & styling khusus */
 #betIdInput, #playerAddress {
-    width: clamp(220px, 40vw, 300px);
+    width: clamp(210px, 35vw, 280px); /* Minimum 210px untuk HP */
     max-width: 100%;
     padding: 10px;
     font-size: 1rem;
-    text-align: center;
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.15);
@@ -209,7 +210,7 @@ tr:hover {
     transition: all 0.3s ease-in-out;
 }
 
-/* Efek hover */
+/* Efek hover futuristik */
 #betIdInput:hover, #playerAddress:hover {
     box-shadow: 0 0 15px rgba(0, 183, 255, 0.8), 
                 0 0 30px rgba(0, 183, 255, 0.5);
@@ -217,30 +218,17 @@ tr:hover {
     transform: scale(1.05);
 }
 
-/* Pastikan tombol tetap sejajar di PC */
-.form-group button {
-    padding: 10px 15px;
-    font-size: 1rem;
-    border-radius: 8px;
-    background: #03a9f4;
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.form-group button:hover {
-    background: #f441a5;
-}
-
-/* Untuk layar kecil */
+/* Menyesuaikan untuk layar kecil */
 @media (max-width: 480px) {
     .form-group {
-        flex-direction: column; /* Input & tombol tersusun ke bawah */
-        align-items: center;
+        flex-direction: column;
+        gap: 10px;
+        padding: 0 10px; /* Ruang sisi */
     }
     #betIdInput, #playerAddress {
-        width: 90%; /* Lebih fleksibel di layar kecil */
+        width: calc(100% - 20px); /* Lebar penuh dikurangi 20px untuk sisi */
+        min-width: 210px; /* Pastikan minimal 210px di HP */
+        max-width: 280px; /* Batasi maksimum */
     }
 }
 
