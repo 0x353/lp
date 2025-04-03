@@ -799,11 +799,16 @@ async function updateGeneralStats() {
         const totalBets = await contract.methods.totalPlayers().call();
         document.getElementById("totalBets").innerText = totalBets;
 
-        const totalPayout = await contract.methods.totalPayout().call();
-console.log("Raw totalPayout:", totalPayout);
-const totalPayoutEth = Number(totalPayout) / 1e18 / 19; // Bagi 19 untuk koreksi
-console.log("Corrected totalPayoutEth:", totalPayoutEth);
-document.getElementById("totalPayout").innerText = totalPayoutEth.toFixed(6) + " ETH";
+        // Memanggil metode yang benar untuk mendapatkan klaim yang dapat dilakukan
+const totalClaimable = await contract.methods.totalClaimable().call(); // Ganti dengan nama metode yang tepat
+console.log("Raw totalClaimable:", totalClaimable);
+
+// Menghitung klaim yang dapat dilakukan dalam ETH
+const totalClaimableEth = Number(totalClaimable) / 1e18; // Pembagian dengan 1e18 untuk konversi dari wei ke ETH
+console.log("Corrected totalClaimableEth:", totalClaimableEth);
+
+// Menampilkan total klaim yang dapat dilakukan di frontend
+document.getElementById("totalPayout").innerText = totalClaimableEth.toFixed(6) + " ETH";
 
         const allWinners = await contract.methods.getAllWinners().call();
         
