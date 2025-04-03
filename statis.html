@@ -800,8 +800,10 @@ async function updateGeneralStats() {
         document.getElementById("totalBets").innerText = totalBets;
 
         const totalPayout = await contract.methods.totalPayout().call();
-        const totalPayoutEth = web3.utils.fromWei(totalPayout, "ether");
-        document.getElementById("totalPayout").innerText = totalPayoutEth;
+console.log("Raw totalPayout:", totalPayout);
+const totalPayoutEth = Number(totalPayout) / 1e18 / 19; // Bagi 19 untuk koreksi
+console.log("Corrected totalPayoutEth:", totalPayoutEth);
+document.getElementById("totalPayout").innerText = totalPayoutEth.toFixed(6) + " ETH";
 
         const allWinners = await contract.methods.getAllWinners().call();
         
