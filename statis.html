@@ -802,10 +802,12 @@ async function updateGeneralStats() {
        const totalPayout = await contract.methods.totalPayout().call();
 console.log("Raw totalPayout:", totalPayout);
 
-// Konversi dari wei ke ETH (tanpa pembagian 19 tambahan)
-const totalPayoutEth = Number(totalPayout) / 1e18;
+// Tambahkan pengecekan nilai raw
+if (Number(totalPayout) !== 2029000000000000n) {
+    console.log("Warning: Raw value from contract doesn't match expected 0.002029 ETH");
+}
 
-console.log("Corrected totalPayoutEth:", totalPayoutEth);
+const totalPayoutEth = Number(totalPayout) / 1e18;
 document.getElementById("totalPayout").innerText = totalPayoutEth.toFixed(6) + " ETH";
         
         const allWinners = await contract.methods.getAllWinners().call();
