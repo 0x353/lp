@@ -899,7 +899,7 @@ async function updateWinnerHistory() {
         console.error("[updateWinnerHistory] Error:", error);
     }
 }
-
+        
 async function updateRecentBets() {
     try {
         const allBets = await contract.methods.getAllBets().call();
