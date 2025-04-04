@@ -837,7 +837,7 @@ async function updateWinnerHistory() {
 
         // Langkah 1: Ambil semua event WinnerSet
         const winnerEvents = await contract.getPastEvents('WinnerSet', {
-            fromBlock: 0,
+            fromBlock: 23614303,
             toBlock: 'latest'
         });
         console.log("[updateWinnerHistory] Winner Events:", winnerEvents);
