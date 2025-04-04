@@ -833,28 +833,62 @@ async function updateGeneralStats() {
 async function updateWinnerHistory() {
     try {
         let winnerHistoryHTML = "";
-        const allBets = await contract.methods.getAllBets().call(); // Ambil semua taruhan
         let winnerCount = 0;
 
-        // Gunakan betId asli dari allBets dan konversi jika perlu
-        for (let i = 0; i < allBets.length; i++) {
-            const betIdBytes32 = allBets[i].betId; // betId dalam bytes32
-            // Konversi bytes32 ke uint256 (ambil bagian numerik jika memungkinkan)
-            const betId = parseInt(betIdBytes32.slice(2), 16) % (2**256); // Ambil nilai numerik dari hex
-            const winnerData = await contract.methods.getWinnerByBetId(betId).call();
-            console.log(`[updateWinnerHistory] Bet ID (bytes32): ${betIdBytes32}, Converted Bet ID (uint256): ${betId}, Winner Data:`, winnerData);
+        // Langkah 1: Ambil semua event WinnerSet
+        const winnerEvents = await contract.getPastEvents('WinnerSet', {
+            fromBlock: 0,
+            toBlock: 'latest'
+        });
+        console.log("[updateWinnerHistory] Winner Events:", winnerEvents);
 
-            if (winnerData.winner !== "0x0000000000000000000000000000000000000000") {
-                winnerHistoryHTML += `
-                    <tr>
-                        <td>${betIdBytes32.slice(0, 6)}...</td>
-                        <td>${winnerData.winner}</td>
-                        <td>${web3.utils.fromWei(winnerData.amount, "ether")}</td>
-                        <td>${winnerData.number}</td>
-                        <td>${new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString()}</td>
-                    </tr>
-                `;
-                winnerCount++;
+        if (winnerEvents.length === 0) {
+            console.log("[updateWinnerHistory] No WinnerSet events found. Checking winnerHistory manually...");
+            
+            // Langkah 2: Jika event kosong, coba scan winnerHistory secara manual
+            const allBets = await contract.methods.getAllBets().call();
+            for (let i = 0; i < allBets.length; i++) {
+                const winnerData = await contract.methods.getWinnerByBetId(i).call();
+                console.log(`[updateWinnerHistory] Manual check Bet ID ${i}:`, winnerData);
+
+                if (winnerData.winner !== "0x0000000000000000000000000000000000000000") {
+                    winnerHistoryHTML += `
+                        <tr>
+                            <td>${allBets[i].betId.slice(0, 6)}...</td>
+                            <td>${winnerData.winner}</td>
+                            <td>${web3.utils.fromWei(winnerData.amount, "ether")}</td>
+                            <td>${winnerData.number}</td>
+                            <td>${new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString()}</td>
+                        </tr>
+                    `;
+                    winnerCount++;
+                }
+            }
+        } else {
+            // Langkah 3: Proses event WinnerSet
+            for (const event of winnerEvents) {
+                const betId = event.returnValues.betId; // bytes32
+                const winner = event.returnValues.winner;
+                const amount = event.returnValues.amount;
+                const number = event.returnValues.number;
+
+                // Konversi betId ke uint256 untuk getWinnerByBetId
+                const betIdUint = parseInt(betId.slice(2), 16) % (2**256);
+                const winnerData = await contract.methods.getWinnerByBetId(betIdUint).call();
+                console.log(`[updateWinnerHistory] Bet ID: ${betId}, Converted ID: ${betIdUint}, Winner Data:`, winnerData);
+
+                if (winner !== "0x0000000000000000000000000000000000000000") {
+                    winnerHistoryHTML += `
+                        <tr>
+                            <td>${betId.slice(0, 6)}...</td>
+                            <td>${winner}</td>
+                            <td>${web3.utils.fromWei(amount, "ether")}</td>
+                            <td>${number}</td>
+                            <td>${new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString()}</td>
+                        </tr>
+                    `;
+                    winnerCount++;
+                }
             }
         }
 
