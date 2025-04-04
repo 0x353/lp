@@ -833,21 +833,33 @@ async function updateGeneralStats() {
 async function updateWinnerHistory() {
     try {
         let winnerHistoryHTML = "";
-        const allBets = await contract.methods.getAllBets().call(); // Ambil semua taruhan
         let winnerCount = 0;
 
-        for (let i = 0; i < allBets.length; i++) {
-            const betId = i; // Gunakan indeks sebagai betId (sesuai kontrak)
-            const winnerData = await contract.methods.getWinnerByBetId(betId).call();
-            console.log(`[updateWinnerHistory] Winner Data for Bet ID ${betId}:`, winnerData);
+        // Ambil semua event WinnerSet
+        const winnerEvents = await contract.getPastEvents('WinnerSet', {
+            fromBlock: 0,
+            toBlock: 'latest'
+        });
 
-            if (winnerData.winner !== "0x0000000000000000000000000000000000000000") {
+        console.log("[updateWinnerHistory] Winner Events:", winnerEvents);
+
+        for (const event of winnerEvents) {
+            const betId = event.returnValues.betId; // bytes32 dari event
+            const winner = event.returnValues.winner;
+            const amount = event.returnValues.amount;
+            const number = event.returnValues.number;
+
+            // Ambil timestamp dari winnerHistory untuk betId yang dikonversi ke uint256
+            const betIdUint = parseInt(betId.slice(2), 16) % (2**256);
+            const winnerData = await contract.methods.getWinnerByBetId(betIdUint).call();
+
+            if (winner !== "0x0000000000000000000000000000000000000000") {
                 winnerHistoryHTML += `
                     <tr>
-                        <td>${allBets[i].betId.slice(0, 6)}...</td> <!-- Tampilkan betId asli -->
-                        <td>${winnerData.winner}</td>
-                        <td>${web3.utils.fromWei(winnerData.amount, "ether")}</td>
-                        <td>${winnerData.number}</td>
+                        <td>${betId.slice(0, 6)}...</td>
+                        <td>${winner}</td>
+                        <td>${web3.utils.fromWei(amount, "ether")}</td>
+                        <td>${number}</td>
                         <td>${new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString()}</td>
                     </tr>
                 `;
