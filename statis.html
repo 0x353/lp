@@ -743,23 +743,6 @@ footer {
                 <p><strong>Winning Number:</strong> <span id="winnerNumber" style="color: #00FF66;">- (ETH)</span></p>
                 <p><strong>Timestamp:</strong> <span id="winnerTimestamp" style="color: orange;">-</span></p><br>
             </div>
-            <!-- Tabel Riwayat Pemenang -->
-            <div class="betid-history hidden">
-                <h3>Winner History for This Address</h3>
-                <div class="table-container">
-                    <table id="betidWinnerHistory">
-                        <thead>
-                            <tr>
-                                <th>BetID</th>
-                                <th>Prizes</th>
-                                <th>WinNumber</th>
-                                <th>Timestamp</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
         </section>
         
     <!-- Footer -->
@@ -978,12 +961,9 @@ async function lookupPlayer() {
 async function lookupWinnerByBetId() {
     const betId = document.getElementById("betIdInput").value.trim();
     const betIdResultDiv = document.querySelector(".betid-result");
-    const betIdHistoryDiv = document.querySelector(".betid-history");
-    const betIdWinnerHistoryTable = document.getElementById("betidWinnerHistory").querySelector("tbody");
 
     // Sembunyikan sebelum lookup
     betIdResultDiv.classList.add("hidden");
-    betIdHistoryDiv.classList.add("hidden");
 
     if (!betId) {
         alert("Please enter a valid Bet ID!");
@@ -993,40 +973,20 @@ async function lookupWinnerByBetId() {
     try {
         const winnerData = await contract.methods.getWinnerByBetId(betId).call();
         console.log(`[lookupWinnerByBetId] Winner Data for Bet ID ${betId}:`, winnerData);
-
+        
         if (winnerData.winner === "0x0000000000000000000000000000000000000000") {
-            document.getElementById("winnerAddress").innerText = "->-";
+            document.getElementById("winnerAddress").innerText = "No winner set";
             document.getElementById("winnerAmount").innerText = "-";
             document.getElementById("winnerNumber").innerText = "-";
             document.getElementById("winnerTimestamp").innerText = "-";
-            betIdWinnerHistoryTable.innerHTML = "<tr><td colspan='4'>No winner history available</td></tr>";
         } else {
-            // Tampilkan detail pemenang
             document.getElementById("winnerAddress").innerText = winnerData.winner;
             document.getElementById("winnerAmount").innerText = web3.utils.fromWei(winnerData.amount, "ether");
             document.getElementById("winnerNumber").innerText = winnerData.number;
             document.getElementById("winnerTimestamp").innerText = new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString();
-
-            // Cari riwayat pemenang berdasarkan alamat pemenang
-            let winnerHistoryHTML = "";
-            for (const knownBetId of knownBetIds) {
-                const historyData = await contract.methods.getWinnerByBetId(knownBetId).call();
-                if (historyData.winner.toLowerCase() === winnerData.winner.toLowerCase() && knownBetId !== betId) {
-                    winnerHistoryHTML += `
-                        <tr>
-                            <td>${knownBetId.slice(0, 6)}...</td>
-                            <td>${web3.utils.fromWei(historyData.amount, "ether")}</td>
-                            <td>${historyData.number}</td>
-                            <td>${new Date(parseInt(historyData.timestamp) * 1000).toLocaleString()}</td>
-                        </tr>
-                    `;
-                }
-            }
-            betIdWinnerHistoryTable.innerHTML = winnerHistoryHTML || "<tr><td colspan='4'>No additional wins found for this address</td></tr>";
-            betIdHistoryDiv.classList.remove("hidden");
         }
 
-        // Tampilkan hasil lookup
+        // Tampilkan setelah lookup berhasil
         betIdResultDiv.classList.remove("hidden");
     } catch (error) {
         console.error("[lookupWinnerByBetId] Error:", error);
