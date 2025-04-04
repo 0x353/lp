@@ -870,6 +870,17 @@ contract.events.BetPlaced({}, async (error, event) => {
     await updateWinnerHistory(); // Perbarui riwayat pemenang saat ada taruhan baru
 });
 
+// Listener untuk event BetPlaced
+contract.events.BetPlaced({}, async (error, event) => {
+    if (error) {
+        console.error("[BetPlaced Event] Error:", error);
+        return;
+    }
+    console.log("[BetPlaced Event] New bet detected:", event.returnValues);
+    await updateRecentBets(event.returnValues.betId);
+    await updateWinnerHistory(); // Perbarui riwayat pemenang saat ada taruhan baru
+});
+
 // Fungsi untuk memperbarui taruhan terbaru
 async function updateRecentBets(newBetId) {
     try {
