@@ -832,9 +832,9 @@ async function updateGeneralStats() {
 // Definisikan knownBetIds secara dinamis (contoh dengan totalBets)
 async function updateWinnerHistory() {
     try {
-        // Ambil total jumlah taruhan dari kontrak (sesuaikan nama fungsi)
-        const totalBets = await contract.methods.totalBets().call(); // Ganti dengan fungsi yang benar
-        const knownBetIds = Array.from({ length: totalBets }, (_, i) => i); // BetID dari 0 sampai totalBets-1
+        const totalBets = await contract.methods.totalBets().call();
+        console.log("[updateWinnerHistory] Total Bets:", totalBets);
+        const knownBetIds = Array.from({ length: totalBets }, (_, i) => i);
         console.log("[updateWinnerHistory] knownBetIds:", knownBetIds);
 
         let winnerHistoryHTML = "";
@@ -852,6 +852,7 @@ async function updateWinnerHistory() {
                     </tr>`;
             }
         }
+        console.log("[updateWinnerHistory] Generated HTML:", winnerHistoryHTML);
         document.querySelector("#winnerHistory tbody").innerHTML = winnerHistoryHTML || "<tr><td colspan='5'>No winners found</td></tr>";
         console.log("[updateWinnerHistory] Updated Winner History");
     } catch (error) {
@@ -859,59 +860,34 @@ async function updateWinnerHistory() {
     }
 }
 
-// Listener untuk event BetPlaced
-contract.events.BetPlaced({}, async (error, event) => {
-    if (error) {
-        console.error("[BetPlaced Event] Error:", error);
-        return;
-    }
-    console.log("[BetPlaced Event] New bet detected:", event.returnValues);
-    await updateRecentBets(event.returnValues.betId);
-    await updateWinnerHistory(); // Perbarui riwayat pemenang saat ada taruhan baru
-});
-
-// Listener untuk event BetPlaced
-contract.events.BetPlaced({}, async (error, event) => {
-    if (error) {
-        console.error("[BetPlaced Event] Error:", error);
-        return;
-    }
-    console.log("[BetPlaced Event] New bet detected:", event.returnValues);
-    await updateRecentBets(event.returnValues.betId);
-    await updateWinnerHistory(); // Perbarui riwayat pemenang saat ada taruhan baru
-});
-
-// Fungsi untuk memperbarui taruhan terbaru
 async function updateRecentBets(newBetId) {
     try {
         const allBets = await contract.methods.getAllBets().call();
-        const recentBets = allBets.slice(-10).reverse(); // Ambil 10 taruhan terakhir
+        console.log("[updateRecentBets] All Bets:", allBets);
+        const recentBets = allBets.slice(-10).reverse();
+        console.log("[updateRecentBets] Recent Bets:", recentBets);
 
         const tbody = document.querySelector("#recentBets tbody");
-        tbody.innerHTML = ""; // Bersihkan tabel sebelum menambahkan data baru
+        tbody.innerHTML = "";
 
-        // Tambahkan baris baru untuk setiap taruhan terbaru
         for (const bet of recentBets) {
-            // Pastikan betId belum ditampilkan sebelumnya
             if (!displayedBetIds.includes(bet.betId)) {
                 const likeCount = await contract.methods.getLikeCount(bet.betId).call();
                 const comments = await contract.methods.getComments(bet.betId).call();
+                console.log(`[updateRecentBets] Bet ID ${bet.betId} - Likes: ${likeCount}, Comments: ${comments.length}`);
 
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td style="color: #ad5cff;">${bet.player}</td>
                     <td style="color: #00FF66;">${bet.number}</td>
-                    <td style="color: #00FF66;">${bet.betAmount}</td>
+                    <td style="color: #00FF66;">${web3.utils.fromWei(bet.betAmount, "ether")}</td>
                     <td style="color: orange;">${likeCount || 0}</td>
                     <td style="color: #fcf800;">${comments.length || 0}</td>
                 `;
-                tbody.appendChild(row); // Tambahkan baris baru ke tabel
-                
-                // Tambahkan betId ke array displayedBetIds
+                tbody.appendChild(row);
                 displayedBetIds.push(bet.betId);
             }
         }
-
         console.log("[updateRecentBets] Updated Recent Bets with Likes & Comments");
     } catch (error) {
         console.error("[updateRecentBets] Error:", error);
