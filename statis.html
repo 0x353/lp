@@ -646,7 +646,7 @@ footer {
 </div>
 <div class="stats-item">
     <i class="fas fa-coins icon-circle"></i>
-    <strong style="color: #F0F0F0;">Total Payout</strong>
+    <strong style="color: #F0F0F0;">Total All ETH Bets</strong>
     <br><span id="totalPayout">0 ETH</span>
 </div>
 <div class="stats-item">
@@ -799,16 +799,9 @@ async function updateGeneralStats() {
         const totalBets = await contract.methods.totalPlayers().call();
         document.getElementById("totalBets").innerText = totalBets;
 
-       const totalPayout = await contract.methods.totalPayout().call();
-console.log("Raw totalPayout:", totalPayout);
-
-// Tambahkan pengecekan nilai raw
-if (Number(totalPayout) !== 2029000000000000n) {
-    console.log("Warning: Raw value from contract doesn't match expected 0.002029 ETH");
-}
-
-const totalPayoutEth = Number(totalPayout) / 1e18;
-document.getElementById("totalPayout").innerText = totalPayoutEth.toFixed(6) + " ETH";
+        const totalPayout = await contract.methods.totalPayout().call();
+        const totalPayoutEth = web3.utils.fromWei(totalPayout, "ether");
+        document.getElementById("totalPayout").innerText = totalPayoutEth;
         
         const allWinners = await contract.methods.getAllWinners().call();
         
