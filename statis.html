@@ -769,7 +769,19 @@ const contractABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constru
     const web3 = new Web3(rpcUrl);
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-let knownBetIds = []; // Kosongkan awalnya, akan diisi dari event
+let knownBetIds = [];
+let recentBets = [];
+
+async function fetchHistoricalWinners() {
+    try {
+        const events = await contract.getPastEvents("WinnerSet", { fromBlock: 23614303, toBlock: "latest" });
+        const historicalBetIds = events.map(event => event.returnValues.betId);
+        knownBetIds = [...new Set([...knownBetIds, ...historicalBetIds])];
+        console.log("[fetchHistoricalWinners] Historical betIds:", knownBetIds);
+    } catch (error) {
+        console.error("[fetchHistoricalWinners] Error fetching past events:", error);
+    }
+}
 
 async function loadStats() {
     try {
@@ -819,36 +831,16 @@ async function updateGeneralStats() {
 }
 
 // Definisikan knownBetIds secara dinamis (contoh dengan totalBets)
-async function fetchHistoricalWinners() {
-    try {
-        const events = await contract.getPastEvents("WinnerSet", { 
-            fromBlock: 23614303, // Block deploy kontrak
-            toBlock: "latest" 
-        });
-        knownBetIds = events.map(event => {
-            // Konversi bytes32 ke uint256
-            const betIdHex = event.returnValues.betId.slice(2); // Hilangkan '0x'
-            return BigInt('0x' + betIdHex).toString(); // Konversi ke string untuk aman
-        });
-        console.log("[fetchHistoricalWinners] Updated knownBetIds:", knownBetIds);
-    } catch (error) {
-        console.error("[fetchHistoricalWinners] Error:", error);
-    }
-}
-
 async function updateWinnerHistory() {
     try {
         let winnerHistoryHTML = "";
-        console.log("[updateWinnerHistory] Current knownBetIds:", knownBetIds);
-
-        // Gunakan knownBetIds yang sudah diambil dari event
         for (const betId of knownBetIds) {
             const winnerData = await contract.methods.getWinnerByBetId(betId).call();
             console.log(`[updateWinnerHistory] Winner Data for Bet ID ${betId}:`, winnerData);
             if (winnerData.winner !== "0x0000000000000000000000000000000000000000") {
                 winnerHistoryHTML += `
                     <tr>
-                        <td>${betId.toString().slice(0, 6)}...</td>
+                        <td>${betId.slice(0, 6)}...</td>
                         <td>${winnerData.winner}</td>
                         <td>${web3.utils.fromWei(winnerData.amount, "ether")}</td>
                         <td>${winnerData.number}</td>
@@ -857,39 +849,12 @@ async function updateWinnerHistory() {
                 `;
             }
         }
-
-        document.getElementById("winnerHistory").innerHTML = 
-            winnerHistoryHTML || "<tr><td colspan='5'>No winners found</td></tr>";
+        document.getElementById("winnerHistory").innerHTML = winnerHistoryHTML || "<tr><td colspan='5'>No winners found</td></tr>";
         console.log("[updateWinnerHistory] Updated Winner History");
     } catch (error) {
         console.error("[updateWinnerHistory] Error:", error);
-        document.getElementById("winnerHistory").innerHTML = "<tr><td colspan='5'>Error loading data</td></tr>";
     }
 }
-
-async function loadStats() {
-    try {
-        await fetchHistoricalWinners(); // Ambil semua betId dari event
-        await updateWinnerHistory(); // Tampilkan riwayat
-        // Tambahkan fungsi lain seperti updateGeneralStats() kalau perlu
-    } catch (error) {
-        console.error("[loadStats] Error:", error);
-    }
-}
-
-window.addEventListener("load", loadStats);
-
-// Event listener untuk update real-time
-contract.events.WinnerSet({ fromBlock: "latest" })
-    .on("data", async (event) => {
-        const betId = BigInt(event.returnValues.betId).toString();
-        if (!knownBetIds.includes(betId)) {
-            knownBetIds.push(betId);
-            await updateWinnerHistory();
-        }
-        console.log("[WinnerSet] New winner:", event.returnValues);
-    })
-    .on("error", console.error);
         
 async function updateRecentBets() {
     try {
