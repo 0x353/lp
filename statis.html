@@ -829,26 +829,27 @@ async function updateGeneralStats() {
     }
 }
 
+// Definisikan knownBetIds secara dinamis (contoh dengan totalBets)
 async function updateWinnerHistory() {
     try {
+        // Ambil total jumlah taruhan dari kontrak (sesuaikan nama fungsi)
+        const totalBets = await contract.methods.totalBets().call(); // Ganti dengan fungsi yang benar
+        const knownBetIds = Array.from({ length: totalBets }, (_, i) => i); // BetID dari 0 sampai totalBets-1
+        console.log("[updateWinnerHistory] knownBetIds:", knownBetIds);
+
         let winnerHistoryHTML = "";
         for (const betId of knownBetIds) {
-            const winnersData = await contract.methods.getWinnersByBetId(betId).call();
-            console.log(`[updateWinnerHistory] Winner Data for Bet ID ${betId}:`, winnersData);
-            if (winnersData.length > 0) {
-                winnersData.forEach(winnerData => {
-                    if (winnerData.winnerAddress !== "0x0000000000000000000000000000000000000000") {
-                        winnerHistoryHTML += `
-                            <tr>
-                                <td style="color: #b37500;">${betId}</td>
-                                <td style="color: #ad5cff;">${winnerData.winnerAddress}</td>
-                                <td style="color: #00b7ff;">${web3.utils.fromWei(winnerData.amount, "ether")}(ETH)</td>
-                                <td style="color: #00FF66;">${winnerData.number}</td>
-                                <td style="color: orange;">${new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString()}</td>
-                            </tr>
-                        `;
-                    }
-                });
+            const winnerData = await contract.methods.getWinnerByBetId(betId).call();
+            console.log(`[updateWinnerHistory] Winner Data for Bet ID ${betId}:`, winnerData);
+            if (winnerData.winner !== "0x0000000000000000000000000000000000000000") {
+                winnerHistoryHTML += `
+                    <tr>
+                        <td style="color: #b37500;">${betId}</td>
+                        <td style="color: #ad5cff;">${winnerData.winner}</td>
+                        <td style="color: #00b7ff;">${web3.utils.fromWei(winnerData.amount, "ether")}(ETH)</td>
+                        <td style="color: #00FF66;">${winnerData.number}</td>
+                        <td style="color: orange;">${new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString()}</td>
+                    </tr>`;
             }
         }
         document.querySelector("#winnerHistory tbody").innerHTML = winnerHistoryHTML || "<tr><td colspan='5'>No winners found</td></tr>";
@@ -857,6 +858,17 @@ async function updateWinnerHistory() {
         console.error("[updateWinnerHistory] Error:", error);
     }
 }
+
+// Listener untuk event BetPlaced
+contract.events.BetPlaced({}, async (error, event) => {
+    if (error) {
+        console.error("[BetPlaced Event] Error:", error);
+        return;
+    }
+    console.log("[BetPlaced Event] New bet detected:", event.returnValues);
+    await updateRecentBets(event.returnValues.betId);
+    await updateWinnerHistory(); // Perbarui riwayat pemenang saat ada taruhan baru
+});
 
 // Fungsi untuk memperbarui taruhan terbaru
 async function updateRecentBets(newBetId) {
