@@ -833,23 +833,31 @@ async function updateGeneralStats() {
 async function updateWinnerHistory() {
     try {
         let winnerHistoryHTML = "";
-        for (const betId of knownBetIds) {
+        const allBets = await contract.methods.getAllBets().call(); // Ambil semua taruhan
+        let winnerCount = 0;
+
+        for (let i = 0; i < allBets.length; i++) {
+            const betId = i; // Gunakan indeks sebagai betId (sesuai kontrak)
             const winnerData = await contract.methods.getWinnerByBetId(betId).call();
             console.log(`[updateWinnerHistory] Winner Data for Bet ID ${betId}:`, winnerData);
+
             if (winnerData.winner !== "0x0000000000000000000000000000000000000000") {
                 winnerHistoryHTML += `
                     <tr>
-                        <td>${betId.slice(0, 6)}...</td>
+                        <td>${allBets[i].betId.slice(0, 6)}...</td> <!-- Tampilkan betId asli -->
                         <td>${winnerData.winner}</td>
                         <td>${web3.utils.fromWei(winnerData.amount, "ether")}</td>
                         <td>${winnerData.number}</td>
                         <td>${new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString()}</td>
                     </tr>
                 `;
+                winnerCount++;
             }
         }
-        document.getElementById("winnerHistory").innerHTML = winnerHistoryHTML || "<tr><td colspan='5'>No winners found</td></tr>";
-        console.log("[updateWinnerHistory] Updated Winner History");
+
+        document.getElementById("winnerHistory").innerHTML = 
+            winnerHistoryHTML || "<tr><td colspan='5'>No winners found</td></tr>";
+        console.log(`[updateWinnerHistory] Updated Winner History with ${winnerCount} winners`);
     } catch (error) {
         console.error("[updateWinnerHistory] Error:", error);
     }
@@ -858,16 +866,27 @@ async function updateWinnerHistory() {
 async function updateRecentBets() {
     try {
         const allBets = await contract.methods.getAllBets().call();
-        recentBets = allBets.slice(-10).reverse();
-        document.getElementById("recentBets").innerHTML = recentBets.map(bet => `
-            <tr>
-                <td>${bet.player}</td>
-                <td>${bet.number}</td>
-                <td>${bet.betAmount}</td>
-                <td>${bet.likeCount}</td>
-                <td>${bet.commentCount}</td>
-            </tr>
-        `).join("");
+        const recentBets = allBets.slice(-10).reverse(); // Ambil 10 terakhir
+        let recentBetsHTML = "";
+
+        for (const bet of recentBets) {
+            const betId = bet.betId;
+            const likeCount = await contract.methods.betLikeCount(betId).call(); // Ambil dari mapping
+            const commentCount = await contract.methods.commentCount(betId).call(); // Ambil dari mapping
+
+            recentBetsHTML += `
+                <tr>
+                    <td>${bet.player}</td>
+                    <td>${bet.number}</td>
+                    <td>${bet.betAmount}</td>
+                    <td>${likeCount}</td>
+                    <td>${commentCount}</td>
+                </tr>
+            `;
+        }
+
+        document.getElementById("recentBets").innerHTML = 
+            recentBetsHTML || "<tr><td colspan='5'>No recent bets</td></tr>";
         console.log("[updateRecentBets] Updated Recent Bets");
     } catch (error) {
         console.error("[updateRecentBets] Error:", error);
