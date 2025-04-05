@@ -686,7 +686,6 @@ footer {
                     <th>BetID</th>
                     <th>Address</th>
                     <th>WinNumber</th>
-                    <th>BetAmount</th>
                     <th>Prizes</th>
                     <th>Timestamp</th>
                 </tr>
@@ -845,7 +844,6 @@ async function updateWinnerHistory() {
                         <td style="color: #b37500;">${betId}</td>
                         <td style="color: #ad5cff;">${winnerData.winner}</td>
                         <td style="color: #00FF66;">${winnerData.number}</td>
-                        <td style="color: #00FF66;">${bet.betAmount}</td>
                         <td style="color: #00b7ff;">${web3.utils.fromWei(winnerData.amount, "ether")}(ETH)</td>
                         <td style="color: orange;">${new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString()}</td>
                     </tr>
