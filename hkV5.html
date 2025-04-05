@@ -1566,6 +1566,9 @@ async function loadBetHistory() {
     const now = Math.floor(Date.now() / 1000);
     const oneMonthAgo = now - 30 * 24 * 60 * 60; // 30 hari dalam detik
     const filteredBets = reversedBets.filter(bet => bet.timestamp >= oneMonthAgo);
+    const payoutWei = bet.payoutAmount;     // masih dalam wei
+    const payoutETH = ethers.utils.formatEther(payoutWei); // konversi ke ETH
+
     
     const start = betHistoryPage * pageSize;
     const end = Math.min(start + pageSize, filteredBets.length);
@@ -1575,9 +1578,6 @@ async function loadBetHistory() {
         let bet = filteredBets[i];
         let shortPlayer = bet.player.slice(0, 10) + "..." + bet.player.slice(-10);
         let shortTxHash = bet.txHash.slice(0, 10) + "..." + bet.txHash.slice(-10);
-
-        const payoutWei = bet.payoutAmount;     // masih dalam wei
-        const payoutETH = ethers.utils.formatEther(payoutWei); // konversi ke ETH
 
         html += `<p>
             Player: <span style="color: #ad5cff;">${shortPlayer}</span><br>
