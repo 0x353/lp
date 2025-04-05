@@ -769,7 +769,19 @@ const contractABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constru
     const web3 = new Web3(rpcUrl);
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
+let knownBetIds = ["63782049335628205328881737524517936403896242350893662034855162823883773081217", "75140292263837463956011812708502580619222247445564919398055141945055445357538"];
 let recentBets = [];
+
+async function fetchHistoricalWinners() {
+    try {
+        const events = await contract.getPastEvents("WinnerSet", { fromBlock: 23614303, toBlock: "latest" });
+        const historicalBetIds = events.map(event => event.returnValues.betId);
+        knownBetIds = [...new Set([...knownBetIds, ...historicalBetIds])];
+        console.log("[fetchHistoricalWinners] Historical betIds:", knownBetIds);
+    } catch (error) {
+        console.error("[fetchHistoricalWinners] Error fetching past events:", error);
+    }
+}
 
 async function loadStats() {
     try {
@@ -815,6 +827,17 @@ async function updateGeneralStats() {
         console.log("[updateGeneralStats] Updated General Statistics");
     } catch (error) {
         console.error("[updateGeneralStats] Error:", error);
+    }
+}
+
+async function fetchHistoricalWinners() {
+    try {
+        const events = await contract.getPastEvents("WinnerSet", { fromBlock: 23614303, toBlock: "latest" });
+        const historicalBetIds = events.map(event => event.returnValues.betId);
+        knownBetIds = [...new Set([...knownBetIds, ...historicalBetIds])];
+        console.log("[fetchHistoricalWinners] Historical betIds:", knownBetIds);
+    } catch (error) {
+        console.error("[fetchHistoricalWinners] Error fetching past events:", error);
     }
 }
         
@@ -933,14 +956,15 @@ contract.events.BetPlaced({ fromBlock: 23614303 })
 
 contract.events.WinnerSet({ fromBlock: "23614303" })
     .on("data", async (event) => {
-        const betId = BigInt(event.returnValues.betId).toString();
+        const betId = event.returnValues.betId;
+        console.log("[WinnerSet Event] New winner set:", event.returnValues);
         if (!knownBetIds.includes(betId)) {
             knownBetIds.push(betId);
-            console.log("[WinnerSet] Added new betId:", betId);
-            await updateWinnerHistory();
         }
+        await updateGeneralStats();
+        await updateWinnerHistory();
     })
-    .on("error", console.error);
+    .on("error", (error) => console.error("[WinnerSet Event] Error:", error));
         
 contract.events.ETHClaimed({ fromBlock: 23614303 })
     .on("data", async (event) => {
