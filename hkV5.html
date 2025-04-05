@@ -1280,10 +1280,8 @@ function showNotification(message) {
 
     console.log("Popup shown!"); // Debugging
 
-    let audio = document.getElementById("notificationSound");
-    if (audio) {
-        audio.play().catch(error => console.log('Audio tidak bisa diputar:', error));
-    }
+    let audio = new Audio("win.mp3"); // Ganti dengan path audio kamu
+    audio.play().catch(error => console.log('error:', error));
     
     setTimeout(() => {
         popup.classList.remove("show");
