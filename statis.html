@@ -678,7 +678,7 @@ footer {
 
         <!-- Winner History -->
 <section>
-    <h3>Winner History</h3>
+    <h3>Latest Winners</h3>
     <div class="table-container">
         <table id="winnerHistory">
             <thead>
@@ -769,23 +769,22 @@ const contractABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constru
     const web3 = new Web3(rpcUrl);
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-let knownBetIds = [];
+let knownBetIds = [
+  "75140292263837463956011812708502580619222247445564919398055141945055445357538",
+  "63782049335628205328881737524517936403896242350893662034855162823883773081217"
+];
 let recentBets = [];
 
 async function fetchHistoricalWinners() {
     try {
-        const events = await contract.getPastEvents("WinnerSet", {
-            fromBlock: 23614303,
-            toBlock: "latest"
-        });
+        const events = await contract.getPastEvents("WinnerSet", { fromBlock: 23614303, toBlock: "latest" });
         const historicalBetIds = events.map(event => event.returnValues.betId);
-        const uniqueBetIds = [...new Set(historicalBetIds)];
-
-        console.log("Copy this array into knownBetIds.json:\n", JSON.stringify(uniqueBetIds, null, 2));
+        knownBetIds = [...new Set([...knownBetIds, ...historicalBetIds])];
+        console.log("[fetchHistoricalWinners] Historical betIds:", knownBetIds);
     } catch (error) {
-        console.error("Failed to fetch events:", error);
+        console.error("[fetchHistoricalWinners] Error fetching past events:", error);
     }
-}
+                                   }
 
 async function loadStats() {
     try {
