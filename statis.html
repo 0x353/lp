@@ -744,12 +744,22 @@ footer {
     </div>
         </section>
 
-    <!-- Lookup by Bet ID -->
+    <!-- SEKARANG: Langsung tabel riwayat -->
 <section class="betid-lookup">
-    <h3>Winner Info by Known Bet IDs</h3>
+    <h3>Winner History by Bet ID</h3>
     <div class="betid-result-list">
-        <!-- Diisi otomatis lewat JS -->
-        <div id="betidResultContainer"></div>
+        <table id="betidHistoryTable" border="1" cellpadding="5">
+            <thead>
+                <tr>
+                    <th>Bet ID</th>
+                    <th>Address</th>
+                    <th>Prize</th>
+                    <th>Winning Number</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
 </section>
 
@@ -796,6 +806,7 @@ async function fetchHistoricalWinners() {
 
 async function loadStats() {
     try {
+        await loadBetIdHistoryFromContract();
         await fetchKnownBetWinners();
         await fetchHistoricalWinners();
         await updateGeneralStats();
@@ -993,35 +1004,30 @@ async function lookupWinnerByBetId() {
 }
 
 // Ambil semua betId lalu render pemenangnya
-async function fetchKnownBetWinners() {
+async function loadBetIdHistoryFromContract() {
     try {
-        const response = await fetch("knownBetIds.json");
-        const knownBetIds = await response.json();
+        const betIds = await contract.methods.getAllBetIds().call();
 
-        const container = document.getElementById("betidResultContainer");
-        container.innerHTML = ""; // Kosongkan dulu
+        const tbody = document.querySelector("#betidHistoryTable tbody");
+        tbody.innerHTML = ""; // Clear existing rows
 
-        for (const betId of knownBetIds) {
-            const winnerData = await contract.methods.getWinnerByBetId(betId).call();
+        for (const betId of betIds) {
+            const data = await contract.methods.getWinnerByBetId(betId).call();
 
-            // Skip jika belum ada pemenang
-            if (winnerData.winner === "0x0000000000000000000000000000000000000000") continue;
-
-            const resultDiv = document.createElement("div");
-            resultDiv.classList.add("winner-info");
-            resultDiv.style.marginBottom = "15px";
-            resultDiv.innerHTML = `
-                <p><strong>Bet ID:</strong> ${betId}</p>
-                <p><strong>Winner Address:</strong> <span style="color: #ad5cff;">${winnerData.winner}</span></p>
-                <p><strong>Prize:</strong> <span style="color: #00b7ff;">${web3.utils.fromWei(winnerData.amount, "ether")} ETH</span></p>
-                <p><strong>Winning Number:</strong> <span style="color: #00FF66;">${winnerData.number}</span></p>
-                <p><strong>Timestamp:</strong> <span style="color: orange;">${new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString()}</span></p>
-                <hr>
-            `;
-            container.appendChild(resultDiv);
+            if (data.winner !== "0x0000000000000000000000000000000000000000") {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${betId}</td>
+                    <td>${data.winner}</td>
+                    <td>${web3.utils.fromWei(data.amount, "ether")} ETH</td>
+                    <td>${data.number}</td>
+                    <td>${new Date(parseInt(data.timestamp) * 1000).toLocaleString()}</td>
+                `;
+                tbody.appendChild(row);
+            }
         }
     } catch (error) {
-        console.error("[fetchKnownBetWinners] Error:", error);
+        console.error("[loadBetIdHistoryFromContract] Error:", error);
     }
 }
 
