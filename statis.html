@@ -731,21 +731,22 @@ footer {
 
         <!-- Lookup by Bet ID -->
         <section class="betid-lookup">
-            <h3>Lookup Winner by Bet ID</h3>
-            <div class="form-group">
-                <input type="text" id="betIdInput" placeholder="Enter Bet ID">
-                <button onclick="lookupWinnerByBetId()">Lookup</button>
-            </div>
-            <div class="betid-result hidden">
-                <p><strong>Winner Address:</strong> <span id="winnerAddress" style="color: #ad5cff; font-size: 12px;">->-</span></p>
-                <p><strong>Prize:</strong> <span id="winnerAmount" style="color: #00b7ff;">-</span></p>
-                <p><strong>Winning Number:</strong> <span id="winnerNumber" style="color: #00FF66;">- (ETH)</span></p>
-                <p><strong>Timestamp:</strong> <span id="winnerTimestamp" style="color: orange;">-</span></p><br>
-            </div>
-            <!-- Riwayat Lookup by Bet ID -->
-<div class="betid-history">
+    <h3>Lookup Winner by Bet ID</h3>
+    <div class="form-group">
+        <input type="text" id="betIdInput" placeholder="Enter Bet ID">
+        <button onclick="lookupWinnerByBetId()">Lookup</button>
+    </div>
+    <div class="betid-result hidden">
+        <p><strong>Winner Address:</strong> <span id="winnerAddress" style="color: #ad5cff; font-size: 12px;">-</span></p>
+        <p><strong>Prize:</strong> <span id="winnerAmount" style="color: #00b7ff;">-</span></p>
+        <p><strong>Winning Number:</strong> <span id="winnerNumber" style="color: #00FF66;">-</span></p>
+        <p><strong>Timestamp:</strong> <span id="winnerTimestamp" style="color: orange;">-</span></p>
+    </div>
+        </section>
+
+    <section class="betid-history">
     <h4>Bet ID Lookup History</h4>
-    <table id="betidHistoryTable" border="1" cellpadding="5">
+    <table border="1" cellpadding="5">
         <thead>
             <tr>
                 <th>BetID</th>
@@ -755,10 +756,9 @@ footer {
                 <th>Timestamp</th>
             </tr>
         </thead>
-        <tbody></tbody>
+        <tbody id="betidHistoryBody"></tbody>
     </table>
-</div>
-        </section>
+    </section>
 
     <!-- Footer -->
 <footer>
@@ -968,7 +968,7 @@ async function lookupWinnerByBetId() {
     const betId = document.getElementById("betIdInput").value.trim();
     const betIdResultDiv = document.querySelector(".betid-result");
 
-    // Sembunyikan sebelum lookup
+    // Sembunyikan hasil sebelumnya
     betIdResultDiv.classList.add("hidden");
 
     if (!betId) {
@@ -979,37 +979,42 @@ async function lookupWinnerByBetId() {
     try {
         const winnerData = await contract.methods.getWinnerByBetId(betId).call();
         console.log(`[lookupWinnerByBetId] Winner Data for Bet ID ${betId}:`, winnerData);
-        
-        if (winnerData.winner === "0x0000000000000000000000000000000000000000") {
-            document.getElementById("winnerAddress").innerText = "No winner set";
-            document.getElementById("winnerAmount").innerText = "-";
-            document.getElementById("winnerNumber").innerText = "-";
-            document.getElementById("winnerTimestamp").innerText = "-";
-        } else {
-            document.getElementById("winnerAddress").innerText = winnerData.winner;
-            document.getElementById("winnerAmount").innerText = web3.utils.fromWei(winnerData.amount, "ether");
-            document.getElementById("winnerNumber").innerText = winnerData.number;
-            document.getElementById("winnerTimestamp").innerText = new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString();
 
-            // Tambahkan ke tabel riwayat lookup
-            const historyTable = document.getElementById("betidHistoryTable").querySelector("tbody");
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${betId}</td>
-                <td>${winnerData.winner}</td>
-                <td>${web3.utils.fromWei(winnerData.amount, "ether")} ETH</td>
-                <td>${winnerData.number}</td>
-                <td>${new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString()}</td>
-            `;
-            historyTable.appendChild(row);
+        // Cek apakah ada pemenang
+        if (winnerData.winner === "0x0000000000000000000000000000000000000000") {
+            showLookupResult("-", "-", "-", "-");
+        } else {
+            const amount = web3.utils.fromWei(winnerData.amount, "ether");
+            const timestamp = new Date(Number(winnerData.timestamp) * 1000).toLocaleString();
+            showLookupResult(winnerData.winner, amount, winnerData.number, timestamp);
+            addToBetIdHistory(betId, winnerData.winner, amount, winnerData.number, timestamp);
         }
 
-        // Tampilkan setelah lookup berhasil
         betIdResultDiv.classList.remove("hidden");
     } catch (error) {
         console.error("[lookupWinnerByBetId] Error:", error);
         alert("Failed to fetch winner data!");
     }
+}
+
+function showLookupResult(address, amount, number, timestamp) {
+    document.getElementById("winnerAddress").innerText = address;
+    document.getElementById("winnerAmount").innerText = amount === "-" ? "-" : `${amount} ETH`;
+    document.getElementById("winnerNumber").innerText = number;
+    document.getElementById("winnerTimestamp").innerText = timestamp;
+}
+
+function addToBetIdHistory(betId, address, amount, number, timestamp) {
+    const table = document.getElementById("betidHistoryBody");
+    const row = document.createElement("tr");
+    row.innerHTML = `
+        <td>${betId}</td>
+        <td>${address}</td>
+        <td>${amount} ETH</td>
+        <td>${number}</td>
+        <td>${timestamp}</td>
+    `;
+    table.appendChild(row);
 }
 
 // Event Listeners untuk Real-Time Updates
