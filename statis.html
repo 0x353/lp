@@ -818,7 +818,8 @@ async function updateGeneralStats() {
         document.getElementById("totalPlayers").innerText = allPlayers.length;
 
         const averagePayoutPerBet = totalBets > 0 ? (totalPayoutEth / totalBets).toFixed(6) : "0.000000";
-
+        document.getElementById("averageBetAmount").innerText = averagePayoutPerBet;
+        
         const topBettorData = await contract.methods.topBettor().call();
         const topBettor = topBettorData.player === "0x0000000000000000000000000000000000000000" 
             ? "None" 
