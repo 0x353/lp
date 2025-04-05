@@ -986,7 +986,7 @@ async function lookupWinnerByBetId() {
 }
 
 // Event Listeners untuk Real-Time Updates
-contract.events.BetPlaced({ fromBlock: "latest" })
+contract.events.BetPlaced({ fromBlock: "23614303" })
     .on("data", async (event) => {
         console.log("[BetPlaced Event] New bet placed:", event.returnValues);
         await updateGeneralStats();
@@ -994,7 +994,7 @@ contract.events.BetPlaced({ fromBlock: "latest" })
     })
     .on("error", (error) => console.error("[BetPlaced Event] Error:", error));
 
-contract.events.WinnerSet({ fromBlock: "latest" })
+contract.events.WinnerSet({ fromBlock: "23614303" })
     .on("data", async (event) => {
         const betId = event.returnValues.betId;
         console.log("[WinnerSet Event] New winner set:", event.returnValues);
@@ -1006,14 +1006,14 @@ contract.events.WinnerSet({ fromBlock: "latest" })
     })
     .on("error", (error) => console.error("[WinnerSet Event] Error:", error));
 
-contract.events.ETHClaimed({ fromBlock: "latest" })
+contract.events.ETHClaimed({ fromBlock: "23614303" })
     .on("data", async (event) => {
         console.log("[ETHClaimed Event] ETH claimed:", event.returnValues);
         await updateGeneralStats();
     })
     .on("error", (error) => console.error("[ETHClaimed Event] Error:", error));
 
-contract.events.LastWinnerUpdated({ fromBlock: "latest" })
+contract.events.LastWinnerUpdated({ fromBlock: "23614303" })
     .on("data", async (event) => {
         console.log("[LastWinnerUpdated Event] Last winner updated:", event.returnValues);
         await updateGeneralStats();
