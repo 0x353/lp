@@ -742,6 +742,22 @@ footer {
                 <p><strong>Winning Number:</strong> <span id="winnerNumber" style="color: #00FF66;">- (ETH)</span></p>
                 <p><strong>Timestamp:</strong> <span id="winnerTimestamp" style="color: orange;">-</span></p><br>
             </div>
+            <!-- Riwayat Lookup by Bet ID -->
+<div class="betid-history">
+    <h4>Bet ID Lookup History</h4>
+    <table id="betidHistoryTable" border="1" cellpadding="5">
+        <thead>
+            <tr>
+                <th>BetID</th>
+                <th>Address</th>
+                <th>Prizes</th>
+                <th>WinNumber</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
         </section>
 
     <!-- Footer -->
@@ -974,6 +990,18 @@ async function lookupWinnerByBetId() {
             document.getElementById("winnerAmount").innerText = web3.utils.fromWei(winnerData.amount, "ether");
             document.getElementById("winnerNumber").innerText = winnerData.number;
             document.getElementById("winnerTimestamp").innerText = new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString();
+
+            // Tambahkan ke tabel riwayat lookup
+            const historyTable = document.getElementById("betidHistoryTable").querySelector("tbody");
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${betId}</td>
+                <td>${winnerData.winner}</td>
+                <td>${web3.utils.fromWei(winnerData.amount, "ether")} ETH</td>
+                <td>${winnerData.number}</td>
+                <td>${new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString()}</td>
+            `;
+            historyTable.appendChild(row);
         }
 
         // Tampilkan setelah lookup berhasil
