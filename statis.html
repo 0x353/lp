@@ -771,58 +771,6 @@ const contract = new web3.eth.Contract(contractABI, contractAddress);
 
 let recentBets = [];
 
-async function fetchAllWinners() {
-    try {
-        // Ambil block deploy kontrak (ganti dengan block sebenarnya kalau tahu)
-        const deployBlock = 23614303; // Ganti dengan block deploy yang benar
-        const latestBlock = await web3.eth.getBlockNumber();
-        console.log(`[fetchAllWinners] Fetching WinnerSet events from block ${deployBlock} to ${latestBlock}`);
-
-        // Ambil semua event WinnerSet
-        const winnerEvents = await contract.getPastEvents("WinnerSet", {
-            fromBlock: 23614303,
-            toBlock: "latest"
-        });
-
-        console.log(`[fetchAllWinners] Total events found: ${winnerEvents.length}`);
-        console.log("[fetchAllWinners] Raw events:", winnerEvents);
-
-        if (winnerEvents.length === 0) {
-            console.log("[fetchAllWinners] No WinnerSet events found. Check contract address, ABI, or deploy block.");
-            return [];
-        }
-
-        // Konversi betId dari bytes32 ke uint256 dan kumpulkan data pemenang
-        const winners = [];
-        for (const event of winnerEvents) {
-            const betIdHex = event.returnValues.betId.slice(2); // Hilangkan '0x'
-            const betId = BigInt('0x' + betIdHex).toString(); // Konversi ke uint256
-            try {
-                const winnerData = await contract.methods.getWinnerByBetId(betId).call();
-                console.log(`[fetchAllWinners] Bet ID ${betId} data:`, winnerData);
-                
-                if (winnerData.winner !== "0x0000000000000000000000000000000000000000") {
-                    winners.push({
-                        betId: betId,
-                        winner: winnerData.winner,
-                        amount: winnerData.amount,
-                        number: winnerData.number,
-                        timestamp: winnerData.timestamp
-                    });
-                }
-            } catch (error) {
-                console.error(`[fetchAllWinners] Error fetching Bet ID ${betId}:`, error);
-            }
-        }
-
-        console.log("[fetchAllWinners] Processed winners:", winners);
-        return winners;
-    } catch (error) {
-        console.error("[fetchAllWinners] Error fetching events:", error);
-        return [];
-    }
-}
-
 async function loadStats() {
     try {
         await fetchHistoricalWinners();
@@ -867,38 +815,6 @@ async function updateGeneralStats() {
         console.log("[updateGeneralStats] Updated General Statistics");
     } catch (error) {
         console.error("[updateGeneralStats] Error:", error);
-    }
-}
-
-// Definisikan knownBetIds secara dinamis (contoh dengan totalBets)
-async function updateWinnerHistory() {
-    try {
-        const winners = await fetchAllWinners();
-        let winnerHistoryHTML = "";
-
-        if (winners.length === 0) {
-            console.log("[updateWinnerHistory] No valid winners to display");
-        } else {
-            console.log("[updateWinnerHistory] Displaying winners:", winners);
-            for (const winner of winners) {
-                winnerHistoryHTML += `
-                    <tr>
-                        <td>${winner.betId.toString().slice(0, 6)}...</td>
-                        <td>${winner.winner}</td>
-                        <td>${web3.utils.fromWei(winner.amount, "ether")}</td>
-                        <td>${winner.number}</td>
-                        <td>${new Date(parseInt(winner.timestamp) * 1000).toLocaleString()}</td>
-                    </tr>
-                `;
-            }
-        }
-
-        document.getElementById("winnerHistory").innerHTML = 
-            winnerHistoryHTML || "<tr><td colspan='5'>No winners found</td></tr>";
-        console.log("[updateWinnerHistory] Table updated");
-    } catch (error) {
-        console.error("[updateWinnerHistory] Error:", error);
-        document.getElementById("winnerHistory").innerHTML = "<tr><td colspan='5'>Error loading data</td></tr>";
     }
 }
         
@@ -1039,13 +955,6 @@ contract.events.LastWinnerUpdated({ fromBlock: 23614303 })
         await updateGeneralStats();
     })
     .on("error", (error) => console.error("[LastWinnerUpdated Event] Error:", error));
-
-contract.events.WinnerSet({ fromBlock: "23614303" })
-    .on("data", async (event) => {
-        console.log("[WinnerSet] New winner event:", event.returnValues);
-        await updateWinnerHistory();
-    })
-    .on("error", (error) => console.error("[WinnerSet] Event error:", error));
 
 window.addEventListener("load", loadStats);
     </script>
