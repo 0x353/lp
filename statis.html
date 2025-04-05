@@ -744,21 +744,14 @@ footer {
     </div>
         </section>
 
-    <section class="betid-history">
-    <h3>Known Bet ID Winners</h3>
-    <table id="betidHistoryTable">
-      <thead>
-        <tr>
-          <th>Bet ID</th>
-          <th>Address</th>
-          <th>Prize</th>
-          <th>Winning Number</th>
-          <th>Timestamp</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-    </section>
+    <!-- Lookup by Bet ID -->
+<section class="betid-lookup">
+    <h3>Winner Info by Known Bet IDs</h3>
+    <div class="betid-result-list">
+        <!-- Diisi otomatis lewat JS -->
+        <div id="betidResultContainer"></div>
+    </div>
+</section>
 
     <!-- Footer -->
 <footer>
@@ -803,7 +796,7 @@ async function fetchHistoricalWinners() {
 
 async function loadStats() {
     try {
-        await fetchKnownBetWinners(); // Tambahan di sini
+        await fetchKnownBetWinners();
         await fetchHistoricalWinners();
         await updateGeneralStats();
         await updateWinnerHistory();
@@ -969,7 +962,6 @@ async function lookupWinnerByBetId() {
     const betId = document.getElementById("betIdInput").value.trim();
     const betIdResultDiv = document.querySelector(".betid-result");
 
-    // Sembunyikan hasil sebelumnya
     betIdResultDiv.classList.add("hidden");
 
     if (!betId) {
@@ -980,15 +972,17 @@ async function lookupWinnerByBetId() {
     try {
         const winnerData = await contract.methods.getWinnerByBetId(betId).call();
         console.log(`[lookupWinnerByBetId] Winner Data for Bet ID ${betId}:`, winnerData);
-
-        // Cek apakah ada pemenang
+        
         if (winnerData.winner === "0x0000000000000000000000000000000000000000") {
-            showLookupResult("-", "-", "-", "-");
+            document.getElementById("winnerAddress").innerText = "No winner set";
+            document.getElementById("winnerAmount").innerText = "-";
+            document.getElementById("winnerNumber").innerText = "-";
+            document.getElementById("winnerTimestamp").innerText = "-";
         } else {
-            const amount = web3.utils.fromWei(winnerData.amount, "ether");
-            const timestamp = new Date(Number(winnerData.timestamp) * 1000).toLocaleString();
-            showLookupResult(winnerData.winner, amount, winnerData.number, timestamp);
-            addToBetIdHistory(betId, winnerData.winner, amount, winnerData.number, timestamp);
+            document.getElementById("winnerAddress").innerText = winnerData.winner;
+            document.getElementById("winnerAmount").innerText = web3.utils.fromWei(winnerData.amount, "ether");
+            document.getElementById("winnerNumber").innerText = winnerData.number;
+            document.getElementById("winnerTimestamp").innerText = new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString();
         }
 
         betIdResultDiv.classList.remove("hidden");
@@ -998,51 +992,38 @@ async function lookupWinnerByBetId() {
     }
 }
 
-function showLookupResult(address, amount, number, timestamp) {
-    document.getElementById("winnerAddress").innerText = address;
-    document.getElementById("winnerAmount").innerText = amount === "-" ? "-" : `${amount} ETH`;
-    document.getElementById("winnerNumber").innerText = number;
-    document.getElementById("winnerTimestamp").innerText = timestamp;
-}
-
 // Ambil semua betId lalu render pemenangnya
-async function loadKnownBetIds() {
-  try {
-    const knownBetIds = await contract.methods.getAllBetIds().call();
-    for (const betId of knownBetIds) {
-      await renderWinnerRow(betId);
+async function fetchKnownBetWinners() {
+    try {
+        const response = await fetch("knownBetIds.json");
+        const knownBetIds = await response.json();
+
+        const container = document.getElementById("betidResultContainer");
+        container.innerHTML = ""; // Kosongkan dulu
+
+        for (const betId of knownBetIds) {
+            const winnerData = await contract.methods.getWinnerByBetId(betId).call();
+
+            // Skip jika belum ada pemenang
+            if (winnerData.winner === "0x0000000000000000000000000000000000000000") continue;
+
+            const resultDiv = document.createElement("div");
+            resultDiv.classList.add("winner-info");
+            resultDiv.style.marginBottom = "15px";
+            resultDiv.innerHTML = `
+                <p><strong>Bet ID:</strong> ${betId}</p>
+                <p><strong>Winner Address:</strong> <span style="color: #ad5cff;">${winnerData.winner}</span></p>
+                <p><strong>Prize:</strong> <span style="color: #00b7ff;">${web3.utils.fromWei(winnerData.amount, "ether")} ETH</span></p>
+                <p><strong>Winning Number:</strong> <span style="color: #00FF66;">${winnerData.number}</span></p>
+                <p><strong>Timestamp:</strong> <span style="color: orange;">${new Date(parseInt(winnerData.timestamp) * 1000).toLocaleString()}</span></p>
+                <hr>
+            `;
+            container.appendChild(resultDiv);
+        }
+    } catch (error) {
+        console.error("[fetchKnownBetWinners] Error:", error);
     }
-  } catch (err) {
-    console.error("Gagal mengambil Bet ID:", err);
-  }
 }
-
-// Render satu baris riwayat
-async function renderWinnerRow(betId) {
-  try {
-    const data = await contract.methods.getWinnerByBetId(betId).call();
-
-    // Skip jika belum ada pemenang
-    if (data.winner === "0x0000000000000000000000000000000000000000") return;
-
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${betId}</td>
-      <td>${data.winner}</td>
-      <td>${web3.utils.fromWei(data.amount, "ether")} ETH</td>
-      <td>${data.number}</td>
-      <td>${new Date(parseInt(data.timestamp) * 1000).toLocaleString()}</td>
-    `;
-
-    document.querySelector("#betidHistoryTable tbody").appendChild(row);
-  } catch (err) {
-    console.error(`Gagal ambil data pemenang untuk Bet ID ${betId}:`, err);
-  }
-}
-
-window.addEventListener("DOMContentLoaded", () => {
-  loadKnownBetIds();
-});
 
 // Event Listeners untuk Real-Time Updates
 contract.events.BetPlaced({ fromBlock: "latest" })
