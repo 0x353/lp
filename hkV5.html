@@ -1566,9 +1566,6 @@ async function loadBetHistory() {
     const now = Math.floor(Date.now() / 1000);
     const oneMonthAgo = now - 30 * 24 * 60 * 60; // 30 hari dalam detik
     const filteredBets = reversedBets.filter(bet => bet.timestamp >= oneMonthAgo);
-    const payoutWei = bet.payoutAmount;     // masih dalam wei
-    const payoutETH = ethers.utils.formatEther(payoutWei); // konversi ke ETH
-
     
     const start = betHistoryPage * pageSize;
     const end = Math.min(start + pageSize, filteredBets.length);
