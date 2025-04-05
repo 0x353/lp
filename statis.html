@@ -745,18 +745,18 @@ footer {
         </section>
 
     <section class="betid-history">
-    <h4>Bet ID Lookup History</h4>
-    <table border="1" cellpadding="5">
-        <thead>
-            <tr>
-                <th>BetID</th>
-                <th>Address</th>
-                <th>Prizes</th>
-                <th>WinNumber</th>
-                <th>Timestamp</th>
-            </tr>
-        </thead>
-        <tbody id="betidHistoryBody"></tbody>
+    <h3>Known Bet ID Winners</h3>
+    <table id="betidHistoryTable">
+      <thead>
+        <tr>
+          <th>Bet ID</th>
+          <th>Address</th>
+          <th>Prize</th>
+          <th>Winning Number</th>
+          <th>Timestamp</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
     </table>
     </section>
 
@@ -803,6 +803,7 @@ async function fetchHistoricalWinners() {
 
 async function loadStats() {
     try {
+        await fetchKnownBetWinners(); // Tambahan di sini
         await fetchHistoricalWinners();
         await updateGeneralStats();
         await updateWinnerHistory();
@@ -1004,18 +1005,44 @@ function showLookupResult(address, amount, number, timestamp) {
     document.getElementById("winnerTimestamp").innerText = timestamp;
 }
 
-function addToBetIdHistory(betId, address, amount, number, timestamp) {
-    const table = document.getElementById("betidHistoryBody");
+// Ambil semua betId lalu render pemenangnya
+async function loadKnownBetIds() {
+  try {
+    const knownBetIds = await contract.methods.getAllBetIds().call();
+    for (const betId of knownBetIds) {
+      await renderWinnerRow(betId);
+    }
+  } catch (err) {
+    console.error("Gagal mengambil Bet ID:", err);
+  }
+}
+
+// Render satu baris riwayat
+async function renderWinnerRow(betId) {
+  try {
+    const data = await contract.methods.getWinnerByBetId(betId).call();
+
+    // Skip jika belum ada pemenang
+    if (data.winner === "0x0000000000000000000000000000000000000000") return;
+
     const row = document.createElement("tr");
     row.innerHTML = `
-        <td>${betId}</td>
-        <td>${address}</td>
-        <td>${amount} ETH</td>
-        <td>${number}</td>
-        <td>${timestamp}</td>
+      <td>${betId}</td>
+      <td>${data.winner}</td>
+      <td>${web3.utils.fromWei(data.amount, "ether")} ETH</td>
+      <td>${data.number}</td>
+      <td>${new Date(parseInt(data.timestamp) * 1000).toLocaleString()}</td>
     `;
-    table.appendChild(row);
+
+    document.querySelector("#betidHistoryTable tbody").appendChild(row);
+  } catch (err) {
+    console.error(`Gagal ambil data pemenang untuk Bet ID ${betId}:`, err);
+  }
 }
+
+window.addEventListener("DOMContentLoaded", () => {
+  loadKnownBetIds();
+});
 
 // Event Listeners untuk Real-Time Updates
 contract.events.BetPlaced({ fromBlock: "latest" })
