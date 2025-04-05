@@ -799,9 +799,9 @@ async function loadStats() {
 
 async function updateGeneralStats() {
     try {
-        const totalBets = await contract.methods.totalPlayers().call();
-        document.getElementById("totalBets").innerText = totalBets;
-
+        const allBets = await contract.methods.getAllBets().call();
+        document.getElementById("totalBets").innerText = allBets.length;
+        
         const totalPayout = await contract.methods.totalPayout().call();
         const totalPayoutEth = web3.utils.fromWei(totalPayout, "ether");
         document.getElementById("totalPayout").innerText = totalPayoutEth;
