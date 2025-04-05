@@ -1576,6 +1576,9 @@ async function loadBetHistory() {
         let shortPlayer = bet.player.slice(0, 10) + "..." + bet.player.slice(-10);
         let shortTxHash = bet.txHash.slice(0, 10) + "..." + bet.txHash.slice(-10);
 
+        const payoutWei = bet.payoutAmount;     // masih dalam wei
+        const payoutETH = ethers.utils.formatEther(payoutWei); // konversi ke ETH
+
         html += `<p>
             Player: <span style="color: #ad5cff;">${shortPlayer}</span><br>
             
@@ -1585,7 +1588,7 @@ async function loadBetHistory() {
             
             BetAmount: <span style="color: #00FF66;">${bet.betAmount}</span><br>
             
-            Payout: <span style="color: #FFD700;">${bet.payoutAmount / 1e18} ETH</span><br>
+            Potential Payout: <span id="payout-${bet.betId}">${payoutETH}</span> ETH<br>
             
             Is ETH: <span style="color: ${bet.isETH ? '#00FF66' : '#fe6666'};">${bet.isETH ? 'Yes' : 'No'}</span><br>
             
