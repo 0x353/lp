@@ -768,7 +768,10 @@ const contractABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constru
     const web3 = new Web3(rpcUrl);
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-let knownBetIds = ["63782049335628205328881737524517936403896242350893662034855162823883773081217"];
+let knownBetIds = [
+  "63782049335628205328881737524517936403896242350893662034855162823883773081217",
+  "75140292263837463956011812708502580619222247445564919398055141945055445357538"
+];
 let recentBets = [];
 
 async function fetchHistoricalWinners() {
