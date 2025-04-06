@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Spin the Wheel Simulation</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #111;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #wheel {
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      border: 10px solid #00b7ff;
+      position: relative;
+      margin-bottom: 30px;
+      transition: transform 4s ease-out;
+    }
+
+    .segment {
+      position: absolute;
+      width: 50%;
+      height: 50%;
+      transform-origin: 100% 100%;
+      background: rgba(0, 183, 255, 0.2);
+      text-align: right;
+      padding: 5px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: #00b7ff;
+    }
+
+    #pointer {
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 30px solid red;
+      position: absolute;
+      top: -30px;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 1rem;
+      background: linear-gradient(135deg, #00b7ff, #007bff);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 183, 255, 0.8);
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 1.5rem;
+    }
+
+    canvas {
+      position: fixed;
+      pointer-events: none;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="pointer"></div>
+  <div id="wheel"></div>
+  <button onclick="spin()">SPIN NOW</button>
+  <div id="result"></div>
+
+  <audio id="spinSound" src="https://www.soundjay.com/button/sounds/button-29.mp3"></audio>
+  <audio id="winSound" src="https://www.soundjay.com/human/sounds/applause-8.mp3"></audio>
+
+  <canvas id="confettiCanvas"></canvas>
+
+  <script>
+    const segments = [
+      "ETH", "BTC", "iPhone", "MacBook", "Try Again", 
+      "Token", "Kripto", "ETH", "BTC", "Try Again", 
+      "Mystery", "Free Spin"
+    ];
+
+    const wheel = document.getElementById("wheel");
+    const angle = 360 / segments.length;
+
+    segments.forEach((label, i) => {
+      const div = document.createElement("div");
+      div.className = "segment";
+      div.style.transform = `rotate(${i * angle}deg) skewY(${90 - angle}deg)`;
+      div.innerText = label;
+      wheel.appendChild(div);
+    });
+
+    const spinSound = document.getElementById("spinSound");
+    const winSound = document.getElementById("winSound");
+
+    let spinning = false;
+    function spin() {
+      if (spinning) return;
+      spinning = true;
+      spinSound.play();
+
+      const randomIndex = Math.floor(Math.random() * segments.length);
+      const rotation = 360 * 5 + (360 - randomIndex * angle - angle / 2);
+      wheel.style.transform = `rotate(${rotation}deg)`;
+
+      setTimeout(() => {
+        const prize = segments[randomIndex];
+        document.getElementById("result").innerText = `You got: ${prize}!`;
+        spinning = false;
+
+        if (prize !== "Try Again") {
+          winSound.play();
+          if (["ETH", "BTC", "iPhone", "MacBook"].includes(prize)) {
+            launchConfetti();
+          }
+        }
+      }, 4500);
+    }
+
+    // Confetti
+    const canvas = document.getElementById("confettiCanvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const confetti = [];
+    function launchConfetti() {
+      for (let i = 0; i < 150; i++) {
+        confetti.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          r: Math.random() * 6 + 4,
+          d: Math.random() * 20 + 10,
+          color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+          tilt: Math.random() * 10 - 5,
+          tiltAngle: 0
+        });
+      }
+      drawConfetti();
+    }
+
+    function drawConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach((c, i) => {
+        ctx.beginPath();
+        ctx.lineWidth = c.r;
+        ctx.strokeStyle = c.color;
+        ctx.moveTo(c.x + c.tilt + c.r / 2, c.y);
+        ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r / 2);
+        ctx.stroke();
+
+        c.y += Math.cos(c.d) + 3;
+        c.tiltAngle += 0.1;
+        c.tilt = Math.sin(c.tiltAngle) * 10;
+
+        if (c.y > canvas.height) confetti[i].y = -20;
+      });
+      requestAnimationFrame(drawConfetti);
+    }
+  </script>
+</body>
+</html>
