@@ -64,37 +64,36 @@
     let isSpinning = false;
 
     function drawWheel() {
-      for (let i = 0; i < segCount; i++) {
-        const angle = i * anglePerSeg;
+  for (let i = 0; i < segCount; i++) {
+    const angle = i * anglePerSeg;
 
-        // Warna bergantian
-        ctx.fillStyle = i % 2 === 0 ? "#00b7ff" : "#007bff";
+    ctx.fillStyle = i % 2 === 0 ? "#00b7ff" : "#007bff";
+    ctx.beginPath();
+    ctx.moveTo(center, center);
+    ctx.arc(center, center, center - 10, angle, angle + anglePerSeg);
+    ctx.lineTo(center, center);
+    ctx.fill();
 
-        ctx.beginPath();
-        ctx.moveTo(center, center);
-        ctx.arc(center, center, center - 10, angle, angle + anglePerSeg);
-        ctx.lineTo(center, center);
-        ctx.fill();
+    // Teks di setiap segmen
+    ctx.save();
+    ctx.translate(center, center);
+    ctx.rotate(angle + anglePerSeg / 2);
+    ctx.textAlign = "right";
+    ctx.fillStyle = "#fff";
+    ctx.font = "bold 14px Arial";
+    ctx.fillText(rewards[i], center - 20, 5);
+    ctx.restore();
+  }
+    }
 
-        // Teks
-        ctx.save();
-        ctx.translate(center, center);
-        ctx.rotate(angle + anglePerSeg / 2);
-        ctx.textAlign = "right";
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 14px Arial";
-        ctx.fillText(rewards[i], center - 20, 5);
-        ctx.restore();
-      }
-
-      // Penunjuk
-      ctx.fillStyle = "#fff";
-      ctx.beginPath();
-      ctx.moveTo(center, 0);
-      ctx.lineTo(center - 15, 20);
-      ctx.lineTo(center + 15, 20);
-      ctx.closePath();
-      ctx.fill();
+    function drawPointer() {
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  ctx.moveTo(center, 0);
+  ctx.lineTo(center - 15, -20);
+  ctx.lineTo(center + 15, -20);
+  ctx.closePath();
+  ctx.fill();
     }
 
     function spinWheel() {
@@ -129,9 +128,21 @@
         }
       }
 
-      requestAnimationFrame(animateSpin);
-    }
+     // redraw
+ctx.clearRect(0, 0, wheelSize, wheelSize);
+ctx.save();
+ctx.translate(center, center);
+ctx.rotate((currentAngle * Math.PI) / 180);
+ctx.translate(-center, -center);
+drawWheel();
+ctx.restore();
 
+// pointer tetap
+ctx.save();
+ctx.translate(center, center);
+drawPointer();
+ctx.restore();
+      
     drawWheel();
     document.getElementById("spinBtn").addEventListener("click", spinWheel);
   </script>
