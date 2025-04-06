@@ -66,6 +66,7 @@
     function drawWheel() {
       for (let i = 0; i < segCount; i++) {
         const angle = i * anglePerSeg;
+
         ctx.fillStyle = i % 2 === 0 ? "#00b7ff" : "#007bff";
         ctx.beginPath();
         ctx.moveTo(center, center);
@@ -85,11 +86,11 @@
     }
 
     function drawPointer() {
-      ctx.fillStyle = "#ff0";
+      ctx.fillStyle = "#fff";
       ctx.beginPath();
-      ctx.moveTo(center, 0); // titik atas
-      ctx.lineTo(center - 15, 30); // sisi kiri bawah
-      ctx.lineTo(center + 15, 30); // sisi kanan bawah
+      ctx.moveTo(center, wheelSize);
+      ctx.lineTo(center - 15, wheelSize - 30);
+      ctx.lineTo(center + 15, wheelSize - 30);
       ctx.closePath();
       ctx.fill();
     }
@@ -98,18 +99,17 @@
       if (isSpinning) return;
 
       isSpinning = true;
-      const spinAngle = Math.random() * 2000 + 2000;
+      const spinAngle = Math.random() * 2000 + 2000; // between 2000–4000 deg
       const duration = 5000;
       const start = performance.now();
 
       function animateSpin(time) {
         const elapsed = time - start;
         const progress = Math.min(elapsed / duration, 1);
-        const ease = 1 - Math.pow(1 - progress, 3);
+        const ease = 1 - Math.pow(1 - progress, 3); // easing
         currentAngle = (spinAngle * ease) % 360;
 
         ctx.clearRect(0, 0, wheelSize, wheelSize);
-
         ctx.save();
         ctx.translate(center, center);
         ctx.rotate((currentAngle * Math.PI) / 180);
@@ -117,12 +117,14 @@
         drawWheel();
         ctx.restore();
 
-        drawPointer(); // Pointer tetap diam di atas
+        drawPointer();
 
         if (progress < 1) {
           requestAnimationFrame(animateSpin);
         } else {
-          const selected = Math.floor((segCount - (currentAngle % 360) / 360 * segCount)) % segCount;
+          const selected = Math.floor(
+            (segCount - ((currentAngle + 270) % 360) / 360 * segCount)
+          ) % segCount;
           document.getElementById("result").textContent = `You got: ${rewards[selected]}!`;
           isSpinning = false;
         }
