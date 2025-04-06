@@ -86,13 +86,13 @@
     }
 
     function drawPointer() {
-      ctx.fillStyle = "#fff";
-      ctx.beginPath();
-      ctx.moveTo(center, 0);
-      ctx.lineTo(center - 15, -20);
-      ctx.lineTo(center + 15, -20);
-      ctx.closePath();
-      ctx.fill();
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  ctx.moveTo(center, center - (center + 10)); // puncak jarum (di luar lingkaran atas)
+  ctx.lineTo(center - 15, center - (center - 10)); // kiri bawah
+  ctx.lineTo(center + 15, center - (center - 10)); // kanan bawah
+  ctx.closePath();
+  ctx.fill();
     }
 
     function spinWheel() {
