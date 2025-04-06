@@ -73,17 +73,6 @@
       border-radius: 12px;
     }
 
-      p {
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    margin-bottom: 10px;
-  }
-
-  p b {
-    margin-right: 10px;
-    color: #333;
-  }
-
   #lastInput {
     padding: 6px 10px;
     font-size: 16px;
@@ -136,31 +125,7 @@
 
   <script>
     let chartNumbers;
-
-    const canvas = document.getElementById("chartNumbers");
-const ctx = document.getElementById('chartNumbers').getContext('2d');
-const chart = new Chart(ctx, {
-  type: 'bar',
-  data: {
-    labels: ['A', 'B', 'C'],
-    datasets: [{
-      label: 'Contoh',
-      data: [12, 19, 3],
-      backgroundColor: ['#007bff', '#00b7ff', '#28a745']
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false
-  }
-});
-
-const dpr = window.devicePixelRatio || 1;
-canvas.width = canvas.clientWidth * dpr;
-canvas.height = Math.min(canvas.clientHeight, 600) * dpr;
-
-ctx.scale(dpr, dpr);
-
+    
     function generateRandomNumbers() {
       let digits = [0, 0, 0, 0];
       let elements = [
