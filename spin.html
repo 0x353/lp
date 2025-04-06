@@ -78,7 +78,7 @@
         ctx.translate(center, center);
         ctx.rotate(angle + anglePerSeg / 2);
         ctx.textAlign = "right";
-        ctx.fillStyle = "red";
+        ctx.fillStyle = "#fffffd";
         ctx.font = "bold 14px Arial";
         ctx.fillText(rewards[i], center - 20, 5);
         ctx.restore();
@@ -86,7 +86,7 @@
     }
 
     function drawPointer() {
-  ctx.fillStyle = "#fff";
+  ctx.fillStyle = "red";
   ctx.beginPath();
   ctx.moveTo(center, wheelSize - 30);          // Titik atas segitiga (arah ke atas)
   ctx.lineTo(center - 15, wheelSize);          // Kiri bawah
