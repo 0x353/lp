@@ -73,7 +73,6 @@
         ctx.lineTo(center, center);
         ctx.fill();
 
-        // Text
         ctx.save();
         ctx.translate(center, center);
         ctx.rotate(angle + anglePerSeg / 2);
@@ -86,19 +85,19 @@
     }
 
     function drawPointer() {
-  ctx.fillStyle = "#fff";
-  ctx.beginPath();
-  ctx.moveTo(center, center - (center + 10)); // puncak jarum (di luar lingkaran atas)
-  ctx.lineTo(center - 15, center - (center - 10)); // kiri bawah
-  ctx.lineTo(center + 15, center - (center - 10)); // kanan bawah
-  ctx.closePath();
-  ctx.fill();
+      ctx.fillStyle = "#ff0";
+      ctx.beginPath();
+      ctx.moveTo(center, 0); // titik atas
+      ctx.lineTo(center - 15, 30); // sisi kiri bawah
+      ctx.lineTo(center + 15, 30); // sisi kanan bawah
+      ctx.closePath();
+      ctx.fill();
     }
 
     function spinWheel() {
       if (isSpinning) return;
-      isSpinning = true;
 
+      isSpinning = true;
       const spinAngle = Math.random() * 2000 + 2000;
       const duration = 5000;
       const start = performance.now();
@@ -109,8 +108,8 @@
         const ease = 1 - Math.pow(1 - progress, 3);
         currentAngle = (spinAngle * ease) % 360;
 
-        // Roda muter
         ctx.clearRect(0, 0, wheelSize, wheelSize);
+
         ctx.save();
         ctx.translate(center, center);
         ctx.rotate((currentAngle * Math.PI) / 180);
@@ -118,11 +117,7 @@
         drawWheel();
         ctx.restore();
 
-        // Pointer tetap
-        ctx.save();
-        ctx.translate(center, center);
-        drawPointer();
-        ctx.restore();
+        drawPointer(); // Pointer tetap diam di atas
 
         if (progress < 1) {
           requestAnimationFrame(animateSpin);
@@ -136,7 +131,6 @@
       requestAnimationFrame(animateSpin);
     }
 
-    // Inisialisasi
     drawWheel();
     drawPointer();
     document.getElementById("spinBtn").addEventListener("click", spinWheel);
