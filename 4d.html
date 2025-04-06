@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lotto Chain | 4D Random Numbers</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@700&display=swap" rel="stylesheet">
+    <style>
+       body {
+    font-family: 'Ubuntu', sans-serif;
+    text-align: center;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    background: #000000;
+    color: white;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+h1, h2 {
+    background: linear-gradient(90deg, #03a9f4, #f441a5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+h3 {
+    color: white;
+    font-size: 17px;
+    text-shadow: 0px 0px 10px #00aaff, 0px 0px 20px #0088ff;
+}
+
+#container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      font-size: 3rem;
+      margin-bottom: 20px
+}
+
+.number {
+    font-size: 5rem;
+    font-weight: bold;
+    width: 80px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    background: linear-gradient(145deg, #273c75, #192a56);
+    box-shadow: 0 8px 25px rgba(0, 183, 255, 0.8), 0 4px 10px rgba(0, 183, 255, 0.5);
+    transform: perspective(500px) rotateX(20deg);
+    animation: pulse 1.5s infinite alternate;
+}
+
+.buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    color: white;
+    background: linear-gradient(135deg, #00b7ff, #007bff);
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 183, 255, 0.8);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 30px rgba(0, 183, 255, 1);
+}
+
+@keyframes pulse {
+    from {
+        transform: perspective(500px) rotateX(20deg) translateY(0);
+    }
+    to {
+        transform: perspective(500px) rotateX(20deg) translateY(-10px);
+    }
+}
+
+#chartNumbers {
+    max-width: 600px; /* Sesuaikan dengan kebutuhan */
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto; /* Pusatkan */
+}
+
+/* === RESPONSIF UNTUK TABLET & HP === */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2.5rem;
+    }
+
+    #container {
+        gap: 10px;
+    }
+
+    .number {
+        font-size: 4rem;
+        width: 70px;
+        height: 110px;
+    }
+
+    .buttons {
+        flex-wrap: nowrap; /* Tetap sejajar */
+    }
+
+    button {
+        font-size: 0.7rem;
+        padding: 7px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    #container {
+        gap: 8px;
+    }
+
+    .number {
+        font-size: 3.5rem;
+        width: 60px;
+        height: 90px;
+    }
+
+    .buttons {
+        flex-wrap: nowrap; /* Tetap sejajar */
+        gap: 10px;
+    }
+
+    button {
+        font-size: 0.5rem;
+        padding: 5px 10px;
+    }
+}
+
+    .message-box {
+        text-align: center;
+        padding: 15px;
+        border-radius: 10px;
+        background: #f4f4f4;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        width: 90%;
+        max-width: 600px;
+        margin: 20px auto;
+    }
+
+    h2 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+
+    p {
+        font-size: 1.2rem;
+    }
+
+   /* RESPONSIF UNTUK HP */
+    @media (max-width: 768px) {
+        h2 {
+            font-size: 1.5rem;
+        }
+
+        p {
+            font-size: 1rem;
+        }
+    }
+
+        @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+}
+
+.shake {
+    animation: shake 0.5s ease;
+}
+
+ /* Footer */
+.footer {
+    padding: 20px;
+    margin-top: 20px;
+    background: #111;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box; /* Pastikan padding dan border tidak mengubah ukuran elemen */
+}
+
+#predictionArea {
+      margin-top: 40px;
+      background: #000000;
+      padding: 20px;
+      border-radius: 12px;
+    }
+
+  #lastInput {
+  padding: 6px 10px;
+  font-size: 16px;
+  width: 100px;
+  background-color: rgba(255, 255, 255, 0.85);
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  transition: 
+    border-color 0.3s,
+    box-shadow 0.3s,
+    background-color 0.3s;
+}
+
+#lastInput:hover {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-color: #007bff;
+  box-shadow: 0 0 6px rgba(0, 123, 255, 0.4);
+}
+
+#lastInput:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.6);
+  background-color: rgba(255, 255, 255, 1);
+}
+    </style>
+</head>
+
+<body>
+
+    <h1>AI Lotto Number Prediction</h1>
+  <h3>Lotto Chain Dezentralized Betting</h3>
+  <br><br>
+    <div id="container">
+        <div class="number" id="num1">0</div>
+        <div class="number" id="num2">0</div>
+        <div class="number" id="num3">0</div>
+        <div class="number" id="num4">0</div>
+    </div><br>
+
+    <div class="buttons">
+        <button onclick="generateRandomNumbers()">Generate</button>
+        <button onclick="copyToClipboard()">Copy</button>
+        <button onclick="resetHistory()">Reset History</button>
+        <button onclick="downloadChart()">Download Chart</button>
+    </div>
+
+    <br><br>
+    <canvas id="chartNumbers"></canvas>
+    <br>
+
+    <div id="stats" style="text-align: left;">
+    <p>
+     <img src="img/4d1.svg" width="16" height="16" style="vertical-align: middle; margin-right: 5px;">
+        Most Frequently Appearing Numbers: <span id="mostFrequent"><b>-</b></span></p>
+    <p>
+     <img src="img/4d2.svg" width="16" height="16" style="vertical-align: middle; margin-right: 5px;">
+        Rarely Appearing Numbers: <span id="leastFrequent"><b>-</b></span></p>
+    <p>
+     <img src="img/4d3.svg" width="16" height="16" style="vertical-align: middle; margin-right: 5px;">
+        Total Number Generated: <span id="totalGenerated"><b>0</b></span></p>
+    </div>
+    <br>
+
+    <div id="predictionArea">
+    <h2>AI Prediction</h2>
+    <p><b>Enter Official Result:</b><br><br>
+    <input type="number" id="lastInput" maxlength="4" placeholder="e.g 4D" /></p>
+    <button onclick="generatePrediction()">Analyze & Predict</button>
+    <div id="predictionOutput" style="margin-top: 20px; font-size: 1.2rem;"></div>
+  </div><br>
+
+    <div>
+    <h3>Good Luck!</h3>
+    <p>Use this tool to get unique and unpredictable random combinations. <br><br> Every number generated is completely random and unpredictable. <br><br> Get random numbers for lottery, calculation or just for fun!</p>
+    </div>
+
+    <!-- Footer -->
+       <div class="footer">
+           © Powered By Lotto Chain. 2025 All rights reserved. Play responsibly.
+       </div>
+
+    <script>
+    let chartNumbers;
+
+    function generateRandomNumbers() {
+        let chart = [0, 0, 0, 0];
+        let elements = [
+            document.getElementById("num1"),
+            document.getElementById("num2"),
+            document.getElementById("num3"),
+            document.getElementById("num4")
+        ];
+        let interval = [];
+
+        for (let i = 0; i < 4; i++) {
+            interval[i] = setInterval(() => {
+                chart[i] = Math.floor(Math.random() * 10);
+                elements[i].textContent = chart[i];
+            }, 50);
+        }
+
+        setTimeout(() => {
+            for (let i = 0; i < 4; i++) {
+                clearInterval(interval[i]);
+
+                elements[i].classList.add("shake");
+                setTimeout(() => {
+                    elements[i].classList.remove("shake");
+                }, 500);
+            }
+
+            saveToHistory(chart.join(""));
+            updateChart();
+        }, 2500);
+    }
+
+    function saveToHistory(newNumber) {
+        let history = JSON.parse(localStorage.getItem("history")) || [];
+        if (history.length >= 50) history.shift();
+        history.push(newNumber);
+        localStorage.setItem("history", JSON.stringify(history));
+    }
+
+    function updateChart() {
+        let history = JSON.parse(localStorage.getItem("history")) || [];
+        let frequency = new Array(10).fill(0);
+
+        history.forEach(entry => {
+            entry.split("").forEach(num => {
+                frequency[parseInt(num)]++;
+            });
+        });
+
+        chartNumbers.data.datasets[0].data = frequency;
+        chartNumbers.update();
+
+        updateStats(frequency);
+    }
+
+    function updateStats(frequency) {
+        let maxFreq = Math.max(...frequency);
+        let minFreq = Math.min(...frequency.filter(f => f > 0));
+
+        let mostFrequent = frequency.map((f, i) => (f === maxFreq ? i : null)).filter(n => n !== null);
+        let leastFrequent = frequency.map((f, i) => (f === minFreq ? i : null)).filter(n => n !== null);
+        let totalGenerated = frequency.reduce((a, b) => a + b, 0);
+
+        document.getElementById("mostFrequent").textContent = mostFrequent.join(", ") || "-";
+        document.getElementById("leastFrequent").textContent = leastFrequent.join(", ") || "-";
+        document.getElementById("totalGenerated").textContent = totalGenerated;
+    }
+
+    function copyToClipboard() {
+        let chart = [
+            document.getElementById("num1").textContent,
+            document.getElementById("num2").textContent,
+            document.getElementById("num3").textContent,
+            document.getElementById("num4").textContent
+        ].join("");
+
+        navigator.clipboard.writeText(chart).then(() => {
+            alert("Numbers copied successfully: " + chart);
+        });
+    }
+
+    function resetHistory() {
+    if (confirm("Are you sure you want to delete all number history?")) {
+        localStorage.removeItem("history");
+        updateChart(); // Refresh chart setelah direset
+    }
+}
+
+function downloadChart() {
+    let link = document.createElement('a');
+    link.href = document.getElementById("chartNumbers").toDataURL("image/png");
+    link.download = "chart.png";
+    link.click();
+}
+
+    window.onload = function () {
+        let ctx = document.getElementById('chartNumbers').getContext('2d'); // Diperbaiki ID-nya
+        chartNumbers = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+                datasets: [{
+                    label: 'Frequency of Numbers Appearing',
+                    data: new Array(10).fill(0),
+                    backgroundColor: 'rgba(0, 183, 255, 0.5)',
+                    borderColor: 'rgba(0, 183, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        updateChart();
+    };
+    </script>
+
+    <script>
+  function generatePrediction() {
+    const input = document.getElementById("lastInput").value.trim();
+    if (!/^\d{4}$/.test(input)) {
+      alert("Please enter the last official 4-digit result.");
+      return;
+    }
+
+    let prediction = {
+      "4D": [],
+      "3D": [],
+      "2D": []
+    };
+
+    for (let i = 0; i < 10; i++) {
+      prediction["4D"].push(randomDigits(4));
+      prediction["3D"].push(randomDigits(3));
+      prediction["2D"].push(randomDigits(2));
+    }
+
+    let output = `<b style="color: orange;">Input:</b> <span style="color: #00FF66;">${input}</span><br><br>`;
+    output += `<b style="color: orange;">4D Suggestions:</b><br> <span style="color: #00FF66;">${prediction["4D"].join(", ")}</span><br><br>`;
+    output += `<b style="color: orange;">3D Suggestions:</b><br> <span style="color: #00FF66;">${prediction["3D"].join(", ")}</span><br><br>`;
+    output += `<b style="color: orange;">2D Suggestions:</b><br> <span style="color: #00FF66;">${prediction["2D"].join(", ")}</span><br><br><br>`;
+    output += `<i style="color: #007bff; font-size: 12px;">Note: "These numbers are generated by AI for inspiration and can help your personal analysis."</i>`;
+
+    document.getElementById("predictionOutput").innerHTML = output;
+  }
+    
+  function randomDigits(length) {
+    let digits = "";
+    for (let i = 0; i < length; i++) {
+      digits += Math.floor(Math.random() * 10);
+    }
+    return digits;
+  }
+    </script>
+
+</body>
+
+</html>
