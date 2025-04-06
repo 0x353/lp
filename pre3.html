@@ -17,7 +17,7 @@
 
     #container {
       display: flex;
-      background: #111;
+      background: #0000000;
       justify-content: center;
       gap: 20px;
       font-size: 3rem;
@@ -124,10 +124,16 @@
   <canvas id="chartNumbers" style="max-height: 600px; width: 100%;"></canvas>
   <br>
 
-  <div id="stats">
-    <p>🔢 Most Frequent Number(s): <span id="mostFrequent"><b>-</b></span></p>
-    <p>📉 Least Frequent Number(s): <span id="leastFrequent"><b>-</b></span></p>
-    <p>📊 Total Numbers Generated: <span id="totalGenerated"><b>0</b></span></p>
+  <div id="stats" style="text-align: left;">
+    <p>
+     <img src="img/4d1.svg" width="16" height="16" style="vertical-align: middle; margin-right: 5px;">
+        Most Frequently Appearing Numbers: <span id="mostFrequent"><b>-</b></span></p>
+    <p>
+     <img src="img/4d2.svg" width="16" height="16" style="vertical-align: middle; margin-right: 5px;">
+        Rarely Appearing Numbers: <span id="leastFrequent"><b>-</b></span></p>
+    <p>
+     <img src="img/4d3.svg" width="16" height="16" style="vertical-align: middle; margin-right: 5px;">
+        Total Number Generated: <span id="totalGenerated"><b>0</b></span></p>
   </div>
 
   <div id="predictionArea">
@@ -194,17 +200,17 @@
     }
 
     function updateStats(frequency) {
-      let maxFreq = Math.max(...frequency);
-      let minFreq = Math.min(...frequency.filter(f => f > 0));
+        let maxFreq = Math.max(...frequency);
+        let minFreq = Math.min(...frequency.filter(f => f > 0));
 
-      let mostFrequent = frequency.map((f, i) => (f === maxFreq ? i : null)).filter(n => n !== null);
-      let leastFrequent = frequency.map((f, i) => (f === minFreq ? i : null)).filter(n => n !== null);
-      let totalGenerated = frequency.reduce((a, b) => a + b, 0);
+        let mostFrequent = frequency.map((f, i) => (f === maxFreq ? i : null)).filter(n => n !== null);
+        let leastFrequent = frequency.map((f, i) => (f === minFreq ? i : null)).filter(n => n !== null);
+        let totalGenerated = frequency.reduce((a, b) => a + b, 0);
 
-      document.getElementById("mostFrequent").textContent = mostFrequent.join(", ") || "-";
-      document.getElementById("leastFrequent").textContent = leastFrequent.join(", ") || "-";
-      document.getElementById("totalGenerated").textContent = totalGenerated;
-    }
+        document.getElementById("mostFrequent").textContent = mostFrequent.join(", ") || "-";
+        document.getElementById("leastFrequent").textContent = leastFrequent.join(", ") || "-";
+        document.getElementById("totalGenerated").textContent = totalGenerated;
+        }
 
     function copyToClipboard() {
       let number = [
