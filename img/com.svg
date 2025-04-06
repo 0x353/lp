@@ -3,12 +3,13 @@
     <style>
       <![CDATA[
         @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@700&display=swap');
-        
+
         .bg {
           fill: #2e2e2e;
         }
         .text {
           font-family: 'Ubuntu', sans-serif;
+          font-weight: 700;
           font-size: 60px;
           fill: #00ffcc;
           animation: bounce 2s infinite;
@@ -27,7 +28,7 @@
   <rect class="bg" width="800" height="400" />
   <g>
     <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" class="text">
-      Coming Soon
+      Coming Soon...
     </text>
   </g>
 </svg>
