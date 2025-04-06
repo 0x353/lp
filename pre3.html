@@ -72,6 +72,32 @@
       padding: 20px;
       border-radius: 12px;
     }
+
+      p {
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  p b {
+    margin-right: 10px;
+    color: #333;
+  }
+
+  #lastInput {
+    padding: 6px 10px;
+    font-size: 16px;
+    width: 100px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  #lastInput:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
   </style>
 </head>
 <body>
@@ -88,11 +114,11 @@
   <div class="buttons">
     <button onclick="generateRandomNumbers()">Generate</button>
     <button onclick="copyToClipboard()">Copy</button>
-    <button onclick="#lastInput">Fake Prediction</button>
+    <button onclick="document.getElementById('lastInput').scrollIntoView({ behavior: 'smooth' })">Prediction</button>
   </div>
 
   <br><br>
-  <canvas id="chartNumbers" height="100"></canvas>
+  <canvas id="chartNumbers" style="max-height: 600px; width: 100%;"></canvas>
   <br>
 
   <div id="stats">
@@ -103,13 +129,37 @@
 
   <div id="predictionArea">
     <h2>Fake AI Prediction</h2>
-    <p><b>Last Official Result:</b> <input type="text" id="lastInput" maxlength="4" placeholder="e.g. 5821" /></p>
+    <p><b>Last Official Result:</b> <input type="text" id="lastInput" maxlength="4" placeholder="e.g 4D" /></p>
     <button onclick="generatePrediction()">Analyze & Predict</button>
     <div id="predictionOutput" style="margin-top: 20px; font-size: 1.2rem;"></div>
   </div>
 
   <script>
     let chartNumbers;
+
+    const canvas = document.getElementById("chartNumbers");
+const ctx = document.getElementById('chartNumbers').getContext('2d');
+const chart = new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: ['A', 'B', 'C'],
+    datasets: [{
+      label: 'Contoh',
+      data: [12, 19, 3],
+      backgroundColor: ['#007bff', '#00b7ff', '#28a745']
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false
+  }
+});
+
+const dpr = window.devicePixelRatio || 1;
+canvas.width = canvas.clientWidth * dpr;
+canvas.height = Math.min(canvas.clientHeight, 600) * dpr;
+
+ctx.scale(dpr, dpr);
 
     function generateRandomNumbers() {
       let digits = [0, 0, 0, 0];
