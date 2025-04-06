@@ -64,59 +64,64 @@
     let isSpinning = false;
 
     function drawWheel() {
-  for (let i = 0; i < segCount; i++) {
-    const angle = i * anglePerSeg;
+      for (let i = 0; i < segCount; i++) {
+        const angle = i * anglePerSeg;
+        ctx.fillStyle = i % 2 === 0 ? "#00b7ff" : "#007bff";
+        ctx.beginPath();
+        ctx.moveTo(center, center);
+        ctx.arc(center, center, center - 10, angle, angle + anglePerSeg);
+        ctx.lineTo(center, center);
+        ctx.fill();
 
-    ctx.fillStyle = i % 2 === 0 ? "#00b7ff" : "#007bff";
-    ctx.beginPath();
-    ctx.moveTo(center, center);
-    ctx.arc(center, center, center - 10, angle, angle + anglePerSeg);
-    ctx.lineTo(center, center);
-    ctx.fill();
-
-    // Teks di setiap segmen
-    ctx.save();
-    ctx.translate(center, center);
-    ctx.rotate(angle + anglePerSeg / 2);
-    ctx.textAlign = "right";
-    ctx.fillStyle = "#fff";
-    ctx.font = "bold 14px Arial";
-    ctx.fillText(rewards[i], center - 20, 5);
-    ctx.restore();
-  }
+        // Text
+        ctx.save();
+        ctx.translate(center, center);
+        ctx.rotate(angle + anglePerSeg / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 14px Arial";
+        ctx.fillText(rewards[i], center - 20, 5);
+        ctx.restore();
+      }
     }
 
     function drawPointer() {
-  ctx.fillStyle = "#fff";
-  ctx.beginPath();
-  ctx.moveTo(center, 0);
-  ctx.lineTo(center - 15, -20);
-  ctx.lineTo(center + 15, -20);
-  ctx.closePath();
-  ctx.fill();
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.moveTo(center, 0);
+      ctx.lineTo(center - 15, -20);
+      ctx.lineTo(center + 15, -20);
+      ctx.closePath();
+      ctx.fill();
     }
 
     function spinWheel() {
       if (isSpinning) return;
-
       isSpinning = true;
-      const spinAngle = Math.random() * 2000 + 2000; // antara 2000-4000 derajat
+
+      const spinAngle = Math.random() * 2000 + 2000;
       const duration = 5000;
       const start = performance.now();
 
       function animateSpin(time) {
         const elapsed = time - start;
         const progress = Math.min(elapsed / duration, 1);
-        const ease = 1 - Math.pow(1 - progress, 3); // easing
+        const ease = 1 - Math.pow(1 - progress, 3);
         currentAngle = (spinAngle * ease) % 360;
 
-        // redraw
+        // Roda muter
         ctx.clearRect(0, 0, wheelSize, wheelSize);
         ctx.save();
         ctx.translate(center, center);
         ctx.rotate((currentAngle * Math.PI) / 180);
         ctx.translate(-center, -center);
         drawWheel();
+        ctx.restore();
+
+        // Pointer tetap
+        ctx.save();
+        ctx.translate(center, center);
+        drawPointer();
         ctx.restore();
 
         if (progress < 1) {
@@ -128,22 +133,12 @@
         }
       }
 
-     // redraw
-ctx.clearRect(0, 0, wheelSize, wheelSize);
-ctx.save();
-ctx.translate(center, center);
-ctx.rotate((currentAngle * Math.PI) / 180);
-ctx.translate(-center, -center);
-drawWheel();
-ctx.restore();
+      requestAnimationFrame(animateSpin);
+    }
 
-// pointer tetap
-ctx.save();
-ctx.translate(center, center);
-drawPointer();
-ctx.restore();
-      
+    // Inisialisasi
     drawWheel();
+    drawPointer();
     document.getElementById("spinBtn").addEventListener("click", spinWheel);
   </script>
 </body>
