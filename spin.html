@@ -79,11 +79,9 @@ const center = wheelSize / 2;
     let currentAngle = 0;
     let isSpinning = false;
 
-    function drawWheel() {
+    function drawWheel(glow = false) {
   for (let i = 0; i < segCount; i++) {
     const angle = i * anglePerSeg;
-
-    // Isi warna segmen
     ctx.fillStyle = i % 2 === 0 ? "#00b7ff" : "#007bff";
     ctx.beginPath();
     ctx.moveTo(center, center);
@@ -91,37 +89,52 @@ const center = wheelSize / 2;
     ctx.lineTo(center, center);
     ctx.fill();
 
-    // Tambah garis batas kuning
+    // Pembatas garis kuning
     ctx.strokeStyle = "orange";
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(center, center);
     ctx.lineTo(
-      center + (center - 10) * Math.cos(angle),
-      center + (center - 10) * Math.sin(angle)
+      center + Math.cos(angle) * (center - 10),
+      center + Math.sin(angle) * (center - 10)
     );
     ctx.stroke();
 
-    // Tambahkan teks reward
+    // Teks
     ctx.save();
     ctx.translate(center, center);
     ctx.rotate(angle + anglePerSeg / 2);
     ctx.textAlign = "right";
     ctx.fillStyle = "#fffffd";
     ctx.font = "bold 14px Arial";
+    if (glow) {
+      ctx.shadowColor = "#0ff";
+      ctx.shadowBlur = 12;
+    }
     ctx.fillText(rewards[i], center - 20, 5);
     ctx.restore();
   }
     }
+    
+    function drawPointer(glow = false) {
+  if (glow) {
+    ctx.shadowColor = "#0ff";
+    ctx.shadowBlur = 20;
+  } else {
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+  }
 
-    function drawPointer() {
   ctx.fillStyle = "red";
   ctx.beginPath();
-  ctx.moveTo(center, wheelSize - 30);          // Titik atas segitiga (arah ke atas)
-  ctx.lineTo(center - 15, wheelSize);          // Kiri bawah
-  ctx.lineTo(center + 15, wheelSize);          // Kanan bawah
+  ctx.moveTo(center, wheelSize - 30);      // atas segitiga
+  ctx.lineTo(center - 15, wheelSize);      // kiri bawah
+  ctx.lineTo(center + 15, wheelSize);      // kanan bawah
   ctx.closePath();
   ctx.fill();
+
+  // Reset shadow
+  ctx.shadowBlur = 0;
     }
 
     function spinWheel() {
@@ -149,13 +162,23 @@ const center = wheelSize / 2;
         drawPointer();
 
         if (progress < 1) {
-          requestAnimationFrame(animateSpin);
-        } else {
-          const selected = Math.floor(
-            (segCount - ((currentAngle + 270) % 360) / 360 * segCount)
-          ) % segCount;
-          document.getElementById("result").textContent = `You got: ${rewards[selected]}!`;
-          isSpinning = false;
+  requestAnimationFrame(animateSpin);
+} else {
+  const selected = Math.floor(
+    (segCount - ((currentAngle + 270) % 360) / 360 * segCount)
+  ) % segCount;
+  document.getElementById("result").textContent = `You got: ${rewards[selected]}!`;
+  isSpinning = false;
+
+  // Gambar ulang dengan efek glow
+  ctx.clearRect(0, 0, wheelSize, wheelSize);
+  ctx.save();
+  ctx.translate(center, center);
+  ctx.rotate((currentAngle * Math.PI) / 180);
+  ctx.translate(-center, -center);
+  drawWheel(true); // glow = true
+  ctx.restore();
+  drawPointer(true); // glow = true
         }
       }
 
