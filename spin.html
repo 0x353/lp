@@ -40,16 +40,32 @@
 </head>
 <body>
   <h1>Crypto Spin Wheel</h1>
-  <canvas id="wheel" width="400" height="400"></canvas>
+  <canvas id="wheel" style="width: 400px; height: 400px;"></canvas>
   <br>
   <button id="spinBtn">Spin!</button>
   <div id="result"></div>
 
   <script>
     const canvas = document.getElementById("wheel");
-    const ctx = canvas.getContext("2d");
-    const wheelSize = canvas.width;
-    const center = wheelSize / 2;
+const ctx = canvas.getContext("2d");
+
+// Deteksi pixel ratio
+const dpr = window.devicePixelRatio || 1;
+
+// Ukuran tampilan (CSS)
+const displaySize = 400;
+
+// Atur ukuran internal canvas
+canvas.width = displaySize * dpr;
+canvas.height = displaySize * dpr;
+canvas.style.width = displaySize + "px";
+canvas.style.height = displaySize + "px";
+
+// Skala gambar agar tajam
+ctx.scale(dpr, dpr);
+
+const wheelSize = displaySize;
+const center = wheelSize / 2;
 
     const rewards = [
       "ETH", "BTC", "iPhone", "MacBook",
