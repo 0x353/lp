@@ -64,25 +64,38 @@
     let isSpinning = false;
 
     function drawWheel() {
-      for (let i = 0; i < segCount; i++) {
-        const angle = i * anglePerSeg;
+  for (let i = 0; i < segCount; i++) {
+    const angle = i * anglePerSeg;
 
-        ctx.fillStyle = i % 2 === 0 ? "#00b7ff" : "#007bff";
-        ctx.beginPath();
-        ctx.moveTo(center, center);
-        ctx.arc(center, center, center - 10, angle, angle + anglePerSeg);
-        ctx.lineTo(center, center);
-        ctx.fill();
+    // Isi warna segmen
+    ctx.fillStyle = i % 2 === 0 ? "#00b7ff" : "#007bff";
+    ctx.beginPath();
+    ctx.moveTo(center, center);
+    ctx.arc(center, center, center - 10, angle, angle + anglePerSeg);
+    ctx.lineTo(center, center);
+    ctx.fill();
 
-        ctx.save();
-        ctx.translate(center, center);
-        ctx.rotate(angle + anglePerSeg / 2);
-        ctx.textAlign = "right";
-        ctx.fillStyle = "#fffffd";
-        ctx.font = "bold 14px Arial";
-        ctx.fillText(rewards[i], center - 20, 5);
-        ctx.restore();
-      }
+    // Tambah garis batas kuning
+    ctx.strokeStyle = "yellow";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(center, center);
+    ctx.lineTo(
+      center + (center - 10) * Math.cos(angle),
+      center + (center - 10) * Math.sin(angle)
+    );
+    ctx.stroke();
+
+    // Tambahkan teks reward
+    ctx.save();
+    ctx.translate(center, center);
+    ctx.rotate(angle + anglePerSeg / 2);
+    ctx.textAlign = "right";
+    ctx.fillStyle = "#fffffd";
+    ctx.font = "bold 14px Arial";
+    ctx.fillText(rewards[i], center - 20, 5);
+    ctx.restore();
+  }
     }
 
     function drawPointer() {
