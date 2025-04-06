@@ -74,24 +74,36 @@
     }
 
   #lastInput {
-    padding: 6px 10px;
-    font-size: 16px;
-    width: 100px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    outline: none;
-    transition: border-color 0.3s, box-shadow 0.3s;
-  }
+  padding: 6px 10px;
+  font-size: 16px;
+  width: 100px;
+  background-color: rgba(255, 255, 255, 0.85);
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  transition: 
+    border-color 0.3s,
+    box-shadow 0.3s,
+    background-color 0.3s;
+}
 
-  #lastInput:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-  }
+#lastInput:hover {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-color: #007bff;
+  box-shadow: 0 0 6px rgba(0, 123, 255, 0.4);
+}
+
+#lastInput:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.6);
+  background-color: rgba(255, 255, 255, 1);
+}
   </style>
 </head>
 <body>
 
   <h1>AI Number Prediction</h1>
+  <h3>Lotto Chain Dezentralized Betting</h3>
   
   <div id="container">
     <div class="number" id="num1">0</div>
@@ -118,10 +130,11 @@
 
   <div id="predictionArea">
     <h2>AI Prediction</h2>
-    <p><b>Last Official Result:</b> <input type="text" id="lastInput" maxlength="4" placeholder="e.g 4D" /></p>
+    <p><b>Enter Official Result:</b><br>
+    <input type="text" id="lastInput" maxlength="4" placeholder="e.g 4D" /></p>
     <button onclick="generatePrediction()">Analyze & Predict</button>
     <div id="predictionOutput" style="margin-top: 20px; font-size: 1.2rem;"></div>
-  </div>
+  </div><br>
 
   <script>
     let chartNumbers;
