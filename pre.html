@@ -1,143 +1,88 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html><html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lotto Analyzer</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prediksi Angka 4D</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
+      background: #0e101c;
+      color: #fff;
       padding: 20px;
     }
-    textarea {
-      width: 100%;
-      height: 200px;
+    h1, h3, h4 {
+      color: #00b7ff;
     }
-    canvas {
-      max-width: 100%;
+    input[type="text"] {
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      width: 220px;
+      text-align: center;
+      font-size: 1rem;
+      margin-right: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(135deg, #00b7ff, #007bff);
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 183, 255, 0.8);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(0, 183, 255, 1);
+    }
+    #prediksiOutput {
       margin-top: 20px;
-    }
-    .chart-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-    .chart-box {
-      flex: 1 1 300px;
-    }
-    #prediction {
-      margin-top: 20px;
-      font-size: 1.2em;
-      font-weight: bold;
+      padding: 20px;
+      background: #1a1c2d;
+      border-radius: 15px;
     }
   </style>
 </head>
 <body>
-  <h2>Input 4 Digit Angka (1 per baris)</h2>
-  <textarea id="inputData" placeholder="Contoh:\n1234\n5678\n...\n"></textarea>
-  <br /><br />
-  <button onclick="analyzeData()">Analisa</button>  <div id="prediction">Prediksi: -</div>  <div class="chart-container">
-    <div class="chart-box">
-      <canvas id="frequencyChart"></canvas>
-    </div>
-    <div class="chart-box">
-      <canvas id="oddEvenChart"></canvas>
-    </div>
-    <div class="chart-box">
-      <canvas id="highLowChart"></canvas>
-    </div>
-  </div>  <script>
-    let frequencyChart, oddEvenChart, highLowChart;
-
-    function analyzeData() {
-      const raw = document.getElementById("inputData").value;
-      const lines = raw.trim().split("\n").map(x => x.trim()).filter(x => /^\d{4}$/.test(x));
-
-      const digits = lines.flatMap(line => line.split('').map(Number));
-
-      const frequency = new Array(10).fill(0);
-      let odd = 0, even = 0, high = 0, low = 0;
-
-      digits.forEach(n => {
-        frequency[n]++;
-        if (n % 2 === 0) even++; else odd++;
-        if (n >= 5) high++; else low++;
-      });
-
-      updateChart(frequency, odd, even, high, low);
-      updatePrediction(frequency, odd, even, high, low);
-    }
-
-    function updatePrediction(freq, odd, even, high, low) {
-      let mostFreq = [...freq].map((val, idx) => ({ num: idx, freq: val }))
-                              .sort((a, b) => b.freq - a.freq)
-                              .slice(0, 6)
-                              .map(f => f.num);
-      let result = [];
-
-      // generate 4 angka prediksi berdasarkan kombinasi yang seimbang
-      let counts = { odd: 0, even: 0, high: 0, low: 0 };
-      for (let i = 0; result.length < 4 && i < mostFreq.length; i++) {
-        let n = mostFreq[i];
-        let isEven = n % 2 === 0;
-        let isHigh = n >= 5;
-
-        if ((isEven && counts.even >= 2) || (!isEven && counts.odd >= 2)) continue;
-        if ((isHigh && counts.high >= 2) || (!isHigh && counts.low >= 2)) continue;
-
-        result.push(n);
-        isEven ? counts.even++ : counts.odd++;
-        isHigh ? counts.high++ : counts.low++;
+  <h1>Prediksi Angka 4D / 3D / 2D (Simulasi)</h1>
+  <p>Masukkan hasil resmi terakhir (4 digit):</p>
+  <input type="text" id="lastResult" placeholder="Misal: 8372">
+  <button onclick="generatePrediksi()">Analisis & Prediksi</button>  <div id="prediksiOutput"></div>  <script>
+    function generatePrediksi() {
+      const result = document.getElementById('lastResult').value.trim();
+      if (!/^\d{4}$/.test(result)) {
+        alert("Masukkan angka 4 digit valid!");
+        return;
       }
 
-      while (result.length < 4) {
-        result.push(Math.floor(Math.random() * 10));
-      }
+      const digits = result.split('').map(Number);
 
-      document.getElementById("prediction").textContent = `Prediksi: ${result.join('')}`;
-    }
+      const angkaTerbalik = [...digits].reverse().join('');
+      const angkaNaik = digits.map(n => (n + 1) % 10).join('');
+      const angkaTurun = digits.map(n => (n - 1 + 10) % 10).join('');
+      const kombinasiAneh = digits.map((n, i) => (n + i) % 10).join('');
 
-    function updateChart(freq, odd, even, high, low) {
-      const labels = Array.from({length: 10}, (_, i) => i.toString());
-      const colors = labels.map(i => 'rgba(0, 183, 255, 0.6)');
+      const angka2D = [angkaTerbalik.slice(2), angkaNaik.slice(2), angkaTurun.slice(2)];
+      const angka3D = [angkaNaik.slice(1), kombinasiAneh.slice(1), angkaTerbalik.slice(1)];
+      const angka4D = [angkaTerbalik, angkaNaik, angkaTurun, kombinasiAneh];
 
-      if (frequencyChart) frequencyChart.destroy();
-      frequencyChart = new Chart(document.getElementById('frequencyChart'), {
-        type: 'bar',
-        data: {
-          labels,
-          datasets: [{
-            label: 'Frekuensi Angka',
-            data: freq,
-            backgroundColor: colors
-          }]
-        },
-        options: { responsive: true, scales: { y: { beginAtZero: true } } }
-      });
+      let output = `
+        <h3>Hasil Analisis Palsu Berdasarkan: <b>${result}</b></h3>
+        <p><b>Metode Pembalikan:</b> ${angkaTerbalik}</p>
+        <p><b>Naik 1 Angka:</b> ${angkaNaik}</p>
+        <p><b>Turun 1 Angka:</b> ${angkaTurun}</p>
+        <p><b>Kombinasi Pola Posisi:</b> ${kombinasiAneh}</p>
 
-      if (oddEvenChart) oddEvenChart.destroy();
-      oddEvenChart = new Chart(document.getElementById('oddEvenChart'), {
-        type: 'doughnut',
-        data: {
-          labels: ['Ganjil', 'Genap'],
-          datasets: [{
-            data: [odd, even],
-            backgroundColor: ['#ff6384', '#36a2eb']
-          }]
-        }
-      });
+        <hr>
+        <h4>Rekomendasi:</h4>
+        <p><b>Angka 2D:</b> ${angka2D.join(", ")}</p>
+        <p><b>Angka 3D:</b> ${angka3D.join(", ")}</p>
+        <p><b>Angka 4D:</b> ${angka4D.join(", ")}</p>
+      `;
 
-      if (highLowChart) highLowChart.destroy();
-      highLowChart = new Chart(document.getElementById('highLowChart'), {
-        type: 'doughnut',
-        data: {
-          labels: ['Tinggi (5-9)', 'Rendah (0-4)'],
-          datasets: [{
-            data: [high, low],
-            backgroundColor: ['#ff9f40', '#4bc0c0']
-          }]
-        }
-      });
+      document.getElementById('prediksiOutput').innerHTML = output;
     }
   </script></body>
 </html>
