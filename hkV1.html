@@ -1566,9 +1566,9 @@ async function loadBetHistory() {
     const reversedBets = bets.slice().reverse(); // Urutkan dari terbaru
 
     const now = Math.floor(Date.now() / 1000);
-    const sevenDaysAgo = now - 7 * 24 * 60 * 60;
-    const filteredBets = reversedBets.filter(bet => bet.timestamp >= sevenDaysAgo);
-
+    const oneMonthAgo = now - 30 * 24 * 60 * 60; // 30 hari dalam detik
+    const filteredBets = reversedBets.filter(bet => bet.timestamp >= oneMonthAgo);
+    
     const start = betHistoryPage * pageSize;
     const end = Math.min(start + pageSize, filteredBets.length);
 
