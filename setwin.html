@@ -237,14 +237,14 @@ async function setWinner() {
 
     statusElement.innerHTML = "";
     const loadingIcon = document.createElement("img");
-    loadingIcon.src = "loading.svg";
+    loadingIcon.src = "img/load.svg";
     loadingIcon.style.width = "20px";
     loadingIcon.style.verticalAlign = "middle";
     loadingIcon.style.marginRight = "5px";
 
     statusElement.appendChild(loadingIcon);
     statusElement.appendChild(document.createTextNode(" Sending transaction..."));
-    statusElement.style.color = "white";
+    statusElement.style.color = "#aaffaa";
 
     try {
         // Memanggil smart contract dengan tambahan parameter betId dan betNumber
@@ -258,7 +258,7 @@ async function setWinner() {
         statusElement.innerHTML = "";
 
         const successIcon = document.createElement("img");
-        successIcon.src = "success.svg";
+        successIcon.src = "img/success.svg";
         successIcon.style.width = "20px";
         successIcon.style.verticalAlign = "middle";
         successIcon.style.marginRight = "5px";
@@ -267,7 +267,7 @@ async function setWinner() {
         txLink.href = `https://basescan.org/tx/${tx.transactionHash}`;
         txLink.innerText = tx.transactionHash;
         txLink.style.textDecoration = "none";
-        txLink.style.color = "blue";
+        txLink.style.color = "#1a88ff";
         txLink.style.fontSize = "8px";
         txLink.target = "_blank";
 
@@ -275,21 +275,21 @@ async function setWinner() {
         statusElement.appendChild(successIcon);
         statusElement.appendChild(document.createTextNode(" Winner Added! Tx: "));
         statusElement.appendChild(txLink);
-        statusElement.style.color = "green";
+        statusElement.style.color = "#00cc00";
     } catch (error) {
         console.error("Transaction Error:", error);
 
         statusElement.innerHTML = "";
 
         const errorIcon = document.createElement("img");
-        errorIcon.src = "error.svg";
+        errorIcon.src = "img/failed.svg";
         errorIcon.style.width = "20px";
         errorIcon.style.verticalAlign = "middle";
         errorIcon.style.marginRight = "5px";
 
         statusElement.appendChild(errorIcon);
         statusElement.appendChild(document.createTextNode(" Failed to send transaction!"));
-        statusElement.style.color = "red";
+        statusElement.style.color = "#ff3333";
     }
 }
 
