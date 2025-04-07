@@ -1971,23 +1971,7 @@ async function updateCommentCount(betId) {
     } catch (error) {
         console.error(`Gagal mengambil jumlah komentar untuk ${betId}:`, error);
     }
-}
-
-// Pastikan MetaMask terhubung sebelum menggunakan fungsi-fungsi ini
-async function connectMetaMask() {
-    if (typeof window.ethereum !== "undefined") {
-        try {
-            await ethereum.request({ method: "eth_requestAccounts" });
-        } catch (error) {
-            console.error("Gagal terhubung ke MetaMask:", error);
-        }
-    } else {
-        alert("MetaMask tidak terdeteksi! Harap instal MetaMask.");
-    }
-}
-
-// Pastikan pengguna sudah terhubung ke MetaMask
-window.addEventListener("load", connectMetaMask);        
+}    
        
 // Modal Result
 function updateHistory(newBall1) {
