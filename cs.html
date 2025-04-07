@@ -11,6 +11,7 @@
       height: 100vh;
       background: #000;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       overflow: hidden;
@@ -56,9 +57,30 @@
           0 0 60px rgba(244,65,165,0.8);
       }
     }
+
+    .button {
+      margin-top: 40px;
+      padding: 12px 30px;
+      border: 2px solid #03a9f4;
+      color: #03a9f4;
+      background: transparent;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 30px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px #03a9f4;
+    }
+
+    .button:hover {
+      background: #03a9f4;
+      color: #000;
+      box-shadow: 0 0 20px #03a9f4;
+    }
   </style>
 </head>
 <body>
   <h1>Coming Soon!</h1>
+  <a href="index" class="button">Back to Home</a>
 </body>
 </html>
