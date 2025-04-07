@@ -90,7 +90,7 @@ input:focus {
     <div id="container">
     <h2>Set Winner Dashboard Admin</h2>
 
-    <button onclick="connectWallet()">🔗 Connect Wallet</button>
+    <button onclick="connectWallet()">Connect Wallet</button>
     <p id="walletAddress">Wallet: Not Connected</p>
     <p id="ownerStatus" style="color: red;"></p>
 
@@ -99,13 +99,13 @@ input:focus {
     <input type="number" id="winnerAmount" placeholder="Amount ETH"><br>
     <input type="text" id="betId" placeholder="Bet ID"><br>
     <input type="text" id="betNumber" placeholder="Bet Number"><br> 
-    <button onclick="setWinner()">✅ Set Winner</button>
+    <button onclick="setWinner()">Set Winner</button>
     <div id="status"></div>
 
     <h3>Withdraw ETH (Only Owner)</h3>
     <p>ETH Balance: <span id="contractBalance" style="color: green;">Loading...</span></p>
     <input type="number" id="withdrawAmount" placeholder="Amount ETH"><br>
-    <button onclick="withdrawETH()">💰 Withdraw</button>
+    <button onclick="withdrawETH()">Withdraw</button>
 
     <p id="withdrawStatus"></p>
     </div>
@@ -162,17 +162,19 @@ async function updateUIAfterConnect() {
     contract = new web3.eth.Contract(contractABI, contractAddress);
 
     ownerAddress = await contract.methods.owner().call();
-    if (userAccount.toLowerCase() === ownerAddress.toLowerCase()) {
-        document.getElementById("ownerStatus").innerText = "✅ You Are the Owner!";
-        document.getElementById("ownerStatus").style.color = "green";
-    } else {
-        document.getElementById("ownerStatus").innerText = "🚫 You Are Not the Owner!";
-        document.getElementById("ownerStatus").style.color = "red";
-    }
+const ownerStatus = document.getElementById("ownerStatus");
 
-    const btn = document.querySelector("button");
-    btn.innerText = "❌ Disconnect Wallet";
-    btn.setAttribute("onclick", "disconnectWallet()");
+if (userAccount.toLowerCase() === ownerAddress.toLowerCase()) {
+    ownerStatus.innerHTML = '<img src="img/success.svg" style="width: 20px; vertical-align: middle; margin-right: 5px;">You Are the Owner!';
+    ownerStatus.style.color = "#00cc00";
+} else {
+    ownerStatus.innerHTML = '<img src="img/failed.svg" style="width: 20px; vertical-align: middle; margin-right: 5px;">You Are Not the Owner!';
+    ownerStatus.style.color = "#ff3333";
+}
+
+const btn = document.querySelector("button");
+btn.innerHTML = '<img src="img/dis.svg" style="width: 20px; vertical-align: middle; margin-right: 5px;">Disconnect Wallet';
+btn.setAttribute("onclick", "disconnectWallet()");
 
     getContractBalance();
 }
@@ -202,7 +204,7 @@ function disconnectWallet() {
     document.getElementById("contractBalance").innerText = "Loading...";
 
     const btn = document.querySelector("button");
-    btn.innerText = "🔗 Connect Wallet";
+    btn.innerText = "Connect Wallet";
     btn.setAttribute("onclick", "connectWallet()");
 
     alert("Wallet disconnected! Refresh the page to fully reset connection.");
