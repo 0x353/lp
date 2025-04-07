@@ -245,99 +245,6 @@ button:hover {
     box-sizing: border-box;
 }
 
-    .social-icons {
-        margin-bottom: 10px;
-    }
-
-    .social-icons a {
-    background: rgba(255, 255, 255, 0.2); /* Transparan seperti kaca */
-    border-radius: 10px; /* Agar sedikit membulat */
-    padding: 10px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: white; /* Warna ikon */
-    font-size: 15px;
-    margin: 0 5px;
-    text-decoration: none;
-    transition: transform 0.5s ease, text-shadow 0.5s ease, box-shadow 0.5s ease;
-    box-shadow: 0 0 10px rgba(0, 0, 255, 0.6); /* Cahaya biru */
-    backdrop-filter: blur(10px); /* Efek blur kaca */
-}
-
-/* Efek saat hover */
-.social-icons a:hover {
-    color: #1a88ff; /* Warna biru neon */
-    text-shadow: 0 0 10px #1a88ff, 0 0 20px #1a88ff, 0 0 30px #1a88ff; /* Glow lebih intens */
-    box-shadow: 0 0 20px rgba(0, 0, 255, 1), 0 0 30px rgba(0, 0, 255, 0.8); /* Shadow lebih terang */
-    transform: rotate(360deg); /* Efek berputar */
-}
-
-/* Mobile (480px ke bawah) */
-@media (max-width: 480px) {
-    h1 {
-        font-size: 1.8rem;
-    }
-
-    .number {
-        font-size: 2rem;
-        width: 60px;
-        height: 90px;
-    }
-
-    button {
-        font-size: 1rem;
-        padding: 8px 16px;
-    }
-
-    #container {
-        gap: 10px;
-    }
-}
-
-/* Tablet (481px - 768px) */
-@media (max-width: 768px) {
-    h1 {
-        font-size: 2.2rem;
-    }
-
-    .number {
-        font-size: 2.5rem;
-        width: 70px;
-        height: 100px;
-    }
-
-    button {
-        font-size: 1.1rem;
-        padding: 9px 18px;
-    }
-
-    #container {
-        gap: 15px;
-    }
-}
-
-/* Desktop (769px ke atas) */
-@media (min-width: 769px) {
-    h1 {
-        font-size: 3.5rem;
-    }
-
-    .number {
-        font-size: 5rem;
-        width: 100px;
-        height: 140px;
-    }
-
-    button {
-        font-size: 1.3rem;
-        padding: 12px 24px;
-    }
-
-    #container {
-        gap: 30px;
-    }
-}
     </style>
 </head>
 
@@ -391,17 +298,9 @@ button:hover {
     <p>Use this tool to get unique and unpredictable random combinations. <br><br> Every number generated is completely random and unpredictable. <br><br> Get random numbers for lottery, calculation or just for fun!</p>
     </div>
 
-    <!-- Footer -->
-       <div class="footer">
-    <div class="social-icons">
-        <a href="https://twitter.com/" target="_blank"><i class="fa-brands fa-twitter"></i></a>
-        <a href="https://t.me/" target="_blank"><i class="fa-brands fa-telegram"></i></a>
-        <a href="" target="_blank"><i class="fa-brands fa-discord"></i></a>
-        <a href="" target="_blank"><i class="fa-brands fa-facebook"></i></a>
-        <a href="" target="_blank"><i class="fa-brands fa-youtube"></i></a>
-    </div><br>
-    <p>© 2025 Powered By Lotto Chain. All rights reserved. Play responsibly.</p>
-       </div>
+    <div class="footer">
+           © Powered By Lotto Chain. 2025 All rights reserved. Play responsibly.
+    </div>
 
     <script>
     let chartNumbers;
