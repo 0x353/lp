@@ -3,117 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <title>Coming Soon</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
-      display: flex;
       height: 100vh;
-      overflow: hidden;
+      background: #0000;
+      display: flex;
       justify-content: center;
       align-items: center;
-      background: black;
+      overflow: hidden;
     }
 
-    .mommy {
-      width: 500px;
-      height: 500px;
+    .coming-soon {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 4em;
+      color: #0ff;
       position: relative;
-      perspective: 800px;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      perspective: 500px;
+      animation: flicker 3s infinite;
     }
 
-    .center-text {
+    .coming-soon::before {
+      content: "Coming Soon";
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-family: 'Orbitron', 'Courier New', monospace;
-      font-size: 36px;
-      color: cyan;
-      text-shadow: 0 0 10px cyan, 0 0 20px blue;
-      z-index: 10;
-      pointer-events: none;
+      left: 0;
+      top: 0;
+      color: #0ff;
+      transform: rotateX(15deg) rotateY(-15deg) skew(1deg, 1deg);
+      text-shadow:
+        0 0 5px #0ff,
+        0 0 10px #0ff,
+        0 0 20px #0ff,
+        0 0 40px #0ff;
+      z-index: -1;
     }
 
-    .daddy {
-      width: 500px;
-      height: 500px;
-      transform-style: preserve-3d;
-      animation: rotate 25s infinite linear;
-    }
-
-    span {
-      display: inline-block;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      perspective: 800px;
-      transform-style: preserve-3d;
-      width: 0;
-      height: 0;
-    }
-
-    span::before {
-      content: "";
-      width: 4px;
-      height: 4px;
-      display: inline-block;
-      position: absolute;
-      top: calc(50% - 2px);
-      left: calc(50% - 2px);
-      background: currentColor;
-      color: inherit;
-      border-radius: 50%;
-      animation: invertRotate 25s infinite linear, scale 2s infinite linear;
-      box-shadow: 0 0 10px currentColor;
-    }
-
-    @keyframes rotate {
-      to {
-        transform: rotateY(360deg);
+    @keyframes flicker {
+      0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        opacity: 1;
+        text-shadow:
+          0 0 5px #0ff,
+          0 0 10px #0ff,
+          0 0 20px #0ff,
+          0 0 40px #0ff;
+      }
+      20%, 24%, 55% {
+        opacity: 0.6;
+        text-shadow: none;
       }
     }
 
-    @keyframes invertRotate {
-      to {
-        transform: rotateY(-360deg);
-      }
-    }
-
-    @keyframes scale {
-      0%, 45%, 55% {
-        box-shadow: 0 0 10px 0px currentColor;
-      }
-
-      50% {
-        box-shadow: 0 0 10px 5px currentColor;
-      }
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
   </style>
 </head>
 <body>
-  <div class="mommy">
-    <div class="center-text">Coming Soon</div>
-    <div class="daddy" id="particles"></div>
-  </div>
-
-  <script>
-    const container = document.getElementById("particles");
-    const amount = 300;
-    for (let i = 1; i <= amount; i++) {
-      const theta = (i / amount) * 120;
-      const phi = (i / amount) * Math.PI;
-      const x = 250 * Math.sin(phi) * Math.cos(theta);
-      const y = 250 * Math.sin(phi) * Math.sin(theta);
-      const z = 250 * Math.cos(phi);
-
-      const span = document.createElement("span");
-      span.style.transform = `translate3d(${x}px, ${y}px, ${z}px)`;
-      const hue = (i / amount) * 360;
-      span.style.color = `hsl(${hue}, 100%, 50%)`;
-      span.innerHTML = `<span style="animation-delay: 0s, -${(i / amount) * 2}s;"></span>`;
-      container.appendChild(span);
-    }
-  </script>
+  <div class="coming-soon">Coming Soon</div>
 </body>
 </html>
