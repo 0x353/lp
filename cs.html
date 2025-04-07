@@ -41,18 +41,18 @@ body {
   transform: rotateY(40deg) rotateX(33deg) translateZ(0);
 }
 
-.layer:after {
-  font: 150px/0.65 "Pacifico", "Kaushan Script", Futura, "Roboto", "Trebuchet MS", Helvetica, sans-serif;
+.layer::after {
   content: "Coming Soon!";
-  white-space: pre;
-  text-align: center;
-  height: 100%;
-  width: 100%;
+  font: 150px/0.65 "Pacifico", "Kaushan Script", Futura, "Roboto", "Trebuchet MS", Helvetica, sans-serif;
+  white-space: nowrap;
   position: absolute;
-  top: 50px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   color: whitesmoke;
   letter-spacing: -2px;
   text-shadow: 4px 0 10px rgba(0, 0, 0, 0.13);
+  text-align: center;
 }
 
 .layer:nth-child(1):after {
