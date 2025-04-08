@@ -6,9 +6,66 @@
   <link href="img/logo.svg" rel="icon">
   <link href="img/logo.svg" rel="apple-touch-icon">
   <script src="statis/noscript3.js"></script>
+  <style>
+  #popupLotto {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #1f1f1f, #4facfe, #8f8f8f);
+    color: white;
+    padding: 40px;
+    border-radius: 24px;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.4);
+    z-index: 9999;
+    font-family: 'Segoe UI', sans-serif;
+    text-align: center;
+    animation: fadeIn 1s ease, bounce 0.5s infinite alternate;
+    max-width: 90%;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; top: 0%; }
+    to { opacity: 1; top: 20%; }
+  }
+
+  @keyframes bounce {
+    from { transform: translate(-50%, 0); }
+    to { transform: translate(-50%, 12px); }
+  }
+
+  .popup-text {
+    font-size: 1.6rem;
+    font-weight: bold;
+    animation: typing 4s steps(50, end), blink 1s infinite;
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: 3px solid white;
+    text-shadow: 0 0 10px #00f2fe, 0 0 20px #007acc;
+  }
+
+  @keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+
+  @keyframes blink {
+    0%, 100% { border-color: transparent; }
+    50% { border-color: white; }
+  }
+  </style>
 </head>
 <body>
+  <div id="popupLotto">
+  <div class="popup-text">Selamat datang di Lotto Chain! Selamat bermain & bersenang-senang. Hadiah menunggu Anda!</div>
+  </div>
   <h1>Coming Soon!</h1>
   <a href="index" class="button">Back to Home</a>
+  <script>
+  setTimeout(() => {
+    const popup = document.getElementById("popupLotto");
+    if (popup) popup.remove();
+  }, 15000); // 15 detik
+  </script>
 </body>
 </html>
