@@ -1904,15 +1904,15 @@ async function addOrUpdateComment(betId) {
         };
 
         if (saveMode) {
-            await contract.methods
-                .editComment(betId, commentIndex, commentInput.value)
-                .send(gasOptions);
-            commentInput.dataset.editing = "false";
-            commentInput.dataset.index = "";
-        } else {
-            await contract.methods
-                .addComment(betId, commentInput.value)
-                .send(gasOptions);
+    await contract.methods
+        .editComment(betId, commentIndex, commentInput.value)
+        .send(gasOptions);
+
+    disableEdit(betId);
+} else {
+    await contract.methods
+        .addComment(betId, commentInput.value)
+        .send(gasOptions);
         }
 
         commentInput.value = "";
@@ -1937,13 +1937,13 @@ function enableEdit(betId, index) {
     commentInput.dataset.index = index;
 
     // Ubah tombol "Kirim" menjadi "Simpan"
-    sendButton.innerText = "Simpan";
+    sendButton.innerText = "Save";
 
     // Jika tombol batal belum ada, tambahkan ke dalam DOM
     if (!cancelButton) {
         cancelButton = document.createElement("button");
         cancelButton.id = `cancelBtn-${betId}`;
-        cancelButton.innerText = "Batal";
+        cancelButton.innerText = "Cancel";
         cancelButton.style.marginLeft = "5px";
         cancelButton.onclick = function () {
             disableEdit(betId);
@@ -1965,7 +1965,7 @@ function disableEdit(betId) {
     delete commentInput.dataset.index;
 
     // Ubah tombol "Simpan" kembali menjadi "Kirim"
-    sendButton.innerText = "Kirim";
+    sendButton.innerText = "Send";
 
     // Hapus tombol batal jika ada
     if (cancelButton) {
