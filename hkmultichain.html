@@ -1291,6 +1291,9 @@ window.addEventListener("load", async () => {
         updateNetworkStatus();
     }
 
+    // Tambahkan ini DI DALAM event load, agar elemen sudah pasti ada
+    document.getElementById("connectWallet").addEventListener("click", connectWallet);
+
     window.ethereum.on("chainChanged", async (chainId) => {
         currentChain = Object.keys(supportedChains).find(key => supportedChains[key].chainId === chainId);
         updateNetworkStatus(currentChain);
@@ -1496,8 +1499,8 @@ async function switchToChain(chainKey) {
                             chainId: chain.chainId,
                             chainName: chain.chainName,
                             nativeCurrency: chain.currency,
-                            rpcUrls: [chain.rpcUrl],
-                            blockExplorerUrls: [chain.explorerUrl]
+                            rpcUrls: [chain.rpcUrl], // pastikan kamu tambahkan rpcUrl di supportedChains
+                            blockExplorerUrls: [chain.explorerUrl] // opsional
                         }]
                     });
                 } else {
@@ -1505,13 +1508,8 @@ async function switchToChain(chainKey) {
                 }
             }
         }
-        currentChain = chainKey;
-        contract = new web3.eth.Contract(chain.contractABI, chain.contractAddress);
-        updateNetworkStatus(currentChain);
     } catch (error) {
-        console.error(`Failed to switch to ${chain.chainName}:`, error);
-        alert(`Failed to switch to ${chain.chainName}!`);
-        updateNetworkStatus();
+        console.error("switchToChain error:", error);
     }
 }
 
