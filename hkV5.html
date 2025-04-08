@@ -1871,38 +1871,53 @@ async function addOrUpdateComment(betId) {
     }
 
     try {
-        let gasEstimate;
-        if (saveMode) {
-            // Estimasi gas untuk edit komentar
-            gasEstimate = await contract.methods.editComment(betId, commentIndex, commentInput.value).estimateGas({ from: ethereum.selectedAddress });
-        } else {
-            // Estimasi gas untuk tambah komentar
-            gasEstimate = await contract.methods.addComment(betId, commentInput.value).estimateGas({ from: ethereum.selectedAddress });
+        // Cek apakah MetaMask terinjeksi dan sudah ada akun aktif
+        if (typeof window.ethereum === "undefined") {
+            alert("MetaMask tidak terdeteksi! Harap instal MetaMask.");
+            return;
         }
 
-        // Gas options dengan buffer tambahan
+        const accounts = await ethereum.request({ method: "eth_accounts" });
+        if (!accounts || accounts.length === 0) {
+            alert("MetaMask belum terhubung. Silakan buka MetaMask dan pilih akun.");
+            return;
+        }
+
+        const walletAddress = accounts[0];
+
+        let gasEstimate;
+        if (saveMode) {
+            gasEstimate = await contract.methods
+                .editComment(betId, commentIndex, commentInput.value)
+                .estimateGas({ from: walletAddress });
+        } else {
+            gasEstimate = await contract.methods
+                .addComment(betId, commentInput.value)
+                .estimateGas({ from: walletAddress });
+        }
+
         const gasOptions = {
-            from: ethereum.selectedAddress,
-            gas: gasEstimate + 56000,  // Menambahkan buffer
+            from: walletAddress,
+            gas: gasEstimate + 56000,
             maxFeePerGas: web3.utils.toWei("0.00025", "gwei"),
-            maxPriorityFeePerGas: web3.utils.toWei("0.00023", "gwei")
+            maxPriorityFeePerGas: web3.utils.toWei("0.00023", "gwei"),
         };
 
-        // Menentukan metode yang dipanggil (edit atau tambah)
         if (saveMode) {
-            // Mode Edit Komentar
-            await contract.methods.editComment(betId, commentIndex, commentInput.value).send(gasOptions);
+            await contract.methods
+                .editComment(betId, commentIndex, commentInput.value)
+                .send(gasOptions);
             commentInput.dataset.editing = "false";
             commentInput.dataset.index = "";
         } else {
-            // Mode Tambah Komentar
-            await contract.methods.addComment(betId, commentInput.value).send(gasOptions);
+            await contract.methods
+                .addComment(betId, commentInput.value)
+                .send(gasOptions);
         }
 
-        // Kosongkan input dan reset tombol
-        commentInput.value = ""; 
-        document.getElementById(`sendBtn-${betId}`).innerText = "Kirim"; 
-        await loadComments(betId); // Refresh komentar setelah operasi
+        commentInput.value = "";
+        document.getElementById(`sendBtn-${betId}`).innerText = "Kirim";
+        await loadComments(betId);
     } catch (error) {
         console.error("Gagal menyimpan komentar:", error);
         alert("Gagal menyimpan komentar. Coba lagi nanti.");
@@ -1997,21 +2012,20 @@ async function updateCommentCount(betId) {
     }
 }
 
-// Pastikan MetaMask terhubung sebelum menggunakan fungsi-fungsi ini
 async function connectMetaMask() {
     if (typeof window.ethereum !== "undefined") {
-        try {
-            await ethereum.request({ method: "eth_requestAccounts" });
-        } catch (error) {
-            console.error("Gagal terhubung ke MetaMask:", error);
+        // Cek apakah ada akun yang sudah terhubung sebelumnya
+        const accounts = await ethereum.request({ method: "eth_accounts" });
+        if (accounts.length > 0) {
+            console.log("Akun terdeteksi:", accounts[0]);
+            // Bisa disimpan sebagai info login jika perlu
+        } else {
+            console.warn("Tidak ada akun MetaMask yang terhubung.");
         }
     } else {
         alert("MetaMask tidak terdeteksi! Harap instal MetaMask.");
     }
-}
-
-// Pastikan pengguna sudah terhubung ke MetaMask
-window.addEventListener("load", connectMetaMask);        
+}        
        
 // Modal Result
 function updateHistory(newBall1) {
