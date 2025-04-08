@@ -1880,15 +1880,15 @@ async function addOrUpdateComment(betId) {
         };
 
         if (saveMode) {
-            await contract.methods
-                .editComment(betId, commentIndex, commentInput.value)
-                .send(gasOptions);
-            commentInput.dataset.editing = "false";
-            commentInput.dataset.index = "";
-        } else {
-            await contract.methods
-                .addComment(betId, commentInput.value)
-                .send(gasOptions);
+    await contract.methods
+        .editComment(betId, commentIndex, commentInput.value)
+        .send(gasOptions);
+
+    disableEdit(betId);
+} else {
+    await contract.methods
+        .addComment(betId, commentInput.value)
+        .send(gasOptions);
         }
 
         commentInput.value = "";
