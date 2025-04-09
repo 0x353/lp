@@ -1171,6 +1171,7 @@ let contract;
 let userAccount = null;
 let userHasLiked = false;
 let likeContract;
+let previousLatestBetId = null;
 let userBetsPage = 0;
 let betHistoryPage = 0;
 const pageSize = 10;
@@ -1685,6 +1686,22 @@ function nextBetHistory() {
     betHistoryPage++;
     loadBetHistory();
 }
+
+// Auto Refresh Bet History
+async function autoRefreshBetHistory() {
+    const bets = await contract.methods.getAllBets().call();
+    const latestBet = bets[bets.length - 1];
+
+    if (!previousLatestBetId || latestBet.betId !== previousLatestBetId) {
+        previousLatestBetId = latestBet.betId;
+        loadBetHistory();
+    }
+}
+
+// Jalankan pertama kali untuk inisialisasi betId
+loadBetHistory().then(() => {
+    setInterval(autoRefreshBetHistory, 2000); // Cek setiap 5 detik
+});
 
 // Like Function
 async function toggleLike(betId) {
