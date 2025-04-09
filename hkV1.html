@@ -854,8 +854,8 @@ textarea:focus {
   to { transform: rotate(360deg); }
 }
 
-.refresh-icon:hover {
-  animation: spin 1s linear infinite;
+.refresh-icon.spin-once {
+  animation: spin 2s linear;
 }
     </style>
 </head>
@@ -932,9 +932,8 @@ textarea:focus {
        <button onclick="window.open('search', '_blank')"><img src="img/search.svg" alt="Lotto" style="width: 15px; height: 15px;">  Search...</button><br><br>
        <hr style="background-color: #333333; height: 1px; border: none;">
        <div id="betHistoryContainer" style="position: relative;">
-    <button style="display: flex; align-items: center; gap: 8px;">
-  <img src="img/refresh.svg" alt="Refresh" class="refresh-icon" style="width: 16px; height: 16px;" />
-  <span>Refresh</span>
+    <button id="refreshButton">
+  <img src="img/refresh.svg" class="refresh-icon" />
     </button>
     <div id="betHistory" style="padding-top: 30px;"></div>
        </div>
@@ -2220,11 +2219,6 @@ window.onload = async () => {
     } catch (error) {
         console.error("Gagal memuat komentar saat halaman dimuat:", error);
     }
-
-    document.querySelector(".refresh-icon").addEventListener("click", function() {
-    this.classList.add("clicked");
-    setTimeout(() => this.classList.remove("clicked"), 1000);
-});
 };
     </script>
        
