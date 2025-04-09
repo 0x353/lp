@@ -846,6 +846,21 @@ textarea:focus {
     position: relative;
 }
 
+#refreshButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.refresh-icon {
+  width: 20px;
+  height: 20px;
+}
+
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -929,10 +944,10 @@ textarea:focus {
        <button onclick="window.open('search', '_blank')"><img src="img/search.svg" alt="Lotto" style="width: 15px; height: 15px;">  Search...</button><br><br>
        <hr style="background-color: #333333; height: 1px; border: none;">
        <div id="betHistoryContainer" style="position: relative;">
-    <button id="refreshButton">
-  <img src="img/refresh.svg" class="refresh-icon"/>
-    </button>
-    <div id="betHistory" style="padding-top: 30px;"></div>
+  <button id="refreshButton">
+    <img src="img/refresh.svg" class="refresh-icon" />
+  </button>
+  <div id="betHistory" style="padding-top: 30px;"></div>
        </div>
 </div>
 <div class="button-container">
