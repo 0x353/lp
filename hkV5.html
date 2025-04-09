@@ -1349,6 +1349,7 @@ async function connectWallet() {
             const message = `Verifying user Connect To Lotto Chain HK Play & Win!\nWallet: ${userAccount}\nTime: ${timestamp}`;
             const signature = await web3.eth.personal.sign(message, userAccount, "");
             console.log("Signature:", signature);
+            showWelcomePopup();
 
             contract = new web3.eth.Contract(contractABI, contractAddress);
 
@@ -2108,14 +2109,14 @@ function closeLikeModal(betId) {
 }
 
 // Popup Messages
- document.addEventListener("DOMContentLoaded", function () {
-    const popupSound = new Audio("https://www.myinstants.com/media/sounds/pop-up-off.mp3");
+ function showWelcomePopup() {
+  const popupSound = new Audio("https://www.myinstants.com/media/sounds/pop-up-off.mp3");
 
-    const popupDiv = document.createElement("div");
-    popupDiv.id = "popupLotto";
-    popupDiv.innerHTML = `
-      <div class="popup-text">Welcome to Lotto Chain! Decentralized Betting, Have fun and enjoy playing!</div>
-    `;
+  const popupDiv = document.createElement("div");
+  popupDiv.id = "popupLotto";
+  popupDiv.innerHTML = `
+    <div class="popup-text">Welcome to Lotto Chain! Decentralized Betting, Have fun and enjoy playing!</div>
+  `;
 
     const style = document.createElement("style");
     style.textContent = `
@@ -2192,16 +2193,16 @@ function closeLikeModal(betId) {
     `;
 
     document.head.appendChild(style);
-    document.body.appendChild(popupDiv);
+  document.body.appendChild(popupDiv);
 
-    popupSound.play().catch(() => {
-      console.log("Popup sound not allowed without user interaction.");
-    });
-
-    setTimeout(() => {
-      popupDiv.remove();
-    }, 11000);
+  popupSound.play().catch(() => {
+    console.log("Popup sound not allowed without user interaction.");
   });
+
+  setTimeout(() => {
+    popupDiv.remove();
+  }, 11000);
+ }
       
 // Initialize saat halaman terbuka
 window.onload = async () => {
