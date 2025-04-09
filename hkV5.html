@@ -876,18 +876,13 @@ textarea:focus {
     position: relative;
 }
 
-    display: none;
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-#betHistoryContainer {
-    background-color: #000000;
-    padding: 15px;
-    border-radius: 10px;
-    max-width: 650px;
-    height: 300px; /* Sesuaikan tinggi */
-    overflow-y: auto; /* Biar bisa discroll */
-    margin: auto;
-    box-shadow: 0px 4px 10px rgba(0, 0, 255, 0.5); /* Efek 3D shadow biru yang smooth */
+.refresh-icon.spin-once {
+  animation: spin 2s linear;
 }
     </style>
 </head>
@@ -963,9 +958,12 @@ textarea:focus {
        <h2>Public Bet History</h2>
        <button onclick="window.open('search', '_blank')"><img src="img/search.svg" alt="Lotto" style="width: 15px; height: 15px;">  Search...</button><br><br>
        <hr style="background-color: #333333; height: 1px; border: none;">
-       <div id="betHistoryContainer">
-    <div id="betHistory"></div>
-</div>
+       <div id="betHistoryContainer" style="position: relative;">
+  <button id="refreshButton" style="position: absolute; top: 0; right: 0; background: #000000; border: none; cursor: pointer;">
+    <img src="img/refresh.svg" class="refresh-icon" style="width: 15px; height: 15px;" />
+  </button>
+  <div id="betHistory" style="padding-top: 30px;"></div>
+       </div>
 <div class="button-container">
     <button class="nav-button" onclick="prevBetHistory()">Prev</button>
     <button class="nav-button" onclick="nextBetHistory()">Next</button>
@@ -1589,6 +1587,7 @@ function nextUserBets() {
         
 // **Load Bet History (with Pagination)**
 async function loadBetHistory() {
+    const refreshIcon = document.querySelector("button img[alt='Refresh']");
     const bets = await contract.methods.getAllBets().call();
     const reversedBets = bets.slice().reverse(); // Urutkan dari terbaru
 
@@ -2245,6 +2244,20 @@ window.onload = async () => {
     } catch (error) {
         console.error("Gagal memuat komentar saat halaman dimuat:", error);
     }
+
+    document.getElementById("refreshButton").addEventListener("click", function () {
+  const icon = this.querySelector(".refresh-icon");
+
+  // Reset animasi supaya bisa diulang
+  icon.classList.remove("spin-once");
+  void icon.offsetWidth; // paksa reflow
+  icon.classList.add("spin-once");
+
+  // Tunggu animasi selesai, lalu reload konten bet history
+  setTimeout(() => {
+    loadBetHistory();
+  }, 2000);
+});
 };
     </script>
        
