@@ -957,7 +957,7 @@ textarea:focus {
         <input type="number" id="betTimes" placeholder="x1 / x99" min="1" max="99" oninput="validateBetTimes(); updateBetPrice()">
         <p id="betWarning" style="color: red;"></p>
         <p id="betPrice" style="color: #00FF66; font-weight: bold;">Cost: 0.000000 ETH</p>
-        <button onclick="placeBet()">Place Bet</button>
+        <button onclick="placeBet()">Submit Ticket</button>
         <p id="betStatus"></p>
        <br>
        <h2>Public Bet History</h2>
@@ -1001,8 +1001,8 @@ textarea:focus {
 
 <div id="menu">
     <button onclick="openModal('menuModal')"><img src="img/pools.svg" alt="Lotto">Pools</button>
-    <button onclick="window.open('4d', '_blank')"><img src="img/tools.svg" alt="Lotto">Tool</button>
-    <button onclick="openModal('myModal')"><img src="img/mybet.svg" alt="Lotto">MyBets</button>
+    <button onclick="window.open('4d', '_blank')"><img src="img/tools.svg" alt="Lotto">Tools</button>
+    <button onclick="openModal('myModal')"><img src="img/mybet.svg" alt="Lotto">Ticket</button>
     <button onclick="openModal('resultModal')"><img src="img/results.svg" alt="Lotto"> Results</button>
     <button onclick="window.open('claim', '_blank')"><img src="img/claim.svg" alt="Lotto" style="width: 28px; height: 28px;">Claim</button>
 </div> <!-- Penutupan <div> harus ada di sini -->
@@ -1467,7 +1467,7 @@ async function placeBet() {
     try {
         document.getElementById("betStatus").innerHTML = `
             <img src="img/load.svg" width="20" height="20" style="vertical-align: middle;">
-            <span style="color: #aaffaa; font-size: 12px;">Transaction in progress...</span>
+            <span style="color: #aaffaa; font-size: 12px;">Your ticket transaction is in progress...</span>
         `;
 
         // Estimasi gas sebelum transaksi
@@ -1483,12 +1483,12 @@ async function placeBet() {
 
         document.getElementById("betStatus").innerHTML = `
             <img src="img/success.svg" width="20" height="20" style="vertical-align: middle;">
-            <span style="color: #00cc00; font-size: 12px;">Bet placed successfully!</span>
+            <span style="color: #00cc00; font-size: 12px;">Your ticket has been submitted successfully! Please check it under your "Tickets".</span>
         `;
 
         setTimeout(() => {
             document.getElementById("betStatus").innerHTML = "";
-        }, 5000);
+        }, 7000);
 
         loadUserBets();
     } catch (error) {
@@ -1496,12 +1496,12 @@ async function placeBet() {
 
         document.getElementById("betStatus").innerHTML = `
             <img src="img/failed.svg" width="20" height="20" style="vertical-align: middle;">
-            <span style="color: #ff3333; font-size: 12px;">Transaction failed!</span>
+            <span style="color: #ff3333; font-size: 12px;">Failed to submit Your ticket. Please try again</span>
         `;
 
         setTimeout(() => {
             document.getElementById("betStatus").innerHTML = "";
-        }, 4000);
+        }, 5000);
     }
 }
 
