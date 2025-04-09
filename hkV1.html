@@ -1571,13 +1571,11 @@ function nextUserBets() {
     userBetsPage++;
     loadUserBets();
 }
-
-async function loadBetHistory() {
-    const refreshIcon = document.querySelector("button img[alt='Refresh']");
-    if (refreshIcon) refreshIcon.style.animation = "spin 1s linear infinite";
         
 // **Load Bet History (with Pagination)**
 async function loadBetHistory() {
+    const refreshIcon = document.querySelector("button img[alt='Refresh']");
+    if (refreshIcon) refreshIcon.style.animation = "spin 1s linear infinite";
     const bets = await contract.methods.getAllBets().call();
     const reversedBets = bets.slice().reverse(); // Urutkan dari terbaru
 
@@ -1662,6 +1660,8 @@ async function loadBetHistory() {
         let bet = filteredBets[i];
         await updateLikeStatus(bet.betId);
     }
+
+    if (refreshIcon) refreshIcon.style.animation = "";
 }
         
 // **Bet History Pagination**
@@ -1675,9 +1675,6 @@ function prevBetHistory() {
 function nextBetHistory() {
     betHistoryPage++;
     loadBetHistory();
-}
-
-if (refreshIcon) refreshIcon.style.animation = "";
 }
 
 // Like Function
