@@ -930,7 +930,7 @@ textarea:focus {
        <hr style="background-color: #333333; height: 1px; border: none;">
        <div id="betHistoryContainer" style="position: relative;">
     <button id="refreshButton">
-  <img src="img/refresh.svg" class="refresh-icon" />
+  <img src="img/refresh.svg" class="refresh-icon" alt="Refresh" />
     </button>
     <div id="betHistory" style="padding-top: 30px;"></div>
        </div>
@@ -2220,14 +2220,15 @@ window.onload = async () => {
     document.getElementById("refreshButton").addEventListener("click", function () {
   const icon = this.querySelector(".refresh-icon");
 
+  // Reset animasi supaya bisa diulang
   icon.classList.remove("spin-once");
-  void icon.offsetWidth;
+  void icon.offsetWidth; // paksa reflow
   icon.classList.add("spin-once");
 
-  // Setelah 2 detik, refresh halaman
+  // Tunggu animasi selesai, lalu reload konten bet history
   setTimeout(() => {
-    location.reload();
-  }, 2000); // waktu harus sama dengan durasi animasi
+    loadBetHistory();
+  }, 2000);
 });
 };
     </script>
