@@ -1,5 +1,4 @@
-const style = document.createElement("style");
-style.innerHTML = `
+
   body {
     font-family: 'Ubuntu', sans-serif;
     font-weight: bold;
@@ -820,5 +819,3 @@ textarea:focus {
 .refresh-icon.spin-once {
   animation: spin 2s linear;
 }
-`;
-document.head.appendChild(style);
