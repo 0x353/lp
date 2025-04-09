@@ -1843,14 +1843,14 @@ function loadComments(betId, limit = 10) {
         if (comments.length > limit) {
             commentHtml += `<button onclick="loadComments('${betId}', ${limit + 10})" 
     style="background-color: rgba(0, 123, 255, 0.5);">
-    Lihat lebih banyak
+    See more
 </button>`;
         }
 
         document.getElementById(`commentList-${betId}`).innerHTML = commentHtml;
         updateCommentCount(betId);
     }).catch((error) => {
-        console.error("Gagal memuat komentar:", error);
+        console.error("Failed to load comments:", error);
     });
 }
 
@@ -1866,20 +1866,20 @@ async function addOrUpdateComment(betId) {
     let commentIndex = commentInput.dataset.index;
 
     if (!commentInput.value.trim()) {
-        alert("Komentar tidak boleh kosong!");
+        alert("Comments cannot be empty!");
         return;
     }
 
     try {
         // Cek apakah MetaMask terinjeksi dan sudah ada akun aktif
         if (typeof window.ethereum === "undefined") {
-            alert("MetaMask tidak terdeteksi! Harap instal MetaMask.");
+            alert("MetaMask not detected! Please install MetaMask.");
             return;
         }
 
         const accounts = await ethereum.request({ method: "eth_accounts" });
         if (!accounts || accounts.length === 0) {
-            alert("MetaMask belum terhubung. Silakan buka MetaMask dan pilih akun.");
+            alert("MetaMask is not connected. Please open MetaMask and select an account.");
             return;
         }
 
@@ -1919,8 +1919,8 @@ async function addOrUpdateComment(betId) {
         document.getElementById(`sendBtn-${betId}`).innerText = "Kirim";
         await loadComments(betId);
     } catch (error) {
-        console.error("Gagal menyimpan komentar:", error);
-        alert("Gagal menyimpan komentar. Coba lagi nanti.");
+        console.error("Failed to save comment:", error);
+        alert("Failed to save comment. Please try again later!");
     }
 }
 
@@ -1974,7 +1974,7 @@ function disableEdit(betId) {
 }
 
 async function deleteComment(betId, index) {
-    if (!confirm("Apakah Anda yakin ingin menghapus komentar ini?")) return;
+    if (!confirm("Are you sure you want to delete this comment?")) return;
 
     try {
         // Estimasi gas untuk transaksi penghapusan komentar
@@ -1997,8 +1997,8 @@ async function deleteComment(betId, index) {
         // Refresh daftar komentar setelah transaksi sukses
         await loadComments(betId); 
     } catch (error) {
-        console.error("Gagal menghapus komentar:", error);
-        alert("Gagal menghapus komentar. Coba lagi.");
+        console.error("Failed to delete comment:", error);
+        alert("Failed to delete comment. Try again!");
     }
 }
         
@@ -2008,7 +2008,7 @@ async function updateCommentCount(betId) {
         const count = await contract.methods.commentCount(betId).call();
         document.getElementById(`commentCount-${betId}`).innerText = count;
     } catch (error) {
-        console.error(`Gagal mengambil jumlah komentar untuk ${betId}:`, error);
+        console.error(`Failed to fetch comment count for ${betId}:`, error);
     }
 }
 
@@ -2017,13 +2017,13 @@ async function connectMetaMask() {
         // Cek apakah ada akun yang sudah terhubung sebelumnya
         const accounts = await ethereum.request({ method: "eth_accounts" });
         if (accounts.length > 0) {
-            console.log("Akun terdeteksi:", accounts[0]);
+            console.log("Account detected:", accounts[0]);
             // Bisa disimpan sebagai info login jika perlu
         } else {
-            console.warn("Tidak ada akun MetaMask yang terhubung.");
+            console.warn("There are no MetaMask accounts connected.");
         }
     } else {
-        alert("MetaMask tidak terdeteksi! Harap instal MetaMask.");
+        alert("MetaMask not detected! Please install MetaMask.");
     }
 }        
        
@@ -2107,7 +2107,83 @@ function closeLikeModal(betId) {
     if (modal) modal.style.display = "none";
 }
 
-// Comment Modal
+// Popup Messages
+document.addEventListener("DOMContentLoaded", function () {
+    const popupSound = new Audio("https://www.myinstants.com/media/sounds/pop-up-off.mp3");
+
+    const popupDiv = document.createElement("div");
+    popupDiv.id = "popupLotto";
+    popupDiv.innerHTML = `
+      <div class="popup-text">Welcome to Lotto Chain! Decentralized Betting, Have fun and enjoy playing!</div>
+    `;
+
+    const style = document.createElement("style");
+    style.textContent = `
+      #popupLotto {
+        position: fixed;
+        top: 20%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(90deg, #000000, #02024c, #4b4b4b);
+        color: white;
+        padding: 40px;
+        border-radius: 24px;
+        box-shadow: 0 0 40px rgba(0, 255, 255, 0.6), 0 0 80px rgba(0, 128, 255, 0.4);
+        z-index: 9999;
+        font-family: 'Ubuntu', sans-serif;
+        text-align: center;
+        animation: fadeIn 1s ease, bounce 0.5s infinite alternate;
+        max-width: 90%;
+        transition: all 0.3s ease;
+      }
+
+      #popupLotto:hover {
+        box-shadow: 0 0 60px rgba(0, 255, 255, 0.8), 0 0 100px rgba(0, 128, 255, 0.6), 0 0 20px rgba(0, 255, 200, 0.5);
+        transform: translateX(-50%) scale(1.03);
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; top: 0%; }
+        to { opacity: 1; top: 20%; }
+      }
+
+      @keyframes bounce {
+        from { transform: translate(-50%, 0); }
+        to { transform: translate(-50%, 12px); }
+      }
+
+      .popup-text {
+        font-size: 1.6rem;
+        font-weight: bold;
+        animation: typing 4s steps(50, end), blink 1s infinite;
+        white-space: nowrap;
+        overflow: hidden;
+        border-right: 3px solid white;
+        text-shadow: 0 0 10px #00f2fe, 0 0 20px #007acc;
+      }
+
+      @keyframes typing {
+        from { width: 0; }
+        to { width: 100%; }
+      }
+
+      @keyframes blink {
+        0%, 100% { border-color: transparent; }
+        50% { border-color: white; }
+      }
+    `;
+
+    document.head.appendChild(style);
+    document.body.appendChild(popupDiv);
+
+    popupSound.play().catch(() => {
+      console.log("Popup sound not allowed without user interaction.");
+    });
+
+    setTimeout(() => {
+      popupDiv.remove();
+    }, 11000);
+  });
       
 // Initialize saat halaman terbuka
 window.onload = async () => {
