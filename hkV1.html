@@ -2219,15 +2219,15 @@ window.onload = async () => {
 
     document.getElementById("refreshButton").addEventListener("click", function () {
   const icon = this.querySelector(".refresh-icon");
-  
-  // Hapus dulu jika sudah ada kelas animasi
+
   icon.classList.remove("spin-once");
-
-  // Paksa reflow agar animasi bisa diulang
   void icon.offsetWidth;
-
-  // Tambahkan kelas animasi
   icon.classList.add("spin-once");
+
+  // Setelah 2 detik, refresh halaman
+  setTimeout(() => {
+    location.reload();
+  }, 2000); // waktu harus sama dengan durasi animasi
 });
 };
     </script>
