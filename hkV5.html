@@ -2120,22 +2120,25 @@ document.addEventListener("DOMContentLoaded", function () {
     const style = document.createElement("style");
     style.textContent = `
       #popupLotto {
-        position: fixed;
-        top: 20%;
-        left: 50%;
-        transform: translateX(-50%);
-        background: linear-gradient(90deg, #000000, #02024c, #4b4b4b);
-        color: white;
-        padding: 40px;
-        border-radius: 24px;
-        box-shadow: 0 0 40px rgba(0, 255, 255, 0.6), 0 0 80px rgba(0, 128, 255, 0.4);
-        z-index: 9999;
-        font-family: 'Ubuntu', sans-serif;
-        text-align: center;
-        animation: fadeIn 1s ease, bounce 0.5s infinite alternate;
-        max-width: 90%;
-        transition: all 0.3s ease;
-      }
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, #000000, #02024c, #4b4b4b);
+  color: white;
+  padding: 20px; /* lebih kecil supaya muat di HP */
+  border-radius: 16px;
+  box-shadow: 0 0 40px rgba(0, 255, 255, 0.6), 0 0 80px rgba(0, 128, 255, 0.4);
+  z-index: 9999;
+  font-family: 'Ubuntu', sans-serif;
+  text-align: center;
+  animation: fadeIn 1s ease, bounce 0.5s infinite alternate;
+  width: 90%;
+  max-width: 1000px;
+  transition: all 0.3s ease;
+  box-sizing: border-box; 
+
+}
 
       #popupLotto:hover {
         box-shadow: 0 0 60px rgba(0, 255, 255, 0.8), 0 0 100px rgba(0, 128, 255, 0.6), 0 0 20px rgba(0, 255, 200, 0.5);
