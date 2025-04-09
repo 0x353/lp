@@ -864,6 +864,10 @@ textarea:focus {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
+
+.refresh-icon:hover {
+    animation: spin 1s linear infinite;
+}
     </style>
 </head>
 <body>
@@ -941,7 +945,7 @@ textarea:focus {
        <div id="betHistoryContainer" style="position: relative;">
     <button onclick="loadBetHistory()" 
         style="position: absolute; top: 0; right: 0; background: transparent; border: none; cursor: pointer;">
-        <img src="img/refresh.svg" alt="Refresh" style="width: 20px; height: 20px;">
+        <img src="img/refresh.svg" alt="Refresh" class="refresh-icon" />
     </button>
     <div id="betHistory" style="padding-top: 30px;"></div>
        </div>
@@ -1660,8 +1664,6 @@ async function loadBetHistory() {
         let bet = filteredBets[i];
         await updateLikeStatus(bet.betId);
     }
-
-    if (refreshIcon) refreshIcon.style.animation = "";
 }
         
 // **Bet History Pagination**
