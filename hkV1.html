@@ -846,24 +846,6 @@ textarea:focus {
     position: relative;
 }
 
-#refreshButton {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 5px;
-  display: inline-block;
-  z-index: 10;
-}
-
-.refresh-icon {
-  width: 15px;
-  height: 15px;
-  display: block; /* ini penting agar gambar tidak ada margin default */
-}
-
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -947,10 +929,11 @@ textarea:focus {
        <button onclick="window.open('search', '_blank')"><img src="img/search.svg" alt="Lotto" style="width: 15px; height: 15px;">  Search...</button><br><br>
        <hr style="background-color: #333333; height: 1px; border: none;">
        <div id="betHistoryContainer" style="position: relative;">
-  <button id="refreshButton">
-    <img src="img/refresh.svg" class="refresh-icon" />
-  </button>
-  <div id="betHistory" style="padding-top: 30px;"></div>
+    <button onclick="loadBetHistory()" 
+        style="position: absolute; top: 0; right: 0; background: transparent; border: none; cursor: pointer;">
+        <img src="img/refresh.svg" alt="Refresh" style="width: 20px; height: 20px;">
+    </button>
+    <div id="betHistory" style="padding-top: 30px;"></div>
        </div>
 </div>
 <div class="button-container">
