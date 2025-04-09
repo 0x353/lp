@@ -1579,7 +1579,6 @@ function nextUserBets() {
 // **Load Bet History (with Pagination)**
 async function loadBetHistory() {
     const refreshIcon = document.querySelector("button img[alt='Refresh']");
-    if (refreshIcon) refreshIcon.style.animation = "spin 1s linear infinite";
     const bets = await contract.methods.getAllBets().call();
     const reversedBets = bets.slice().reverse(); // Urutkan dari terbaru
 
