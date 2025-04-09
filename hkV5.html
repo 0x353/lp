@@ -1917,7 +1917,7 @@ async function addOrUpdateComment(betId) {
         }
 
         commentInput.value = "";
-        document.getElementById(`sendBtn-${betId}`).innerText = "Kirim";
+        document.getElementById(`sendBtn-${betId}`).innerText = "Send";
         await loadComments(betId);
     } catch (error) {
         console.error("Failed to save comment:", error);
