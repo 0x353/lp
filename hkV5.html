@@ -2108,7 +2108,7 @@ function closeLikeModal(betId) {
 }
 
 // Popup Messages
-document.addEventListener("DOMContentLoaded", function () {
+ document.addEventListener("DOMContentLoaded", function () {
     const popupSound = new Audio("https://www.myinstants.com/media/sounds/pop-up-off.mp3");
 
     const popupDiv = document.createElement("div");
@@ -2120,39 +2120,28 @@ document.addEventListener("DOMContentLoaded", function () {
     const style = document.createElement("style");
     style.textContent = `
       #popupLotto {
-  position: fixed;
-  top: 10%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: linear-gradient(90deg, #000000, #02024c, #4b4b4b);
-  color: white;
-  padding: 20px; /* lebih kecil supaya muat di HP */
-  border-radius: 16px;
-  box-shadow: 0 0 40px rgba(0, 255, 255, 0.6), 0 0 80px rgba(0, 128, 255, 0.4);
-  z-index: 9999;
-  font-family: 'Ubuntu', sans-serif;
-  text-align: center;
-  animation: fadeIn 1s ease, bounce 0.5s infinite alternate;
-  width: 90%;
-  max-width: 1000px;
-  transition: all 0.3s ease;
-  box-sizing: border-box; 
-
-}
+        position: fixed;
+        top: 10%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(90deg, #000000, #02024c, #4b4b4b);
+        color: white;
+        padding: 20px;
+        border-radius: 16px;
+        box-shadow: 0 0 40px rgba(0, 255, 255, 0.6), 0 0 80px rgba(0, 128, 255, 0.4);
+        z-index: 9999;
+        font-family: 'Ubuntu', sans-serif;
+        text-align: center;
+        animation: fadeIn 1s ease, bounce 0.5s infinite alternate;
+        width: 90%;
+        max-width: 1000px;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+      }
 
       #popupLotto:hover {
         box-shadow: 0 0 60px rgba(0, 255, 255, 0.8), 0 0 100px rgba(0, 128, 255, 0.6), 0 0 20px rgba(0, 255, 200, 0.5);
         transform: translateX(-50%) scale(1.03);
-      }
-
-      @keyframes fadeIn {
-        from { opacity: 0; top: 0%; }
-        to { opacity: 1; top: 20%; }
-      }
-
-      @keyframes bounce {
-        from { transform: translate(-50%, 0); }
-        to { transform: translate(-50%, 12px); }
       }
 
       .popup-text {
@@ -2165,6 +2154,16 @@ document.addEventListener("DOMContentLoaded", function () {
         text-shadow: 0 0 10px #00f2fe, 0 0 20px #007acc;
       }
 
+      @keyframes fadeIn {
+        from { opacity: 0; top: 0%; }
+        to { opacity: 1; top: 10%; }
+      }
+
+      @keyframes bounce {
+        from { transform: translate(-50%, 0); }
+        to { transform: translate(-50%, 12px); }
+      }
+
       @keyframes typing {
         from { width: 0; }
         to { width: 100%; }
@@ -2173,6 +2172,22 @@ document.addEventListener("DOMContentLoaded", function () {
       @keyframes blink {
         0%, 100% { border-color: transparent; }
         50% { border-color: white; }
+      }
+
+      /* Responsive adjustment for small screens */
+      @media (max-width: 480px) {
+        #popupLotto {
+          padding: 16px;
+          top: 8%;
+          border-radius: 12px;
+          width: 95%;
+        }
+
+        .popup-text {
+          font-size: 1rem;
+          border-right: 2px solid white;
+          animation: typing 4s steps(35, end), blink 1s step-end infinite;
+        }
       }
     `;
 
