@@ -850,12 +850,12 @@ textarea:focus {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
-.refresh-icon.spin-once {
-  animation: spin 2s linear;
+.refresh-icon:hover {
+    animation: spin 2s linear;
 }
     </style>
 </head>
@@ -932,8 +932,8 @@ textarea:focus {
        <button onclick="window.open('search', '_blank')"><img src="img/search.svg" alt="Lotto" style="width: 15px; height: 15px;">  Search...</button><br><br>
        <hr style="background-color: #333333; height: 1px; border: none;">
        <div id="betHistoryContainer" style="position: relative;">
-    <button id="refreshButton">
-  <img src="img/refresh.svg" class="refresh-icon" />
+    <button>
+  <img src="img/refresh.svg" alt="Refresh" class="refresh-icon" />
     </button>
     <div id="betHistory" style="padding-top: 30px;"></div>
        </div>
