@@ -15,11 +15,11 @@ document.getElementById("noScript").innerHTML = `
     </div>
     <div class="hamburger" onclick="toggleMenu()">&#9776;</div>
     <ul class="nav-links" id="navMenu">
-        <a href="#features">4D Pools</a>
-        <a href="#prizes">Prizes</a>
-        <a href="lottery">LottoBalls (LB)</a>
-        <a href="hk">Hong Kong (HK)</a>
-        <a href="syd">Sydney (SYD)</a>
+        <li><a href="#features">4D Pools</a></li>
+        <li><a href="#prizes">Prizes</a></li>
+        <li><a href="lottery">LottoBalls (LB)</a></li>
+        <li><a href="hk">Hong Kong (HK)</a></li>
+        <li><a href="syd">Sydney (SYD)</a></li>
     </ul>
 </nav>
     
@@ -28,19 +28,16 @@ document.getElementById("noScript").innerHTML = `
         <h3>Lotto Chain Decentralizer Betting</h3>
         <br>
 
-       <!-- Notifikasi Popup -->
 <div id="notificationPopup" class="popup hidden" role="alert">
     <button id="closePopup" onclick="closePopup()">×</button>
     <p id="notificationMessage"></p>
 </div>
 
-<!-- Ikon Notifikasi -->
 <div id="notificationIcon" onclick="toggleNotificationList()">
     <img src="img/bell.svg" alt="Notifications">
     <span id="notificationBadge" class="hidden"></span>
 </div>
 
-<!-- Daftar Notifikasi -->
 <div id="notificationList" class="hidden">
     <div class="notification-header">
         <p>Notifications</p>
@@ -164,14 +161,14 @@ document.getElementById("noScript").innerHTML = `
         <span class="close" onclick="closeModal('resultModal')">&times;</span>
         <h2>Hong Kong (HK) Results Today</h2>
         <br>
-        <!-- Tabel Utama (Empat Ball Utama) -->
+
         <table class="lottery-table">
             <thead>
                 <tr>
                     <th style="color: #ffffff;">4D</th>
                     <th style="color: #ffffff;">3D</th>
                     <th style="color: #ffffff;">2D></th>
-                    <th style="color: #ffffff;"><2D</th>
+                    <th style="color: #ffffff;">2D</th>
                 </tr>
             </thead>
             <tbody>
@@ -194,7 +191,7 @@ document.getElementById("noScript").innerHTML = `
                     <th style="color: #ffffff;">4D</th>
                     <th style="color: #ffffff;">3D</th>
                     <th style="color: #ffffff;">2D></th>
-                    <th style="color: #ffffff;"><2D</th>
+                    <th style="color: #ffffff;">2D</th>
                 </tr>
             </thead>
             <tbody id="historyBody">
