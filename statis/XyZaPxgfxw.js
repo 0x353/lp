@@ -256,11 +256,14 @@ footer {
 .modal-content {
     background: #111;
     color: white;
-    margin: 5% auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     padding: 20px;
     width: 80%;
     max-width: 900px;
-    max-height: 90vh;
+    max-height: 85vh;
     overflow-y: auto;
     border-radius: 10px;
     text-align: center;
