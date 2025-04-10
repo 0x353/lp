@@ -7,7 +7,7 @@ let contract;
 let userAccount = null;
 let userHasLiked = false;
 let likeContract;
-let userBetsPage = 3;
+let userBetsPage = 0;
 let betHistoryPage = 0;
 const pageSize = 10;
 const SEPOLIA_BASE_CHAIN_ID = "0x14a34";
