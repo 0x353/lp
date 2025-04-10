@@ -176,8 +176,7 @@ button:not(#closePopup):active::after {
     text-align: justify;
     hyphens: auto;
     line-height: 1.8;
-    max-width: 1000px;
-    width: 100%;
+    max-width: 650px;
     margin: auto;
     padding: 15px;
     text-indent: 20px;
@@ -189,7 +188,6 @@ button:not(#closePopup):active::after {
     hyphens: auto;
     line-height: 1.8;
     max-width: 600px;
-    width: 100%;
     margin: auto;
     padding: 15px;
     text-indent: 20px;
