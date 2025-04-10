@@ -260,7 +260,7 @@ footer {
     border-radius: 10px;
     width: 90%;
     max-width: 600px;
-    max-height: 70vh;
+    max-height: 30vh;
     overflow-y: auto;
     position: relative;
 }
