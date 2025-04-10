@@ -37,6 +37,15 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+#preloader {
+    transition: opacity 0.5s ease;
+}
+
+#preloader.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
     </style>
 </head>
 <body>
@@ -76,9 +85,14 @@
 
     <script>
     window.addEventListener("load", function () {
-        const preloader = document.getElementById("preloader");
-        preloader.style.display = "none";
-    });
+    const preloader = document.getElementById("preloader");
+    if (preloader) {
+        preloader.classList.add("fade-out");
+        setTimeout(() => {
+            preloader.style.display = "none";
+        }, 500); // match dengan durasi transition
+    }
+});
     </script>
         
     <script src="statis/oXjfHalTdXx.js"></script>
