@@ -6,10 +6,33 @@
   <link href="img/logo.svg" rel="icon">
   <link href="img/logo.svg" rel="apple-touch-icon">
   <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
-  <script src="statis/noscript3.js"></script>
+  <script src="statis/noscrip3.js"></script>
 </head>
 <body>
   <h1>Coming Soon!</h1>
   <a href="index" class="button">Back to Home</a>
+<script>
+  /**
+ * @param {string} str
+ * @param {number} step
+ * @return {?}
+ */
+function chunkData(str, step) {
+  /** @type {Array} */
+  var colNames = [];
+  var len = str.length;
+  /** @type {number} */
+  var i = 0;
+  for (;i < len;i += step) {
+    if (i + step < len) {
+      colNames.push(str.substring(i, i + step));
+    } else {
+      colNames.push(str.substring(i, len));
+    }
+  }
+  return colNames;
+}
+;
+</script>
 </body>
 </html>
