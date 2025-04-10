@@ -21,11 +21,6 @@ document.getElementById("xGxYxyz").innerHTML = `
     </ul>
 </nav>
 
-<div class="container">
-    <h1>HK Bet DApp</h1>
-    <h3>Lotto Chain Decentralizer Betting</h3>
-    <br>
-
     <div id="notificationPopup" class="popup hidden" role="alert">
         <button id="closePopup" onclick="closePopup()">×</button>
         <p id="notificationMessage"></p>
