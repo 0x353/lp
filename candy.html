@@ -2,155 +2,123 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Candy Crush Pro</title>
+  <title>Candy Slot</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    canvas {
-      border: 2px solid #444;
-      display: block;
-      margin: 20px auto;
-      background-color: #111;
+    @keyframes drop {
+      0% { transform: translateY(-100px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
     }
-    body {
-      font-family: sans-serif;
-      background: #222;
-      color: white;
-      text-align: center;
+    .coin {
+      animation: drop 1s ease-out;
     }
   </style>
 </head>
-<body>
-  <h1>Candy Crush Pro Clone</h1>
-  <canvas id="game" width="480" height="480"></canvas>
-  <p id="score">Score: 0</p>  <script>
-    const canvas = document.getElementById("game");
-    const ctx = canvas.getContext("2d");
-    const size = 60;
-    const rows = 8;
-    const cols = 8;
-    const colors = ["red", "yellow", "lime", "cyan", "magenta"];
+<body class="flex items-center justify-center min-h-screen bg-gradient-to-br from-pink-100 to-purple-200">
+  <div class="text-center bg-white p-8 rounded-2xl shadow-xl space-y-4 w-full max-w-md">
+    <h1 class="text-3xl font-bold text-pink-600">Candy Slot Machine</h1><div id="slots" class="flex justify-center space-x-4 text-6xl">
+  <div class="slot">🍭</div>
+  <div class="slot">🍬</div>
+  <div class="slot">🍫</div>
+</div>
 
-    let grid = [];
-    let score = 0;
-    let selected = null;
+<button onclick="spin()" id="spinBtn" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-6 rounded-xl">
+  Spin
+</button>
 
-    function randomColor() {
-      return colors[Math.floor(Math.random() * colors.length)];
-    }
+<div id="result" class="text-lg font-semibold text-pink-700"></div>
+<div class="mt-4">
+  <p>Score: <span id="score">0</span> | XP: <span id="xp">0</span> | Level: <span id="level">1</span></p>
+</div>
+<div class="mt-2">
+  <button onclick="toggleSound()" class="text-sm text-blue-500 underline">Toggle Music</button>
+</div>
+<div id="coins" class="absolute top-0 left-0 w-full flex flex-col items-center z-10"></div>
 
-    function drawCircle(x, y, color) {
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.arc(x + size / 2, y + size / 2, size / 2 - 5, 0, Math.PI * 2);
-      ctx.fill();
-    }
+  </div>  <audio id="bgMusic" loop>
+    <source src="https://www.bensound.com/bensound-music/bensound-sunny.mp3" type="audio/mp3">
+  </audio>  <script>
+    const candies = ["🍒", "🍋", "🍇", "🍬", "🍭", "🍎", "🧁", "🍦"];
+    let score = +localStorage.getItem("score") || 0;
+    let xp = +localStorage.getItem("xp") || 0;
+    let level = +localStorage.getItem("level") || 1;
 
-    function drawGrid() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols; x++) {
-          drawCircle(x * size, y * size, grid[y][x]);
+    const scoreEl = document.getElementById("score");
+    const xpEl = document.getElementById("xp");
+    const levelEl = document.getElementById("level");
+    const resultEl = document.getElementById("result");
+    const slots = document.querySelectorAll(".slot");
+    const coins = document.getElementById("coins");
+
+    scoreEl.textContent = score;
+    xpEl.textContent = xp;
+    levelEl.textContent = level;
+
+    function spin() {
+      document.getElementById("spinBtn").disabled = true;
+      resultEl.textContent = "Spinning...";
+      const interval = setInterval(() => {
+        slots.forEach(slot => {
+          slot.textContent = candies[Math.floor(Math.random() * candies.length)];
+        });
+      }, 100);
+
+      setTimeout(() => {
+        clearInterval(interval);
+        const final = [0, 1, 2].map(() => candies[Math.floor(Math.random() * candies.length)]);
+        slots.forEach((slot, i) => slot.textContent = final[i]);
+
+        const [a, b, c] = final;
+        if (a === b && b === c) {
+          resultEl.textContent = "Jackpot! Tiga cocok!";
+          score += 10;
+          xp += 10;
+          dropCoins(10);
+        } else if (a === b || b === c || a === c) {
+          resultEl.textContent = "Dua cocok! Lumayan!";
+          score += 3;
+          xp += 3;
+        } else {
+          resultEl.textContent = "Coba lagi!";
+          score = Math.max(0, score - 1);
         }
+
+        if (xp >= level * 20) {
+          xp = 0;
+          level++;
+          alert("Naik Level ke " + level + "!");
+        }
+
+        scoreEl.textContent = score;
+        xpEl.textContent = xp;
+        levelEl.textContent = level;
+        localStorage.setItem("score", score);
+        localStorage.setItem("xp", xp);
+        localStorage.setItem("level", level);
+
+        document.getElementById("spinBtn").disabled = false;
+      }, 2000);
+    }
+
+    function dropCoins(amount) {
+      for (let i = 0; i < amount; i++) {
+        const el = document.createElement("div");
+        el.textContent = "🪙";
+        el.className = "coin text-2xl absolute";
+        el.style.left = `${Math.random() * 100}%`;
+        el.style.top = `-${Math.random() * 50}px`;
+        coins.appendChild(el);
+        setTimeout(() => coins.removeChild(el), 2000);
       }
     }
 
-    function generateGrid() {
-      grid = [];
-      for (let y = 0; y < rows; y++) {
-        let row = [];
-        for (let x = 0; x < cols; x++) {
-          row.push(randomColor());
-        }
-        grid.push(row);
-      }
-    }
-
-    function getMatches() {
-      let matches = [];
-      let visited = new Set();
-
-      function dfs(x, y, color, group) {
-        const key = `${x},${y}`;
-        if (x < 0 || x >= cols || y < 0 || y >= rows || grid[y][x] !== color || visited.has(key)) return;
-        visited.add(key);
-        group.push({ x, y });
-        dfs(x + 1, y, color, group);
-        dfs(x - 1, y, color, group);
-        dfs(x, y + 1, color, group);
-        dfs(x, y - 1, color, group);
-      }
-
-      for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols; x++) {
-          const group = [];
-          dfs(x, y, grid[y][x], group);
-          if (group.length >= 8) matches.push(group);
-        }
-      }
-
-      return matches;
-    }
-
-    function explode(matches) {
-      matches.flat().forEach(({ x, y }) => {
-        grid[y][x] = null;
-        score += 10;
-      });
-      document.getElementById("score").textContent = `Score: ${score}`;
-    }
-
-    function applyGravity() {
-      for (let x = 0; x < cols; x++) {
-        let stack = [];
-        for (let y = rows - 1; y >= 0; y--) {
-          if (grid[y][x] !== null) stack.push(grid[y][x]);
-        }
-        for (let y = rows - 1; y >= 0; y--) {
-          grid[y][x] = stack[rows - 1 - y] || randomColor();
-        }
-      }
-    }
-
-    canvas.addEventListener("click", (e) => {
-      const rect = canvas.getBoundingClientRect();
-      const x = Math.floor((e.clientX - rect.left) / size);
-      const y = Math.floor((e.clientY - rect.top) / size);
-
-      if (!selected) {
-        selected = { x, y };
-        ctx.strokeStyle = "white";
-        ctx.lineWidth = 3;
-        ctx.strokeRect(x * size + 3, y * size + 3, size - 6, size - 6);
+    function toggleSound() {
+      const audio = document.getElementById("bgMusic");
+      if (audio.paused) {
+        audio.play();
       } else {
-        const dx = Math.abs(selected.x - x);
-        const dy = Math.abs(selected.y - y);
-        if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
-          [grid[y][x], grid[selected.y][selected.x]] = [grid[selected.y][selected.x], grid[y][x]];
-
-          const matches = getMatches();
-          if (matches.length > 0) {
-            explode(matches);
-            applyGravity();
-          } else {
-            [grid[y][x], grid[selected.y][selected.x]] = [grid[selected.y][selected.x], grid[y][x]];
-          }
-        }
-        selected = null;
-        drawGrid();
+        audio.pause();
       }
-    });
-
-    function gameLoop() {
-      drawGrid();
-      let matches = getMatches();
-      if (matches.length > 0) {
-        explode(matches);
-        applyGravity();
-      }
-      requestAnimationFrame(gameLoop);
     }
-
-    generateGrid();
-    drawGrid();
-    gameLoop();
   </script></body>
 </html>
