@@ -171,7 +171,7 @@ button:not(#closePopup):active::after {
     font-size: 12px;
 }
 
-#betHistory, #userBets {
+#betHistory {
     font-size: 13px;
     text-align: justify;
     hyphens: auto;
