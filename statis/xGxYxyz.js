@@ -1,4 +1,4 @@
-document.getElementById("0xGxYxyz").innerHTML = `
+document.getElementById("xGxYxyz").innerHTML = `
 <nav class="navbar">
     <div class="logo">
         <img src="img/logo.svg" alt="Lotto Chain Logo" class="logo-img">
