@@ -256,7 +256,7 @@ footer {
 .modal-content {
     background: #111;
     color: white;
-    margin: 10% auto;
+    margin: 5% auto;
     padding: 20px;
     width: 80%;
     max-width: 900px;
@@ -265,7 +265,7 @@ footer {
     border-radius: 10px;
     text-align: center;
     box-shadow: 0px 0px 15px rgba(0, 255, 255, 0.5);
-    }
+}
 
 .close {
   color: white;
