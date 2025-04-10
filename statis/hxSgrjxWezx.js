@@ -10,6 +10,7 @@ let likeContract;
 let userBetsPage = 0;
 let betHistoryPage = 0;
 const pageSize = 10;
+const userBetsPageSize = 4;
 const SEPOLIA_BASE_CHAIN_ID = "0x14a34";
 const SEPOLIA_RPC_URL = "https://sepolia.base.org";
 const SEPOLIA_EXPLORER_URL = "https://sepolia.basescan.org";
