@@ -20,7 +20,7 @@ styleTag.innerHTML = `
 
 .container {
     width: 100%;
-    max-width: 1250px;
+    max-width: 1300px;
     margin: auto;
     padding: 20px;
     background: #000000;
@@ -260,7 +260,7 @@ footer {
     border-radius: 10px;
     width: 90%;
     max-width: 600px;
-    max-height: 30vh;
+    max-height: 40vh;
     overflow-y: auto;
     position: relative;
 }
