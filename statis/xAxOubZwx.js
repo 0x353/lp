@@ -2,7 +2,7 @@ document.getElementById("xAxOubZwx").innerHTML += `
 <div id="myModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal('myModal')">&times;</span>
-        <h2>Your Bets</h2>
+        <h2>Your Ticets</h2>
         <div id="userBets"></div>
         <div class="button-container">
             <button class="nav-button" onclick="prevUserBets()">Prev</button>
