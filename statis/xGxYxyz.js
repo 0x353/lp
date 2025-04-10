@@ -1,26 +1,4 @@
 document.getElementById("xGxYxyz").innerHTML = `
-<nav class="navbar">
-    <div class="logo">
-        <img src="img/logo.svg" alt="Lotto Chain Logo" class="logo-img">
-        <span style="
-            font-size: 22px; 
-            font-weight: bold; 
-            background: linear-gradient(90deg, #03a9f4, #f441a5); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent;
-            display: inline-block;
-        ">Lotto Chain</span>
-    </div>
-    <div class="hamburger" onclick="toggleMenu()">&#9776;</div>
-    <ul class="nav-links" id="navMenu">
-        <li><a href="#features">4D Pools</a></li>
-        <li><a href="#prizes">Prizes</a></li>
-        <li><a href="lottery">LottoBalls (LB)</a></li>
-        <li><a href="hk">Hong Kong (HK)</a></li>
-        <li><a href="syd">Sydney (SYD)</a></li>
-    </ul>
-</nav>
-
     <div id="notificationPopup" class="popup hidden" role="alert">
         <button id="closePopup" onclick="closePopup()">×</button>
         <p id="notificationMessage"></p>
