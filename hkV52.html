@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lotto Chain Decentralized Betting</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Favicons -->
     <link href="img/logo.svg" rel="icon">
     <link href="img/logo.svg" rel="apple-touch-icon">
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@700&display=swap" rel="stylesheet">
@@ -33,12 +32,11 @@ let likeContract;
 let userBetsPage = 0;
 let betHistoryPage = 0;
 const pageSize = 10;
-const SEPOLIA_BASE_CHAIN_ID = "0x14a34"; // Chain ID Sepolia Base Testnet
-const SEPOLIA_RPC_URL = "https://sepolia.base.org"; // RPC Sepolia Base
-const SEPOLIA_EXPLORER_URL = "https://sepolia.basescan.org"; // Block Explorer
+const SEPOLIA_BASE_CHAIN_ID = "0x14a34";
+const SEPOLIA_RPC_URL = "https://sepolia.base.org";
+const SEPOLIA_EXPLORER_URL = "https://sepolia.basescan.org";
 const SEPOLIA_CURRENCY = { name: "Ethereum", symbol: "ETH", decimals: 18 };
 
-// **Check Connection on Page Load**
 window.addEventListener("load", async () => {
     if (window.ethereum) {
         const savedAccount = localStorage.getItem("walletAddress");
@@ -56,22 +54,19 @@ window.addEventListener("load", async () => {
                     document.getElementById("walletBalance").style.display = "block";
                     document.getElementById("connectWallet").style.display = "none";
                     document.getElementById("disconnectWallet").style.display = "block";
-
-                    // Tampilkan ikon notifikasi setelah wallet terhubung
                     document.getElementById("notificationIcon").style.display = "block";
 
                     updateBalance();
                     loadUserBets();
                     loadBetHistory();
-                    checkForWinnings(); // Cek apakah user menang
-
-                    // **Perbaikan: Ganti getAllBetIds() dengan getAllBets()**
+                    checkForWinnings();
+                    
                     const allBets = await contract.methods.getAllBets().call();
-                    const betIds = allBets.map(bet => bet.betId); // Ambil betId dari data taruhan
+                    const betIds = allBets.map(bet => bet.betId);
 
                     for (const betId of betIds) {
-                        await updateCommentCount(betId); // Perbarui jumlah komentar
-                        await loadComments(betId); // Muat komentar
+                        await updateCommentCount(betId);
+                        await loadComments(betId);
                     }
                 }
             } catch (error) {
@@ -84,7 +79,6 @@ window.addEventListener("load", async () => {
     }
 });
 
-// **Check Winnings**
 async function checkForWinnings() {
     try {
         const winnings = await contract.methods.winnings(userAccount).call();
@@ -98,7 +92,6 @@ async function checkForWinnings() {
     }
 }
 
-// **Add Notification**
 function addNotification(message, link) {
     const notifications = document.getElementById("notifications");
     const li = document.createElement("li");
@@ -108,7 +101,6 @@ function addNotification(message, link) {
     document.getElementById("notificationBadge").classList.add("active");
 }
 
-// **Toggle Notification List**
 function toggleNotificationList() {
     const list = document.getElementById("notificationList");
     list.classList.toggle("hidden");
@@ -118,7 +110,6 @@ function toggleNotificationList() {
     }
 }
 
-// Menampilkan popup notifikasi dengan animasi
 function showNotification(message) {
     const popup = document.getElementById("notificationPopup");
     const messageContainer = document.getElementById("notificationMessage");
@@ -131,29 +122,26 @@ function showNotification(message) {
     messageContainer.innerHTML = `<span style="color: #00FF66;">${message}</span> 
         <a href="claim" target="_blank" style="color: #00b7ff; text-decoration: none;">Claim now!</a>`;
 
-    // Pastikan popup ditampilkan
     popup.classList.remove("hidden");
-    popup.style.display = "block"; // Menampilkan elemen
+    popup.style.display = "block";
     popup.classList.add("show");
 
-    console.log("Popup shown!"); // Debugging
+    console.log("Popup shown!");
 
-    let audio = new Audio("win.mp3"); // Ganti dengan path audio kamu
+    let audio = new Audio("win.mp3");
     audio.play().catch(error => console.log('error:', error));
     
     setTimeout(() => {
         popup.classList.remove("show");
         setTimeout(() => {
             popup.classList.add("hidden");
-            popup.style.display = "none"; // Sembunyikan elemen
+            popup.style.display = "none";
         }, 300);
-    }, 15000); // Tampilkan selama 5 detik
+    }, 15000);
 }
 
-// Panggil fungsi ini setiap kali notifikasi diperbarui
 updateNotificationStatus();
 
-// Menutup popup
 function closePopup() {
     const popup = document.getElementById("notificationPopup");
     if (!popup) return;
@@ -171,24 +159,21 @@ function updateNotificationStatus() {
 
     setTimeout(() => {
         if (notificationsList.children.length === 0) {
-            noNotificationsMessage.classList.remove("hidden"); // Tampilkan pesan
+            noNotificationsMessage.classList.remove("hidden");
         } else {
-            noNotificationsMessage.classList.add("hidden"); // Sembunyikan pesan
+            noNotificationsMessage.classList.add("hidden");
         }
-    }, 100); // Delay kecil untuk memastikan elemen terupdate
+    }, 100);
 }
 
-// **Close Popup**
 function closePopup() {
     document.getElementById("notificationPopup").style.display = "none";
 }
 
-// **Close Notification List**
 function closeNotificationList() {
     document.getElementById("notificationList").classList.add("hidden");
 }
 
-// **Connect Wallet**
 async function connectWallet() {
     if (window.ethereum) {
         try {
@@ -217,8 +202,6 @@ async function connectWallet() {
             document.getElementById("walletBalance").style.display = "block";
             document.getElementById("connectWallet").style.display = "none";
             document.getElementById("disconnectWallet").style.display = "block";
-
-            // Tampilkan ikon notifikasi setelah wallet terhubung
             document.getElementById("notificationIcon").style.display = "block";
 
             updateBalance();
@@ -226,13 +209,12 @@ async function connectWallet() {
             loadBetHistory();
             checkForWinnings();
 
-            // **Perbaikan: Ganti getAllBetIds() dengan getAllBets()**
             const allBets = await contract.methods.getAllBets().call();
-            const betIds = allBets.map(bet => bet.betId); // Ambil betId dari setiap taruhan
+            const betIds = allBets.map(bet => bet.betId);
 
             for (const betId of betIds) {
-                await updateCommentCount(betId); // Perbarui jumlah komentar
-                await loadComments(betId); // Muat komentar
+                await updateCommentCount(betId);
+                await loadComments(betId);
             }
 
         } catch (error) {
@@ -244,7 +226,6 @@ async function connectWallet() {
     }
 }
 
-// **Switch to Sepolia Base Testnet**
 async function switchToSepoliaBase() {
     try {
         const currentChainId = await window.ethereum.request({ method: "eth_chainId" });
@@ -278,7 +259,6 @@ async function switchToSepoliaBase() {
     }
 }
 
-// **Disconnect Wallet**
 function disconnectWallet() {
     userAccount = null;
     localStorage.removeItem("walletAddress");
@@ -291,7 +271,6 @@ function disconnectWallet() {
     document.getElementById("disconnectWallet").style.display = "none";
 }
 
-// **Update Balance**
 async function updateBalance() {
     if (userAccount) {
         let balanceWei = await web3.eth.getBalance(userAccount);
@@ -302,11 +281,10 @@ async function updateBalance() {
        
 function updateBetPrice() {
     let betTimes = document.getElementById("betTimes").value;
-    let ethPrice = (betTimes * 0.000256).toFixed(6); // Hitung harga ETH
+    let ethPrice = (betTimes * 0.000256).toFixed(6);
     document.getElementById("betPrice").innerText = `Cost: ${ethPrice} ETH`;
 }
 
-// **Place Bet**
 async function placeBet() {
     if (!userAccount) {
         alert("Please connect your wallet first!");
@@ -329,15 +307,14 @@ async function placeBet() {
             <span style="color: #aaffaa; font-size: 12px;">Your ticket transaction is in progress...</span>
         `;
 
-        // Estimasi gas sebelum transaksi
         const estimatedGas = await contract.methods.placeBet(number, times, true, 0).estimateGas({ from: userAccount, value: totalCost });
 
         await contract.methods.placeBet(number, times, true, 0).send({
             from: userAccount,
             value: totalCost,
-            gas: estimatedGas + 50000, // Tambahkan buffer 50.000 untuk keamanan
-            maxFeePerGas: web3.utils.toWei("0.0015", "gwei"),  // Gas Fee maksimum
-            maxPriorityFeePerGas: web3.utils.toWei("0.0014", "gwei") // Fee Prioritas
+            gas: estimatedGas + 50000,
+            maxFeePerGas: web3.utils.toWei("0.0015", "gwei"),
+            maxPriorityFeePerGas: web3.utils.toWei("0.0014", "gwei")
         });
 
         document.getElementById("betStatus").innerHTML = `
@@ -364,19 +341,17 @@ async function placeBet() {
     }
 }
 
-// Number Funcion
 function validateBetNumber() {
     let betNumberInput = document.getElementById("betNumber");
     let betWarning = document.getElementById("betWarning");
 
-    // Hanya angka yang diperbolehkan
     betNumberInput.value = betNumberInput.value.replace(/\D/g, "");
 
     if (betNumberInput.value.length < 2) {
         betWarning.innerText = "Bet number must minimum be 2 digits!";
     } else if (betNumberInput.value.length > 4) {
         betWarning.innerText = "Bet number must minimum 4 digits!";
-        betNumberInput.value = betNumberInput.value.slice(0, 4); // Membatasi maksimal 4 digit
+        betNumberInput.value = betNumberInput.value.slice(0, 4);
     } else {
         betWarning.innerText = "";
     }
@@ -386,7 +361,7 @@ function validateBetTimes() {
     let betTimesInput = document.getElementById("betTimes");
     let warning = document.getElementById("betWarning");
 
-    let value = parseInt(betTimesInput.value, 10); // Konversi ke angka
+    let value = parseInt(betTimesInput.value, 10);
 
     if (value < 1) {
         betTimesInput.value = 1;
@@ -399,14 +374,13 @@ function validateBetTimes() {
     }
 }
     
-// **Load User Bets (with Pagination & Last 7 Days Filter)**
 async function loadUserBets() {
     if (!userAccount) return;
     const bets = await contract.methods.getUserBets(userAccount).call();
-    const reversedBets = bets.slice().reverse(); // Membalik urutan bets agar yang terbaru di atas
+    const reversedBets = bets.slice().reverse();
 
     const now = Math.floor(Date.now() / 1000);
-    const oneMonthAgo = now - 30 * 24 * 60 * 60; // 30 hari dalam detik
+    const oneMonthAgo = now - 30 * 24 * 60 * 60;
     const filteredBets = reversedBets.filter(bet => bet.timestamp >= oneMonthAgo);
     
     const start = userBetsPage * pageSize;
@@ -433,7 +407,6 @@ async function loadUserBets() {
     document.getElementById("userBets").innerHTML = html;
 }
                     
-// **User Bets Pagination**
 function prevUserBets() {
     if (userBetsPage > 0) {
         userBetsPage--;
@@ -446,14 +419,13 @@ function nextUserBets() {
     loadUserBets();
 }
         
-// **Load Bet History (with Pagination)**
 async function loadBetHistory() {
     const refreshIcon = document.querySelector("button img[alt='Refresh']");
     const bets = await contract.methods.getAllBets().call();
-    const reversedBets = bets.slice().reverse(); // Urutkan dari terbaru
+    const reversedBets = bets.slice().reverse();
 
     const now = Math.floor(Date.now() / 1000);
-    const oneMonthAgo = now - 30 * 24 * 60 * 60; // 30 hari dalam detik
+    const oneMonthAgo = now - 30 * 24 * 60 * 60;
     const filteredBets = reversedBets.filter(bet => bet.timestamp >= oneMonthAgo);
     
     const start = betHistoryPage * pageSize;
@@ -526,14 +498,12 @@ async function loadBetHistory() {
 
     document.getElementById("betHistory").innerHTML = html;
 
-    // Update jumlah like dan status like setelah bet history dimuat
     for (let i = start; i < end; i++) {
         let bet = filteredBets[i];
         await updateLikeStatus(bet.betId);
     }
 }
         
-// **Bet History Pagination**
 function prevBetHistory() {
     if (betHistoryPage > 0) {
         betHistoryPage--;
@@ -546,12 +516,10 @@ function nextBetHistory() {
     loadBetHistory();
 }
 
-// Jalankan pertama kali untuk inisialisasi betId
 loadBetHistory().then(() => {
-    setInterval(autoRefreshBetHistory, 2000); // Cek setiap 5 detik
+    setInterval(autoRefreshBetHistory, 2000);
 });
 
-// Like Function
 async function toggleLike(betId) {
     try {
         if (typeof window.ethereum === "undefined") {
@@ -579,10 +547,9 @@ async function toggleLike(betId) {
             estimatedGas = await contract.methods.likeBet(betId, "👍").estimateGas({ from: userAccount });
         }
 
-        // Menambahkan buffer agar transaksi tidak gagal
         const gasOptions = {
             from: userAccount,
-            gas: estimatedGas + 50000, // Tambahkan buffer
+            gas: estimatedGas + 50000,
             maxFeePerGas: web3.utils.toWei("0.0002", "gwei"),  
             maxPriorityFeePerGas: web3.utils.toWei("0.00018", "gwei") 
         };
@@ -637,7 +604,6 @@ async function toggleLike(betId) {
     }
 }
         
-// Fungsi untuk memperbarui jumlah like
 function updateLikeCount(betId, change) {
     const likeCountElement = document.getElementById(`likeCount-${betId}`);
     let currentCount = parseInt(likeCountElement.innerText, 10);
@@ -669,8 +635,6 @@ function updateLikeCount(betId, change) {
     }
         }
 
- // Comment Function
-// Fungsi Lazy Load Komentar
 function loadComments(betId, limit = 10) {
     contract.methods.getComments(betId).call().then((comments) => {
         const currentUser = ethereum.selectedAddress ? ethereum.selectedAddress.toLowerCase() : null;
@@ -705,7 +669,6 @@ function loadComments(betId, limit = 10) {
             }
         });
 
-        // Jika ada lebih dari `limit` komentar, tambahkan tombol "Lihat lebih banyak"
         if (comments.length > limit) {
             commentHtml += `<button onclick="loadComments('${betId}', ${limit + 10})" 
     style="background-color: rgba(0, 123, 255, 0.5);">
@@ -720,12 +683,10 @@ function loadComments(betId, limit = 10) {
     });
 }
 
-// Panggil fungsi saat halaman dimuat
 window.addEventListener("load", () => {
-    loadComments("BET_ID", 10); // Mulai dengan 5 komentar
+    loadComments("BET_ID", 10);
 });
 
-// Fungsi untuk menambahkan atau menyimpan komentar (mode normal dan edit)
 async function addOrUpdateComment(betId) {
     let commentInput = document.getElementById(`commentInput-${betId}`);
     let saveMode = commentInput.dataset.editing === "true";
@@ -737,7 +698,6 @@ async function addOrUpdateComment(betId) {
     }
 
     try {
-        // Cek apakah MetaMask terinjeksi dan sudah ada akun aktif
         if (typeof window.ethereum === "undefined") {
             alert("MetaMask not detected! Please install MetaMask.");
             return;
@@ -790,22 +750,18 @@ async function addOrUpdateComment(betId) {
     }
 }
 
-// Fungsi untuk mengaktifkan mode edit
 function enableEdit(betId, index) {
     let commentTextElement = document.getElementById(`commentText-${betId}-${index}`);
     let commentInput = document.getElementById(`commentInput-${betId}`);
     let sendButton = document.getElementById(`sendBtn-${betId}`);
     let cancelButton = document.getElementById(`cancelBtn-${betId}`);
 
-    // Isi textarea dengan komentar lama dan aktifkan mode edit
     commentInput.value = commentTextElement.innerText;
     commentInput.dataset.editing = "true";
     commentInput.dataset.index = index;
 
-    // Ubah tombol "Kirim" menjadi "Simpan"
     sendButton.innerText = "Save";
 
-    // Jika tombol batal belum ada, tambahkan ke dalam DOM
     if (!cancelButton) {
         cancelButton = document.createElement("button");
         cancelButton.id = `cancelBtn-${betId}`;
@@ -818,22 +774,18 @@ function enableEdit(betId, index) {
         sendButton.parentNode.insertBefore(cancelButton, sendButton.nextSibling);
     }
 }
-
-// Fungsi untuk membatalkan mode edit
+        
 function disableEdit(betId) {
     let commentInput = document.getElementById(`commentInput-${betId}`);
     let sendButton = document.getElementById(`sendBtn-${betId}`);
     let cancelButton = document.getElementById(`cancelBtn-${betId}`);
 
-    // Kosongkan input dan kembalikan ke mode normal
     commentInput.value = "";
     delete commentInput.dataset.editing;
     delete commentInput.dataset.index;
 
-    // Ubah tombol "Simpan" kembali menjadi "Kirim"
     sendButton.innerText = "Send";
 
-    // Hapus tombol batal jika ada
     if (cancelButton) {
         cancelButton.remove();
     }
@@ -843,24 +795,20 @@ async function deleteComment(betId, index) {
     if (!confirm("Are you sure you want to delete this comment?")) return;
 
     try {
-        // Estimasi gas untuk transaksi penghapusan komentar
         const gasEstimate = await contract.methods.deleteComment(betId, index).estimateGas({ from: ethereum.selectedAddress });
         console.log(`Gas Estimate: ${gasEstimate}`);
 
-        // Gas options
         const gasOptions = {
             from: ethereum.selectedAddress,
-            gas: gasEstimate + 100000,  // Menambahkan buffer untuk gas
-            maxFeePerGas: web3.utils.toWei("0.0025", "gwei"),  // Gas fee maksimal
-            maxPriorityFeePerGas: web3.utils.toWei("0.0023", "gwei")  // Prioritas fee
+            gas: gasEstimate + 55000,
+            maxFeePerGas: web3.utils.toWei("0.00025", "gwei"),
+            maxPriorityFeePerGas: web3.utils.toWei("0.00023", "gwei") 
         };
         console.log(`Gas Options: ${JSON.stringify(gasOptions)}`);
 
-        // Menyampaikan transaksi ke blockchain
         const transaction = await contract.methods.deleteComment(betId, index).send(gasOptions);
         console.log(`Transaction Hash: ${transaction.transactionHash}`);
 
-        // Refresh daftar komentar setelah transaksi sukses
         await loadComments(betId); 
     } catch (error) {
         console.error("Failed to delete comment:", error);
@@ -868,7 +816,6 @@ async function deleteComment(betId, index) {
     }
 }
         
-// Fungsi untuk memperbarui jumlah komentar
 async function updateCommentCount(betId) {
     try {
         const count = await contract.methods.commentCount(betId).call();
@@ -880,11 +827,9 @@ async function updateCommentCount(betId) {
 
 async function connectMetaMask() {
     if (typeof window.ethereum !== "undefined") {
-        // Cek apakah ada akun yang sudah terhubung sebelumnya
         const accounts = await ethereum.request({ method: "eth_accounts" });
         if (accounts.length > 0) {
             console.log("Account detected:", accounts[0]);
-            // Bisa disimpan sebagai info login jika perlu
         } else {
             console.warn("There are no MetaMask accounts connected.");
         }
@@ -893,18 +838,15 @@ async function connectMetaMask() {
     }
 }        
        
-// Modal Result
 function updateHistory(newBall1) {
     let historyTable = document.getElementById("historyBody");
     let rows = historyTable.getElementsByTagName("tr");
 
-    // Ambil nilai dari baris pertama untuk di-shift ke bawah
     let previousBall1 = rows[0].children[1].innerText;
     let previousBall2 = rows[0].children[2].innerText;
     let previousBall3 = rows[0].children[3].innerText;
     let previousBall4 = rows[0].children[4].innerText;
 
-    // Geser data ke bawah
     for (let i = rows.length - 1; i > 0; i--) {
         rows[i].children[1].innerText = rows[i - 1].children[1].innerText;
         rows[i].children[2].innerText = rows[i - 1].children[2].innerText;
@@ -912,14 +854,12 @@ function updateHistory(newBall1) {
         rows[i].children[4].innerText = rows[i - 1].children[4].innerText;
     }
 
-    // Perbarui data di baris pertama dengan data terbaru
     rows[0].children[1].innerText = newBall1;
     rows[0].children[2].innerText = previousBall1;
     rows[0].children[3].innerText = previousBall2;
     rows[0].children[4].innerText = previousBall3;
 }
 
-// Fungsi untuk membuka modal berdasarkan ID
 function openModal(modalId) {
     let modal = document.getElementById(modalId);
     
@@ -935,7 +875,6 @@ function openModal(modalId) {
     }
 }
 
-// Fungsi untuk menutup modal berdasarkan ID
 function closeModal(modalId) {
     let modal = document.getElementById(modalId);
     if (modal) {
@@ -943,7 +882,6 @@ function closeModal(modalId) {
     }
 }
 
-// Fungsi khusus untuk menutup modal
 function closeMyBets() {
     closeModal('myModal');
 }
@@ -956,10 +894,6 @@ function closeResult() {
     closeModal('resultModal');
 }
 
-// Html Modal
-
-
-// **Fungsi untuk menampilkan modal**
 function openLikeModal(betId) {
     if (!document.getElementById(`likeModal-${betId}`)) {
         createLikeModal(betId);
@@ -967,13 +901,11 @@ function openLikeModal(betId) {
     document.getElementById(`likeModal-${betId}`).style.display = "block";
 }
 
-// **Fungsi untuk menutup modal**
 function closeLikeModal(betId) {
     const modal = document.getElementById(`likeModal-${betId}`);
     if (modal) modal.style.display = "none";
 }
 
-// Popup Messages
  function showWelcomePopup() {
   const popupSound = new Audio("https://www.myinstants.com/media/sounds/pop-up-off.mp3");
 
@@ -1069,7 +1001,6 @@ function closeLikeModal(betId) {
   }, 11000);
  }
       
-// Initialize saat halaman terbuka
 window.onload = async () => {
     if (window.ethereum) {
         window.ethereum.on("accountsChanged", (accounts) => {
@@ -1091,16 +1022,13 @@ window.onload = async () => {
     }
 
     try {
-        // Ambil semua taruhan dari kontrak
         const allBets = await contract.methods.getAllBets().call();
 
-        // Ambil betId dari setiap taruhan
         const betIds = allBets.map(bet => bet.betId);
 
-        // Perbarui jumlah komentar dan muat komentar untuk setiap betId
         for (const betId of betIds) {
             await updateCommentCount(betId);
-            await loadComments(betId); // Memuat komentar langsung saat halaman dibuka
+            await loadComments(betId);
         }
     } catch (error) {
         console.error("Gagal memuat komentar saat halaman dimuat:", error);
@@ -1109,12 +1037,10 @@ window.onload = async () => {
     document.getElementById("refreshButton").addEventListener("click", function () {
   const icon = this.querySelector(".refresh-icon");
 
-  // Reset animasi supaya bisa diulang
   icon.classList.remove("spin-once");
-  void icon.offsetWidth; // paksa reflow
+  void icon.offsetWidth;
   icon.classList.add("spin-once");
 
-  // Tunggu animasi selesai, lalu reload konten bet history
   setTimeout(() => {
     loadBetHistory();
   }, 2000);
