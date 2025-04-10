@@ -1,4 +1,4 @@
-document.getElementById("0xAxOubZwx").innerHTML += `
+document.getElementById("xAxOubZwx").innerHTML += `
 <div id="myModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal('myModal')">&times;</span>
