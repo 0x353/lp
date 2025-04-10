@@ -176,7 +176,20 @@ button:not(#closePopup):active::after {
     text-align: justify;
     hyphens: auto;
     line-height: 1.8;
+    max-width: 1000px;
+    width: 100%;
+    margin: auto;
+    padding: 15px;
+    text-indent: 20px;
+}
+
+#userBets {
+    font-size: 13px;
+    text-align: justify;
+    hyphens: auto;
+    line-height: 1.8;
     max-width: 600px;
+    width: 100%;
     margin: auto;
     padding: 15px;
     text-indent: 20px;
@@ -260,7 +273,7 @@ footer {
     border-radius: 10px;
     width: 90%;
     max-width: 600px;
-    max-height: 40vh;
+    max-height: 75vh;
     overflow-y: auto;
     position: relative;
 }
