@@ -249,6 +249,7 @@ footer {
     top: 0;
     width: 100%;
     height: 100%;
+    overflow: auto;
     background-color: rgba(0, 0, 0, 0.7);
     }
 
@@ -259,6 +260,8 @@ footer {
     padding: 20px;
     width: 80%;
     max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
     border-radius: 10px;
     text-align: center;
     box-shadow: 0px 0px 15px rgba(0, 255, 255, 0.5);
