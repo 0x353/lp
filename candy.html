@@ -1,0 +1,156 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Candy Crush Pro</title>
+  <style>
+    canvas {
+      border: 2px solid #444;
+      display: block;
+      margin: 20px auto;
+      background-color: #111;
+    }
+    body {
+      font-family: sans-serif;
+      background: #222;
+      color: white;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Candy Crush Pro Clone</h1>
+  <canvas id="game" width="480" height="480"></canvas>
+  <p id="score">Score: 0</p>  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const size = 60;
+    const rows = 8;
+    const cols = 8;
+    const colors = ["red", "yellow", "lime", "cyan", "magenta"];
+
+    let grid = [];
+    let score = 0;
+    let selected = null;
+
+    function randomColor() {
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    function drawCircle(x, y, color) {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(x + size / 2, y + size / 2, size / 2 - 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawGrid() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          drawCircle(x * size, y * size, grid[y][x]);
+        }
+      }
+    }
+
+    function generateGrid() {
+      grid = [];
+      for (let y = 0; y < rows; y++) {
+        let row = [];
+        for (let x = 0; x < cols; x++) {
+          row.push(randomColor());
+        }
+        grid.push(row);
+      }
+    }
+
+    function getMatches() {
+      let matches = [];
+      let visited = new Set();
+
+      function dfs(x, y, color, group) {
+        const key = `${x},${y}`;
+        if (x < 0 || x >= cols || y < 0 || y >= rows || grid[y][x] !== color || visited.has(key)) return;
+        visited.add(key);
+        group.push({ x, y });
+        dfs(x + 1, y, color, group);
+        dfs(x - 1, y, color, group);
+        dfs(x, y + 1, color, group);
+        dfs(x, y - 1, color, group);
+      }
+
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          const group = [];
+          dfs(x, y, grid[y][x], group);
+          if (group.length >= 8) matches.push(group);
+        }
+      }
+
+      return matches;
+    }
+
+    function explode(matches) {
+      matches.flat().forEach(({ x, y }) => {
+        grid[y][x] = null;
+        score += 10;
+      });
+      document.getElementById("score").textContent = `Score: ${score}`;
+    }
+
+    function applyGravity() {
+      for (let x = 0; x < cols; x++) {
+        let stack = [];
+        for (let y = rows - 1; y >= 0; y--) {
+          if (grid[y][x] !== null) stack.push(grid[y][x]);
+        }
+        for (let y = rows - 1; y >= 0; y--) {
+          grid[y][x] = stack[rows - 1 - y] || randomColor();
+        }
+      }
+    }
+
+    canvas.addEventListener("click", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = Math.floor((e.clientX - rect.left) / size);
+      const y = Math.floor((e.clientY - rect.top) / size);
+
+      if (!selected) {
+        selected = { x, y };
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x * size + 3, y * size + 3, size - 6, size - 6);
+      } else {
+        const dx = Math.abs(selected.x - x);
+        const dy = Math.abs(selected.y - y);
+        if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
+          [grid[y][x], grid[selected.y][selected.x]] = [grid[selected.y][selected.x], grid[y][x]];
+
+          const matches = getMatches();
+          if (matches.length > 0) {
+            explode(matches);
+            applyGravity();
+          } else {
+            [grid[y][x], grid[selected.y][selected.x]] = [grid[selected.y][selected.x], grid[y][x]];
+          }
+        }
+        selected = null;
+        drawGrid();
+      }
+    });
+
+    function gameLoop() {
+      drawGrid();
+      let matches = getMatches();
+      if (matches.length > 0) {
+        explode(matches);
+        applyGravity();
+      }
+      requestAnimationFrame(gameLoop);
+    }
+
+    generateGrid();
+    drawGrid();
+    gameLoop();
+  </script></body>
+</html>
