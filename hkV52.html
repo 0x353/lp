@@ -11,61 +11,41 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.0/web3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js" crossorigin="anonymous"></script>
       <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: #000;
-      font-family: 'Courier New', monospace;
-    }
-
     #preloader {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #000;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 0.5s ease;
-    }
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color:
+z-index: 9999;
+display: flex;
+align-items: center;
+justify-content: center;
+}
 
-    #preloader.fade-out {
-      opacity: 0;
-      pointer-events: none;
-    }
+.loader {
+border: 5px solid #f3f3f3;
+border-top: 5px solid #00b7ff;
+border-radius: 50%;
+width: 40px;
+height: 40px;
+animation: spin 1s linear infinite;
+}
 
-    .loader {
-      border: 5px solid #f3f3f3;
-      border-top: 5px solid #fff;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-      margin-bottom: 20px;
-    }
+@keyframes spin {
+0% { transform: rotate(0deg); }
+100% { transform: rotate(360deg); }
+}
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+#preloader {
+transition: opacity 0.5s ease;
+}
 
-    #loading-text {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      font-size: 16px;
-      text-align: center;
-    }
-
-    .bounce-char {
-      display: inline-block;
-      animation: bounce 1s infinite;
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
+#preloader.fade-out {
+opacity: 0;
+pointer-events: none;
+}
       </style>
 </head>
 <body>
@@ -92,10 +72,9 @@
     </ul>
     </nav>
 
-    <div id="preloader">
-    <div class="loader"></div>
-    <div id="loading-text"></div>
-     </div>
+    <div id="preloader">  
+        <div class="loader"></div>  
+    </div>
 
     <div class="container">
     <h1>HK Bet DApp</h1>
@@ -106,32 +85,14 @@
 
     <script>
     window.addEventListener("load", function () {
-      const preloader = document.getElementById("preloader");
-      if (preloader) {
-        preloader.classList.add("fade-out");
-        setTimeout(() => {
-          preloader.style.display = "none";
-        }, 500);
-      }
-    });
-
-    const text = "Lotto Chain Dezentralized Betting...";
-    const colors = [
-      "#FF0000", "#FF7F00", "#FFFF00", "#00FF00",
-      "#0000FF", "#4B0082", "#8F00FF"
-    ];
-
-    const container = document.getElementById("loading-text");
-
-    text.split("").forEach((char, i) => {
-      const span = document.createElement("span");
-      span.textContent = char;
-      span.classList.add("bounce-char");
-      span.style.animationDelay = `${i * 0.1}s`;
-      span.style.color = colors[i % colors.length];
-      span.style.textShadow = `0 0 5px ${colors[i % colors.length]}`;
-      container.appendChild(span);
-    });
+const preloader = document.getElementById("preloader");
+if (preloader) {
+preloader.classList.add("fade-out");
+setTimeout(() => {
+preloader.style.display = "none";
+}, 500); // match dengan durasi transition
+}
+});
     </script>
         
     <script src="statis/oXjfHalTdXx.js"></script>
