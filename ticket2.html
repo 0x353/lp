@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Lotto Chain Decentralizer Betting</title>
+  <link href="img/logo.svg" rel="icon">
+  <link href="img/logo.svg" rel="apple-touch-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+   <style>
+    body {
+      background-color: #000000;
+      color: white;
+      padding: 20px;
+      font-family: 'Ubuntu', sans-serif;
+    }
+    .container {
+      background-color: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+     h1, h2 {
+    background: linear-gradient(90deg, #03a9f4, #f441a5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+h3 {
+    color: white;
+    font-size: 17px;
+    text-shadow: 0px 0px 10px #00aaff, 0px 0px 20px #0088ff;
+}
+     
+    a {
+      color: #1a88ff;
+      text-decoration: none;
+    }
+
+#ticketDetail {
+  background-color: #1e1e1e;
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  width: 95%;
+  max-width: 95%;
+  margin: 20px auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(3px);
+}
+
+#ticketDetail:hover {
+  transform: scale(1.015);
+  box-shadow: 0 0 12px rgba(80, 160, 255, 0.3), 0 0 18px rgba(80, 160, 255, 0.2);
+  border: 1px solid rgba(80, 160, 255, 0.3);
+}
+
+#ticketDetail p {
+  margin: 6px 0;
+}
+
+#ticketDetail a {
+  color: #82baff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  text-shadow: 0 0 3px rgba(130, 186, 255, 0.2);
+}
+
+#ticketDetail a:hover {
+  color: #dbeeff;
+  text-decoration: underline;
+  text-shadow: 0 0 5px rgba(130, 186, 255, 0.4);
+}
+
+button {
+  background-color: #1a88ff;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin: 20px auto;
+  box-shadow: 0 0 0 transparent;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background-color: #006fd6;
+  transform: scale(1.05);
+  box-shadow: 0 0 15px #1a88ff, 0 0 25px #1a88ff;
+}
+   </style>
+</head>
+<body>
+  <div class="container" id="ticketContainer">
+  <center><h1>Public Ticket Detail</h1></center><br>
+  <div id="ticketDetail">Loading...</div>
+  <button onclick="downloadPNG()">Download Ticket</button>
+  </div>
+
+  <script>
+    const contractAddress = '0xA6074b47915d155B5EB097c446fc9d850A4C6E60'; // Ganti dengan alamat kontrak di Base Sepolia
+    const abi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"liker","type":"address"},{"indexed":false,"internalType":"uint256","name":"likeCount","type":"uint256"}],"name":"BetLiked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"liker","type":"address"}],"name":"BetLiked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"liker","type":"address"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"},{"indexed":false,"internalType":"string","name":"likeType","type":"string"}],"name":"BetLiked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"liker","type":"address"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"},{"indexed":false,"internalType":"string","name":"likeType","type":"string"},{"indexed":false,"internalType":"uint256","name":"newLikeCount","type":"uint256"}],"name":"BetLiked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"liker","type":"address"},{"indexed":true,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":false,"internalType":"uint256","name":"newLikeCount","type":"uint256"}],"name":"BetLiked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":false,"internalType":"string","name":"number","type":"string"},{"indexed":false,"internalType":"uint256","name":"betAmount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"blockNumber","type":"uint256"},{"indexed":false,"internalType":"bytes32","name":"txHash","type":"bytes32"}],"name":"BetPlaced","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"drawId","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"winningNumber","type":"uint256"}],"name":"BetResultSet","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"liker","type":"address"},{"indexed":false,"internalType":"uint256","name":"likeCount","type":"uint256"}],"name":"BetUnliked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"liker","type":"address"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"newLikeCount","type":"uint256"}],"name":"BetUnliked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"winner","type":"address"},{"indexed":false,"internalType":"uint256","name":"winningNumber","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"prize","type":"uint256"}],"name":"BetWon","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"commenter","type":"address"},{"indexed":false,"internalType":"string","name":"comment","type":"string"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"CommentAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"commentIndex","type":"uint256"}],"name":"CommentDeleted","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"commentIndex","type":"uint256"},{"indexed":false,"internalType":"string","name":"newComment","type":"string"}],"name":"CommentUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"winner","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"ETHClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"winner","type":"address"}],"name":"LastWinnerUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint256","name":"totalPlayers","type":"uint256"}],"name":"PlayerJoined","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"winner","type":"address"},{"indexed":false,"internalType":"uint256","name":"reward","type":"uint256"}],"name":"RewardDistributed","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":false,"internalType":"uint256","name":"totalComments","type":"uint256"}],"name":"TotalCommentsUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"totalPayout","type":"uint256"}],"name":"TotalPayoutUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"totalPlayers","type":"uint256"}],"name":"TotalPlayersUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"newTotalPrizes","type":"uint256"}],"name":"TotalPrizesUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"winner","type":"address"},{"indexed":false,"internalType":"uint256","name":"prize","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"totalWinners","type":"uint256"}],"name":"WinnerAnnounced","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"winner","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"WinnerSet","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"winner","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"number","type":"uint256"}],"name":"WinnerSet","type":"event"},{"inputs":[{"internalType":"bytes32","name":"betId","type":"bytes32"},{"internalType":"string","name":"_comment","type":"string"}],"name":"addComment","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"betComments","outputs":[{"internalType":"address","name":"commenter","type":"address"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"string","name":"commentText","type":"string"},{"internalType":"bool","name":"isDeleted","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"betHistory","outputs":[{"internalType":"address","name":"player","type":"address"},{"internalType":"bytes32","name":"betId","type":"bytes32"},{"internalType":"string","name":"number","type":"string"},{"internalType":"uint256","name":"betAmount","type":"uint256"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"uint256","name":"blockNumber","type":"uint256"},{"internalType":"bytes32","name":"txHash","type":"bytes32"},{"internalType":"bool","name":"isETH","type":"bool"},{"internalType":"uint256","name":"likeCount","type":"uint256"},{"internalType":"uint256","name":"commentCount","type":"uint256"},{"internalType":"uint256","name":"payoutAmount","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"betLikeCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"betLikeDetails","outputs":[{"internalType":"address","name":"liker","type":"address"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"string","name":"likeType","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"betLikeList","outputs":[{"internalType":"address","name":"liker","type":"address"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"string","name":"likeType","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"betLikers","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"address","name":"","type":"address"}],"name":"betLikes","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"betLikesArray","outputs":[{"internalType":"address","name":"liker","type":"address"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"string","name":"likeType","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"betPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"betResults","outputs":[{"internalType":"uint256","name":"drawId","type":"uint256"},{"internalType":"uint256","name":"winningNumber","type":"uint256"},{"internalType":"bool","name":"isProcessed","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"betToDrawId","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"betWinners","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"bets","outputs":[{"internalType":"address","name":"player","type":"address"},{"internalType":"bytes32","name":"betId","type":"bytes32"},{"internalType":"string","name":"number","type":"string"},{"internalType":"uint256","name":"betAmount","type":"uint256"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"uint256","name":"blockNumber","type":"uint256"},{"internalType":"bytes32","name":"txHash","type":"bytes32"},{"internalType":"bool","name":"isETH","type":"bool"},{"internalType":"uint256","name":"likeCount","type":"uint256"},{"internalType":"uint256","name":"commentCount","type":"uint256"},{"internalType":"uint256","name":"payoutAmount","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"claimETH","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"commentCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"contractBalance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"betId","type":"bytes32"},{"internalType":"uint256","name":"commentIndex","type":"uint256"}],"name":"deleteComment","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"distributeReward","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"betId","type":"bytes32"},{"internalType":"uint256","name":"commentIndex","type":"uint256"},{"internalType":"string","name":"newComment","type":"string"}],"name":"editComment","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getAllBets","outputs":[{"components":[{"internalType":"address","name":"player","type":"address"},{"internalType":"bytes32","name":"betId","type":"bytes32"},{"internalType":"string","name":"number","type":"string"},{"internalType":"uint256","name":"betAmount","type":"uint256"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"uint256","name":"blockNumber","type":"uint256"},{"internalType":"bytes32","name":"txHash","type":"bytes32"},{"internalType":"bool","name":"isETH","type":"bool"},{"internalType":"uint256","name":"likeCount","type":"uint256"},{"internalType":"uint256","name":"commentCount","type":"uint256"},{"internalType":"uint256","name":"payoutAmount","type":"uint256"}],"internalType":"struct BetHistory.Bet[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getAllPlayers","outputs":[{"internalType":"address[]","name":"","type":"address[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getAllWinners","outputs":[{"internalType":"address[]","name":"","type":"address[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"betId","type":"bytes32"}],"name":"getBetLikers","outputs":[{"internalType":"address[]","name":"","type":"address[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"betId","type":"bytes32"}],"name":"getComments","outputs":[{"components":[{"internalType":"address","name":"commenter","type":"address"},{"internalType":"string","name":"text","type":"string"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"bool","name":"isDeleted","type":"bool"}],"internalType":"struct BetHistory.CommentData[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"betId","type":"bytes32"}],"name":"getLikeCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_player","type":"address"}],"name":"getPlayerStats","outputs":[{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"topN","type":"uint256"}],"name":"getTopPlayers","outputs":[{"internalType":"address[]","name":"","type":"address[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_user","type":"address"}],"name":"getUserBets","outputs":[{"components":[{"internalType":"address","name":"player","type":"address"},{"internalType":"bytes32","name":"betId","type":"bytes32"},{"internalType":"string","name":"number","type":"string"},{"internalType":"uint256","name":"betAmount","type":"uint256"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"uint256","name":"blockNumber","type":"uint256"},{"internalType":"bytes32","name":"txHash","type":"bytes32"},{"internalType":"bool","name":"isETH","type":"bool"},{"internalType":"uint256","name":"likeCount","type":"uint256"},{"internalType":"uint256","name":"commentCount","type":"uint256"},{"internalType":"uint256","name":"payoutAmount","type":"uint256"}],"internalType":"struct BetHistory.Bet[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_betId","type":"uint256"}],"name":"getWinnerByBetId","outputs":[{"components":[{"internalType":"address","name":"winner","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"uint256","name":"number","type":"uint256"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"uint256","name":"prizesETH","type":"uint256"}],"internalType":"struct BetHistory.WinnerData","name":"","type":"tuple"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"address","name":"","type":"address"}],"name":"hasLiked","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"betId","type":"bytes32"},{"internalType":"address","name":"user","type":"address"}],"name":"hasUserLiked","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"lastLeaderboardReset","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"lastWinner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"betId","type":"bytes32"},{"internalType":"string","name":"likeType","type":"string"}],"name":"likeBet","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"maxBet","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"minBet","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"_number","type":"string"},{"internalType":"uint256","name":"_times","type":"uint256"},{"internalType":"bool","name":"_isETH","type":"bool"},{"internalType":"uint256","name":"_payoutAmount","type":"uint256"}],"name":"placeBet","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"playerBets","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"playerStats","outputs":[{"internalType":"uint256","name":"totalBets","type":"uint256"},{"internalType":"uint256","name":"totalAmountBet","type":"uint256"},{"internalType":"uint256","name":"totalWins","type":"uint256"},{"internalType":"uint256","name":"totalPayout","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"playerWins","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"players","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"rewardAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_drawId","type":"uint256"},{"internalType":"uint256","name":"_winningNumber","type":"uint256"}],"name":"setBetResult","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_winner","type":"address"},{"internalType":"uint256","name":"_amount","type":"uint256"},{"internalType":"uint256","name":"_betId","type":"uint256"},{"internalType":"uint256","name":"_number","type":"uint256"}],"name":"setWinner","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"topBettor","outputs":[{"internalType":"address","name":"player","type":"address"},{"internalType":"uint256","name":"totalBets","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"totalBetsByPlayer","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"totalComments","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"totalLikes","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalPayout","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"totalPayoutPerDraw","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalPlayers","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalWinners","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"betId","type":"bytes32"}],"name":"unlikeBet","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"userBets","outputs":[{"internalType":"address","name":"player","type":"address"},{"internalType":"bytes32","name":"betId","type":"bytes32"},{"internalType":"string","name":"number","type":"string"},{"internalType":"uint256","name":"betAmount","type":"uint256"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"uint256","name":"blockNumber","type":"uint256"},{"internalType":"bytes32","name":"txHash","type":"bytes32"},{"internalType":"bool","name":"isETH","type":"bool"},{"internalType":"uint256","name":"likeCount","type":"uint256"},{"internalType":"uint256","name":"commentCount","type":"uint256"},{"internalType":"uint256","name":"payoutAmount","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"winnerHistory","outputs":[{"internalType":"address","name":"winner","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"uint256","name":"number","type":"uint256"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"uint256","name":"prizesETH","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"winnings","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"withdrawETH","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
+    
+    async function loadBetDetail() {
+  const detailDiv = document.getElementById("ticketDetail");
+
+  if (!window.ethereum) {
+    detailDiv.innerHTML = 'MetaMask or Web3 provider not found. Please install <a href="https://metamask.io" target="_blank">MetaMask</a>.';
+    return;
+  }
+
+  try {
+    const web3 = new Web3(window.ethereum);
+    await window.ethereum.enable();
+
+    if (!await checkNetwork(web3, detailDiv)) return;
+    if (!validateAbi(detailDiv)) return;
+
+    const contract = new web3.eth.Contract(abi, contractAddress);
+    const betIdParam = getBetIdFromUrl();
+
+    if (!validateBetId(betIdParam, detailDiv)) return;
+
+    async function updateData() {
+      const allBets = await contract.methods.getAllBets().call();
+      if (!allBets || allBets.length === 0) {
+        detailDiv.innerText = "No bets found in the contract.";
+        return;
+      }
+
+      const bet = findBetById(allBets, betIdParam);
+      if (!bet) {
+        detailDiv.innerText = `Bet with ID ${betIdParam} not found in the contract.`;
+        return;
+      }
+
+      const [
+        likeCount,
+        comments,
+        winnerData,
+        gasUsed,
+        stats,
+        userBets
+      ] = await Promise.all([
+        contract.methods.getLikeCount(bet.betId).call(),
+        contract.methods.getComments(bet.betId).call(),
+        contract.methods.getWinnerByBetId(betIdParam).call(),
+        fetchGasFee(web3, bet.txHash),
+        contract.methods.getPlayerStats(bet.player).call(),
+        contract.methods.getUserBets(bet.player).call()
+      ]);
+
+      const activeCommentCount = comments.filter(c => !c.isDeleted).length;
+      const isWinner = winnerData.winner !== '0x0000000000000000000000000000000000000000' && Number(winnerData.amount) > 0;
+      const payoutEth = web3.utils.fromWei(winnerData.amount, 'ether');
+      const shortPlayer = shortenAddress(bet.player);
+      const shortTxHash = shortenHash(bet.txHash);
+      const totalWins = await countWins(contract, userBets, bet.player);
+      const totalPayout = await calculateTotalPayout(contract, userBets, bet.player, web3);
+
+      renderDetails({
+        detailDiv,
+        bet,
+        likeCount,
+        activeCommentCount,
+        isWinner,
+        payoutEth,
+        winnerData,
+        gasUsed,
+        shortPlayer,
+        shortTxHash,
+        stats,
+        totalWins,
+        totalPayout,
+        totalBets: allBets.length,
+        relativeTime: getRelativeTime(bet.timestamp)
+      });
+    }
+
+    await updateData();
+    setInterval(updateData, 10000);
+
+  } catch (err) {
+    console.error("Error loading bet:", err);
+    detailDiv.innerText = `Failed to load bet detail: ${err.message}`;
+  }
+}
+
+// UTILITAS
+function getBetIdFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('betId');
+}
+
+function validateAbi(detailDiv) {
+  if (!abi || !Array.isArray(abi) || abi.length === 0) {
+    detailDiv.innerText = "Error: ABI is not defined or invalid. Check the abi variable.";
+    return false;
+  }
+  return true;
+}
+
+async function checkNetwork(web3, detailDiv) {
+  const chainId = await web3.eth.getChainId();
+  if (chainId !== 84532) {
+    detailDiv.innerText = "Please switch to Base Sepolia Testnet in MetaMask.";
+    return false;
+  }
+  return true;
+}
+
+function validateBetId(betId, detailDiv) {
+  if (!betId || !/^0x[a-fA-F0-9]{64}$/.test(betId)) {
+    detailDiv.innerText = "Invalid Bet ID in URL. Must be a 32-byte hex string.";
+    return false;
+  }
+  return true;
+}
+
+function findBetById(allBets, betIdParam) {
+  return allBets.find(b => b.betId.toLowerCase() === betIdParam.toLowerCase());
+}
+
+function shortenAddress(address) {
+  return `${address.slice(0, 21)}...${address.slice(-21)}`;
+}
+
+function shortenHash(hash) {
+  return `${hash.slice(0, 15)}...${hash.slice(-15)}`;
+}
+
+function getRelativeTime(timestamp) {
+  const diff = Math.floor(Date.now() / 1000) - Number(timestamp);
+  const days = Math.floor(diff / (60 * 60 * 24));
+  return days > 0 ? `${days} day(s) ago` : "Today";
+}
+
+async function fetchGasFee(web3, txHash) {
+  try {
+    const receipt = await web3.eth.getTransactionReceipt(txHash);
+    if (receipt) {
+      const gasUsedWei = web3.utils.toBN(receipt.gasUsed).mul(web3.utils.toBN(receipt.effectiveGasPrice));
+      return web3.utils.fromWei(gasUsedWei, 'ether');
+    }
+
+    const fallback = await web3.eth.getTransaction(txHash);
+    if (fallback) {
+      const gasPrice = fallback.gasPrice || await web3.eth.getGasPrice();
+      const estimated = web3.utils.toBN(gasPrice).mul(web3.utils.toBN(fallback.gas));
+      return web3.utils.fromWei(estimated, 'ether') + " (estimated)";
+    }
+
+    return "N/A";
+  } catch {
+    return "N/A";
+  }
+}
+
+async function countWins(contract, userBets, player) {
+  let wins = 0;
+  for (const ub of userBets) {
+    const result = await contract.methods.getWinnerByBetId(ub.betId).call();
+    if (result.winner.toLowerCase() === player.toLowerCase() && Number(result.amount) > 0) {
+      wins++;
+    }
+  }
+  return wins;
+}
+
+async function calculateTotalPayout(contract, userBets, player, web3) {
+  let payout = web3.utils.toBN("0");
+  for (const ub of userBets) {
+    const result = await contract.methods.getWinnerByBetId(ub.betId).call();
+    if (result.winner.toLowerCase() === player.toLowerCase()) {
+      payout = payout.add(web3.utils.toBN(result.amount));
+    }
+  }
+  return web3.utils.fromWei(payout, 'ether');
+}
+
+function renderDetails({ detailDiv, bet, likeCount, activeCommentCount, isWinner, payoutEth, winnerData, gasUsed, shortPlayer, shortTxHash, stats, totalWins, totalPayout, totalBets, relativeTime }) {
+  const payoutColor = isWinner ? '#00FF66' : '#fe6666';
+  detailDiv.innerHTML = `
+    <p>Player: <a href="https://sepolia.basescan.org/address/${bet.player}" target="_blank" style="color:#ad5cff;">${shortPlayer}</a></p>
+    <p>Bet ID: <span style="color:#b37500;">${bet.betId}</span>
+      <button onclick="navigator.clipboard.writeText('${bet.betId}'); alert('Bet ID copied!')" style="background:#555; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin-left:10px;">Copy</button>
+    </p>
+    <p>Bet Number: <span style="color:#00FF66;">${bet.number}</span></p>
+    <p>Bet Amount: <span style="color:#00FF66;">${bet.betAmount}</span></p>
+    <p>Is ETH: <span style="color:${bet.isETH ? '#00FF66' : '#fe6666'};">${bet.isETH ? 'Yes' : 'No'}</span></p>
+    <p>Transaction: <a href="https://sepolia.basescan.org/tx/${bet.txHash}" target="_blank" style="color:#fe6666;">${shortTxHash}</a></p>
+    <p>Gas Fee: <span style="color:#ffcc00;">${gasUsed} ETH</span></p>
+    <p>Block: <a href="https://sepolia.basescan.org/block/${bet.blockNumber}" target="_blank">${bet.blockNumber}</a></p>
+    <p>Time: <span style="color:orange;">${new Date(Number(bet.timestamp) * 1000).toISOString()} UTC</span> (<span style="color:#ffcc00;">${relativeTime}</span>)</p>
+    <p>Likes: <span style="color:#00cc51;">${likeCount}</span></p>
+    <p>Comments: <span style="color:#00cc51;">${activeCommentCount}</span></p>
+    <p>Payout: <span style="color:${payoutColor};">${payoutEth} ETH</span> (${winnerData.amount} wei)</p>
+    <p>Status: <span style="color:${payoutColor};">${isWinner ? 'Won' : 'Lost'}</span></p>
+    <p>Total Bets in Contract: <span style="color:#1a88ff;">${totalBets}</span></p>
+    <p>Player Total Bets: <span style="color:#1a88ff;">${stats[0]}</span></p>
+    <p>Player Total Amount Bet: <span style="color:#1a88ff;">${web3.utils.fromWei(stats[1], 'ether')} ETH</span></p>
+    <p>Player Total Wins: <span style="color:#1a88ff;">${totalWins}</span></p>
+    <p>Player Total Payout: <span style="color:#1a88ff;">${totalPayout} ETH</span></p>
+    <p>Contract: <a href="https://sepolia.basescan.org/address/${contractAddress}" target="_blank" style="color:#1a88ff;">${contractAddress.slice(0, 10)}...${contractAddress.slice(-10)}</a></p>
+    <div style="margin-top:10px;">
+      <button onclick="shareToTwitter('${bet.betId}')" style="background:#1DA1F2; color:white; border:none; padding:5px 10px; border-radius:5px;">Share to Twitter</button>
+      <button onclick="shareToTelegram('${bet.betId}')" style="background:#0088cc; color:white; border:none; padding:5px 10px; border-radius:5px;">
+        <img src="img/telegram.svg" alt="Telegram" style="width:16px; height:16px; vertical-align:middle;"> Share to Telegram
+      </button>
+      <button onclick="shareToFacebook('${bet.betId}')" style="background:#4267B2; color:white; border:none; padding:5px 10px; border-radius:5px;">Share to Facebook</button>
+    </div>
+    <div style="margin-top:10px;">
+      <canvas id="qrCode-${bet.betId}" width="128" height="128"></canvas>
+    </div>
+  `;
+  const qrCanvas = document.getElementById(`qrCode-${bet.betId}`);
+  generateQRCode(qrCanvas, `${window.location.origin}${window.location.pathname}?betId=${bet.betId}`);
+      }
+  </script>
+</body>
+  </html>
