@@ -181,7 +181,7 @@ async function loadBetDetail() {
       if (txReceipt) {
         gasUsed = web3.utils.fromWei((txReceipt.gasUsed * txReceipt.effectiveGasPrice).toString(), 'ether');
       } else {
-        const response = await fetch(`https://api-sepolia.basescan.org/api?module=transaction&action=gettxreceipt&txhash=${bet.txHash}&apikey=YOUR_API_KEY`);
+        const response = await fetch(`https://sepolia.basescan.org/api?module=transaction&action=gettxreceipt&txhash=${bet.txHash}`);
         const data = await response.json();
         if (data.status === "1") {
           const gasUsedWei = web3.utils.toBN(data.result.gasUsed).mul(web3.utils.toBN(data.result.effectiveGasPrice));
@@ -252,10 +252,18 @@ async function loadBetDetail() {
       </div>
     `;
 
-    // QR Code manual menggunakan canvas
+        // QR Code menggunakan library qrcode.js
     const qrCanvas = document.getElementById(`qrCode-${bet.betId}`);
     const qrUrl = `${window.location.origin}${window.location.pathname}?betId=${bet.betId}`;
-    generateQRCode(qrCanvas, qrUrl);
+    QRCode.toCanvas(qrCanvas, qrUrl, {
+      width: 128,
+      color: {
+        dark: "#ffffff", // Warna kotak QR
+        light: "#1e1e1e" // Warna latar belakang
+      }
+    }, function (error) {
+      if (error) console.error("Error generating QR code:", error);
+    });
 
   } catch (err) {
     console.error("Error saat memuat bet:", err);
@@ -323,33 +331,6 @@ function generateQRCode(canvas, text) {
       }
     }
   }
-}
-
-// QR Code Generator sederhana (implementasi dasar)
-function QRCodeGenerator(text) {
-  this.text = text;
-  this.generate = function() {
-    // Implementasi QR Code sederhana (untuk demo, kita simulasi 21x21 grid)
-    const size = 21;
-    const data = Array(size).fill().map(() => Array(size).fill(false));
-    const hash = this.text.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-    for (let i = 0; i < size; i++) {
-      for (let j = 0; j < size; j++) {
-        data[i][j] = ((hash + i * j) % 2) === 0; // Pola acak untuk demo
-      }
-    }
-    // Tambahkan pola finder (kiri atas, kanan atas, kiri bawah)
-    for (let i = 0; i < 7; i++) {
-      for (let j = 0; j < 7; j++) {
-        if (i === 0 || i === 6 || j === 0 || j === 6 || (i >= 2 && i <= 4 && j >= 2 && j <= 4)) {
-          data[i][j] = true;
-          data[i][size - 7 + j] = true;
-          data[size - 7 + i][j] = true;
-        }
-      }
-    }
-    return data;
-  };
 }
 
 window.onload = loadBetDetail;
