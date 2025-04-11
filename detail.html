@@ -50,24 +50,32 @@ h3 {
   max-width: 95%;
   margin: 20px auto;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(3px);
 }
-     
+
 #ticketDetail:hover {
-  transform: scale(1.02);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+  transform: scale(1.025);
+  box-shadow: 0 0 20px #00c3ff, 0 0 30px #00c3ff;
+  border: 1px solid rgba(0, 195, 255, 0.4);
 }
+
 #ticketDetail p {
   margin: 6px 0;
 }
+
 #ticketDetail a {
   color: #1a88ff;
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: all 0.3s ease;
+  text-shadow: 0 0 5px rgba(26, 136, 255, 0.3);
 }
+
 #ticketDetail a:hover {
-  color: #4ca3ff;
+  color: #ffffff;
   text-decoration: underline;
+  text-shadow: 0 0 8px #4ca3ff, 0 0 12px #4ca3ff;
 }
 
 button {
@@ -79,10 +87,14 @@ button {
   border-radius: 6px;
   cursor: pointer;
   margin: 20px auto;
+  box-shadow: 0 0 0 transparent;
+  transition: all 0.3s ease;
 }
 
 button:hover {
   background-color: #006fd6;
+  transform: scale(1.05);
+  box-shadow: 0 0 15px #1a88ff, 0 0 25px #1a88ff;
 }
    </style>
 </head>
