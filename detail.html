@@ -94,6 +94,44 @@
           <p>Tx: <span style="color:#fe6666;">${shortTxHash}</span></p>
           <p>Block: <a href="https://sepolia.basescan.org/block/${bet.blockNumber}" target="_blank">${bet.blockNumber}</a></p>
           <p>Time: <span style="color:orange;">${new Date(Number(bet.timestamp) * 1000).toISOString()} UTC</span></p>
+          <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" 
+            style="background-color: #000000; color: white; border: none; padding: 5px 10px; 
+               cursor: pointer; margin-top: 5px;">
+             <img src="img/like.svg" alt="Like" 
+             style="width: 11px; height: 11px; vertical-align: middle;">
+             </button> 
+
+             <span id="likeCount-${bet.betId}" 
+             style="margin-left: 10px; color: #00cc51; font-size: 15px; font-weight: bold;">
+             0
+             </span> Likes 
+
+             <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p> 
+
+             <details class="comment-dropdown">
+    <summary style="display: flex; align-items: center; cursor: pointer; justify-content: space-between; width: 100%; padding: 0 15px;">
+    <span style="display: flex; align-items: center; gap: 10px;">
+        <img src="img/comment.svg" alt="Komentar" style="width: 18px; height: 18px;" margin-right: 20px;">
+        <span id="commentCount-${bet.betId}" style="color: #00cc51; font-size: 15px; font-weight: bold;">0</span> Comments
+    </span>
+    <img src="img/clos.svg" style="width: 18px; height: 18px; margin-right: 20px;">
+</summary>
+    <div id="commentSection-${bet.betId}" class="comment-section">
+        <div id="commentList-${bet.betId}" class="comment-list"></div>
+        <textarea id="commentInput-${bet.betId}" placeholder="Write a comment..."></textarea>
+        <button id="sendBtn-${bet.betId}" onclick="addOrUpdateComment('${bet.betId}')" style="background: rgba(0, 255, 0, 0.5); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Send</button>
+        <br><h6 style="
+    color: #ff1a1d; 
+    text-align: left; 
+    padding: 10px; 
+    background: url('img/warning.svg') no-repeat left center; 
+    background-size: 20px; 
+    padding-left: 40px;">
+    WARNING: Comments stored on the blockchain are permanent and cannot be deleted. 
+    Please be wise in your comments before posting!
+</h6>
+    </div>
+</details>
         `;
       } catch (err) {
         console.error("Error saat memuat bet:", err);
