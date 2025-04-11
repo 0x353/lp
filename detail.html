@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
    <style>
     body {
       background-color: #000000;
@@ -38,6 +39,46 @@ h3 {
       color: #1a88ff;
       text-decoration: none;
     }
+
+#ticketDetail {
+  background-color: #1e1e1e;
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  width: fit-content;
+  max-width: 90%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+#ticketDetail:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+}
+#ticketDetail p {
+  margin: 6px 0;
+}
+#ticketDetail a {
+  color: #1a88ff;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+#ticketDetail a:hover {
+  color: #4ca3ff;
+  text-decoration: underline;
+}
+
+button {
+      background-color: #1a88ff;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      font-size: 14px;
+      border-radius: 6px;
+      cursor: pointer;
+}
    </style>
 </head>
 <body>
@@ -45,6 +86,7 @@ h3 {
     <center><h1>Ticket Detail</h1></center>
     <hr style="background-color: #ccc; height: 1px; border: none;"><br>
     <div id="ticketDetail">Loading...</div>
+    <button onclick="downloadPNG()">Download Ticket</button>
   </div>
 
   <script>
@@ -118,6 +160,16 @@ h3 {
         console.error("Error saat memuat bet:", err);
         detailDiv.innerText = `Failed to load bet detail: ${err.message}`;
       }
+    }
+
+    function downloadPNG() {
+    const target = document.getElementById("ticketDetail");
+    html2canvas(target).then(canvas => {
+      const link = document.createElement("a");
+      link.download = "bet-detail.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
     }
 
     window.onload = loadBetDetail;
