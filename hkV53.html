@@ -1604,7 +1604,7 @@ async function loadBetHistory() {
         let shortPlayer = bet.player.slice(0, 10) + "..." + bet.player.slice(-10);
         let shortTxHash = bet.txHash.slice(0, 10) + "..." + bet.txHash.slice(-10);
 
-        html += `<div onclick="window.location.href='ticketdetail?betId=${bet.betId}'"
+        html += `<div onclick="window.location.href='ticketDetail?betId=${bet.betId}'"
          style="cursor: pointer; padding: 10px; background-color: #111; border-radius: 10px; margin-bottom: 10px;">
         <p>
             Player: <span style="color: #ad5cff;">${shortPlayer}</span><br>
