@@ -87,7 +87,7 @@ button:hover {
    </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" id="ticketContainer">
     <center><h1>Ticket Detail</h1></center>
     <hr style="background-color: #ccc; height: 1px; border: none;"><br>
     <div id="ticketDetail">Loading...</div>
@@ -168,7 +168,7 @@ button:hover {
     }
 
     function downloadPNG() {
-  const element = document.getElementById("ticketContainer");
+  const element = document.querySelector(".container");
   html2canvas(element).then(canvas => {
     const link = document.createElement("a");
     link.download = "ticket.png";
