@@ -164,12 +164,12 @@ button:hover {
         const shortTxHash = bet.txHash.slice(0, 15) + "..." + bet.txHash.slice(-15);
 
         detailDiv.innerHTML = `
-          <p>Player: <a href="https://basescan.org/address/${fullAddress}" target="_blank" style="color:#ad5cff; text-decoration:none;">${shortPlayer}</a></p>
+          <p>Player: <a href="https://basescan.org/address/${bet.player}" target="_blank" style="color:#ad5cff; text-decoration:none;">${shortPlayer}</a></p>
           <p>BetID: <span style="color:#b37500;">${bet.betId}</span></p>
           <p>BetNumber: <span style="color:#00FF66;">${bet.number}</span></p>
           <p>BetAmount: <span style="color:#00FF66;">${bet.betAmount}</span></p>
           <p>Is ETH: <span style="color:${bet.isETH ? '#00FF66' : '#fe6666'};">${bet.isETH ? 'Yes' : 'No'}</span></p>
-          <p>Tx:  <a href="https://basescan.org/tx/${fullTxHash}" target="_blank" rel="noopener noreferrer" style="color:#fe6666; text-decoration: none;">${shortTxHash}</a></p>
+          <p>Tx:  <a href="https://basescan.org/tx/${bet.TxHash}" target="_blank" rel="noopener noreferrer" style="color:#fe6666; text-decoration: none;">${shortTxHash}</a></p>
           <p>Block: <a href="https://sepolia.basescan.org/block/${bet.blockNumber}" target="_blank">${bet.blockNumber}</a></p>
           <p>Time: <span style="color:orange;">${new Date(Number(bet.timestamp) * 1000).toISOString()} UTC</span></p>
         `;
