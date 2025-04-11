@@ -161,7 +161,7 @@ button:hover {
         }
 
         const shortPlayer = bet.player.slice(0, 21) + "" + bet.player.slice(-21);
-        const shortTxHash = bet.txHash.slice(0, 10) + "..." + bet.txHash.slice(-10);
+        const shortTxHash = bet.txHash.slice(0, 32) + "" + bet.txHash.slice(-32);
 
         detailDiv.innerHTML = `
           <p>Player: <span style="color:#ad5cff;">${shortPlayer}</span></p>
