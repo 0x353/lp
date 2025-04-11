@@ -36,7 +36,7 @@
       const detailDiv = document.getElementById("ticketDetail");
 
       if (typeof window.ethereum === 'undefined') {
-        detailDiv.innerText = "MetaMask or Web3 provider not found.";
+        detailDiv.innerHTML = 'MetaMask or Web3 provider not found. Please install <a href="https://metamask.io" target="_blank">MetaMask</a>.';
         return;
       }
 
@@ -44,28 +44,37 @@
         const web3 = new Web3(window.ethereum);
         await window.ethereum.enable();
 
+        // Periksa jaringan (contoh: Base, chain ID 8453)
+        const chainId = await web3.eth.getChainId();
+        if (chainId !== 8453) {
+          detailDiv.innerText = "Please switch to the Base network in MetaMask.";
+          return;
+        }
+
         const contract = new web3.eth.Contract(abi, contractAddress);
         const urlParams = new URLSearchParams(window.location.search);
         const betIdParam = urlParams.get('betId');
 
-        if (!betIdParam) {
-          detailDiv.innerText = "Bet ID not found in URL.";
+        console.log("Bet ID dari URL:", betIdParam);
+        if (!betIdParam || isNaN(betIdParam)) {
+          detailDiv.innerText = "Invalid Bet ID in URL.";
           return;
         }
 
         const allBets = await contract.methods.getAllBets().call();
-        console.log("Semua bets:", allBets);
-        console.log("Bet ID dari URL:", betIdParam);
+        console.log("Data allBets:", allBets);
 
-        // Cari bet dengan ID yang cocok
-        const bet = allBets.find(b => b.betId.toString() === betIdParam.toString());
+        if (!allBets || allBets.length === 0) {
+          detailDiv.innerText = "No bets found in the contract.";
+          return;
+        }
 
+        const bet = allBets.find(b => b.betId.toString() === betIdParam);
         if (!bet) {
           detailDiv.innerText = "Bet not found.";
           return;
         }
 
-        // Format tampilan
         const shortPlayer = bet.player.slice(0, 10) + "..." + bet.player.slice(-10);
         const shortTxHash = bet.txHash.slice(0, 10) + "..." + bet.txHash.slice(-10);
 
@@ -76,12 +85,12 @@
           <p>BetAmount: <span style="color:#00FF66;">${bet.betAmount}</span></p>
           <p>Is ETH: <span style="color:${bet.isETH ? '#00FF66' : '#fe6666'};">${bet.isETH ? 'Yes' : 'No'}</span></p>
           <p>Tx: <span style="color:#fe6666;">${shortTxHash}</span></p>
-          <p>Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank">${bet.blockNumber}</a></p>
-          <p>Time: <span style="color:orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span></p>
+          <p>Block: <a href="https://basescan.org/block/${bet.blockNumber}" target="_blank">${bet.blockNumber}</a></p>
+          <p>Time: <span style="color:orange;">${new Date(Number(bet.timestamp) * 1000).toISOString()} UTC</span></p>
         `;
       } catch (err) {
         console.error("Error saat memuat bet:", err);
-        detailDiv.innerText = "Failed to load bet detail.";
+        detailDiv.innerText = `Failed to load bet detail: ${err.message}`;
       }
     }
 
