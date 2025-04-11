@@ -148,7 +148,7 @@ button:hover {
           return;
         }
 
-        const shortPlayer = bet.player.slice(0, 10) + "..." + bet.player.slice(-10);
+        const shortPlayer = bet.player.slice(0, 21) + "" + bet.player.slice(-21);
         const shortTxHash = bet.txHash.slice(0, 10) + "..." + bet.txHash.slice(-10);
 
         detailDiv.innerHTML = `
