@@ -164,12 +164,30 @@ async function loadBetDetail() {
     const likeCount = await contract.methods.getLikeCount(betIdBytes32).call();
     const comments = await contract.methods.getComments(betIdBytes32).call();
     const activeCommentCount = comments.filter(c => !c.isDeleted).length;
-    const payoutAmount = bet.payoutAmount || "0";
-    const betAmountEth = web3.utils.fromWei(bet.betAmount, 'ether');
+
+    // Ambil data pemenang untuk status dan payout yang benar
+    const winnerData = await contract.methods.getWinnerByBetId(betIdParam).call();
+    const isWinner = winnerData.winner !== '0x0000000000000000000000000000000000000000' && Number(winnerData.amount) > 0;
+    const payoutAmount = isWinner ? winnerData.amount : "0";
     const payoutAmountEth = web3.utils.fromWei(payoutAmount, 'ether');
-    const isWinner = Number(payoutAmount) > 0 ? "Won" : "Lost";
+
+    // Bet Amount adalah jumlah taruhan (_times), bukan nilai wei
+    const betAmount = bet.betAmount;
+
+    // Gas Fee dengan fallback ke estimasi
+    let gasUsed = "N/A";
     const txReceipt = await web3.eth.getTransactionReceipt(bet.txHash);
-    const gasUsed = txReceipt ? web3.utils.fromWei((txReceipt.gasUsed * txReceipt.effectiveGasPrice).toString(), 'ether') : "N/A";
+    if (txReceipt) {
+      gasUsed = web3.utils.fromWei((txReceipt.gasUsed * txReceipt.effectiveGasPrice).toString(), 'ether');
+    } else {
+      const tx = await web3.eth.getTransaction(bet.txHash);
+      if (tx) {
+        const gasPrice = tx.gasPrice || await web3.eth.getGasPrice(); // Fallback ke harga gas saat ini
+        const gasLimit = tx.gas;
+        gasUsed = web3.utils.fromWei((gasPrice * gasLimit).toString(), 'ether') + " (estimated)";
+      }
+    }
+
     const totalBets = allBets.length;
     const timeDiff = Math.floor((Date.now() / 1000) - Number(bet.timestamp));
     const daysAgo = Math.floor(timeDiff / (60 * 60 * 24));
@@ -182,7 +200,7 @@ async function loadBetDetail() {
         <button onclick="navigator.clipboard.writeText('${bet.betId}'); alert('Bet ID copied!')" style="background:#555; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin-left:10px;">Copy</button>
       </p>
       <p>Bet Number: <span style="color:#00FF66;">${bet.number}</span></p>
-      <p>Bet Amount: <span style="color:#00FF66;">${betAmountEth} ETH</span> (${bet.betAmount} wei)</p>
+      <p>Bet Amount: <span style="color:#00FF66;">${betAmount}</span></p>
       <p>Is ETH: <span style="color:${bet.isETH ? '#00FF66' : '#fe6666'};">${bet.isETH ? 'Yes' : 'No'}</span></p>
       <p>Transaction: <a href="https://sepolia.basescan.org/tx/${bet.txHash}" target="_blank" style="color:#fe6666;">${shortTxHash}</a></p>
       <p>Gas Fee: <span style="color:#ffcc00;">${gasUsed} ETH</span></p>
@@ -191,7 +209,7 @@ async function loadBetDetail() {
       <p>Likes: <span style="color:#00cc51;">${likeCount}</span></p>
       <p>Comments: <span style="color:#00cc51;">${activeCommentCount}</span></p>
       <p>Payout: <span style="color:${Number(payoutAmount) > 0 ? '#00FF66' : '#fe6666'};">${payoutAmountEth} ETH</span> (${payoutAmount} wei)</p>
-      <p>Status: <span style="color:${isWinner === 'Won' ? '#00FF66' : '#fe6666'};">${isWinner}</span></p>
+      <p>Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span></p>
       <p>Total Bets in Contract: <span style="color:#1a88ff;">${totalBets}</span></p>
       <p>Player Total Bets: <span style="color:#1a88ff;">${stats[0]}</span></p>
       <p>Player Total Amount Bet: <span style="color:#1a88ff;">${web3.utils.fromWei(stats[1], 'ether')} ETH</span></p>
@@ -199,16 +217,15 @@ async function loadBetDetail() {
       <p>Player Total Payout: <span style="color:#1a88ff;">${web3.utils.fromWei(stats[3], 'ether')} ETH</span></p>
       <p>Contract: <a href="https://sepolia.basescan.org/address/${contractAddress}" target="_blank" style="color:#1a88ff;">${contractAddress.slice(0, 10)}...${contractAddress.slice(-10)}</a></p>
       <div style="margin-top:10px;">
-        <button onclick="shareToTwitter('${bet.betId}')" style="background:#1DA1F2;">Share to Twitter</button>
-        <button onclick="shareToTelegram('${bet.betId}')" style="background:#0088cc;">
+        <button onclick="shareToTwitter('${bet.betId}')" style="background:#1DA1F2; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin-right:5px;">Share to Twitter</button>
+        <button onclick="shareToTelegram('${bet.betId}')" style="background:#0088cc; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin-right:5px;">
           <img src="img/telegram.svg" alt="Telegram" style="width:16px; height:16px; vertical-align:middle;"> Share to Telegram
         </button>
-        <button onclick="shareToFacebook('${bet.betId}')" style="background:#4267B2;">Share to Facebook</button>
+        <button onclick="shareToFacebook('${bet.betId}')" style="background:#4267B2; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Share to Facebook</button>
       </div>
       <div id="qrCode-${bet.betId}" style="margin-top:10px;"></div>
     `;
 
-    // Tambahkan QR Code dengan penanganan error
     try {
       const qrCodeDiv = document.getElementById(`qrCode-${bet.betId}`);
       const qrUrl = `${window.location.origin}${window.location.pathname}?betId=${bet.betId}`;
