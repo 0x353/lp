@@ -168,15 +168,14 @@ button:hover {
     }
 
     function downloadPNG() {
-    const target = document.getElementById("ticketDetail");
-    html2canvas(target).then(canvas => {
-      const link = document.createElement("a");
-      link.download = "bet-detail.png";
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-    });
-    }
-
+  const element = document.getElementById("ticketContainer");
+  html2canvas(element).then(canvas => {
+    const link = document.createElement("a");
+    link.download = "ticket.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  });
+}
     window.onload = loadBetDetail;
   </script>
 </body>
