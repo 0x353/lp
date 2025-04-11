@@ -34,7 +34,7 @@
     
     async function loadBetDetail() {
       if (typeof window.ethereum === 'undefined') {
-        document.getElementById("betDetail").innerText = "MetaMask or Web3 provider not found.";
+        document.getElementById("ticketDetail").innerText = "MetaMask or Web3 provider not found.";
         return;
       }
 
@@ -47,7 +47,7 @@
       const betId = urlParams.get('betId');
 
       if (!betId) {
-        document.getElementById("betDetail").innerText = "Bet ID not found.";
+        document.getElementById("ticketDetail").innerText = "Bet ID not found.";
         return;
       }
 
@@ -56,14 +56,14 @@
         const bet = allBets.find(b => b.betId === betId);
 
         if (!bet) {
-          document.getElementById("betDetail").innerText = "Bet not found.";
+          document.getElementById("ticketDetail").innerText = "Bet not found.";
           return;
         }
 
         const shortPlayer = bet.player.slice(0, 10) + "..." + bet.player.slice(-10);
         const shortTxHash = bet.txHash.slice(0, 10) + "..." + bet.txHash.slice(-10);
 
-        document.getElementById("betDetail").innerHTML = `
+        document.getElementById("ticketDetail").innerHTML = `
           <p>Player: <span style="color:#ad5cff;">${shortPlayer}</span></p>
           <p>BetID: <span style="color:#b37500;">${bet.betId}</span></p>
           <p>BetNumber: <span style="color:#00FF66;">${bet.number}</span></p>
@@ -75,7 +75,7 @@
         `;
       } catch (err) {
         console.error(err);
-        document.getElementById("betDetail").innerText = "Failed to load bet detail.";
+        document.getElementById("ticketDetail").innerText = "Failed to load bet detail.";
       }
     }
 
