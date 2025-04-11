@@ -20,8 +20,6 @@
       background-color: #1e1e1e;
       padding: 20px;
       border-radius: 10px;
-      width: 95%;
-      max-width: 1300%;
     }
 
      h1, h2 {
@@ -145,13 +143,16 @@ button {
           return;
         }
 
+        const shortPlayer = bet.player.slice(0, 21) + "" + bet.player.slice(-21);
+        const shortTxHash = bet.txHash.slice(0, 10) + "..." + bet.txHash.slice(-10);
+
         detailDiv.innerHTML = `
-          <p>Player: <span style="color:#ad5cff;">${bet.player}</span></p>
+          <p>Player: <span style="color:#ad5cff;">${shortPlayer}</span></p>
           <p>BetID: <span style="color:#b37500;">${bet.betId}</span></p>
           <p>BetNumber: <span style="color:#00FF66;">${bet.number}</span></p>
           <p>BetAmount: <span style="color:#00FF66;">${bet.betAmount}</span></p>
           <p>Is ETH: <span style="color:${bet.isETH ? '#00FF66' : '#fe6666'};">${bet.isETH ? 'Yes' : 'No'}</span></p>
-          <p>Tx: <span style="color:#fe6666;">${bet.txHash}</span></p>
+          <p>Tx: <span style="color:#fe6666;">${shortTxHash}</span></p>
           <p>Block: <a href="https://sepolia.basescan.org/block/${bet.blockNumber}" target="_blank">${bet.blockNumber}</a></p>
           <p>Time: <span style="color:orange;">${new Date(Number(bet.timestamp) * 1000).toISOString()} UTC</span></p>
         `;
