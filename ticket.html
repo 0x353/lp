@@ -10,6 +10,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
    <style>
     body {
       background-color: #000000;
@@ -246,7 +248,30 @@ async function loadBetDetail() {
           <img src="img/telegram.svg" alt="Telegram" style="width:16px; height:16px; vertical-align:middle;"> Share to Telegram
         </button>
         <button onclick="shareToFacebook('${bet.betId}')" style="background:#4267B2; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Share to Facebook</button>
+        </div>
+      <div style="margin-top:10px;">
+        <canvas id="qrCode-${bet.betId}" width="128" height="128"></canvas>
+      </div>
     `;
+
+    // QR Code menggunakan library qrcode.js
+    const qrCanvas = document.getElementById(`qrCode-${bet.betId}`);
+    const qrUrl = `${window.location.origin}${window.location.pathname}?betId=${bet.betId}`;
+    QRCode.toCanvas(qrCanvas, qrUrl, {
+      width: 128,
+      color: {
+        dark: "#ffffff", // Warna kotak QR
+        light: "#1e1e1e" // Warna latar belakang
+      }
+    }, function (error) {
+      if (error) console.error("Error generating QR code:", error);
+    });
+
+  } catch (err) {
+    console.error("Error saat memuat bet:", err);
+    detailDiv.innerText = `Failed to load bet detail: ${err.message}`;
+  }
+}
 
 function shareToTwitter(betId) {
   const url = `${window.location.origin}${window.location.pathname}?betId=${betId}`;
@@ -287,27 +312,6 @@ function downloadPNG() {
     console.error("Gagal membuat PNG:", err);
     alert("Gagal menghasilkan gambar. Cek console untuk detail.");
   });
-}
-
-// Fungsi QR Code manual tanpa library eksternal
-function generateQRCode(canvas, text) {
-  const ctx = canvas.getContext('2d');
-  const size = 128;
-  const qr = new QRCodeGenerator(text); // QR Code generator sederhana di bawah
-  const qrData = qr.generate();
-
-  ctx.fillStyle = "#1e1e1e";
-  ctx.fillRect(0, 0, size, size);
-
-  const moduleSize = size / qrData.length;
-  for (let y = 0; y < qrData.length; y++) {
-    for (let x = 0; x < qrData.length; x++) {
-      if (qrData[y][x]) {
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(x * moduleSize, y * moduleSize, moduleSize, moduleSize);
-      }
-    }
-  }
 }
 
 window.onload = loadBetDetail;
