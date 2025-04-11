@@ -11,7 +11,7 @@
    <style>
     body {
       background-color: #000000;
-      color: blue;
+      color: white;
       font-family: Arial, sans-serif;
       padding: 20px;
       font-family: 'Ubuntu', sans-serif;
@@ -112,12 +112,6 @@ h3 {
           <p>Tx: <span style="color:#fe6666;">${shortTxHash}</span></p>
           <p>Block: <a href="https://sepolia.basescan.org/block/${bet.blockNumber}" target="_blank">${bet.blockNumber}</a></p>
           <p>Time: <span style="color:orange;">${new Date(Number(bet.timestamp) * 1000).toISOString()} UTC</span></p>
-          <button id="likeButton-${bet.betId}" onclick="toggleLike('${bet.betId}')" 
-            style="background-color: #000000; color: white; border: none; padding: 5px 10px; 
-               cursor: pointer; margin-top: 5px;">
-             <img src="img/like.svg" alt="Like" 
-             style="width: 11px; height: 11px; vertical-align: middle;">
-             </button> 
         `;
       } catch (err) {
         console.error("Error saat memuat bet:", err);
