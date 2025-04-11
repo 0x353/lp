@@ -1606,8 +1606,6 @@ async function loadBetHistory() {
 
         html += `
         <p>
-            <div onclick="window.location.href='ticketDetail?betId=${bet.betId}'"
-            style="cursor: pointer; padding: 10px; background-color: #111; border-radius: 10px; margin-bottom: 10px;">
             Player: <span style="color: #ad5cff;">${shortPlayer}</span><br>
             
             BetID: <span style="color: #b37500; font-size: 9px;">${bet.betId}</span><br>
@@ -1662,6 +1660,12 @@ async function loadBetHistory() {
 </h6>
     </div>
 </details>
+
+        <br>
+<a href="detail?betId=${bet.betId}" 
+   style="display: inline-block; margin-top: 8px; background-color: #1a88ff; color: white; padding: 4px 8px; font-size: 12px; border-radius: 4px; text-decoration: none;">
+   Lihat Detail
+</a>
         </p>
         <hr style="background-color: #333333; height: 1px; border: none;">`;
     }
