@@ -305,9 +305,6 @@ button:not(#closePopup):active::after {
     // Panggil pertama kali
     await updateData();
 
-    // Polling setiap 10 detik
-    setInterval(updateData, 10000);
-
   } catch (err) {
     console.error("Error loading ticket:", err);
     detailDiv.innerText = `Failed to load bet detail: ${err.message}`;
