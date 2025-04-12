@@ -52,18 +52,12 @@ h3 {
   width: 95%;
   max-width: 95%;
   margin: 20px auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 12px rgba(80, 160, 255, 0.3), 0 0 18px rgba(80, 160, 255, 0.2);
   transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
   border: 1px solid rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(3px);
   text-align: justify;
   text-justify: inter-word;
-}
-
-#ticketDetail:hover {
-  transform: scale(1.015);
-  box-shadow: 0 0 12px rgba(80, 160, 255, 0.3), 0 0 18px rgba(80, 160, 255, 0.2);
-  border: 1px solid rgba(80, 160, 255, 0.3);
 }
 
 #ticketDetail p {
@@ -76,13 +70,7 @@ h3 {
   transition: all 0.3s ease;
   text-shadow: 0 0 3px rgba(130, 186, 255, 0.2);
 }
-
-#ticketDetail a:hover {
-  color: #dbeeff;
-  text-decoration: underline;
-  text-shadow: 0 0 5px rgba(130, 186, 255, 0.4);
-}
-
+     
 button {
   background-color: #007bff;
   color: white;
@@ -367,7 +355,7 @@ function shareToFacebook(betId) {
         background: #222222;
         padding: 20px;
         border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        box-shadow: 0 0 12px rgba(80, 160, 255, 0.3), 0 0 18px rgba(80, 160, 255, 0.2);
         z-index: 1000;
         text-align: center;
       `;
