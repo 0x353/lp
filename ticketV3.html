@@ -374,7 +374,7 @@ function shareTo(betId) {
   function fallbackShare() {
     // Daftar platform dan URL share-nya
     const shareOptions = [
-      { name: "Facebook", icon: "img/success.svg", url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}` },
+      { name: icon: "img/success.svg", url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}` },
       { name: "Facebook", url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}` },
       { name: "Twitter", url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=Check%20this%20out!` },
       { name: "WhatsApp", url: `https://api.whatsapp.com/send?text=${encodeURIComponent("Check this out: " + url)}` },
