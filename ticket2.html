@@ -247,10 +247,11 @@ button:hover {
         <canvas id="qrCode-${bet.betId}" width="128" height="128"></canvas>
       `;
 
-      const qrCanvas = document.getElementById(`qrCode-${bet.betId}`);
-      const qrUrl = `${window.location.origin}${window.location.pathname}?betId=${bet.betId}`;
-      generateQRCode(qrCanvas, qrUrl);
-    }
+      setTimeout(() => {
+  const qrCanvas = document.getElementById(`qrCode-${bet.betId}`);
+  const qrUrl = `${window.location.origin}${window.location.pathname}?betId=${bet.betId}`;
+  if (qrCanvas) generateQRCode(qrCanvas, qrUrl);
+}, 100);
 
     // Panggil pertama kali
     await updateData();
