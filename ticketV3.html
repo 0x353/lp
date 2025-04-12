@@ -288,7 +288,7 @@ button:not(#closePopup):active::after {
         <p>Player Total Payout: <span style="color:#1a88ff;">${totalPayoutEth} ETH</span></p>
         <p>Contract: <a href="https://sepolia.basescan.org/address/${contractAddress}" target="_blank" style="color:#1a88ff;">${contractAddress.slice(0, 10)}...${contractAddress.slice(-10)}</a></p>
         <div style="margin-top:10px;">
-          <button onclick="shareTo('${bet.betId}')" style="background:#00000; color:white; border:none; padding:5px 10px; border-radius:0.9em; cursor:pointer; margin-right:5px;">
+          <button onclick="shareTo('${bet.betId}')" style="background:#111111; color:white; border:none; padding:5px 10px; border-radius:0.9em; cursor:pointer; margin-right:5px;">
             <img src="img/telegram.svg" style="width:16px; height:16px; vertical-align:middle;"> Share to
           </button>
           <canvas id="qrCode-${bet.betId}" width="128" height="128" style="display:block; margin-top:10px; background-color:white;"></canvas>
