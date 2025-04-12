@@ -104,7 +104,7 @@ button:hover {
 </head>
 <body>
   <div class="container" id="ticketContainer">
-  <center><h1>Pmublic Ticket Detail</h1></center><br>
+  <center><h1>Public Ticket Detail</h1></center><br>
   <div id="ticketDetail">Loading...</div>
   <button onclick="downloadPNG()">Download Ticket</button>
   </div>
@@ -281,25 +281,49 @@ function shareToTelegram(betId) {
 
 function shareToFacebook(betId) {
   const url = `${window.location.origin}${window.location.pathname}?betId=${betId}`;
-  console.log("Generated URL:", url); // Debugging
+  console.log("Generated URL:", url); // Debug URL
 
   // Cek apakah di perangkat mobile
   if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
-    // Intent umum dengan ACTION_SEND
-    const shareIntent = `intent://#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT=${encodeURIComponent(url)};end`;
-    const facebookWeb = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+    // Prioritas 1: Web Share API
+    if (navigator.share) {
+      console.log("Mencoba Web Share API");
+      navigator.share({
+        title: "Share Bet",
+        text: "Check this out!",
+        url: url
+      })
+        .then(() => console.log("Berbagi berhasil"))
+        .catch((err) => {
+          console.error("Web Share gagal:", err);
+          // Fallback ke Intent kalau Web Share gagal
+          tryIntent();
+        });
+    } else {
+      // Langsung ke Intent kalau Web Share tidak ada
+      console.log("Web Share tidak tersedia, coba Intent");
+      tryIntent();
+    }
 
-    console.log("Mencoba Intent:", shareIntent); // Debugging
+    // Fungsi untuk coba Intent
+    function tryIntent() {
+      // Intent sederhana untuk share
+      const shareIntent = `intent://#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT=${encodeURIComponent(url)};end`;
+      const facebookWeb = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+      console.log("Mencoba Intent:", shareIntent);
 
-    // Coba buka Intent
-    const intentWindow = window.open(shareIntent, '_blank');
-    setTimeout(() => {
-      // Jika Intent gagal, fallback ke web
-      if (!intentWindow || intentWindow.closed) {
-        console.log("Intent gagal, buka web");
+      try {
+        window.location.href = shareIntent; // Pakai location.href untuk Intent
+        setTimeout(() => {
+          // Fallback ke web kalau Intent gagal setelah 2 detik
+          console.log("Intent mungkin gagal, buka web");
+          window.open(facebookWeb, '_blank');
+        }, 2000);
+      } catch (err) {
+        console.error("Intent error:", err);
         window.open(facebookWeb, '_blank');
       }
-    }, 1500);
+    }
   } else {
     // Untuk PC atau non-mobile, langsung ke web
     console.log("Buka Facebook web");
