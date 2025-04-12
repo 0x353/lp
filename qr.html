@@ -42,17 +42,6 @@
       pointer-events: none;
     }
 
-    .qr-logo {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 48px;
-      height: 48px;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      border-radius: 50%;
-    }
-
     .download-btn {
       background-color: #00FF66;
       color: #fff;
@@ -68,19 +57,6 @@
     .download-btn:hover {
       background-color: #00994d;
     }
-
-    .qr-logo {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 48px; /* Ukuran logo bisa disesuaikan */
-  height: 48px;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  border-radius: 12px; /* opsional kalau mau bulet */
-  background: white; /* opsional: latar belakang agar kontras */
-  padding: 4px; /* opsional: kasih jarak antara logo dan QR */
-}
   </style>
 </head>
 <body>
@@ -89,7 +65,20 @@
 
   <div class="qr-wrapper" id="qrWrapper">
     <canvas id="qr" width="256" height="256"></canvas>
-    <img src="img/logo.svg">
+    <div style="position: relative; display: inline-block;">
+  <canvas id="qrCanvas"></canvas>
+  <img src="img/logo.svg" alt="Logo"
+       style="position: absolute;
+              top: 50%;
+              left: 50%;
+              width: 20px;
+              height: 20px;
+              transform: translate(-50%, -50%);
+              pointer-events: none;
+              border-radius: 12px;
+              background: white;
+              padding: 4px;">
+</div>
     <div class="watermark">Lotto Chain</div>
   </div>
 
