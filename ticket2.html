@@ -137,7 +137,7 @@ button:hover {
 </head>
 <body>
   <div class="container" id="ticketContainer">
-  <center><h1>Public Ticket Detail</h1></center><br>
+  <center><h1>Pucdddblic Ticket Detail</h1></center><br>
   <div id="ticketDetail">Loading...</div>
   <button onclick="downloadPNG()">Download Ticket</button>
   </div>
@@ -320,6 +320,7 @@ function shareToFacebook(betId) {
             if (isMobile) {
               tryIntent();
             } else {
+              console.log("Web Share gagal di PC, buka modal");
               fallbackShare();
             }
           } else {
@@ -332,6 +333,7 @@ function shareToFacebook(betId) {
       if (isMobile) {
         tryIntent();
       } else {
+        console.log("Web Share tidak tersedia di PC, buka modal");
         fallbackShare();
       }
     }
@@ -358,6 +360,7 @@ function shareToFacebook(betId) {
 
   // Fungsi untuk custom share modal di PC
   function fallbackShare() {
+    console.log("Membuka modal share"); // Debug modal
     // Daftar platform dan URL share-nya
     const shareOptions = [
       { name: "Facebook", url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}` },
@@ -372,7 +375,16 @@ function shareToFacebook(betId) {
 
     // Cek apakah modal sudah ada, hapus kalau ada
     const existingModal = document.getElementById("shareModal");
-    if (existingModal) existingModal.remove();
+    if (existingModal) {
+      console.log("Menghapus modal lama");
+      existingModal.remove();
+    }
+
+    // Pastikan document.body tersedia
+    if (!document.body) {
+      console.error("document.body tidak tersedia");
+      return;
+    }
 
     // Buat modal
     const modal = document.createElement("div");
@@ -422,18 +434,21 @@ function shareToFacebook(betId) {
         Tutup
       </button>
     `;
+    console.log("Menambahkan modal ke body");
     document.body.appendChild(modal);
   }
 
-  // Cek apakah di perangkat mobile
-  if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+  // Deteksi mobile dengan lebih akurat
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) &&
+                   window.innerWidth <= 1024; // Tambah cek lebar layar
+  if (isMobile) {
     console.log("Mode mobile, coba share");
     tryShare(true);
   } else {
     console.log("Mode PC, coba share");
     tryShare(false);
   }
-    }
+      }
     
 function downloadPNG() {
   const element = document.querySelector(".container");
