@@ -137,7 +137,7 @@ button:hover {
 </head>
 <body>
   <div class="container" id="ticketContainer">
-  <center><h1>Pucdddblic Ticket Detail</h1></center><br>
+  <center><h1>Public Ticket Detail</h1></center><br>
   <div id="ticketDetail">Loading...</div>
   <button onclick="downloadPNG()">Download Ticket</button>
   </div>
@@ -304,38 +304,32 @@ function shareToFacebook(betId) {
 
   // Fungsi untuk handle share
   function tryShare(isMobile) {
-    // Prioritas 1: Coba Web Share API
-    if (navigator.share) {
-      console.log("Mencoba Web Share API");
-      navigator.share({
-        title: "Share Bet",
-        text: "Check this out!",
-        url: url
-      })
-        .then(() => console.log("Berbagi berhasil"))
-        .catch((err) => {
-          // Hanya panggil fallback kalau bukan error pembatalan
-          if (err.name !== "AbortError") {
-            console.error("Web Share gagal:", err);
-            if (isMobile) {
+    if (isMobile) {
+      // Mode HP: Pakai Web Share atau Intent
+      if (navigator.share) {
+        console.log("Mencoba Web Share API di mobile");
+        navigator.share({
+          title: "Share Bet",
+          text: "Check this out!",
+          url: url
+        })
+          .then(() => console.log("Berbagi berhasil di mobile"))
+          .catch((err) => {
+            if (err.name !== "AbortError") {
+              console.error("Web Share gagal di mobile:", err);
               tryIntent();
             } else {
-              console.log("Web Share gagal di PC, buka modal");
-              fallbackShare();
+              console.log("Share dibatalkan di mobile, tidak ada aksi");
             }
-          } else {
-            console.log("Share dibatalkan, tidak ada aksi");
-          }
-        });
-    } else {
-      // Fallback ke Intent (mobile) atau modal (PC)
-      console.log("Web Share tidak tersedia");
-      if (isMobile) {
-        tryIntent();
+          });
       } else {
-        console.log("Web Share tidak tersedia di PC, buka modal");
-        fallbackShare();
+        console.log("Web Share tidak tersedia di mobile, coba Intent");
+        tryIntent();
       }
+    } else {
+      // Mode PC: Langsung ke modal, skip Web Share
+      console.log("Mode PC, buka modal langsung");
+      fallbackShare();
     }
   }
 
@@ -360,7 +354,7 @@ function shareToFacebook(betId) {
 
   // Fungsi untuk custom share modal di PC
   function fallbackShare() {
-    console.log("Membuka modal share"); // Debug modal
+    console.log("Membuka modal share di PC"); // Debug modal
     // Daftar platform dan URL share-nya
     const shareOptions = [
       { name: "Facebook", url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}` },
@@ -382,65 +376,77 @@ function shareToFacebook(betId) {
 
     // Pastikan document.body tersedia
     if (!document.body) {
-      console.error("document.body tidak tersedia");
+      console.error("document.body tidak tersedia, menunggu DOM");
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log("DOM siap, coba buat modal lagi");
+        createModal();
+      });
       return;
     }
 
-    // Buat modal
-    const modal = document.createElement("div");
-    modal.id = "shareModal";
-    modal.style.cssText = `
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      z-index: 1000;
-      text-align: center;
-      font-family: Arial, sans-serif;
-    `;
-    modal.innerHTML = `
-      <h3>Pilih Platform untuk Share</h3>
-      <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
-        ${shareOptions
-          .map(
-            (opt) => `
-              <button style="
-                padding: 10px 20px;
-                background: #007bff;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-              " onclick="window.open('${opt.url}', '_blank'); document.getElementById('shareModal').remove();">
-                ${opt.name}
-              </button>
-            `
-          )
-          .join("")}
-      </div>
-      <button style="
-        margin-top: 15px;
-        padding: 8px 16px;
-        background: #dc3545;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      " onclick="document.getElementById('shareModal').remove();">
-        Tutup
-      </button>
-    `;
-    console.log("Menambahkan modal ke body");
-    document.body.appendChild(modal);
+    createModal();
+
+    function createModal() {
+      console.log("Menambahkan modal ke body");
+      const modal = document.createElement("div");
+      modal.id = "shareModal";
+      modal.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        z-index: 1000;
+        text-align: center;
+        font-family: Arial, sans-serif;
+      `;
+      modal.innerHTML = `
+        <h3>Pilih Platform untuk Share</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+          ${shareOptions
+            .map(
+              (opt) => `
+                <button style="
+                  padding: 10px 20px;
+                  background: #007bff;
+                  color: white;
+                  border: none;
+                  border-radius: 4px;
+                  cursor: pointer;
+                " onclick="window.open('${opt.url}', '_blank'); document.getElementById('shareModal').remove();">
+                  ${opt.name}
+                </button>
+              `
+            )
+            .join("")}
+        </div>
+        <button style="
+          margin-top: 15px;
+          padding: 8px 16px;
+          background: #dc3545;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+        " onclick="document.getElementById('shareModal').remove();">
+          Tutup
+        </button>
+      `;
+      document.body.appendChild(modal);
+    }
   }
 
-  // Deteksi mobile dengan lebih akurat
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) &&
-                   window.innerWidth <= 1024; // Tambah cek lebar layar
+  // Deteksi mobile dengan logika lebih ketat
+  const isMobile = (
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+    ('ontouchstart' in window) ||
+    (navigator.maxTouchPoints > 0)
+  ) && window.innerWidth <= 1024;
+  console.log("User Agent:", navigator.userAgent); // Debug user agent
+  console.log("Is Mobile:", isMobile); // Debug deteksi
   if (isMobile) {
     console.log("Mode mobile, coba share");
     tryShare(true);
@@ -448,7 +454,7 @@ function shareToFacebook(betId) {
     console.log("Mode PC, coba share");
     tryShare(false);
   }
-      }
+                 }
     
 function downloadPNG() {
   const element = document.querySelector(".container");
