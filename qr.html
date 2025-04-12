@@ -155,37 +155,37 @@
       const logo = new Image();
 logo.src = "img/logo.svg";
 logo.onload = () => {
-  const logoSize = hdSize * 0.19; // mendekati 48px jika hdSize = 256
+  const logoSize = hdSize * 0.19;
   const logoX = (hdSize - logoSize) / 2;
-  const logoY = (hdSize - logoSize) / 2 - (hdSize * 0.04); // naik sedikit agar seperti transform -60%
+  const logoY = (hdSize - logoSize) / 2 - (hdSize * 0.04);
 
-  // Gambar logo
+  // Buat background putih bulat di belakang logo (tanpa clip)
   ctx.save();
   ctx.beginPath();
-  const radius = 12 * (hdSize / 256); // menyamakan border-radius
+  const radius = 12 * (hdSize / 256);
   ctx.moveTo(logoX + radius, logoY);
   ctx.arcTo(logoX + logoSize, logoY, logoX + logoSize, logoY + logoSize, radius);
   ctx.arcTo(logoX + logoSize, logoY + logoSize, logoX, logoY + logoSize, radius);
   ctx.arcTo(logoX, logoY + logoSize, logoX, logoY, radius);
   ctx.arcTo(logoX, logoY, logoX + logoSize, logoY, radius);
   ctx.closePath();
-  ctx.fillStyle = "#ffffff"; // background logo putih
-  ctx.fill();
-  ctx.clip();
-  ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+  ctx.fillStyle = "#ffffff";
+  ctx.fill(); // Hanya background, tanpa clip
   ctx.restore();
 
-  // Gambar watermark
+  // Gambar logo di atas background putih
+  ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+
+  // Watermark
   const watermarkY = logoY + logoSize + (hdSize * 0.07);
   ctx.font = `${hdSize * 0.05}px Orbitron`;
   ctx.textAlign = "center";
   ctx.lineWidth = 1;
   ctx.shadowColor = "#03a9f4";
   ctx.shadowBlur = 6;
-  ctx.fillStyle = "#ffffff"; // font color fallback
+  ctx.fillStyle = "#ffffff";
   ctx.fillText("Lotto Chain", hdSize / 2, watermarkY);
 
-  // Gradient fill effect seperti UI
   const gradient = ctx.createLinearGradient(0, 0, hdSize, 0);
   gradient.addColorStop(0, "#03a9f4");
   gradient.addColorStop(1, "#f441a5");
