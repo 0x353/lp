@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QR Dynamic</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 50px;
+      background: #0f0f0f;
+      color: #00FF66;
+    }
+
+    .qr-wrapper {
+      position: relative;
+      display: inline-block;
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+
+    .qr-wrapper:hover {
+      transform: scale(1.1);
+    }
+
+    #qr {
+      border-radius: 16px;
+      box-shadow: 0 0 20px #00FF66;
+    }
+
+    .watermark {
+      position: absolute;
+      bottom: 8px;
+      left: 0;
+      right: 0;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.5);
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .qr-logo {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 48px;
+      height: 48px;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      border-radius: 50%;
+    }
+
+    .download-btn {
+      background-color: #00FF66;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 8px;
+      margin-top: 20px;
+      transition: background-color 0.3s;
+    }
+
+    .download-btn:hover {
+      background-color: #00994d;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>QR Kode Halaman Ini</h2>
+
+  <div class="qr-wrapper" id="qrWrapper">
+    <canvas id="qr"></canvas>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Chain_link_icon_black.svg/2048px-Chain_link_icon_black.svg.png" alt="Logo" class="qr-logo">
+    <div class="watermark">Lotto Chain</div>
+  </div>
+
+  <button class="download-btn" id="downloadBtn">Download QR</button>
+
+  <script>
+    const currentURL = window.location.href;
+    const qrCanvas = document.getElementById("qr");
+
+    // Menentukan resolusi tinggi untuk QR Code (HD)
+    const qr = new QRious({
+      element: qrCanvas,
+      value: currentURL,
+      size: 512, // Resolusi tinggi untuk QR Code (HD)
+      level: 'H',
+      background: '#fff',
+      foreground: '#00FF66'
+    });
+
+    // Tombol untuk download QR
+    document.getElementById("downloadBtn").addEventListener("click", () => {
+      const link = document.createElement('a');
+      link.download = "LottoQR.png"; // nama file yang akan di-download
+      link.href = qrCanvas.toDataURL("image/png"); // ambil dari canvas
+      link.click(); // langsung download
+    });
+  </script>
+
+</body>
+</html>
