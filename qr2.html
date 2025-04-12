@@ -53,23 +53,25 @@
     }
 
     .watermark {
-      position: absolute;
-      top: 64%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 14px;
-      font-weight: 600;
-      padding: 4px 12px;
-      border-radius: 12px;
-      background: rgba(0, 0, 0, 0.7);
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-image: linear-gradient(90deg, #03a9f4, #f441a5);
-      text-shadow: 0 0 5px #03a9f4, 0 0 8px #f441a5;
-      animation: shimmer 3s infinite linear;
-      pointer-events: none;
-    }
+  position: absolute;
+  top: 72%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
+  font-weight: 700;
+  font-family: 'Orbitron', sans-serif;
+  padding: 6px 14px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.65); /* blur semi hitam */
+  backdrop-filter: blur(6px); /* efek frosted glass */
+  color: #ffffff;
+  text-shadow: 0 0 6px #03a9f4, 0 0 12px #f441a5;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 12px rgba(3,169,244,0.5);
+  z-index: 3;
+  pointer-events: none;
+  animation: shimmer 3s linear infinite;
+}
 
     @keyframes shimmer {
       0% { background-position: -200% 0; }
