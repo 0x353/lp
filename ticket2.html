@@ -284,12 +284,44 @@ function shareToTelegram(betId) {
 
 function shareToFacebook(betId) {
   const url = `${window.location.origin}${window.location.pathname}?betId=${betId}`;
-  const facebookUrl = /Android|iPhone|iPad/i.test(navigator.userAgent) 
-    ? `fb://share?href=${encodeURIComponent(url)}`
-    : `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-  window.open(facebookUrl, '_blank');
-}
+  
+  // Cek apakah di perangkat mobile
+  if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+    // Intent untuk Facebook Lite
+    const facebookLiteIntent = `intent://share?text=${encodeURIComponent(url)}#Intent;package=com.facebook.lite;scheme=fb;end`;
+    // Intent untuk Facebook besar
+    const facebookIntent = `intent://share?text=${encodeURIComponent(url)}#Intent;package=com.facebook.katana;scheme=fb;end`;
+    // Fallback ke web jika kedua aplikasi tidak ada
+    const facebookWeb = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
 
+    // Coba buka Facebook Lite dulu, lalu Facebook besar, lalu web
+    const tryOpenApp = () => {
+      let opened = false;
+
+      // Coba Facebook Lite
+      const liteWindow = window.open(facebookLiteIntent, '_blank');
+      setTimeout(() => {
+        if (!liteWindow || liteWindow.closed) {
+          // Jika Lite gagal, coba Facebook besar
+          const mainWindow = window.open(facebookIntent, '_blank');
+          setTimeout(() => {
+            if (!mainWindow || mainWindow.closed) {
+              // Jika keduanya gagal, buka web
+              window.open(facebookWeb, '_blank');
+            }
+          }, 1000);
+        }
+      }, 1000);
+    };
+
+    tryOpenApp();
+  } else {
+    // Untuk PC atau non-mobile, langsung ke web
+    const facebookWeb = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+    window.open(facebookWeb, '_blank');
+  }
+}
+    
 function downloadPNG() {
   const element = document.querySelector(".container");
   html2canvas(element, {
