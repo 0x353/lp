@@ -241,11 +241,9 @@ button:hover {
         <p>Player Total Payout: <span style="color:#1a88ff;">${totalPayoutEth} ETH</span></p>
         <p>Contract: <a href="https://sepolia.basescan.org/address/${contractAddress}" target="_blank" style="color:#1a88ff;">${contractAddress.slice(0, 10)}...${contractAddress.slice(-10)}</a></p>
         <div style="margin-top:10px;">
-          <button onclick="shareToTwitter('${bet.betId}')" style="background:#1DA1F2; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin-right:5px;">Share to Twitter</button>
-          <button onclick="shareToTelegram('${bet.betId}')" style="background:#0088cc; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin-right:5px;">
-            <img src="img/telegram.svg" alt="Telegram" style="width:16px; height:16px; vertical-align:middle;"> Share to Telegram
+          <button onclick="shareTo('${bet.betId}')" style="background:#0088cc; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin-right:5px;">
+            <img src="img/telegram.svg" style="width:16px; height:16px; vertical-align:middle;"> Share to Telegram
           </button>
-          <button onclick="shareToFacebook('${bet.betId}')" style="background:#4267B2; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Share to Facebook</button>
           <canvas id="qrCode-${bet.betId}" width="128" height="128" style="display:block; margin-top:10px; background-color:white;"></canvas>
       `;
 
@@ -266,29 +264,142 @@ button:hover {
   }
 }
 
-function shareToTwitter(betId) {
+function shareTo(betId) {
   const url = `${window.location.origin}${window.location.pathname}?betId=${betId}`;
-  const text = `Check out this bet on Base Sepolia Testnet! Bet ID: ${betId}`;
-  const twitterUrl = /Android|iPhone|iPad/i.test(navigator.userAgent) 
-    ? `twitter://post?message=${encodeURIComponent(text + " " + url)}`
-    : `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
-  window.open(twitterUrl, '_blank');
-}
+  console.log("Generated URL:", url); // Debug URL
 
-function shareToTelegram(betId) {
-  const url = `${window.location.origin}${window.location.pathname}?betId=${betId}`;
-  const text = `Check out this bet on Base Sepolia Testnet! Bet ID: ${betId}`;
-  const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
-  window.open(telegramUrl, '_blank');
-}
+  // Fungsi untuk handle share
+  function tryShare(isMobile) {
+    // Prioritas 1: Coba Web Share API
+    if (navigator.share) {
+      console.log("Mencoba Web Share API");
+      navigator.share({
+        title: "Share Bet",
+        text: "Check this out!",
+        url: url
+      })
+        .then(() => console.log("Berbagi berhasil"))
+        .catch((err) => {
+          // Hanya panggil fallback kalau bukan error pembatalan
+          if (err.name !== "AbortError") {
+            console.error("Web Share gagal:", err);
+            if (isMobile) {
+              tryIntent();
+            } else {
+              fallbackShare();
+            }
+          } else {
+            console.log("Share dibatalkan, tidak ada aksi");
+          }
+        });
+    } else {
+      // Fallback ke Intent (mobile) atau modal (PC)
+      console.log("Web Share tidak tersedia");
+      if (isMobile) {
+        tryIntent();
+      } else {
+        fallbackShare();
+      }
+    }
+  }
 
-function shareToFacebook(betId) {
-  const url = `${window.location.origin}${window.location.pathname}?betId=${betId}`;
-  const facebookUrl = /Android|iPhone|iPad/i.test(navigator.userAgent) 
-    ? `fb://share?href=${encodeURIComponent(url)}`
-    : `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-  window.open(facebookUrl, '_blank');
-}
+  // Fungsi untuk Intent di mobile
+  function tryIntent() {
+    console.log("Coba Intent di mobile");
+    const shareIntent = `intent://#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT=${encodeURIComponent(url)};end`;
+    const facebookWeb = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+    console.log("Mencoba Intent:", shareIntent);
+
+    try {
+      window.location.href = shareIntent;
+      setTimeout(() => {
+        console.log("Intent mungkin gagal, buka web");
+        window.open(facebookWeb, '_blank');
+      }, 2000);
+    } catch (err) {
+      console.error("Intent error:", err);
+      window.open(facebookWeb, '_blank');
+    }
+  }
+
+  // Fungsi untuk custom share modal di PC
+  function fallbackShare() {
+    // Daftar platform dan URL share-nya
+    const shareOptions = [
+      { name: "Facebook", url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}` },
+      { name: "Twitter", url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=Check%20this%20out!` },
+      { name: "WhatsApp", url: `https://api.whatsapp.com/send?text=${encodeURIComponent("Check this out: " + url)}` },
+      { name: "LinkedIn", url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}` },
+      { name: "Email", url: `mailto:?subject=Check%20this%20out&body=${encodeURIComponent(url)}` },
+      { name: "Telegram", url: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=Check%20this%20out!` },
+      { name: "Reddit", url: `https://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=Check%20this%20out!` },
+      { name: "Discord", url: `https://discord.com/channels/@me?content=${encodeURIComponent("Check this out: " + url)}` }
+    ];
+
+    // Cek apakah modal sudah ada, hapus kalau ada
+    const existingModal = document.getElementById("shareModal");
+    if (existingModal) existingModal.remove();
+
+    // Buat modal
+    const modal = document.createElement("div");
+    modal.id = "shareModal";
+    modal.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      z-index: 1000;
+      text-align: center;
+      font-family: Arial, sans-serif;
+    `;
+    modal.innerHTML = `
+      <h3>Pilih Platform untuk Share</h3>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+        ${shareOptions
+          .map(
+            (opt) => `
+              <button style="
+                padding: 10px 20px;
+                background: #007bff;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+              " onclick="window.open('${opt.url}', '_blank'); document.getElementById('shareModal').remove();">
+                ${opt.name}
+              </button>
+            `
+          )
+          .join("")}
+      </div>
+      <button style="
+        margin-top: 15px;
+        padding: 8px 16px;
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      " onclick="document.getElementById('shareModal').remove();">
+        Tutup
+      </button>
+    `;
+    document.body.appendChild(modal);
+  }
+
+  // Cek apakah di perangkat mobile
+  if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+    console.log("Mode mobile, coba share");
+    tryShare(true);
+  } else {
+    console.log("Mode PC, coba share");
+    tryShare(false);
+  }
+       }
 
 function downloadPNG() {
   const element = document.querySelector(".container");
