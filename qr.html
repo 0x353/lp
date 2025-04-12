@@ -47,12 +47,12 @@
   top: 72%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   font-family: 'Orbitron', sans-serif;
   padding: 6px 14px;
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.65); /* blur semi hitam */
+  background: rgba(0, 0, 0, 0.3); /* Kurangi transparansi */
   backdrop-filter: blur(6px); /* efek frosted glass */
   color: #ffffff;
   text-shadow: 0 0 6px #03a9f4, 0 0 12px #f441a5;
@@ -61,6 +61,11 @@
   z-index: 3;
   pointer-events: none;
   animation: shimmer 3s linear infinite;
+  background: linear-gradient(90deg, #03a9f4, #f441a5); /* Gradient warna yang lebih terang */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
 }
 
     .download-btn {
