@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>QR Dynamic</title>
+  <title>QR Code Dynamic HD</title>
   <script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
   <style>
     body {
@@ -25,6 +25,8 @@
     }
 
     #qr {
+      width: 256px; /* Ukuran tampilan di layar */
+      height: 256px;
       border-radius: 16px;
       box-shadow: 0 0 20px #00FF66;
     }
@@ -73,33 +75,47 @@
   <h2>QR Kode Halaman Ini</h2>
 
   <div class="qr-wrapper" id="qrWrapper">
-    <canvas id="qr"></canvas>
+    <canvas id="qr" width="256" height="256"></canvas>
     <img src="img/logo.svg">
     <div class="watermark">Lotto Chain</div>
   </div>
 
-  <button class="download-btn" id="downloadBtn">Download QR</button>
+  <button class="download-btn" id="downloadBtn">Download QR (HD)</button>
 
   <script>
     const currentURL = window.location.href;
-    const qrCanvas = document.getElementById("qr");
 
-    // Menentukan resolusi tinggi untuk QR Code (HD)
+    // QR untuk tampilan di layar (canvas kecil)
+    const qrCanvas = document.getElementById("qr");
     const qr = new QRious({
       element: qrCanvas,
       value: currentURL,
-      size: 3000, // Resolusi tinggi untuk QR Code (HD)
+      size: 256,
       level: 'H',
-      background: '#fff',
+      background: '#ffffff',
       foreground: '#00FF66'
     });
 
-    // Tombol untuk download QR
+    // QR untuk resolusi tinggi saat download
     document.getElementById("downloadBtn").addEventListener("click", () => {
+      const hdCanvas = document.createElement('canvas');
+      const hdSize = 1024; // resolusi download
+      hdCanvas.width = hdSize;
+      hdCanvas.height = hdSize;
+
+      const hdQR = new QRious({
+        element: hdCanvas,
+        value: currentURL,
+        size: hdSize,
+        level: 'H',
+        background: '#ffffff',
+        foreground: '#00FF66'
+      });
+
       const link = document.createElement('a');
-      link.download = "LottoQR.png"; // nama file yang akan di-download
-      link.href = qrCanvas.toDataURL("image/png"); // ambil dari canvas
-      link.click(); // langsung download
+      link.download = "LottoQR-HD.png";
+      link.href = hdCanvas.toDataURL("image/png");
+      link.click();
     });
   </script>
 
