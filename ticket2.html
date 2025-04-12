@@ -312,13 +312,13 @@ function generateQRCode(canvas, text) {
     console.error("Canvas tidak ditemukan!");
     return;
   }
-
+  console.log("Generating QR for:", text); // Tambah log untuk debugging
   new QRCode(canvas, {
     text: text,
     width: 128,
     height: 128,
-    colorDark: "#000000", // Hitam untuk kode
-    colorLight: "#ffffff", // Putih untuk latar
+    colorDark: "#000000",
+    colorLight: "#ffffff",
     correctLevel: QRCode.CorrectLevel.H
   });
 }
