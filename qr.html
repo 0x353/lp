@@ -137,7 +137,7 @@
 
     // Download QR in HD
     document.getElementById("downloadBtn").addEventListener("click", () => {
-      const hdSize = 3000;
+      const hdSize = 1024;
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       canvas.width = hdSize;
@@ -152,7 +152,7 @@
         foreground: '#007bff'
       });
 
-    const logo = new Image();
+      const logo = new Image();
       logo.src = "img/logo.svg";
       logo.onload = () => {
         const logoSize = hdSize * 0.15;
@@ -160,6 +160,19 @@
         const logoY = (hdSize - logoSize) / 2 - 20;
 
         ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+
+        // Watermark
+        ctx.fillStyle = "#007bff";
+        ctx.font = `${hdSize * 0.035}px Ubuntu`;
+        ctx.textAlign = "center";
+        ctx.fillText("Lotto Chain", hdSize / 2, logoY + logoSize + 40);
+
+        const link = document.createElement('a');
+        link.download = "LottoQR-HD.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      };
+    });
       
     function shareTo(betId) {
   const url = `${window.location.origin}${window.location.pathname}?betId=${betId}`;
