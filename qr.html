@@ -104,7 +104,7 @@
 
   <div class="button-container" id="buttonContainer">
     <button class="download-btn" id="downloadBtn">DownloadQR</button>
-    <button class="shareTo('${bet.betId}')" id="downloadBtn">
+    <button onclick="shareTo('${bet.betId}')" style="background:#111111; color:white; border:none; padding:5px 10px; border-radius:0.9em; cursor:pointer; margin-right:5px;">
     <img src="img/share.svg" style="width:16px; height:16px; vertical-align:middle;">Share to</button>
   </div>
 
@@ -152,47 +152,15 @@
         foreground: '#007bff'
       });
 
-      const logo = new Image();
-logo.src = "img/logo.svg";
-logo.onload = () => {
-  const logoSize = hdSize * 0.19;
-  const logoX = (hdSize - logoSize) / 2;
-  const logoY = (hdSize - logoSize) / 2 - (hdSize * 0.04);
+    const logo = new Image();
+      logo.src = "img/logo.svg";
+      logo.onload = () => {
+        const logoSize = hdSize * 0.15;
+        const logoX = (hdSize - logoSize) / 2;
+        const logoY = (hdSize - logoSize) / 2 - 20;
 
-  // Buat background putih bulat di belakang logo (tanpa clip)
-  ctx.save();
-  ctx.beginPath();
-  const radius = 12 * (hdSize / 256);
-  ctx.moveTo(logoX + radius, logoY);
-  ctx.arcTo(logoX + logoSize, logoY, logoX + logoSize, logoY + logoSize, radius);
-  ctx.arcTo(logoX + logoSize, logoY + logoSize, logoX, logoY + logoSize, radius);
-  ctx.arcTo(logoX, logoY + logoSize, logoX, logoY, radius);
-  ctx.arcTo(logoX, logoY, logoX + logoSize, logoY, radius);
-  ctx.closePath();
-  ctx.fillStyle = "#ffffff";
-  ctx.fill(); // Hanya background, tanpa clip
-  ctx.restore();
-
-  // Gambar logo di atas background putih
-  ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
-
-  // Watermark
-  const watermarkY = logoY + logoSize + (hdSize * 0.07);
-  ctx.font = `${hdSize * 0.05}px Orbitron`;
-  ctx.textAlign = "center";
-  ctx.lineWidth = 1;
-  ctx.shadowColor = "#03a9f4";
-  ctx.shadowBlur = 6;
-  ctx.fillStyle = "#ffffff";
-  ctx.fillText("Lotto Chain", hdSize / 2, watermarkY);
-
-  const gradient = ctx.createLinearGradient(0, 0, hdSize, 0);
-  gradient.addColorStop(0, "#03a9f4");
-  gradient.addColorStop(1, "#f441a5");
-  ctx.fillStyle = gradient;
-  ctx.fillText("Lotto Chain", hdSize / 2, watermarkY);
-};
-
+        ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+      
     function shareTo(betId) {
   const url = `${window.location.origin}${window.location.pathname}?betId=${betId}`;
   console.log("Generated URL:", url); // Debug URL
