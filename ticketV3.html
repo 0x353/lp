@@ -153,7 +153,7 @@ button:not(#closePopup):active::after {
 <body>
   <div class="container" id="ticketContainer">
   <center><h1>Public Ticket Detail</h1><br></center>
-  <div id="ticketDetail"><center>Loading...</center></div>
+  <div id="ticketDetail"><center>Please wait, data is loading...</center></div>
   <center><button id="download-btn">Download Ticket</button></center>
   </div>
 
@@ -307,7 +307,7 @@ button:not(#closePopup):active::after {
     setInterval(updateData, 10000);
 
   } catch (err) {
-    console.error("Error saat memuat bet:", err);
+    console.error("Error loading ticket:", err);
     detailDiv.innerText = `Failed to load bet detail: ${err.message}`;
   }
 }
@@ -320,29 +320,29 @@ function shareTo(betId) {
   function tryShare(isMobile) {
     // Prioritas 1: Coba Web Share API
     if (navigator.share) {
-      console.log("Mencoba Web Share API");
+      console.log("Try Web Share API");
       navigator.share({
         title: "Share Bet",
         text: "Check this out!",
         url: url
       })
-        .then(() => console.log("Berbagi berhasil"))
+        .then(() => console.log("Successful sharing"))
         .catch((err) => {
           // Hanya panggil fallback kalau bukan error pembatalan
           if (err.name !== "AbortError") {
-            console.error("Web Share gagal:", err);
+            console.error("Web Share failed, tyr again:", err);
             if (isMobile) {
               tryIntent();
             } else {
               fallbackShare();
             }
           } else {
-            console.log("Share dibatalkan, tidak ada aksi");
+            console.log("Share cancelled, no action");
           }
         });
     } else {
       // Fallback ke Intent (mobile) atau modal (PC)
-      console.log("Web Share tidak tersedia");
+      console.log("Web Share is not available");
       if (isMobile) {
         tryIntent();
       } else {
@@ -353,7 +353,7 @@ function shareTo(betId) {
 
   // Fungsi untuk Intent di mobile
   function tryIntent() {
-    console.log("Coba Intent di mobile");
+    console.log("Try Intent on mobile");
     const shareIntent = `intent://#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT=${encodeURIComponent(url)};end`;
     const facebookWeb = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
     console.log("Mencoba Intent:", shareIntent);
@@ -361,7 +361,7 @@ function shareTo(betId) {
     try {
       window.location.href = shareIntent;
       setTimeout(() => {
-        console.log("Intent mungkin gagal, buka web");
+        console.log("Intent may have failed, open web");
         window.open(facebookWeb, '_blank');
       }, 2000);
     } catch (err) {
@@ -440,10 +440,10 @@ function shareTo(betId) {
 
   // Cek apakah di perangkat mobile
   if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
-    console.log("Mode mobile, coba share");
+    console.log("Mobile mode, try sharing");
     tryShare(true);
   } else {
-    console.log("Mode PC, coba share");
+    console.log("PC mode, try sharing");
     tryShare(false);
   }
        }
@@ -451,17 +451,17 @@ function shareTo(betId) {
 function downloadPNG() {
   const element = document.querySelector(".container");
   html2canvas(element, {
-    scale: 5,
+    scale: 6,
     useCORS: true,
     backgroundColor: "#121212"
   }).then(canvas => {
     const link = document.createElement("a");
-    link.download = "ticket-hd.png";
+    link.download = "LottoChainTicket.png";
     link.href = canvas.toDataURL("image/png");
     link.click();
   }).catch(err => {
-    console.error("Gagal membuat PNG:", err);
-    alert("Gagal menghasilkan gambar. Cek console untuk detail.");
+    console.error("Failed to create PNG, try again:", err);
+    alert("Failed to generate image. Check console for details..");
   });
 }
 
