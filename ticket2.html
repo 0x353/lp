@@ -104,7 +104,7 @@ button:hover {
 </head>
 <body>
   <div class="container" id="ticketContainer">
-  <center><h1>Public Ticket Detail</h1></center><br>
+  <center><h1>Pmublic Ticket Detail</h1></center><br>
   <div id="ticketDetail">Loading...</div>
   <button onclick="downloadPNG()">Download Ticket</button>
   </div>
@@ -257,9 +257,6 @@ button:hover {
     // Panggil pertama kali
     await updateData();
 
-    // Polling setiap 10 detik
-    setInterval(updateData, 10000);
-
   } catch (err) {
     console.error("Error saat memuat bet:", err);
     detailDiv.innerText = `Failed to load bet detail: ${err.message}`;
@@ -284,39 +281,28 @@ function shareToTelegram(betId) {
 
 function shareToFacebook(betId) {
   const url = `${window.location.origin}${window.location.pathname}?betId=${betId}`;
-  
+  console.log("Generated URL:", url); // Debugging
+
   // Cek apakah di perangkat mobile
   if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
-    // Intent untuk Facebook Lite
-    const facebookLiteIntent = `intent://share?text=${encodeURIComponent(url)}#Intent;package=com.facebook.lite;scheme=fb;end`;
-    // Intent untuk Facebook besar
-    const facebookIntent = `intent://share?text=${encodeURIComponent(url)}#Intent;package=com.facebook.katana;scheme=fb;end`;
-    // Fallback ke web jika kedua aplikasi tidak ada
+    // Intent umum dengan ACTION_SEND
+    const shareIntent = `intent://#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT=${encodeURIComponent(url)};end`;
     const facebookWeb = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
 
-    // Coba buka Facebook Lite dulu, lalu Facebook besar, lalu web
-    const tryOpenApp = () => {
-      let opened = false;
+    console.log("Mencoba Intent:", shareIntent); // Debugging
 
-      // Coba Facebook Lite
-      const liteWindow = window.open(facebookLiteIntent, '_blank');
-      setTimeout(() => {
-        if (!liteWindow || liteWindow.closed) {
-          // Jika Lite gagal, coba Facebook besar
-          const mainWindow = window.open(facebookIntent, '_blank');
-          setTimeout(() => {
-            if (!mainWindow || mainWindow.closed) {
-              // Jika keduanya gagal, buka web
-              window.open(facebookWeb, '_blank');
-            }
-          }, 1000);
-        }
-      }, 1000);
-    };
-
-    tryOpenApp();
+    // Coba buka Intent
+    const intentWindow = window.open(shareIntent, '_blank');
+    setTimeout(() => {
+      // Jika Intent gagal, fallback ke web
+      if (!intentWindow || intentWindow.closed) {
+        console.log("Intent gagal, buka web");
+        window.open(facebookWeb, '_blank');
+      }
+    }, 1500);
   } else {
     // Untuk PC atau non-mobile, langsung ke web
+    console.log("Buka Facebook web");
     const facebookWeb = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
     window.open(facebookWeb, '_blank');
   }
