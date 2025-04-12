@@ -88,7 +88,7 @@ button {
   border: none;
   padding: 8px 12px;
   font-size: 14px;
-  border-radius: 6px;
+  border-radius: 9px;
   cursor: pointer;
   margin: 20px auto;
   box-shadow: 0 0 0 transparent;
@@ -101,38 +101,6 @@ button:hover {
   box-shadow: 0 0 15px #1a88ff, 0 0 25px #1a88ff;
 }
 
-#shareModal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-    text-align: center;
-    font-family: Arial, sans-serif;
-  }
-  #shareModal h3 {
-    margin: 0 0 15px;
-  }
-  #shareModal button {
-    padding: 10px 20px;
-    margin: 5px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-  }
-  #shareModal button:not(:last-child) {
-    background: #007bff;
-    color: white;
-  }
-  #shareModal button:last-child {
-    background: #dc3545;
-    color: white;
-  }
    </style>
 </head>
 <body>
@@ -275,7 +243,7 @@ button:hover {
         <p>Contract: <a href="https://sepolia.basescan.org/address/${contractAddress}" target="_blank" style="color:#1a88ff;">${contractAddress.slice(0, 10)}...${contractAddress.slice(-10)}</a></p>
         <div style="margin-top:10px;"><br>
         <button onclick="shareToFacebook('${bet.betId}')" 
-  style="background:#007bff; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; 
+  style="background:#007bff; color:white; border:none; padding:5px 10px; border-radius:9px; cursor:pointer; 
          display: inline-flex; align-items: center; justify-content: center; font-family: 'Ubuntu', sans-serif; font-weight: bold; 
          text-align: center;">
   <img src="img/facebook-icon.png"  style="width: 20px; height: 20px; margin-right: 8px;">
@@ -395,13 +363,12 @@ function shareToFacebook(betId) {
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background: white;
+        background: #000000;
         padding: 20px;
         border-radius: 8px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         z-index: 1000;
         text-align: center;
-        font-family: Arial, sans-serif;
       `;
       modal.innerHTML = `
         <h3>Pilih Platform untuk Share</h3>
@@ -414,7 +381,7 @@ function shareToFacebook(betId) {
                   background: #007bff;
                   color: white;
                   border: none;
-                  border-radius: 4px;
+                  border-radius: 9px;
                   cursor: pointer;
                 " onclick="window.open('${opt.url}', '_blank'); document.getElementById('shareModal').remove();">
                   ${opt.name}
@@ -429,10 +396,10 @@ function shareToFacebook(betId) {
           background: #dc3545;
           color: white;
           border: none;
-          border-radius: 4px;
+          border-radius: 9px;
           cursor: pointer;
         " onclick="document.getElementById('shareModal').remove();">
-          Tutup
+          Closed
         </button>
       `;
       document.body.appendChild(modal);
@@ -459,7 +426,7 @@ function shareToFacebook(betId) {
 function downloadPNG() {
   const element = document.querySelector(".container");
   html2canvas(element, {
-    scale: 5,
+    scale: 6,
     useCORS: true,
     backgroundColor: "#121212"
   }).then(canvas => {
