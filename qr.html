@@ -104,10 +104,9 @@
 
   <div class="button-container" id="buttonContainer">
     <button class="download-btn" id="downloadBtn">DownloadQR</button>
+    <button class="shareTo('${bet.betId}')" id="downloadBtn">
+    <img src="img/share.svg" style="width:16px; height:16px; vertical-align:middle;">Share to</button>
   </div>
-  <button onclick="shareTo('${bet.betId}')" style="background:#111111; color:white; border:none; padding:5px 10px; border-radius:0.9em; cursor:pointer; margin-right:5px;">
-            <img src="img/share.svg" style="width:16px; height:16px; vertical-align:middle;"> Share to
-          </button>
 
   <script>
     const currentURL = window.location.href;
