@@ -20,7 +20,7 @@
       font-family: 'Ubuntu', sans-serif;
     }
     .container {
-      background-color: #111111;
+      background-color: #000000;
       padding: 20px;
       border-radius: 10px;
     }
@@ -43,14 +43,14 @@ h3 {
     }
 
 #ticketDetail {
-  background-color: #222222;
+  background-color: #111111;
   color: white;
   padding: 20px;
   border-radius: 12px;
   font-size: 14px;
   line-height: 1.6;
-  width: 95%;
-  max-width: 95%;
+  width: 100%;
+  max-width: 100%;
   margin: 20px auto;
   box-shadow: 0 0 12px rgba(80, 160, 255, 0.3), 0 0 18px rgba(80, 160, 255, 0.2);
   transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
@@ -80,22 +80,54 @@ h3 {
 }
 
 button {
-  background-color: #1a88ff;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  font-size: 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  margin: 20px auto;
-  box-shadow: 0 0 0 transparent;
-  transition: all 0.3s ease;
+    font-size: 1.2em;
+    padding: 10px 23px;
+    border-radius: 0.7em;
+    border: none;
+    background-color: #000;
+    color: #fff;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 0 10px rgba(0, 0, 255, 0.6);
+    transition: all 0.3s ease-in-out;
+    font-family: Ubuntu, sans-serif;
+}
+
+ .button-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+ }
+
+button::before {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: 0.9em;
+    background: linear-gradient(90deg, #03a9f4, #f441a5);
+    z-index: -1;
+    filter: blur(0);
+    transition: filter 0.4s ease, opacity 0.4s ease;
+    opacity: 1;
+}
+
+button:hover::before {
+    filter: blur(1.2em);
+    opacity: 1;
 }
 
 button:hover {
-  background-color: #006fd6;
-  transform: scale(1.05);
-  box-shadow: 0 0 15px #1a88ff, 0 0 25px #1a88ff;
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+button:active {
+    transform: scale(0.95);
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+button:active::before {
+    filter: blur(0.2em);
 }
    </style>
 </head>
