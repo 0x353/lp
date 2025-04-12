@@ -79,13 +79,12 @@ h3 {
   text-shadow: 0 0 5px rgba(130, 186, 255, 0.4);
 }
 
-button {
-    font-size: 1em;
-    padding: 10px 14px;
+button:not(#closePopup) {
+    font-size: 0.7em;
+    padding: 6px 12px;
     border-radius: 0.7em;
     border: none;
     background-color: #000;
-    background: linear-gradient(90deg, #03a9f4, #f441a5);
     color: #fff;
     cursor: pointer;
     position: relative;
@@ -94,16 +93,16 @@ button {
     font-family: Ubuntu, sans-serif;
 }
 
- .button-container {
+ .button-container:not(#closePopup) {
     display: flex;
     justify-content: center;
     gap: 20px;
  }
 
-button::before {
+button:not(#closePopup)::before {
     content: "";
     position: absolute;
-    inset: -3px;
+    inset: -2px;
     border-radius: 0.9em;
     background: linear-gradient(90deg, #03a9f4, #f441a5);
     z-index: -1;
@@ -112,23 +111,41 @@ button::before {
     opacity: 1;
 }
 
-button:hover::before {
+button:not(#closePopup):hover::before {
     filter: blur(1.2em);
     opacity: 1;
 }
 
-button:hover {
-    transform: scale(1.1);
+button:not(#closePopup):hover {
+    transform: scale(1.05);
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
-button:active {
+button:not(#closePopup):active {
     transform: scale(0.95);
     box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
 }
 
-button:active::before {
+button:not(#closePopup):active::before {
     filter: blur(0.2em);
+}
+
+button:not(#closePopup)::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 10%, transparent 70%);
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    transition: transform 0.5s, opacity 0.5s;
+}
+
+button:not(#closePopup):active::after {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 1;
 }
    </style>
 </head>
