@@ -1,121 +1,129 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>QR Code Futuristic</title>
+  <title>QR Code Dynamic HD</title>
   <script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@700&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Orbitron', sans-serif;
-      background: #0a0a0a;
-      color: #007bff;
+      font-family: 'Ubuntu', sans-serif;
       text-align: center;
-      padding: 40px;
+      padding: 50px;
+      background: #f8f9fa;
+      color: #333;
     }
 
     .qr-wrapper {
       position: relative;
       display: inline-block;
-      cursor: pointer;
-      transition: transform 0.4s ease;
-    }
-
-    .qr-wrapper:active {
-      transform: scale(1.2);
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(0, 123, 255, 0.4), 0 0 10px rgba(0, 123, 255, 0.6);
+      background: #ffffff;
     }
 
     #qr {
       width: 256px;
       height: 256px;
       border-radius: 16px;
-      box-shadow: 0 0 25px #007bff;
+      background: #ffffff;
     }
 
-    .logo-overlay {
+    .logo {
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 40px;
-      height: 40px;
-      transform: translate(-50%, -50%);
-      background: #ffffff;
-      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      transform: translate(-50%, -60%);
+      pointer-events: none;
+      border-radius: 12px;
+      background: white;
       padding: 4px;
-      z-index: 2;
-    }
-
-    .logo-overlay img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      border-radius: 50%;
     }
 
     .watermark {
-  position: absolute;
-  top: 72%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 14px;
-  font-weight: 700;
-  font-family: 'Orbitron', sans-serif;
-  padding: 6px 14px;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.3); /* Kurangi transparansi */
-  backdrop-filter: blur(6px); /* efek frosted glass */
-  color: #ffffff;
-  text-shadow: 0 0 6px #03a9f4, 0 0 12px #f441a5;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 12px rgba(3,169,244,0.5);
-  z-index: 3;
-  pointer-events: none;
-  animation: shimmer 3s linear infinite;
-  background: linear-gradient(90deg, #03a9f4, #f441a5); /* Gradient warna yang lebih terang */
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-fill-color: transparent;
-}
+      margin-top: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'Orbitron', sans-serif;
+      padding: 6px 14px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(6px);
+      color: #ffffff;
+      text-shadow: 0 0 6px #03a9f4, 0 0 12px #f441a5;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 12px rgba(3,169,244,0.5);
+      animation: shimmer 3s linear infinite;
+      background: linear-gradient(90deg, #03a9f4, #f441a5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-fill-color: transparent;
+    }
+
+    .button-container {
+      margin-top: 16px;
+    }
+
+    .download-btn {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 6px;
+      margin-right: 8px;
+    }
+
+    .download-btn:hover {
+      background-color: #0056b3;
+    }
+
+    .share-btn {
+      background: #111111;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 0.9em;
+      cursor: pointer;
+    }
+
+    .share-btn img {
+      width: 16px;
+      height: 16px;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    .zoomed {
+      transform: scale(1.3);
+    }
 
     @keyframes shimmer {
       0% { background-position: -200% 0; }
       100% { background-position: 200% 0; }
     }
-
-    .download-btn {
-      background: linear-gradient(90deg, #007bff, #00d4ff);
-      color: white;
-      border: none;
-      padding: 8px 20px;
-      font-size: 14px;
-      margin-top: 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s;
-      box-shadow: 0 0 10px #007bff;
-    }
-
-    .download-btn:hover {
-      background: linear-gradient(90deg, #00d4ff, #007bff);
-      box-shadow: 0 0 20px #00d4ff;
-    }
   </style>
 </head>
 <body>
 
-  <h2 style="color: #ffffff;">QR Kode Halaman Ini</h2>
-
   <div class="qr-wrapper" id="qrWrapper">
-    <canvas id="qr"></canvas>
-    <div class="logo-overlay">
-      <img src="img/logo.svg" alt="Logo">
-    </div>
-    <div class="watermark">Lotto Chain</div>
-  </div>
+    <canvas id="qr" width="256" height="256"></canvas>
+    <img src="img/logo.svg" alt="Logo" class="logo">
 
-  <br>
-  <button class="download-btn" id="downloadBtn">Download QR (HD)</button>
+    <div class="watermark">Lotto Chain</div>
+
+    <div class="button-container" id="buttonContainer">
+      <button class="download-btn" id="downloadBtn">DownloadQR</button>
+      <button class="share-btn" onclick="shareTo('12345')">
+        <img src="img/share.svg">Share to
+      </button>
+    </div>
+  </div>
 
   <script>
     const currentURL = window.location.href;
@@ -130,14 +138,21 @@
       foreground: '#007bff'
     });
 
+    const qrWrapper = document.getElementById("qrWrapper");
+
+    qrWrapper.addEventListener("click", () => {
+      qrWrapper.classList.toggle("zoomed");
+    });
+
     document.getElementById("downloadBtn").addEventListener("click", () => {
-      const hdCanvas = document.createElement('canvas');
-      const hdSize = 1024;
-      hdCanvas.width = hdSize;
-      hdCanvas.height = hdSize;
+      const hdSize = 3000;
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = hdSize;
+      canvas.height = hdSize;
 
       const hdQR = new QRious({
-        element: hdCanvas,
+        element: canvas,
         value: currentURL,
         size: hdSize,
         level: 'H',
@@ -145,11 +160,54 @@
         foreground: '#007bff'
       });
 
-      const link = document.createElement('a');
-      link.download = "LottoQR-HD.png";
-      link.href = hdCanvas.toDataURL("image/png");
-      link.click();
+      const logo = new Image();
+      logo.src = "img/logo.svg";
+      logo.onload = () => {
+        const logoSize = hdSize * 0.19;
+        const logoX = (hdSize - logoSize) / 2;
+        const logoY = (hdSize - logoSize) / 2 - (hdSize * 0.04);
+
+        ctx.save();
+        ctx.beginPath();
+        const radius = 12 * (hdSize / 256);
+        ctx.moveTo(logoX + radius, logoY);
+        ctx.arcTo(logoX + logoSize, logoY, logoX + logoSize, logoY + logoSize, radius);
+        ctx.arcTo(logoX + logoSize, logoY + logoSize, logoX, logoY + logoSize, radius);
+        ctx.arcTo(logoX, logoY + logoSize, logoX, logoY, radius);
+        ctx.arcTo(logoX, logoY, logoX + logoSize, logoY, radius);
+        ctx.closePath();
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+        ctx.clip();
+        ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+        ctx.restore();
+
+        const watermarkY = logoY + logoSize + (hdSize * 0.07);
+        ctx.font = `${hdSize * 0.05}px Orbitron`;
+        ctx.textAlign = "center";
+        ctx.lineWidth = 1;
+        ctx.shadowColor = "#03a9f4";
+        ctx.shadowBlur = 6;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText("Lotto Chain", hdSize / 2, watermarkY);
+
+        const gradient = ctx.createLinearGradient(0, 0, hdSize, 0);
+        gradient.addColorStop(0, "#03a9f4");
+        gradient.addColorStop(1, "#f441a5");
+        ctx.fillStyle = gradient;
+        ctx.fillText("Lotto Chain", hdSize / 2, watermarkY);
+
+        const link = document.createElement('a');
+        link.download = "LottoQR-HD.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      };
     });
+
+    function shareTo(betId) {
+      alert(`Share to triggered with bet ID: ${betId}`);
+      // Implement real sharing logic here if needed
+    }
   </script>
 
 </body>
