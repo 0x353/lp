@@ -100,11 +100,44 @@ button:hover {
   transform: scale(1.05);
   box-shadow: 0 0 15px #1a88ff, 0 0 25px #1a88ff;
 }
+
+#shareModal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    text-align: center;
+    font-family: Arial, sans-serif;
+  }
+  #shareModal h3 {
+    margin: 0 0 15px;
+  }
+  #shareModal button {
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  #shareModal button:not(:last-child) {
+    background: #007bff;
+    color: white;
+  }
+  #shareModal button:last-child {
+    background: #dc3545;
+    color: white;
+  }
    </style>
 </head>
 <body>
   <div class="container" id="ticketContainer">
-  <center><h1>Pugfblic Ticket Detail</h1></center><br>
+  <center><h1>Public Ticket Detail</h1></center><br>
   <div id="ticketDetail">Loading...</div>
   <button onclick="downloadPNG()">Download Ticket</button>
   </div>
@@ -241,8 +274,13 @@ button:hover {
         <p>Player Total Payout: <span style="color:#1a88ff;">${totalPayoutEth} ETH</span></p>
         <p>Contract: <a href="https://sepolia.basescan.org/address/${contractAddress}" target="_blank" style="color:#1a88ff;">${contractAddress.slice(0, 10)}...${contractAddress.slice(-10)}</a></p>
         <div style="margin-top:10px;"><br>
-        <button onclick="shareToFacebook('${bet.betId}')" style="background:#007bff; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-family:'Ubuntu', sans-serif; font-weight:700; display:flex; align-items:center; gap:6px;">
-        <img src="img/share.svg"  style="width:16px; height:16px;">Share Ticket</button><br>
+        <button onclick="shareToFacebook('${bet.betId}')" 
+  style="background:#007bff; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; 
+         display: inline-flex; align-items: center; justify-content: center; font-family: 'Ubuntu', sans-serif; font-weight: bold; 
+         text-align: center;">
+  <img src="img/facebook-icon.png"  style="width: 20px; height: 20px; margin-right: 8px;">
+  Share Ticket
+</button><<br>
         <canvas id="qrCode-${bet.betId}" width="128" height="128" style="display:block; margin-top:10px; background-color:white;"></canvas>
       `;
 
@@ -264,9 +302,9 @@ function shareToFacebook(betId) {
   const url = `${window.location.origin}${window.location.pathname}?betId=${betId}`;
   console.log("Generated URL:", url); // Debug URL
 
-  // Fungsi untuk handle share di semua perangkat
-  function tryShare() {
-    // Prioritas 1: Coba Web Share API (bekerja di mobile dan beberapa browser PC)
+  // Fungsi untuk handle share
+  function tryShare(isMobile) {
+    // Prioritas 1: Coba Web Share API
     if (navigator.share) {
       console.log("Mencoba Web Share API");
       navigator.share({
@@ -276,13 +314,45 @@ function shareToFacebook(betId) {
       })
         .then(() => console.log("Berbagi berhasil"))
         .catch((err) => {
-          console.error("Web Share gagal:", err);
-          fallbackShare();
+          // Hanya panggil fallback kalau bukan error pembatalan
+          if (err.name !== "AbortError") {
+            console.error("Web Share gagal:", err);
+            if (isMobile) {
+              tryIntent();
+            } else {
+              fallbackShare();
+            }
+          } else {
+            console.log("Share dibatalkan, tidak ada aksi");
+          }
         });
     } else {
-      // Fallback ke custom share jika Web Share tidak tersedia
-      console.log("Web Share tidak tersedia, ke fallback share");
-      fallbackShare();
+      // Fallback ke Intent (mobile) atau modal (PC)
+      console.log("Web Share tidak tersedia");
+      if (isMobile) {
+        tryIntent();
+      } else {
+        fallbackShare();
+      }
+    }
+  }
+
+  // Fungsi untuk Intent di mobile
+  function tryIntent() {
+    console.log("Coba Intent di mobile");
+    const shareIntent = `intent://#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT=${encodeURIComponent(url)};end`;
+    const facebookWeb = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+    console.log("Mencoba Intent:", shareIntent);
+
+    try {
+      window.location.href = shareIntent;
+      setTimeout(() => {
+        console.log("Intent mungkin gagal, buka web");
+        window.open(facebookWeb, '_blank');
+      }, 2000);
+    } catch (err) {
+      console.error("Intent error:", err);
+      window.open(facebookWeb, '_blank');
     }
   }
 
@@ -357,58 +427,13 @@ function shareToFacebook(betId) {
 
   // Cek apakah di perangkat mobile
   if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
-    // Di mobile, langsung coba Web Share atau Intent
-    if (navigator.share) {
-      console.log("Mencoba Web Share di mobile");
-      navigator.share({
-        title: "Share Bet",
-        text: "Check this out!",
-        url: url
-      })
-        .then(() => console.log("Berbagi berhasil di mobile"))
-        .catch((err) => {
-          console.error("Web Share gagal di mobile:", err);
-          // Intent sebagai fallback
-          console.log("Coba Intent di mobile");
-          const shareIntent = `intent://#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT=${encodeURIComponent(url)};end`;
-          const facebookWeb = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-          console.log("Mencoba Intent:", shareIntent);
-
-          try {
-            window.location.href = shareIntent;
-            setTimeout(() => {
-              console.log("Intent mungkin gagal, buka web");
-              window.open(facebookWeb, '_blank');
-            }, 2000);
-          } catch (err) {
-            console.error("Intent error:", err);
-            window.open(facebookWeb, '_blank');
-          }
-        });
-    } else {
-      // Intent langsung kalau Web Share tidak ada
-      console.log("Web Share tidak tersedia di mobile, coba Intent");
-      const shareIntent = `intent://#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT=${encodeURIComponent(url)};end`;
-      const facebookWeb = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-      console.log("Mencoba Intent:", shareIntent);
-
-      try {
-        window.location.href = shareIntent;
-        setTimeout(() => {
-          console.log("Intent mungkin gagal, buka web");
-          window.open(facebookWeb, '_blank');
-        }, 2000);
-      } catch (err) {
-        console.error("Intent error:", err);
-        window.open(facebookWeb, '_blank');
-      }
-    }
+    console.log("Mode mobile, coba share");
+    tryShare(true);
   } else {
-    // Di PC/non-mobile, coba Web Share atau modal
     console.log("Mode PC, coba share");
-    tryShare();
+    tryShare(false);
   }
-}
+    }
     
 function downloadPNG() {
   const element = document.querySelector(".container");
