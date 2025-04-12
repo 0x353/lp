@@ -153,19 +153,44 @@
       });
 
       const logo = new Image();
-      logo.src = "img/logo.svg";
-      logo.onload = () => {
-        const logoSize = hdSize * 0.15;
-        const logoX = (hdSize - logoSize) / 2;
-        const logoY = (hdSize - logoSize) / 2 - 20;
+logo.src = "img/logo.svg";
+logo.onload = () => {
+  const logoSize = hdSize * 0.19; // mendekati 48px jika hdSize = 256
+  const logoX = (hdSize - logoSize) / 2;
+  const logoY = (hdSize - logoSize) / 2 - (hdSize * 0.04); // naik sedikit agar seperti transform -60%
 
-        ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+  // Gambar logo
+  ctx.save();
+  ctx.beginPath();
+  const radius = 12 * (hdSize / 256); // menyamakan border-radius
+  ctx.moveTo(logoX + radius, logoY);
+  ctx.arcTo(logoX + logoSize, logoY, logoX + logoSize, logoY + logoSize, radius);
+  ctx.arcTo(logoX + logoSize, logoY + logoSize, logoX, logoY + logoSize, radius);
+  ctx.arcTo(logoX, logoY + logoSize, logoX, logoY, radius);
+  ctx.arcTo(logoX, logoY, logoX + logoSize, logoY, radius);
+  ctx.closePath();
+  ctx.fillStyle = "#ffffff"; // background logo putih
+  ctx.fill();
+  ctx.clip();
+  ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+  ctx.restore();
 
-        // Watermark
-        ctx.fillStyle = "#007bff";
-        ctx.font = `${hdSize * 0.035}px Ubuntu`;
-        ctx.textAlign = "center";
-        ctx.fillText("Lotto Chain", hdSize / 2, logoY + logoSize + 40);
+  // Gambar watermark
+  const watermarkY = logoY + logoSize + (hdSize * 0.07);
+  ctx.font = `${hdSize * 0.05}px Orbitron`;
+  ctx.textAlign = "center";
+  ctx.lineWidth = 1;
+  ctx.shadowColor = "#03a9f4";
+  ctx.shadowBlur = 6;
+  ctx.fillStyle = "#ffffff"; // font color fallback
+  ctx.fillText("Lotto Chain", hdSize / 2, watermarkY);
+
+  // Gradient fill effect seperti UI
+  const gradient = ctx.createLinearGradient(0, 0, hdSize, 0);
+  gradient.addColorStop(0, "#03a9f4");
+  gradient.addColorStop(1, "#f441a5");
+  ctx.fillStyle = gradient;
+  ctx.fillText("Lotto Chain", hdSize / 2, watermarkY);
 
         const link = document.createElement('a');
         link.download = "LottoQR-HD.png";
