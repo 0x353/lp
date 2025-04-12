@@ -246,7 +246,7 @@ button:hover {
             <img src="img/telegram.svg" alt="Telegram" style="width:16px; height:16px; vertical-align:middle;"> Share to Telegram
           </button>
           <button onclick="shareToFacebook('${bet.betId}')" style="background:#4267B2; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Share to Facebook</button>
-        <canvas id="qrCode-${bet.betId}" width="128" height="128"></canvas>
+        <canvas id="qrCode-${bet.betId}" width="128" height="128" style="display:block; margin-top:10px; background-color:white;"></canvas>
       `;
 
       const qrCanvas = document.getElementById(`qrCode-${bet.betId}`);
@@ -308,19 +308,24 @@ function downloadPNG() {
 }
 
 function generateQRCode(canvas, text) {
-  if (!canvas) {
-    console.error("Canvas tidak ditemukan!");
-    return;
-  }
-  console.log("Generating QR for:", text); // Tambah log untuk debugging
-  new QRCode(canvas, {
+  const tempDiv = document.createElement("div");
+  new QRCode(tempDiv, {
     text: text,
     width: 128,
     height: 128,
-    colorDark: "#000000",
-    colorLight: "#ffffff",
-    correctLevel: QRCode.CorrectLevel.H
+    colorDark: "#000000", // pastikan warna jelas
+    colorLight: "#ffffff", // pastikan background jelas
+    correctLevel: QRCode.CorrectLevel.H,
   });
+
+  const generatedImg = tempDiv.querySelector("img");
+  if (generatedImg) {
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // clear canvas terlebih dahulu
+    ctx.drawImage(generatedImg, 0, 0);
+  } else {
+    console.error("QR image not found in generated div");
+  }
 }
 
   // Ambil canvas dari div sementara
