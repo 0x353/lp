@@ -395,13 +395,12 @@ function shareTo(betId) {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: white;
+      background: #000000;
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
       z-index: 1000;
       text-align: center;
-      font-family: Arial, sans-serif;
     `;
     modal.innerHTML = `
       <h3>Pilih Platform untuk Share</h3>
@@ -411,10 +410,10 @@ function shareTo(betId) {
             (opt) => `
               <button style="
                 padding: 10px 20px;
-                background: #007bff;
+                background: #000000;
                 color: white;
                 border: none;
-                border-radius: 4px;
+                border-radius: 0.9em;
                 cursor: pointer;
               " onclick="window.open('${opt.url}', '_blank'); document.getElementById('shareModal').remove();">
                 ${opt.name}
@@ -429,10 +428,10 @@ function shareTo(betId) {
         background: #dc3545;
         color: white;
         border: none;
-        border-radius: 4px;
+        border-radius: 0.9em;
         cursor: pointer;
       " onclick="document.getElementById('shareModal').remove();">
-        Tutup
+        Closed
       </button>
     `;
     document.body.appendChild(modal);
