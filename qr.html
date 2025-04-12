@@ -25,20 +25,35 @@
     }
 
     #qr {
-      width: 256px; /* Ukuran tampilan di layar */
+      width: 256px;
       height: 256px;
       border-radius: 16px;
       box-shadow: 0 0 20px #00FF66;
     }
 
+    .logo {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      transform: translate(-50%, -60%);
+      pointer-events: none;
+      border-radius: 12px;
+      background: white;
+      padding: 4px;
+    }
+
     .watermark {
       position: absolute;
-      bottom: 8px;
-      left: 0;
-      right: 0;
-      font-size: 14px;
-      color: rgba(255, 255, 255, 0.5);
-      text-align: center;
+      top: 60%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: rgba(0, 255, 102, 0.8);
+      background: rgba(255, 255, 255, 0.9);
+      padding: 2px 6px;
+      border-radius: 6px;
       pointer-events: none;
     }
 
@@ -65,20 +80,7 @@
 
   <div class="qr-wrapper" id="qrWrapper">
     <canvas id="qr" width="256" height="256"></canvas>
-    <div style="position: relative; display: inline-block;">
-  <canvas id="qrCanvas"></canvas>
-  <img src="img/logo.svg" alt="Logo"
-       style="position: absolute;
-              top: 50%;
-              left: 50%;
-              width: 20px;
-              height: 20px;
-              transform: translate(-50%, -50%);
-              pointer-events: none;
-              border-radius: 12px;
-              background: white;
-              padding: 4px;">
-</div>
+    <img src="img/logo.svg" alt="Logo" class="logo">
     <div class="watermark">Lotto Chain</div>
   </div>
 
@@ -87,7 +89,7 @@
   <script>
     const currentURL = window.location.href;
 
-    // QR untuk tampilan di layar (canvas kecil)
+    // Render QR kecil di layar
     const qrCanvas = document.getElementById("qr");
     const qr = new QRious({
       element: qrCanvas,
@@ -98,15 +100,17 @@
       foreground: '#00FF66'
     });
 
-    // QR untuk resolusi tinggi saat download
+    // Fungsi download
     document.getElementById("downloadBtn").addEventListener("click", () => {
-      const hdCanvas = document.createElement('canvas');
-      const hdSize = 1024; // resolusi download
-      hdCanvas.width = hdSize;
-      hdCanvas.height = hdSize;
+      const hdSize = 1024;
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = hdSize;
+      canvas.height = hdSize;
 
+      // Render ulang QR di canvas HD
       const hdQR = new QRious({
-        element: hdCanvas,
+        element: canvas,
         value: currentURL,
         size: hdSize,
         level: 'H',
@@ -114,10 +118,27 @@
         foreground: '#00FF66'
       });
 
-      const link = document.createElement('a');
-      link.download = "LottoQR-HD.png";
-      link.href = hdCanvas.toDataURL("image/png");
-      link.click();
+      const logo = new Image();
+      logo.src = "img/logo.svg";
+      logo.onload = () => {
+        const logoSize = hdSize * 0.15;
+        const logoX = (hdSize - logoSize) / 2;
+        const logoY = (hdSize - logoSize) / 2 - 20;
+
+        ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+
+        // Tambah watermark di bawah logo
+        ctx.fillStyle = "rgba(0,0,0,0.7)";
+        ctx.font = `${hdSize * 0.035}px sans-serif`;
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#00FF66";
+        ctx.fillText("Lotto Chain", hdSize / 2, logoY + logoSize + 40);
+
+        const link = document.createElement('a');
+        link.download = "LottoQR-HD.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      };
     });
   </script>
 
