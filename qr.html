@@ -74,7 +74,7 @@
 
   <div class="qr-wrapper" id="qrWrapper">
     <canvas id="qr"></canvas>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Chain_link_icon_black.svg/2048px-Chain_link_icon_black.svg.png" alt="Logo" class="qr-logo">
+    <img src="img/logo.svg">
     <div class="watermark">Lotto Chain</div>
   </div>
 
@@ -88,7 +88,7 @@
     const qr = new QRious({
       element: qrCanvas,
       value: currentURL,
-      size: 512, // Resolusi tinggi untuk QR Code (HD)
+      size: 3000, // Resolusi tinggi untuk QR Code (HD)
       level: 'H',
       background: '#fff',
       foreground: '#00FF66'
