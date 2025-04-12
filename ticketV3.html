@@ -398,12 +398,12 @@ function shareTo(betId) {
       background: #000000;
       padding: 20px;
       border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      box-shadow: 0 0 12px rgba(80, 160, 255, 0.3), 0 0 18px rgba(80, 160, 255, 0.2);
       z-index: 1000;
       text-align: center;
     `;
     modal.innerHTML = `
-      <h3>Pilih Platform untuk Share</h3>
+      <h3>Share To</h3><br>
       <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
         ${shareOptions
           .map(
