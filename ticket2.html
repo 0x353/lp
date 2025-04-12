@@ -83,7 +83,7 @@ h3 {
 }
 
 button {
-  background-color: #1a88ff;
+  background-color: #007bff;
   color: white;
   border: none;
   padding: 8px 12px;
@@ -241,11 +241,7 @@ button:hover {
         <p>Player Total Payout: <span style="color:#1a88ff;">${totalPayoutEth} ETH</span></p>
         <p>Contract: <a href="https://sepolia.basescan.org/address/${contractAddress}" target="_blank" style="color:#1a88ff;">${contractAddress.slice(0, 10)}...${contractAddress.slice(-10)}</a></p>
         <div style="margin-top:10px;">
-          <button onclick="shareToTwitter('${bet.betId}')" style="background:#1DA1F2; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin-right:5px;">Share to Twitter</button>
-          <button onclick="shareToTelegram('${bet.betId}')" style="background:#0088cc; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin-right:5px;">
-            <img src="img/telegram.svg" alt="Telegram" style="width:16px; height:16px; vertical-align:middle;"> Share to Telegram
-          </button>
-          <button onclick="shareToFacebook('${bet.betId}')" style="background:#4267B2; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Share to Facebook</button>
+          <button onclick="shareToFacebook('${bet.betId}')" style="background:#007bff; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Share Ticket</button>
           <canvas id="qrCode-${bet.betId}" width="128" height="128" style="display:block; margin-top:10px; background-color:white;"></canvas>
       `;
 
@@ -261,22 +257,6 @@ button:hover {
     console.error("Error saat memuat bet:", err);
     detailDiv.innerText = `Failed to load bet detail: ${err.message}`;
   }
-}
-
-function shareToTwitter(betId) {
-  const url = `${window.location.origin}${window.location.pathname}?betId=${betId}`;
-  const text = `Check out this bet on Base Sepolia Testnet! Bet ID: ${betId}`;
-  const twitterUrl = /Android|iPhone|iPad/i.test(navigator.userAgent) 
-    ? `twitter://post?message=${encodeURIComponent(text + " " + url)}`
-    : `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
-  window.open(twitterUrl, '_blank');
-}
-
-function shareToTelegram(betId) {
-  const url = `${window.location.origin}${window.location.pathname}?betId=${betId}`;
-  const text = `Check out this bet on Base Sepolia Testnet! Bet ID: ${betId}`;
-  const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
-  window.open(telegramUrl, '_blank');
 }
 
 function shareToFacebook(betId) {
