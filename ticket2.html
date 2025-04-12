@@ -241,8 +241,9 @@ button:hover {
         <p>Player Total Payout: <span style="color:#1a88ff;">${totalPayoutEth} ETH</span></p>
         <p>Contract: <a href="https://sepolia.basescan.org/address/${contractAddress}" target="_blank" style="color:#1a88ff;">${contractAddress.slice(0, 10)}...${contractAddress.slice(-10)}</a></p>
         <div style="margin-top:10px;">
-          <button onclick="shareToFacebook('${bet.betId}')" style="background:#007bff; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Share Ticket</button>
-          <canvas id="qrCode-${bet.betId}" width="128" height="128" style="display:block; margin-top:10px; background-color:white;"></canvas>
+        <button onclick="shareToFacebook('${bet.betId}')" style="background:#007bff; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-family:'Ubuntu', sans-serif; font-weight:700; display:flex; align-items:center; gap:6px;">
+        <img src="img/share.svg"  style="width:16px; height:16px;">Share Ticket</button>
+        <canvas id="qrCode-${bet.betId}" width="128" height="128" style="display:block; margin-top:10px; background-color:white;"></canvas>
       `;
 
       const qrCanvas = document.getElementById(`qrCode-${bet.betId}`);
