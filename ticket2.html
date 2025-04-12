@@ -308,15 +308,20 @@ function downloadPNG() {
 }
 
 function generateQRCode(canvas, text) {
-  const tempDiv = document.createElement("div");
-  new QRCode(tempDiv, {
+  if (!canvas) {
+    console.error("Canvas tidak ditemukan!");
+    return;
+  }
+
+  new QRCode(canvas, {
     text: text,
     width: 128,
     height: 128,
-    colorDark : "#ffffff",
-    colorLight : "#1e1e1e",
-    correctLevel : QRCode.CorrectLevel.H
+    colorDark: "#000000", // Hitam untuk kode
+    colorLight: "#ffffff", // Putih untuk latar
+    correctLevel: QRCode.CorrectLevel.H
   });
+}
 
   // Ambil canvas dari div sementara
   const generatedImg = tempDiv.querySelector("img") || tempDiv.querySelector("canvas");
