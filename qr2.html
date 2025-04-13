@@ -28,7 +28,7 @@
       font-size: 20px;
       cursor: pointer;
     }
-    #downloadBtn {
+    #downloadBtn, #showQRBtn {
       display: none;
       margin-top: 10px;
       background: linear-gradient(to right, #5f4bd3, #7e72f2);
@@ -113,8 +113,8 @@
       downloadBtn.addEventListener("click", () => {
     if (canvas) {
       const combinedCanvas = document.createElement("canvas");
-      combinedCanvas.width = 300;
-      combinedCanvas.height = 300;
+      combinedCanvas.width = 3000;
+      combinedCanvas.height = 3000;
       const ctx = combinedCanvas.getContext("2d");
 
       // Gambar QR ke canvas baru
@@ -123,7 +123,7 @@
       // Logo di tengah
       const logoImage = new Image();
       logoImage.crossOrigin = "anonymous";
-      logoImage.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/LetterL.svg/1200px-LetterL.svg.png";
+      logoImage.src = "img/logo.png";
 
       // Tunggu sampai logo selesai diload, baru download
       logoImage.onload = () => {
@@ -131,7 +131,7 @@
 
         // Buat link download
         const link = document.createElement("a");
-        link.download = "qr-code-with-logo.png";
+        link.download = "Lotto-qr-code-link.png";
         link.href = combinedCanvas.toDataURL("image/png");
         document.body.appendChild(link);
         link.click();
