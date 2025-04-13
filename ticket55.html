@@ -360,44 +360,102 @@
       }
 
       function fallbackShare() {
-        const shareOptions = [
-          { name: "Facebook", url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, icon: "img/facebook.svg" },
-          { name: "Twitter", url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=Check%20this%20out!`, icon: "img/twitter.svg" },
-          { name: "WhatsApp", url: `https://api.whatsapp.com/send?text=${encodeURIComponent("Check this out: " + url)}`, icon: "img/wa.svg" },
-          { name: "LinkedIn", url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, icon: "img/linke.svg" },
-          { name: "Email", url: `mailto:?subject=Check%20this%20out&body=${encodeURIComponent(url)}`, icon: "img/email.svg" },
-          { name: "Telegram", url: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=Check%20this%20out!`, icon: "img/telegram.svg" },
-          { name: "Reddit", url: `https://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=Check%20this%20out!`, icon: "img/reddit.svg" },
-          { name: "Discord", url: `https://discord.com/channels/@me?content=${encodeURIComponent("Check this out: " + url)}`, icon: "img/discord.svg" }
-        ];
+    // Daftar platform dan URL share-nya dengan ikon PNG
+    const shareOptions = [
+        {
+            name: "Facebook",
+            url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+            icon: "img/facebook.svg"
+        },
+        {
+            name: "Twitter",
+            url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=Check%20this%20out!`,
+            icon: "img/twitter.svg"
+        },
+        {
+            name: "WhatsApp",
+            url: `https://api.whatsapp.com/send?text=${encodeURIComponent("Check this out: " + url)}`,
+            icon: "img/wa.svg"
+        },
+        {
+            name: "LinkedIn",
+            url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
+            icon: "img/linke.svg"
+        },
+        {
+            name: "Email",
+            url: `mailto:?subject=Check%20this%20out&body=${encodeURIComponent(url)}`,
+            icon: "img/email.svg"
+        },
+        {
+            name: "Telegram",
+            url: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=Check%20this%20out!`,
+            icon: "img/telegram.svg"
+        },
+        {
+            name: "Reddit",
+            url: `https://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=Check%20this%20out!`,
+            icon: "img/reddit.svg"
+        },
+        {
+            name: "Discord",
+            url: `https://discord.com/channels/@me?content=${encodeURIComponent("Check this out: " + url)}`,
+            icon: "img/discord.svg"
+        }
+    ];
 
-        const existingModal = document.getElementById("shareModal");
-        if (existingModal) existingModal.remove();
+    // Cek apakah modal sudah ada, hapus kalau ada
+    const existingModal = document.getElementById("shareModal");
+    if (existingModal) existingModal.remove();
 
-        const modal = document.createElement("div");
-        modal.id = "shareModal";
-        modal.style.cssText = `
-          position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-          background: #000000; padding: 20px; border-radius: 8px;
-          box-shadow: 0 0 12px rgba(80, 160, 255, 0.3), 0 0 18px rgba(80, 160, 255, 0.2);
-          z-index: 1000; text-align: center;
-        `;
-        modal.innerHTML = `
-          <h1>Share To</h1>
-          <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
-            ${shareOptions.map(opt => `
-              <button style="padding: 10px; background: #000000; border: none; border-radius: 0.9em; cursor: pointer;"
-                onclick="window.open('${opt.url}', '_blank'); document.getElementById('shareModal').remove();">
-                <img src="${opt.icon}" alt="${opt.name}" width="32" height="32" style="display: block;">
-              </button>
-            `).join("")}
-          </div>
-          <button style="margin-top: 15px; padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 0.9em; cursor: pointer;"
-            onclick="document.getElementById('shareModal').remove();">
-            Close
-          </button>
-        `;
-        document.body.appendChild(modal);
+    // Buat modal
+    const modal = document.createElement("div");
+    modal.id = "shareModal";
+    modal.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #000000;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 12px rgba(80, 160, 255, 0.3), 0 0 18px rgba(80, 160, 255, 0.2);
+      z-index: 1000;
+      text-align: center;
+    `;
+    modal.innerHTML = `
+      <h1>Share To</h1>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+        ${shareOptions
+            .map(
+                (opt) => `
+                  <button style="
+                    padding: 10px;
+                    background: #000000;
+                    border: none;
+                    border-radius: 0.9em;
+                    cursor: pointer;
+                  " onclick="window.open('${opt.url}', '_blank'); document.getElementById('shareModal').remove();">
+                    <img src="${opt.icon}" alt="${opt.name}" width="32" height="32" style="display: block;">
+                  </button>
+                `
+            )
+            .join("")}
+      </div>
+      <button style="
+        margin-top: 15px;
+        padding: 8px 16px;
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 0.9em;
+        cursor: pointer;
+      " onclick="document.getElementById('shareModal').remove();">
+        Closed
+      </button>
+    `;
+    document.body.appendChild(modal);
+    
       }
 
       if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
