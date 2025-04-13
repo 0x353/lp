@@ -47,109 +47,58 @@
 </head>
 <body>
 
-<input type="text" id="customLink" placeholder="Enter your dynamic link" style="width: 60%; padding: 6px;">
-<br><br>
+<button id="qrlink">Generate QR</button>
 
-<button id="qrlinkBtn" onclick="handleQRButton()">Generate QR Link</button>
-
-<div id="qrWrapper" style="position: relative; display: none; margin-top: 20px;">
-  <button onclick="closeQR()" style="position: absolute; top: 0; right: 0; background: red; color: white; border: none; border-radius: 4px; padding: 2px 6px; cursor: pointer;">X</button>
-  <canvas id="qrCanvas" onclick="zoomQR()" style="cursor: pointer;"></canvas>
-</div>
-
-<div id="qrModal" onclick="closeZoomQR()" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); align-items:center; justify-content:center;">
-  <canvas id="zoomedQR"></canvas>
+<div id="qrContainer">
+  <div id="closeQR">×</div>
+  <div id="qrCanvas"></div>
+  <img id="qrLogo" src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="Logo">
 </div>
 
 <script>
-let qrGenerated = false;
-
-function handleQRButton() {
-  if (!qrGenerated) {
-    generateQRLink();
-  } else {
-    downloadQR();
-  }
-}
-
-function generateQRLink() {
-  const inputLink = document.getElementById("customLink").value.trim();
+  const qrlink = document.getElementById("qrlink");
   const qrCanvas = document.getElementById("qrCanvas");
-  const qrWrapper = document.getElementById("qrWrapper");
-  const btn = document.getElementById("qrlinkBtn");
+  const qrContainer = document.getElementById("qrContainer");
+  const qrLogo = document.getElementById("qrLogo");
+  const closeQR = document.getElementById("closeQR");
 
-  if (!inputLink || !inputLink.startsWith("http")) {
-    alert("Please enter a valid link starting with http/https");
-    return;
-  }
+  let qr;
 
-  QRCode.toCanvas(qrCanvas, inputLink, { width: 240 }, function (error) {
-    if (error) return console.error(error);
-
-    // Tambahkan logo setelah QR dibuat
-    const ctx = qrCanvas.getContext("2d");
-    const logo = new Image();
-    logo.src = "logo.png"; // Ganti path dengan logo kamu (100x100 disarankan)
-    logo.onload = () => {
-      const x = (qrCanvas.width - 40) / 2;
-      const y = (qrCanvas.height - 40) / 2;
-      ctx.fillStyle = "#fff";
-      ctx.fillRect(x, y, 40, 40); // background putih logo
-      ctx.drawImage(logo, x, y, 40, 40);
-    };
-
-    qrWrapper.style.display = "block";
-    btn.innerText = "Download QR";
-    qrGenerated = true;
+  qrlink.addEventListener("click", () => {
+    if (!qr) {
+      const link = "https://example.com"; // Ganti ini sesuai link dinamis kamu
+      qr = new QRCode(qrCanvas, {
+        text: link,
+        width: 220,
+        height: 220,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+      qrContainer.style.display = "block";
+      qrlink.innerText = "Download QR";
+    } else {
+      const canvas = qrCanvas.querySelector("canvas");
+      const image = canvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = image;
+      a.download = "qr-code.png";
+      a.click();
+    }
   });
-}
 
-function downloadQR(link) {
-    const size = ,3000; // Ganti sesuai resolusi yang kamu mau
-    const canvas = document.createElement('canvas');
-    canvas.width = size;
-    canvas.height = size;
+  qrCanvas.addEventListener("click", () => {
+    const img = qrCanvas.querySelector("canvas").toDataURL("image/png");
+    const win = window.open();
+    win.document.write(`<img src="${img}" style="width:90%;margin:auto;display:block;">`);
+  });
 
-    QRCode.toCanvas(canvas, link, {
-        width: size,
-        margin: 2,
-        color: {
-            dark: "#000000",
-            light: "#ffffff"
-        }
-    }, function (error) {
-        if (error) console.error(error);
-        const a = document.createElement("a");
-        a.download = "qr-code.png";
-        a.href = canvas.toDataURL("image/png");
-        a.click();
-    });
-}
-
-function closeQR() {
-  document.getElementById("qrWrapper").style.display = "none";
-  document.getElementById("qrlinkBtn").innerText = "Generate QR Link";
-  qrGenerated = false;
-}
-
-function zoomQR() {
-  const modal = document.getElementById("qrModal");
-  const qrCanvas = document.getElementById("qrCanvas");
-  const zoomedCanvas = document.getElementById("zoomedQR");
-
-  zoomedCanvas.width = 480;
-  zoomedCanvas.height = 480;
-
-  const ctx = zoomedCanvas.getContext("2d");
-  ctx.clearRect(0, 0, 480, 480);
-  ctx.drawImage(qrCanvas, 0, 0, 480, 480);
-
-  modal.style.display = "flex";
-}
-
-function closeZoomQR() {
-  document.getElementById("qrModal").style.display = "none";
-}
+  closeQR.addEventListener("click", () => {
+    qrCanvas.innerHTML = "";
+    qr = null;
+    qrContainer.style.display = "none";
+    qrlink.innerText = "Generate QR";
+  });
 </script>
 
 </body>
