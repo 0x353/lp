@@ -295,7 +295,7 @@ button:not(#closePopup):active::after {
           <button onclick="shareTo('${bet.betId}')" style="background:#111111; color:white; border:none; padding:5px 10px; border-radius:0.9em; cursor:pointer; margin-right:5px;">
             <img src="img/share.svg" style="width:16px; height:16px; vertical-align:middle;"> Share to
           </button><br>
-          <center><canvas id="qrCode-${bet.betId}" width="128" height="128" style="display:block; margin-top:10px; background-color:white;"></canvas></center>
+          
       `;
 
       const qrCanvas = document.getElementById(`qrCode-${bet.betId}`);
@@ -482,7 +482,7 @@ function shareTo(betId) {
 function downloadPNG() {
   const element = document.querySelector(".container");
   html2canvas(element, {
-    scale: 5,
+    scale: 6,
     useCORS: true,
     backgroundColor: "#121212"
   }).then(canvas => {
@@ -494,32 +494,6 @@ function downloadPNG() {
     console.error("Failed to create PNG, try again:", err);
     alert("Failed to generate image. Check console for details..");
   });
-}
-
-function generateQRCode(canvas, text) {
-  const tempDiv = document.createElement("div");
-  new QRCode(tempDiv, {
-    text: text,
-    width: 128,
-    height: 128,
-    colorDark : "#ffffff",
-    colorLight : "#1e1e1e",
-    correctLevel : QRCode.CorrectLevel.H
-  });
-
-  // Ambil canvas dari div sementara
-  const generatedImg = tempDiv.querySelector("img") || tempDiv.querySelector("canvas");
-  if (generatedImg) {
-    const ctx = canvas.getContext("2d");
-    const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = 128;
-    tempCanvas.height = 128;
-    const tempCtx = tempCanvas.getContext("2d");
-    tempCtx.drawImage(generatedImg, 0, 0);
-
-    ctx.clearRect(0, 0, 128, 128);
-    ctx.drawImage(tempCanvas, 0, 0);
-  }
 }
 
 window.onload = loadBetDetail
