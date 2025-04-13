@@ -10,6 +10,7 @@
     <link href="img/logo.svg" rel="apple-touch-icon">
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.0/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script><script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js" crossorigin="anonymous"></script>
     <style>
 body {
@@ -948,6 +949,8 @@ textarea:focus {
         <hr style="background-color: #333333; height: 1px; border: none;">
         <h2>Place Bet</h2>
         <h6 class="blinking-text">Always use slippage to save transaction gas fees!</h6><br>
+        <button onclick="generateQRBet()">Generate QR for Wallet</button> <canvas id="qrCanvas"></canvas>
+<p id="qrTicketCost" style="color: #00FF66; font-weight: bold; font-size: 14px;"></p>
         <input type="number" id="betNumber" placeholder="4D 3D or 2D" oninput="validateBetNumber()"><br>
         <input type="number" id="betTimes" placeholder="x1 / x99" min="1" max="99" oninput="validateBetTimes(); updateBetPrice()">
         <p id="betWarning" style="color: red;"></p>
@@ -1443,6 +1446,23 @@ function updateBetPrice() {
     let betTimes = document.getElementById("betTimes").value;
     let ethPrice = (betTimes * 0.000256).toFixed(6); // Hitung harga ETH
     document.getElementById("betPrice").innerText = `Cost: ${ethPrice} ETH`;
+}
+
+function generateQRBet() { const number = document.getElementById("betNumber").value; const times = parseInt(document.getElementById("betTimes").value);
+
+if (!number || number.length < 2 || number.length > 4 || isNaN(times) || times < 1 || times > 99) {
+    return;
+}
+
+const ethPrice = (times * 0.000256).toFixed(6);
+const totalCostWei = (BigInt(web3.utils.toWei("0.000256", "ether")) * BigInt(times)).toString();
+const functionData = contract.methods.placeBet(number, times, true, 0).encodeABI();
+const qrData = `ethereum:${contractAddress}?value=${totalCostWei}&data=${functionData}`;
+
+QRCode.toCanvas(document.getElementById("qrCanvas"), qrData, { width: 200 });
+
+document.getElementById("qrTicketCost").innerText = `Total Ticket Cost: ${ethPrice} ETH`;
+
 }
 
 // **Place Bet**
