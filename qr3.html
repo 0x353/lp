@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QR Generator</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    #qrCanvasContainer {
+      display: none;
+      position: relative;
+      margin: 20px auto;
+      width: 320px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      padding: 20px;
+    }
+    #closeBtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: #ff4d4d;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    #closeBtn:hover {
+      transform: scale(1.2);
+    }
+    #downloadBtn {
+      display: none;
+      margin-top: 15px;
+      background: linear-gradient(to right, #5f4bd3, #7e72f2);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    #downloadBtn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    #showQRBtn {
+      background: linear-gradient(to right, #5f4bd3, #7e72f2);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    #showQRBtn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    #qr {
+      position: relative;
+      display: inline-block;
+    }
+    .logo {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60px;
+      height: 60px;
+    }
+  </style>
+</head>
+<body>
+  <button id="showQRBtn">QR Link</button>
+  <div id="qrCanvasContainer">
+    <div id="closeBtn">×</div>
+    <div id="qr"></div>
+  </div>
+  <button id="downloadBtn">Download QR</button>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script>
+    const qrContainer = document.getElementById("qr");
+    const showQRBtn = document.getElementById("showQRBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const qrCanvasContainer = document.getElementById("qrCanvasContainer");
+    const closeBtn = document.getElementById("closeBtn");
+
+    let canvas;
+
+    showQRBtn.addEventListener("click", () => {
+      qrCanvasContainer.style.display = "block";
+      qrContainer.innerHTML = ""; // Bersihkan QR sebelumnya
+
+      const url = window.location.href;
+
+      QRCode.toCanvas(url, { 
+        width: 300, 
+        margin: 2,
+        errorCorrectionLevel: 'H' // Tingkat koreksi error tinggi untuk keandalan
+      }, (err, c) => {
+        if (err) {
+          console.error("Error generating QR:", err);
+          qrContainer.innerHTML = "<p style='color: red;'>Failed to generate QR code.</p>";
+          return;
+        }
+        canvas = c;
+        qrContainer.appendChild(canvas);
+
+        const logo = document.createElement("img");
+        logo.src = "img/logo.svg"; // Ganti dengan path logo Anda
+        logo.className = "logo";
+        logo.crossOrigin = "anonymous";
+        logo.onerror = () => {
+          console.error("Failed to load logo");
+        };
+        qrContainer.appendChild(logo);
+
+        showQRBtn.style.display = "none";
+        downloadBtn.style.display = "inline-block";
+      });
+    });
+
+    closeBtn.addEventListener("click", () => {
+      qrCanvasContainer.style.display = "none";
+      showQRBtn.style.display = "inline-block";
+      downloadBtn.style.display = "none";
+      qrContainer.innerHTML = "";
+      canvas = null; // Reset canvas
+    });
+
+    downloadBtn.addEventListener("click", () => {
+      if (!canvas) {
+        alert("QR code belum dibuat. Klik 'QR Link' terlebih dahulu.");
+        return;
+      }
+
+      // Buat QR code dengan resolusi tinggi untuk download
+      const url = window.location.href;
+      QRCode.toCanvas(url, { 
+        width: 2600, // Ukuran QR lebih kecil dari canvas untuk margin
+        margin: 8,
+        errorCorrectionLevel: 'H'
+      }, (err, highResCanvas) => {
+        if (err) {
+          console.error("Error generating high-res QR:", err);
+          alert("Gagal membuat QR code untuk download.");
+          return;
+        }
+
+        // Buat canvas 3000x3000
+        const combinedCanvas = document.createElement("canvas");
+        combinedCanvas.width = 3000;
+        combinedCanvas.height = 3000;
+        const ctx = combinedCanvas.getContext("2d");
+
+        // Latar belakang putih
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, 3000, 3000);
+
+        // Gambar QR code dengan margin (200px di setiap sisi)
+        ctx.drawImage(highResCanvas, 200, 200, 2600, 2600);
+
+        // Logo di tengah
+        const logoImage = new Image();
+        logoImage.crossOrigin = "anonymous";
+        logoImage.src = "img/logo.svg";
+
+        logoImage.onload = () => {
+          // Logo berukuran 10% dari lebar QR code (2600 * 0.1 = 260px)
+          const logoSize = 260;
+          const logoX = (3000 - logoSize) / 2; // Pusat horizontal
+          const logoY = (3000 - logoSize) / 2; // Pusat vertikal
+          ctx.drawImage(logoImage, logoX, logoY, logoSize, logoSize);
+
+          // Buat link download
+          const link = document.createElement("a");
+          link.download = "Lotto-qr-code-link.png";
+          link.href = combinedCanvas.toDataURL("image/png");
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        };
+
+        logoImage.onerror = () => {
+          console.error("Gagal memuat logo untuk download");
+          // Tetap lanjutkan download tanpa logo
+          const link = document.createElement("a");
+          link.download = "Lotto-qr-code-link.png";
+          link.href = combinedCanvas.toDataURL("image/png");
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        };
+      });
+    });
+  </script>
+</body>
+</html>
