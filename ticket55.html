@@ -256,7 +256,7 @@
         const payoutAmount = isWinner ? winnerData.amount : "0";
         const payoutAmountEth = web3.utils.fromWei(payoutAmount, 'ether');
 
-        const betAmount = web3.utils.fromWei(bet.betAmount, 'ether');
+        const betAmount = bet.betAmount;
 
         let gasUsed = "N/A";
         try {
@@ -292,7 +292,7 @@
             <button onclick="navigator.clipboard.writeText('${bet.betId}'); alert('Bet ID copied!')" style="background:#111111; color:white; border:none; padding:5px 10px; border-radius:0.9em; cursor:pointer; margin-left:10px;">Copy</button>
           </p>
           <p>Bet Number: <span style="color:#00FF66;">${bet.number}</span></p>
-          <p>Bet Amount: <span style="color:#00FF66;">${betAmount} ETH</span></p>
+          <p>Bet Amount: <span style="color:#00FF66;">${betAmount}</span></p>
           <p>Is ETH: <span style="color:${bet.isETH ? '#00FF66' : '#fe6666'};">${bet.isETH ? 'Yes' : 'No'}</span></p>
           <p>Transaction: <a href="https://sepolia.basescan.org/tx/${bet.txHash}" target="_blank" style="color:#fe6666;">${shortTxHash}</a></p>
           <p>Gas Fee: <span style="color:#ffcc00;">${gasUsed} ETH</span></p>
