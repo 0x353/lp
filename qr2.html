@@ -5,96 +5,71 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>QR Generator</title>
   <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 20px;
-      background-color: #f5f5f5;
-    }
+    body { font-family: sans-serif; text-align: center; padding: 20px; }
     #qrCanvasContainer {
       display: none;
       position: relative;
       margin: 20px auto;
-      width: 320px;
-      background: #ffffff;
+      width: 340px;
+      height: 360px;
+      background: #f0f0f0;
       border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
     #closeBtn {
       position: absolute;
-      top: 10px;
+      top: 5px;
       right: 10px;
-      color: #ff4d4d;
-      font-size: 24px;
-      font-weight: bold;
+      color: red;
+      font-size: 20px;
       cursor: pointer;
-      transition: transform 0.2s;
-    }
-    #closeBtn:hover {
-      transform: scale(1.2);
     }
     #downloadBtn {
       display: none;
-      margin-top: 15px;
+      margin-top: 10px;
       background: linear-gradient(to right, #5f4bd3, #7e72f2);
       color: white;
       border: none;
-      padding: 12px 24px;
+      padding: 10px 20px;
       border-radius: 12px;
       cursor: pointer;
       font-weight: bold;
-      font-size: 16px;
-      transition: transform 0.2s, box-shadow 0.2s;
     }
-    #downloadBtn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    }
-    #qr {
-      display: block;
-      margin: 0 auto;
+    canvas {
+      margin-top: 20px;
       border-radius: 12px;
-    }
-    #showQRBtn {
-      background: linear-gradient(to right, #5f4bd3, #7e72f2);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: bold;
-      font-size: 16px;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    #showQRBtn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
   </style>
 </head>
 <body>
+
   <button id="showQRBtn">QR Link</button>
   <div id="qrCanvasContainer">
     <div id="closeBtn">×</div>
-    <canvas id="qr"></canvas>
+    <div id="qr"></div>
   </div>
   <button id="downloadBtn">Download QR</button>
 
   <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
   <script>
+    const qrContainer = document.getElementById("qr");
+    const showQRBtn = document.getElementById("showQRBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const qrCanvasContainer = document.getElementById("qrCanvasContainer");
+    const closeBtn = document.getElementById("closeBtn");
+
     const qr = new QRCodeStyling({
-      width: 280,
-      height: 280,
+      width: 1024,
+      height: 1024,
       data: window.location.href,
-      image: "https://upload.wikimedia.org/wikipedia/commons/5/51/Globe_icon.svg", // Ganti dengan logo Anda, pastikan CORS-enabled
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/LetterL.svg/1200px-LetterL.svg.png",
       imageOptions: {
         crossOrigin: "anonymous",
-        margin: 8,
-        imageSize: 0.2
+        margin: 4,
+        imageSize: 0.25
       },
       dotsOptions: {
-        color: "#000000",
+        color: "#000",
         type: "rounded"
       },
       cornersSquareOptions: {
@@ -106,43 +81,24 @@
       }
     });
 
-    const showQRBtn = document.getElementById("showQRBtn");
-    const downloadBtn = document.getElementById("downloadBtn");
-    const qrCanvas = document.getElementById("qr");
-    const qrCanvasContainer = document.getElementById("qrCanvasContainer");
-    const closeBtn = document.getElementById("closeBtn");
-
-    function renderQR() {
-      try {
-        qr.update({ data: window.location.href }); // Pastikan data selalu terbaru
-        qr.append(qrCanvas); // Render ke canvas
-      } catch (err) {
-        console.error("Error rendering QR:", err);
-        qrCanvasContainer.innerHTML = "<p style='color: red;'>Failed to render QR code.</p>";
-      }
-    }
+    // Append QR ke container sekali saja saat pertama
+    qr.append(qrContainer);
 
     showQRBtn.addEventListener("click", () => {
+      qr.update({ data: window.location.href }); // kalau mau update link
       qrCanvasContainer.style.display = "block";
       showQRBtn.style.display = "none";
       downloadBtn.style.display = "inline-block";
-      renderQR();
     });
 
     closeBtn.addEventListener("click", () => {
       qrCanvasContainer.style.display = "none";
       downloadBtn.style.display = "none";
       showQRBtn.style.display = "inline-block";
-      qrCanvas.getContext("2d").clearRect(0, 0, qrCanvas.width, qrCanvas.height); // Bersihkan canvas
     });
 
     downloadBtn.addEventListener("click", () => {
-      try {
-        qr.download({ name: "qr-code", extension: "png" });
-      } catch (err) {
-        console.error("Error downloading QR:", err);
-        alert("Failed to download QR code. Check console for details.");
-      }
+      qr.download({ name: "qr-code", extension: "png" });
     });
   </script>
 </body>
