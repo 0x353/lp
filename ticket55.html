@@ -244,8 +244,8 @@
           return;
         }
 
-        const shortPlayer = bet.player.slice(0, 6) + "..." + bet.player.slice(-4);
-        const shortTxHash = bet.txHash.slice(0, 6) + "..." + bet.txHash.slice(-4);
+        const shortPlayer = bet.player.slice(0, 21) + "" + bet.player.slice(-21);
+        const shortTxHash = bet.txHash.slice(0, 15) + "..." + bet.txHash.slice(-15);
         const betIdBytes32 = bet.betId;
         const likeCount = await contract.methods.getLikeCount(betIdBytes32).call();
         const comments = await contract.methods.getComments(betIdBytes32).call();
