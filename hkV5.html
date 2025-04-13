@@ -949,8 +949,9 @@ textarea:focus {
         <hr style="background-color: #333333; height: 1px; border: none;">
         <h2>Place Bet</h2>
         <h6 class="blinking-text">Always use slippage to save transaction gas fees!</h6><br>
-        <button onclick="generateQRBet()">Generate QR for Wallet</button> <canvas id="qrCanvas"></canvas>
+         <canvas id="qrCanvas"></canvas>
 <p id="qrTicketCost" style="color: #00FF66; font-weight: bold; font-size: 14px;"></p>
+       <button onclick="generateQRBet()">Generate QR Payment</button>
         <input type="number" id="betNumber" placeholder="4D 3D or 2D" oninput="validateBetNumber()"><br>
         <input type="number" id="betTimes" placeholder="x1 / x99" min="1" max="99" oninput="validateBetTimes(); updateBetPrice()">
         <p id="betWarning" style="color: red;"></p>
