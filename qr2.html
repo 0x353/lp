@@ -2,103 +2,155 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Simple QR with Logo</title>
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+  <title>QR Generator with Logo</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <style>
-    #qrContainer {
-      position: relative;
-      display: none;
-      width: 220px;
-      margin-top: 20px;
-    }
-
-    #qrCanvas {
-      cursor: zoom-in;
-      border: 2px solid #000;
-      border-radius: 8px;
-    }
-
-    #qrLogo {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 40px;
-      height: 40px;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-    }
-
-    #closeQR {
+    body { font-family: sans-serif; padding: 20px; }
+    #qrWrapper { display: none; position: relative; margin-top: 20px; }
+    #qrCanvas { border: 2px solid #000; border-radius: 8px; cursor: zoom-in; }
+    .closeBtn {
       position: absolute;
       top: -10px;
       right: -10px;
-      background: #fff;
-      color: #000;
+      background: red;
+      color: white;
+      border: none;
       border-radius: 50%;
-      width: 22px;
-      height: 22px;
-      text-align: center;
+      width: 24px;
+      height: 24px;
+      font-size: 16px;
       cursor: pointer;
-      font-size: 14px;
-      line-height: 22px;
-      border: 1px solid #000;
+    }
+    #qrModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
     }
   </style>
 </head>
 <body>
 
-<button id="qrlink">Generate QR</button>
+<input type="text" id="customData" placeholder="Enter any text or code..." style="width: 60%; padding: 8px;">
+<br><br>
+<button id="qrButton" onclick="handleQR()">Generate QR</button>
 
-<div id="qrContainer">
-  <div id="closeQR">×</div>
-  <div id="qrCanvas"></div>
-  <img id="qrLogo" src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="Logo">
+<div id="qrWrapper">
+  <button class="closeBtn" onclick="closeQR()">×</button>
+  <canvas id="qrCanvas" onclick="zoomQR()"></canvas>
+</div>
+
+<div id="qrModal" onclick="closeZoom()">
+  <canvas id="zoomedQR"></canvas>
 </div>
 
 <script>
-  const qrlink = document.getElementById("qrlink");
-  const qrCanvas = document.getElementById("qrCanvas");
-  const qrContainer = document.getElementById("qrContainer");
-  const qrLogo = document.getElementById("qrLogo");
-  const closeQR = document.getElementById("closeQR");
+let generated = false;
+let lastText = '';
 
-  let qr;
+function handleQR() {
+  const input = document.getElementById("customData").value.trim();
+  const btn = document.getElementById("qrButton");
 
-  qrlink.addEventListener("click", () => {
-    if (!qr) {
-      const link = "https://example.com"; // Ganti ini sesuai link dinamis kamu
-      qr = new QRCode(qrCanvas, {
-        text: link,
-        width: 220,
-        height: 220,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
-      });
-      qrContainer.style.display = "block";
-      qrlink.innerText = "Download QR";
-    } else {
-      const canvas = qrCanvas.querySelector("canvas");
-      const image = canvas.toDataURL("image/png");
-      const a = document.createElement("a");
-      a.href = image;
-      a.download = "qr-code.png";
-      a.click();
+  if (!generated) {
+    if (!input) return alert("Masukkan data apa pun untuk dibuat QR.");
+    lastText = input;
+    generateQR(input);
+    generated = true;
+    btn.innerText = "Download QR";
+  } else {
+    downloadQR(lastText);
+  }
+}
+
+function generateQR(text) {
+  const canvas = document.getElementById("qrCanvas");
+  const qrWrapper = document.getElementById("qrWrapper");
+
+  QRCode.toCanvas(canvas, text, {
+    width: 280,
+    errorCorrectionLevel: 'H', // high for logo overlay
+    margin: 1,
+    color: {
+      dark: '#000000',
+      light: '#ffffff'
     }
+  }, (err) => {
+    if (err) return console.error(err);
+    overlayLogo(canvas);
+    qrWrapper.style.display = "block";
   });
+}
 
-  qrCanvas.addEventListener("click", () => {
-    const img = qrCanvas.querySelector("canvas").toDataURL("image/png");
-    const win = window.open();
-    win.document.write(`<img src="${img}" style="width:90%;margin:auto;display:block;">`);
-  });
+function overlayLogo(canvas) {
+  const ctx = canvas.getContext("2d");
+  const logo = new Image();
+  logo.src = "logo.png"; // pastikan logo.png tersedia
+  logo.onload = () => {
+    const size = 50;
+    const x = (canvas.width - size) / 2;
+    const y = (canvas.height - size) / 2;
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(x, y, size, size); // background putih
+    ctx.drawImage(logo, x, y, size, size);
+  };
+}
 
-  closeQR.addEventListener("click", () => {
-    qrCanvas.innerHTML = "";
-    qr = null;
-    qrContainer.style.display = "none";
-    qrlink.innerText = "Generate QR";
+function closeQR() {
+  document.getElementById("qrWrapper").style.display = "none";
+  document.getElementById("qrButton").innerText = "Generate QR";
+  generated = false;
+}
+
+function zoomQR() {
+  const modal = document.getElementById("qrModal");
+  const zoomCanvas = document.getElementById("zoomedQR");
+  const originalCanvas = document.getElementById("qrCanvas");
+
+  zoomCanvas.width = 600;
+  zoomCanvas.height = 600;
+  const ctx = zoomCanvas.getContext("2d");
+  ctx.clearRect(0, 0, 600, 600);
+  ctx.drawImage(originalCanvas, 0, 0, 600, 600);
+
+  overlayLogo(zoomCanvas);
+  modal.style.display = "flex";
+}
+
+function closeZoom() {
+  document.getElementById("qrModal").style.display = "none";
+}
+
+function downloadQR(text) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 1200;
+  canvas.height = 1200;
+
+  QRCode.toCanvas(canvas, text, {
+    width: 1200,
+    errorCorrectionLevel: 'H',
+    margin: 2,
+    color: {
+      dark: "#000000",
+      light: "#ffffff"
+    }
+  }, function (err) {
+    if (err) return console.error(err);
+
+    overlayLogo(canvas);
+
+    setTimeout(() => {
+      const a = document.createElement("a");
+      a.download = "custom-qr.png";
+      a.href = canvas.toDataURL("image/png");
+      a.click();
+    }, 500); // beri waktu render logo
   });
+}
 </script>
 
 </body>
