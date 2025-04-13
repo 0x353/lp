@@ -2,196 +2,104 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>QR Code Dynamic HD</title>
-  <script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@700&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+  <title>Simple QR with Logo</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
   <style>
-    body {
-      font-family: 'Ubuntu', sans-serif;
-      text-align: center;
-      padding: 50px;
-      background: #f8f9fa;
-      color: #333;
-    }
-
-    .qr-wrapper {
+    #qrContainer {
       position: relative;
-      display: inline-block;
-      transition: transform 0.3s ease;
-      box-shadow: 0 0 25px rgba(0, 123, 255, 0.4), 0 0 10px rgba(0, 123, 255, 0.6);
-      border-radius: 20px;
-      margin-bottom: 16px;
+      display: none;
+      width: 220px;
+      margin-top: 20px;
     }
 
-    #qr {
-      width: 256px;
-      height: 256px;
-      border-radius: 16px;
-      background: #ffffff;
+    #qrCanvas {
+      cursor: zoom-in;
+      border: 2px solid #000;
+      border-radius: 8px;
     }
 
-    .logo {
+    #qrLogo {
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 48px;
-      height: 48px;
-      transform: translate(-50%, -60%);
-      pointer-events: none;
-      border-radius: 12px;
-      background: white;
-      padding: 4px;
-    }
-
-    .watermark {
-      position: absolute;
-      top: 72%;
-      left: 50%;
+      width: 40px;
+      height: 40px;
       transform: translate(-50%, -50%);
-      font-size: 13px;
-      font-weight: 700;
-      font-family: 'Orbitron', sans-serif;
-      padding: 6px 14px;
-      border-radius: 12px;
-      backdrop-filter: blur(6px);
-      color: #ffffff;
-      text-shadow: 0 0 6px #03a9f4, 0 0 12px #f441a5;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0 0 12px rgba(3,169,244,0.5);
-      z-index: 3;
       pointer-events: none;
-      animation: shimmer 3s linear infinite;
-      background: linear-gradient(90deg, #03a9f4, #f441a5);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      text-fill-color: transparent;
     }
 
-    .download-btn {
-      background-color: #007bff;
-      color: #fff;
-      border: none;
-      padding: 8px 14px;
-      font-size: 14px;
+    #closeQR {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: #fff;
+      color: #000;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      text-align: center;
       cursor: pointer;
-      border-radius: 6px;
-      transition: background-color 0.3s;
-    }
-
-    .download-btn:hover {
-      background-color: #0056b3;
-    }
-
-    .zoomed {
-      transform: scale(1.3);
-    }
-
-    .button-container {
-      margin-top: 10px;
-      transition: transform 0.3s ease;
+      font-size: 14px;
+      line-height: 22px;
+      border: 1px solid #000;
     }
   </style>
 </head>
 <body>
 
-  <div class="qr-wrapper" id="qrWrapper">
-    <canvas id="qr" width="256" height="256"></canvas>
-    <img src="img/logo.svg" alt="Logo" class="logo">
-    <div class="watermark">Lotto Chain</div>
-  </div>
+<button id="qrlink">Generate QR</button>
 
-  <div class="button-container" id="buttonContainer">
-    <button class="download-btn" id="downloadBtn">DownloadQR</button>
-  </div>
+<div id="qrContainer">
+  <div id="closeQR">×</div>
+  <div id="qrCanvas"></div>
+  <img id="qrLogo" src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="Logo">
+</div>
 
-  <script>
-    const currentURL = window.location.href;
+<script>
+  const qrlink = document.getElementById("qrlink");
+  const qrCanvas = document.getElementById("qrCanvas");
+  const qrContainer = document.getElementById("qrContainer");
+  const qrLogo = document.getElementById("qrLogo");
+  const closeQR = document.getElementById("closeQR");
 
-    const qrCanvas = document.getElementById("qr");
-    const qr = new QRious({
-      element: qrCanvas,
-      value: currentURL,
-      size: 256,
-      level: 'H',
-      background: '#ffffff',
-      foreground: '#007bff'
-    });
+  let qr;
 
-    // Zoom effect on QR click
-    const qrWrapper = document.getElementById("qrWrapper");
-    const buttonContainer = document.getElementById("buttonContainer");
-
-    qrWrapper.addEventListener("click", () => {
-      qrWrapper.classList.toggle("zoomed");
-
-      if (qrWrapper.classList.contains("zoomed")) {
-        buttonContainer.style.transform = "scale(1.3)";
-      } else {
-        buttonContainer.style.transform = "scale(1)";
-      }
-    });
-
-    // Download QR in HD
-    document.getElementById("downloadBtn").addEventListener("click", () => {
-      const hdSize = 3000;
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = hdSize;
-      canvas.height = hdSize;
-
-      const hdQR = new QRious({
-        element: canvas,
-        value: currentURL,
-        size: hdSize,
-        level: 'H',
-        background: '#ffffff',
-        foreground: '#007bff'
+  qrlink.addEventListener("click", () => {
+    if (!qr) {
+      const link = "https://example.com"; // Ganti ini sesuai link dinamis kamu
+      qr = new QRCode(qrCanvas, {
+        text: link,
+        width: 220,
+        height: 220,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
       });
+      qrContainer.style.display = "block";
+      qrlink.innerText = "Download QR";
+    } else {
+      const canvas = qrCanvas.querySelector("canvas");
+      const image = canvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = image;
+      a.download = "qr-code.png";
+      a.click();
+    }
+  });
 
-      const logo = new Image();
-      logo.src = "img/logo.svg";
-      logo.onload = () => {
-        const logoSize = hdSize * 0.19;
-        const logoX = (hdSize - logoSize) / 2;
-        const logoY = (hdSize - logoSize) / 2 - (hdSize * 0.04);
+  qrCanvas.addEventListener("click", () => {
+    const img = qrCanvas.querySelector("canvas").toDataURL("image/png");
+    const win = window.open();
+    win.document.write(`<img src="${img}" style="width:90%;margin:auto;display:block;">`);
+  });
 
-        ctx.save();
-        ctx.beginPath();
-        const radius = 12 * (hdSize / 256);
-        ctx.moveTo(logoX + radius, logoY);
-        ctx.arcTo(logoX + logoSize, logoY, logoX + logoSize, logoY + logoSize, radius);
-        ctx.arcTo(logoX + logoSize, logoY + logoSize, logoX, logoY + logoSize, radius);
-        ctx.arcTo(logoX, logoY + logoSize, logoX, logoY, radius);
-        ctx.arcTo(logoX, logoY, logoX + logoSize, logoY, radius);
-        ctx.closePath();
-        ctx.fillStyle = "#ffffff";
-        ctx.fill();
-        ctx.clip();
-        ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
-        ctx.restore();
+  closeQR.addEventListener("click", () => {
+    qrCanvas.innerHTML = "";
+    qr = null;
+    qrContainer.style.display = "none";
+    qrlink.innerText = "Generate QR";
+  });
+</script>
 
-        const watermarkY = logoY + logoSize + (hdSize * 0.07);
-        ctx.font = `${hdSize * 0.05}px Orbitron`;
-        ctx.textAlign = "center";
-        ctx.lineWidth = 1;
-        ctx.shadowColor = "#03a9f4";
-        ctx.shadowBlur = 6;
-        ctx.fillStyle = "#ffffff";
-        ctx.fillText("Lotto Chain", hdSize / 2, watermarkY);
-
-        const gradient = ctx.createLinearGradient(0, 0, hdSize, 0);
-        gradient.addColorStop(0, "#03a9f4");
-        gradient.addColorStop(1, "#f441a5");
-        ctx.fillStyle = gradient;
-        ctx.fillText("Lotto Chain", hdSize / 2, watermarkY);
-
-        const link = document.createElement('a');
-        link.download = "LottoQR-HD.png";
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-      };
-    });
-  </script>
 </body>
 </html>
