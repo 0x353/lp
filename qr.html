@@ -1,203 +1,135 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>QR Code Dynamic HD</title>
-  <script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@700&display=swap" rel="stylesheet">
+  <title>Advanced QR with Logo</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
   <style>
-    body {
-      font-family: 'Ubuntu', sans-serif;
-      text-align: center;
-      padding: 50px;
-      background: #f8f9fa;
-      color: #333;
-    }
-
-    .qr-wrapper {
+    #qrWrapper {
       position: relative;
-      display: inline-block;
-      transition: transform 0.3s ease;
-      box-shadow: 0 0 25px rgba(0, 123, 255, 0.4), 0 0 10px rgba(0, 123, 255, 0.6);
-      border-radius: 20px;
+      display: none;
+      margin-top: 20px;
     }
-
-    #qr {
-      width: 256px;
-      height: 256px;
-      border-radius: 16px;
-      background: #ffffff;
+    #qrCanvas {
+      cursor: zoom-in;
+      border: 2px solid #000;
+      border-radius: 8px;
     }
-
-    .logos {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 48px;
-      height: 48px;
-      transform: translate(-50%, -60%);
-      pointer-events: none;
-      border-radius: 12px;
+    #qrModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      align-items: center;
+      justify-content: center;
+    }
+    #zoomedQR {
       background: white;
-      padding: 4px;
     }
-
-    .watermark {
-  position: absolute;
-  top: 72%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 13px;
-  font-weight: 700;
-  font-family: 'Orbitron', sans-serif;
-  padding: 6px 14px;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.3); /* Kurangi transparansi */
-  backdrop-filter: blur(6px); /* efek frosted glass */
-  color: #ffffff;
-  text-shadow: 0 0 6px #03a9f4, 0 0 12px #f441a5;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 12px rgba(3,169,244,0.5);
-  z-index: 3;
-  pointer-events: none;
-  animation: shimmer 3s linear infinite;
-  background: linear-gradient(90deg, #03a9f4, #f441a5); /* Gradient warna yang lebih terang */
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-fill-color: transparent;
-}
-
-    .download-btn {
-      background-color: #007bff;
-      color: #fff;
+    #closeQR {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: red;
+      color: white;
       border: none;
-      padding: 8px 14px;
-      font-size: 14px;
+      border-radius: 4px;
+      padding: 2px 6px;
       cursor: pointer;
-      border-radius: 6px;
-      margin-top: 12px;
-      transition: background-color 0.3s;
-    }
-
-    .download-btn:hover {
-      background-color: #0056b3;
-    }
-
-    .zoomed {
-      transform: scale(1.3);
-    }
-
-    .button-container {
-      margin-top: 10px;
-      transition: transform 0.3s ease;
     }
   </style>
 </head>
-<body>
+<body><input type="text" id="customLink" placeholder="Enter your dynamic link" style="width: 60%; padding: 6px;">
+<br><br>
+<button id="qrlinkBtn">Generate QR Link</button><div id="qrWrapper">
+  <button id="closeQR">X</button>
+  <canvas id="qrCanvas"></canvas>
+</div><div id="qrModal" onclick="closeZoomQR()">
+  <canvas id="zoomedQR"></canvas>
+</div><script>
+let qrGenerated = false;
+let lastLink = "";
+const qrBtn = document.getElementById("qrlinkBtn");
+const qrCanvas = document.getElementById("qrCanvas");
+const qrWrapper = document.getElementById("qrWrapper");
+const closeBtn = document.getElementById("closeQR");
+const logoSrc = "logo.png"; // Ganti sesuai path logomu
 
-  <div class="qr-wrapper" id="qrWrapper">
-    <canvas id="qr" width="256" height="256"></canvas>
-    <img src="img/logo.svg" class="logos">
-    <div class="watermark">Lotto Chain</div>
-  </div>
+qrBtn.addEventListener("click", () => {
+  if (!qrGenerated) generateQR();
+  else downloadQR();
+});
 
-  <div class="button-container" id="buttonContainer">
-    <button class="download-btn" id="downloadBtn">DownloadQR</button>
-  </div>
+closeBtn.addEventListener("click", () => {
+  qrWrapper.style.display = "none";
+  qrBtn.innerText = "Generate QR Link";
+  qrGenerated = false;
+});
 
-  <script>
-    const currentURL = window.location.href;
+qrCanvas.addEventListener("click", zoomQR);
 
-    const qrCanvas = document.getElementById("qr");
-    const qr = new QRious({
-      element: qrCanvas,
-      value: currentURL,
-      size: 256,
-      level: 'H',
-      background: '#ffffff',
-      foreground: '#007bff'
-    });
+function generateQR() {
+  const link = document.getElementById("customLink").value.trim();
+  if (!link.startsWith("http")) return alert("Link harus diawali dengan http atau https.");
+  lastLink = link;
 
-    // Zoom effect on click
-    const qrWrapper = document.getElementById("qrWrapper");
-    const buttonContainer = document.getElementById("buttonContainer");
+  drawQR(qrCanvas, link, 400, () => {
+    qrWrapper.style.display = "block";
+    qrBtn.innerText = "Download QR";
+    qrGenerated = true;
+  });
+}
 
-    qrWrapper.addEventListener("click", () => {
-      qrWrapper.classList.toggle("zoomed");
+function drawQR(canvas, text, size, callback) {
+  const ctx = canvas.getContext("2d");
+  canvas.width = size;
+  canvas.height = size;
+  ctx.clearRect(0, 0, size, size);
 
-      if (qrWrapper.classList.contains("zoomed")) {
-        buttonContainer.style.transform = "scale(1.3)";
-      } else {
-        buttonContainer.style.transform = "scale(1)";
-      }
-    });
+  QRCode.toCanvas(canvas, text, {
+    width: size,
+    margin: 1,
+    errorCorrectionLevel: 'H',
+    color: { dark: '#000000', light: '#ffffff' }
+  }, err => {
+    if (err) return console.error(err);
 
-    // Download QR in HD
-    document.getElementById("downloadBtn").addEventListener("click", () => {
-      const hdSize = 3000;
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = hdSize;
-      canvas.height = hdSize;
+    const logo = new Image();
+    logo.src = logoSrc;
+    logo.onload = () => {
+      const logoSize = size * 0.2;
+      const x = (size - logoSize) / 2;
+      const y = (size - logoSize) / 2;
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(x, y, logoSize, logoSize);
+      ctx.drawImage(logo, x, y, logoSize, logoSize);
+      if (callback) callback();
+    };
+  });
+}
 
-      const hdQR = new QRious({
-        element: canvas,
-        value: currentURL,
-        size: hdSize,
-        level: 'H',
-        background: '#ffffff',
-        foreground: '#007bff'
-      });
+function downloadQR() {
+  const tempCanvas = document.createElement("canvas");
+  const size = 3000;
+  drawQR(tempCanvas, lastLink, size, () => {
+    const a = document.createElement("a");
+    a.download = "LottoChainQR-code.png";
+    a.href = tempCanvas.toDataURL("image/png");
+    a.click();
+  });
+}
 
-      const logo = new Image();
-logo.src = "img/logo.svg";
-logo.onload = () => {
-  const logoSize = hdSize * 0.19; // mendekati 48px jika hdSize = 256
-  const logoX = (hdSize - logoSize) / 2;
-  const logoY = (hdSize - logoSize) / 2 - (hdSize * 0.04); // naik sedikit agar seperti transform -60%
+function zoomQR() {
+  const modal = document.getElementById("qrModal");
+  const zoomedCanvas = document.getElementById("zoomedQR");
+  drawQR(zoomedCanvas, lastLink, 1000);
+  modal.style.display = "flex";
+}
 
-  // Gambar logo
-  ctx.save();
-  ctx.beginPath();
-  const radius = 12 * (hdSize / 256); // menyamakan border-radius
-  ctx.moveTo(logoX + radius, logoY);
-  ctx.arcTo(logoX + logoSize, logoY, logoX + logoSize, logoY + logoSize, radius);
-  ctx.arcTo(logoX + logoSize, logoY + logoSize, logoX, logoY + logoSize, radius);
-  ctx.arcTo(logoX, logoY + logoSize, logoX, logoY, radius);
-  ctx.arcTo(logoX, logoY, logoX + logoSize, logoY, radius);
-  ctx.closePath();
-  ctx.fillStyle = "#ffffff"; // background logo putih
-  ctx.fill();
-  ctx.clip();
-  ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
-  ctx.restore();
-
-  // Gambar watermark
-  const watermarkY = logoY + logoSize + (hdSize * 0.07);
-  ctx.font = `${hdSize * 0.05}px Orbitron`;
-  ctx.textAlign = "center";
-  ctx.lineWidth = 1;
-  ctx.shadowColor = "#03a9f4";
-  ctx.shadowBlur = 6;
-  ctx.fillStyle = "#ffffff"; // font color fallback
-  ctx.fillText("Lotto Chain", hdSize / 2, watermarkY);
-
-  // Gradient fill effect seperti UI
-  const gradient = ctx.createLinearGradient(0, 0, hdSize, 0);
-  gradient.addColorStop(0, "#03a9f4");
-  gradient.addColorStop(1, "#f441a5");
-  ctx.fillStyle = gradient;
-  ctx.fillText("Lotto Chain", hdSize / 2, watermarkY);
-
-        const link = document.createElement('a');
-        link.download = "LottoQR-HD.png";
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-      };
-    });
-      
-  </script>
-
-</body>
+function closeZoomQR() {
+  document.getElementById("qrModal").style.display = "none";
+}
+</script></body>
 </html>
