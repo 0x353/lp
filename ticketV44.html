@@ -8,7 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   
    <style>
     body {
@@ -295,10 +294,6 @@ button:not(#closePopup):active::after {
         
       `;
 
-      const qrCanvas = document.getElementById(`qrCode-${bet.betId}`);
-      const qrUrl = `${window.location.origin}${window.location.pathname}?betId=${bet.betId}`;
-      generateQRCode(qrCanvas, qrUrl);
-    }
 
     // Panggil pertama kali
     await updateData();
