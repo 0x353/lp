@@ -29,7 +29,7 @@
       background: #ffffff;
     }
 
-    .logo {
+    .logos {
       position: absolute;
       top: 50%;
       left: 50%;
@@ -98,14 +98,12 @@
 
   <div class="qr-wrapper" id="qrWrapper">
     <canvas id="qr" width="256" height="256"></canvas>
-    <img src="img/logo.svg" alt="Logo" class="logo">
+    <img src="img/logo.svg" class="logos">
     <div class="watermark">Lotto Chain</div>
   </div>
 
   <div class="button-container" id="buttonContainer">
     <button class="download-btn" id="downloadBtn">DownloadQR</button>
-    <button onclick="shareTo('${bet.betId}')" style="background:#111111; color:white; border:none; padding:5px 10px; border-radius:0.9em; cursor:pointer; margin-right:5px;">
-    <img src="img/share.svg" style="width:16px; height:16px; vertical-align:middle;">Share to</button>
   </div>
 
   <script>
@@ -199,141 +197,6 @@ logo.onload = () => {
       };
     });
       
-    function shareTo(betId) {
-  const url = `${window.location.origin}${window.location.pathname}?betId=${betId}`;
-  console.log("Generated URL:", url); // Debug URL
-
-  // Fungsi untuk handle share
-  function tryShare(isMobile) {
-    // Prioritas 1: Coba Web Share API
-    if (navigator.share) {
-      console.log("Try Web Share API");
-      navigator.share({
-        title: "Share Bet",
-        text: "Check this out!",
-        url: url
-      })
-        .then(() => console.log("Successful sharing"))
-        .catch((err) => {
-          // Hanya panggil fallback kalau bukan error pembatalan
-          if (err.name !== "AbortError") {
-            console.error("Web Share failed, tyr again:", err);
-            if (isMobile) {
-              tryIntent();
-            } else {
-              fallbackShare();
-            }
-          } else {
-            console.log("Share cancelled, no action");
-          }
-        });
-    } else {
-      // Fallback ke Intent (mobile) atau modal (PC)
-      console.log("Web Share is not available");
-      if (isMobile) {
-        tryIntent();
-      } else {
-        fallbackShare();
-      }
-    }
-  }
-
-  // Fungsi untuk Intent di mobile
-  function tryIntent() {
-    console.log("Try Intent on mobile");
-    const shareIntent = `intent://#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT=${encodeURIComponent(url)};end`;
-    const facebookWeb = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-    console.log("Mencoba Intent:", shareIntent);
-
-    try {
-      window.location.href = shareIntent;
-      setTimeout(() => {
-        console.log("Intent may have failed, open web");
-        window.open(facebookWeb, '_blank');
-      }, 2000);
-    } catch (err) {
-      console.error("Intent error:", err);
-      window.open(facebookWeb, '_blank');
-    }
-  }
-
-  // Fungsi untuk custom share modal di PC
-  function fallbackShare() {
-    // Daftar platform dan URL share-nya
-    const shareOptions = [
-      { name: "Facebook", url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}` },
-      { name: "Twitter", url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=Check%20this%20out!` },
-      { name: "WhatsApp", url: `https://api.whatsapp.com/send?text=${encodeURIComponent("Check this out: " + url)}` },
-      { name: "LinkedIn", url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}` },
-      { name: "Email", url: `mailto:?subject=Check%20this%20out&body=${encodeURIComponent(url)}` },
-      { name: "Telegram", url: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=Check%20this%20out!` },
-      { name: "Reddit", url: `https://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=Check%20this%20out!` },
-      { name: "Discord", url: `https://discord.com/channels/@me?content=${encodeURIComponent("Check this out: " + url)}` }
-    ];
-
-    // Cek apakah modal sudah ada, hapus kalau ada
-    const existingModal = document.getElementById("shareModal");
-    if (existingModal) existingModal.remove();
-
-    // Buat modal
-    const modal = document.createElement("div");
-    modal.id = "shareModal";
-    modal.style.cssText = `
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #000000;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 12px rgba(80, 160, 255, 0.3), 0 0 18px rgba(80, 160, 255, 0.2);
-      z-index: 1000;
-      text-align: center;
-    `;
-    modal.innerHTML = `
-      <h1>Share To</h1><br>
-      <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
-        ${shareOptions
-          .map(
-            (opt) => `
-              <button style="
-                padding: 10px 20px;
-                background: #000000;
-                color: white;
-                border: none;
-                border-radius: 0.9em;
-                cursor: pointer;
-              " onclick="window.open('${opt.url}', '_blank'); document.getElementById('shareModal').remove();">
-                ${opt.name}
-              </button>
-            `
-          )
-          .join("")}
-      </div>
-      <button style="
-        margin-top: 15px;
-        padding: 8px 16px;
-        background: #dc3545;
-        color: white;
-        border: none;
-        border-radius: 0.9em;
-        cursor: pointer;
-      " onclick="document.getElementById('shareModal').remove();">
-        Closed
-      </button>
-    `;
-    document.body.appendChild(modal);
-  }
-
-  // Cek apakah di perangkat mobile
-  if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
-    console.log("Mobile mode, try sharing");
-    tryShare(true);
-  } else {
-    console.log("PC mode, try sharing");
-    tryShare(false);
-  }
-}
   </script>
 
 </body>
