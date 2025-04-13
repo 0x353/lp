@@ -94,7 +94,7 @@
         qrContainer.appendChild(canvas);
 
         const logo = document.createElement("img");
-        logo.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/LetterL.svg/1200px-LetterL.svg.png"; // Logo kamu di sini
+        logo.src = "img/logo.svg"; // Logo kamu di sini
         logo.className = "logo";
         qrContainer.appendChild(logo);
 
@@ -110,30 +110,40 @@
       qrContainer.innerHTML = "";
     });
 
-    downloadBtn.addEventListener("click", () => {
-      if (canvas) {
-        // Buat canvas baru dengan logo disatukan
-        const combinedCanvas = document.createElement("canvas");
-        combinedCanvas.width = 300;
-        combinedCanvas.height = 300;
-        const ctx = combinedCanvas.getContext("2d");
+      downloadBtn.addEventListener("click", () => {
+    if (canvas) {
+      const combinedCanvas = document.createElement("canvas");
+      combinedCanvas.width = 300;
+      combinedCanvas.height = 300;
+      const ctx = combinedCanvas.getContext("2d");
 
-        // Gambar QR dulu
-        ctx.drawImage(canvas, 0, 0);
+      // Gambar QR ke canvas baru
+      ctx.drawImage(canvas, 0, 0);
 
-        // Gambar logo di tengah
-        const logoImage = new Image();
-        logoImage.crossOrigin = "anonymous";
-        logoImage.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/LetterL.svg/1200px-LetterL.svg.png";
-        logoImage.onload = () => {
-          ctx.drawImage(logoImage, 120, 120, 60, 60);
-          const link = document.createElement("a");
-          link.download = "qr-code-with-logo.png";
-          link.href = combinedCanvas.toDataURL("image/png");
-          link.click();
-        };
-      }
-    });
+      // Logo di tengah
+      const logoImage = new Image();
+      logoImage.crossOrigin = "anonymous";
+      logoImage.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/LetterL.svg/1200px-LetterL.svg.png";
+
+      // Tunggu sampai logo selesai diload, baru download
+      logoImage.onload = () => {
+        ctx.drawImage(logoImage, 120, 120, 60, 60);
+
+        // Buat link download
+        const link = document.createElement("a");
+        link.download = "qr-code-with-logo.png";
+        link.href = combinedCanvas.toDataURL("image/png");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
+
+      // Handle error load image
+      logoImage.onerror = () => {
+        alert("Gagal memuat logo.");
+      };
+    }
+  });
   </script>
 </body>
 </html>
