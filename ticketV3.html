@@ -236,6 +236,17 @@ button:not(#closePopup):active::after {
   <img src="img/loading.svg" style="vertical-align: middle; width: 24px; height: 24px; margin-right: 8px;">
   Please wait, data is loading...</center></div>
   <br><br><button onclick="downloadPNG()">Download Ticket</button>
+   
+  <div class="qr-wrapper" id="qrWrapper">
+    <canvas id="qr" width="256" height="256"></canvas>
+    <img src="img/logo.svg" class="logos">
+    <div class="watermark">Lotto Chain</div>
+  </div>
+
+  <div class="button-container" id="buttonContainer">
+    <button class="download-btn" id="downloadBtn">DownloadQR</button>
+  </div>
+  
   </div>
 
   <script>
@@ -374,13 +385,6 @@ button:not(#closePopup):active::after {
             <img src="img/share.svg" style="width:16px; height:16px; vertical-align:middle;"> Share to
           </button><br>
 
-    <canvas id="qr" width="256" height="256"></canvas>
-    <img src="img/logo.svg" class="logos">
-    <div class="watermark">Lotto Chain</div>
-  </div>
-
-  <div class="button-container" id="buttonContainer">
-    <button class="download-btn" id="downloadBtn">DownloadQR</button>
   </div>
       `;
 
