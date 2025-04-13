@@ -156,7 +156,7 @@ button:not(#closePopup):active::after {
   <center style="color: #00FF66;">
   <img src="img/loading.svg" style="vertical-align: middle; width: 24px; height: 24px; margin-right: 8px;">
   Please wait, data is loading...</center></div>
-  <br><br><center><button id="download-btn">Download Ticket</button></center>
+  <br><br><button onclick="downloadPNG()">Download Ticket</button>
   </div>
 
   <script>
@@ -294,7 +294,7 @@ button:not(#closePopup):active::after {
           <button onclick="shareTo('${bet.betId}')" style="background:#111111; color:white; border:none; padding:5px 10px; border-radius:0.9em; cursor:pointer; margin-right:5px;">
             <img src="img/share.svg" style="width:16px; height:16px; vertical-align:middle;"> Share to
           </button><br>
-          <center><canvas id="qrCode-${bet.betId}" width="128" height="128" style="display:block; margin-top:10px; background-color:white;"></canvas></center>
+        
       `;
 
       const qrCanvas = document.getElementById(`qrCode-${bet.betId}`);
@@ -304,9 +304,6 @@ button:not(#closePopup):active::after {
 
     // Panggil pertama kali
     await updateData();
-
-    // Polling setiap 10 detik
-    setInterval(updateData, 10000);
 
   } catch (err) {
     console.error("Error loading ticket:", err);
@@ -374,16 +371,48 @@ function shareTo(betId) {
 
   // Fungsi untuk custom share modal di PC
   function fallbackShare() {
-    // Daftar platform dan URL share-nya
+    // Daftar platform dan URL share-nya dengan ikon PNG
     const shareOptions = [
-      { name: "Facebook", url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}` },
-      { name: "Twitter", url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=Check%20this%20out!` },
-      { name: "WhatsApp", url: `https://api.whatsapp.com/send?text=${encodeURIComponent("Check this out: " + url)}` },
-      { name: "LinkedIn", url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}` },
-      { name: "Email", url: `mailto:?subject=Check%20this%20out&body=${encodeURIComponent(url)}` },
-      { name: "Telegram", url: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=Check%20this%20out!` },
-      { name: "Reddit", url: `https://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=Check%20this%20out!` },
-      { name: "Discord", url: `https://discord.com/channels/@me?content=${encodeURIComponent("Check this out: " + url)}` }
+        {
+            name: "Facebook",
+            url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+            icon: "img/facebook.svg"
+        },
+        {
+            name: "Twitter",
+            url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=Check%20this%20out!`,
+            icon: "img/twitter.svg"
+        },
+        {
+            name: "WhatsApp",
+            url: `https://api.whatsapp.com/send?text=${encodeURIComponent("Check this out: " + url)}`,
+            icon: "img/wa.svg"
+        },
+        {
+            name: "LinkedIn",
+            url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
+            icon: "img/linke.svg"
+        },
+        {
+            name: "Email",
+            url: `mailto:?subject=Check%20this%20out&body=${encodeURIComponent(url)}`,
+            icon: "img/email.svg"
+        },
+        {
+            name: "Telegram",
+            url: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=Check%20this%20out!`,
+            icon: "img/telegram.svg"
+        },
+        {
+            name: "Reddit",
+            url: `https://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=Check%20this%20out!`,
+            icon: "img/reddit.svg"
+        },
+        {
+            name: "Discord",
+            url: `https://discord.com/channels/@me?content=${encodeURIComponent("Check this out: " + url)}`,
+            icon: "img/discord.svg"
+        }
     ];
 
     // Cek apakah modal sudah ada, hapus kalau ada
@@ -406,24 +435,23 @@ function shareTo(betId) {
       text-align: center;
     `;
     modal.innerHTML = `
-      <h1>Share To</h1><br>
+      <h1>Share To</h1>
       <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
         ${shareOptions
-          .map(
-            (opt) => `
-              <button style="
-                padding: 10px 20px;
-                background: #000000;
-                color: white;
-                border: none;
-                border-radius: 0.9em;
-                cursor: pointer;
-              " onclick="window.open('${opt.url}', '_blank'); document.getElementById('shareModal').remove();">
-                ${opt.name}
-              </button>
-            `
-          )
-          .join("")}
+            .map(
+                (opt) => `
+                  <button style="
+                    padding: 10px;
+                    background: #000000;
+                    border: none;
+                    border-radius: 0.9em;
+                    cursor: pointer;
+                  " onclick="window.open('${opt.url}', '_blank'); document.getElementById('shareModal').remove();">
+                    <img src="${opt.icon}" alt="${opt.name}" width="32" height="32" style="display: block;">
+                  </button>
+                `
+            )
+            .join("")}
       </div>
       <button style="
         margin-top: 15px;
@@ -438,8 +466,9 @@ function shareTo(betId) {
       </button>
     `;
     document.body.appendChild(modal);
+  
   }
-
+    
   // Cek apakah di perangkat mobile
   if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
     console.log("Mobile mode, try sharing");
