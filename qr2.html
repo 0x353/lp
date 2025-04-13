@@ -1,157 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>QR Generator with Logo</title>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QR Generator</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; }
-    #qrWrapper { display: none; position: relative; margin-top: 20px; }
-    #qrCanvas { border: 2px solid #000; border-radius: 8px; cursor: zoom-in; }
-    .closeBtn {
+    body { font-family: sans-serif; text-align: center; padding: 20px; }
+    #qrCanvasContainer {
+      display: none;
+      position: relative;
+      margin: 20px auto;
+      width: 320px;
+      height: 340px;
+      background: #f0f0f0;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    #closeBtn {
       position: absolute;
-      top: -10px;
-      right: -10px;
-      background: red;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      font-size: 16px;
+      top: 5px;
+      right: 10px;
+      color: red;
+      font-size: 20px;
       cursor: pointer;
     }
-    #qrModal {
+    #downloadBtn {
       display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.8);
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
+      margin-top: 10px;
+      background: linear-gradient(to right, #5f4bd3, #7e72f2);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    canvas {
+      margin-top: 20px;
+      border-radius: 12px;
     }
   </style>
 </head>
 <body>
 
-<input type="text" id="customData" placeholder="Enter any text or code..." style="width: 60%; padding: 8px;">
-<br><br>
-<button id="qrButton" onclick="handleQR()">Generate QR</button>
+  <button id="showQRBtn">QR Link</button>
+  <div id="qrCanvasContainer">
+    <div id="closeBtn">×</div>
+    <div id="qr"></div>
+  </div>
+  <button id="downloadBtn">Download QR</button>
 
-<div id="qrWrapper">
-  <button class="closeBtn" onclick="closeQR()">×</button>
-  <canvas id="qrCanvas" onclick="zoomQR()"></canvas>
-</div>
+  <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+  <script>
+    const qr = new QRCodeStyling({
+      width: 300,
+      height: 300,
+      data: window.location.href,
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/LetterL.svg/1200px-LetterL.svg.png", // ganti logo L kamu
+      imageOptions: {
+        crossOrigin: "anonymous",
+        margin: 4,
+        imageSize: 0.25
+      },
+      dotsOptions: {
+        color: "#000",
+        type: "rounded"
+      },
+      cornersSquareOptions: {
+        color: "#5f4bd3",
+        type: "extra-rounded"
+      },
+      backgroundOptions: {
+        color: "#ffffff"
+      }
+    });
 
-<div id="qrModal" onclick="closeZoom()">
-  <canvas id="zoomedQR"></canvas>
-</div>
+    const showQRBtn = document.getElementById("showQRBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const qrContainer = document.getElementById("qr");
+    const qrCanvasContainer = document.getElementById("qrCanvasContainer");
+    const closeBtn = document.getElementById("closeBtn");
 
-<script>
-let generated = false;
-let lastText = '';
+    showQRBtn.addEventListener("click", () => {
+      qrCanvasContainer.style.display = "block";
+      qr.append(qrContainer);
+      showQRBtn.style.display = "none";
+      downloadBtn.style.display = "inline-block";
+    });
 
-function handleQR() {
-  const input = document.getElementById("customData").value.trim();
-  const btn = document.getElementById("qrButton");
+    closeBtn.addEventListener("click", () => {
+      qrCanvasContainer.style.display = "none";
+      downloadBtn.style.display = "none";
+      showQRBtn.style.display = "inline-block";
+      qrContainer.innerHTML = ""; // hapus QR sebelumnya
+    });
 
-  if (!generated) {
-    if (!input) return alert("Masukkan data apa pun untuk dibuat QR.");
-    lastText = input;
-    generateQR(input);
-    generated = true;
-    btn.innerText = "Download QR";
-  } else {
-    downloadQR(lastText);
-  }
-}
-
-function generateQR(text) {
-  const canvas = document.getElementById("qrCanvas");
-  const qrWrapper = document.getElementById("qrWrapper");
-
-  QRCode.toCanvas(canvas, text, {
-    width: 280,
-    errorCorrectionLevel: 'H', // high for logo overlay
-    margin: 1,
-    color: {
-      dark: '#000000',
-      light: '#ffffff'
-    }
-  }, (err) => {
-    if (err) return console.error(err);
-    overlayLogo(canvas);
-    qrWrapper.style.display = "block";
-  });
-}
-
-function overlayLogo(canvas) {
-  const ctx = canvas.getContext("2d");
-  const logo = new Image();
-  logo.src = "logo.png"; // pastikan logo.png tersedia
-  logo.onload = () => {
-    const size = 50;
-    const x = (canvas.width - size) / 2;
-    const y = (canvas.height - size) / 2;
-    ctx.fillStyle = "#fff";
-    ctx.fillRect(x, y, size, size); // background putih
-    ctx.drawImage(logo, x, y, size, size);
-  };
-}
-
-function closeQR() {
-  document.getElementById("qrWrapper").style.display = "none";
-  document.getElementById("qrButton").innerText = "Generate QR";
-  generated = false;
-}
-
-function zoomQR() {
-  const modal = document.getElementById("qrModal");
-  const zoomCanvas = document.getElementById("zoomedQR");
-  const originalCanvas = document.getElementById("qrCanvas");
-
-  zoomCanvas.width = 600;
-  zoomCanvas.height = 600;
-  const ctx = zoomCanvas.getContext("2d");
-  ctx.clearRect(0, 0, 600, 600);
-  ctx.drawImage(originalCanvas, 0, 0, 600, 600);
-
-  overlayLogo(zoomCanvas);
-  modal.style.display = "flex";
-}
-
-function closeZoom() {
-  document.getElementById("qrModal").style.display = "none";
-}
-
-function downloadQR(text) {
-  const canvas = document.createElement("canvas");
-  canvas.width = 1200;
-  canvas.height = 1200;
-
-  QRCode.toCanvas(canvas, text, {
-    width: 1200,
-    errorCorrectionLevel: 'H',
-    margin: 2,
-    color: {
-      dark: "#000000",
-      light: "#ffffff"
-    }
-  }, function (err) {
-    if (err) return console.error(err);
-
-    overlayLogo(canvas);
-
-    setTimeout(() => {
-      const a = document.createElement("a");
-      a.download = "custom-qr.png";
-      a.href = canvas.toDataURL("image/png");
-      a.click();
-    }, 500); // beri waktu render logo
-  });
-}
-</script>
-
+    downloadBtn.addEventListener("click", () => {
+      qr.download({ name: "qr-code", extension: "png" });
+    });
+  </script>
 </body>
 </html>
