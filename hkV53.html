@@ -908,17 +908,20 @@ textarea:focus {
     }
 
     #qrCanvasContainer {
-      display: none;
-      position: fixed;
-      top: 70px;
-      left: 20px;
-      width: 320px;
-      background: #222222;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-      padding: 20px;
-      z-index: 1000;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: none;
+  position: fixed;
+  top: 70px;
+  left: 20px;
+  width: 320px;
+  background: #111111;
+  border-radius: 16px;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    0 0 15px rgba(3, 169, 244, 0.3);
+  padding: 20px;
+  z-index: 1000;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+        
     }
 
     #qrCanvasContainer:hover,
