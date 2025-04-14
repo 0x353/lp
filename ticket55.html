@@ -176,7 +176,7 @@
 </head>
 <body>
   <div class="container" id="ticketContainer">
-    <h1>Public Ticket Detail</h1>
+    <h1>Puesdblic Ticket Detail</h1>
     <div id="ticketDetail">
       <center style="color: #00FF66;">
         <img src="img/loading.svg" style="vertical-align: middle; width: 24px; height: 24px; margin-right: 8px;">
@@ -258,20 +258,29 @@ function setPendingStatus() {
 }
 
 async function setFinalStatus(bet) {
-  const statusElement = document.getElementById('status');
-  const stats = await contract.methods.getPlayerStats(bet.player).call();
-  const isWinner = Number(stats.totalWins) > 0; // atau logika kamu
-  if (statusElement) {
-    statusElement.innerHTML = `Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span>`;
+  try {
+    const statusElement = document.getElementById('status');
+    const stats = await contract.methods.getPlayerStats(bet.player).call();
+    const isWinner = Number(stats.totalWins) > 0;
+    if (statusElement) {
+      statusElement.innerHTML = `Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span>`;
+    }
+  } catch (err) {
+    console.error('Gagal ambil status akhir:', err);
   }
 }
 
-setPendingStatus();
+const betTime = new Date(bet.time).getTime();
+const now = Date.now();
 
-setTimeout(() => {
-  setFinalStatus(bet); // pastikan objek bet tersedia di scope
-}, delayStatusTime);
-
+if (now - betTime >= delayStatusTime) {
+  setFinalStatus(bet);
+} else {
+  setPendingStatus();
+  const remainingTime = delayStatusTime - (now - betTime);
+  setTimeout(() => setFinalStatus(bet), remainingTime);
+}
+        
         const shortPlayer = bet.player.slice(0, 21) + "" + bet.player.slice(-21);
         const shortTxHash = bet.txHash.slice(0, 15) + "..." + bet.txHash.slice(-15);
         const betIdBytes32 = bet.betId;
