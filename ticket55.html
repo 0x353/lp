@@ -176,7 +176,7 @@
 </head>
 <body>
   <div class="container" id="ticketContainer">
-    <h1>Public Ticket Detail</h1>
+    <h1>Pblic Ticket Detail</h1>
     <div id="ticketDetail">
       <center style="color: #00FF66;">
         <img src="img/loading.svg" style="vertical-align: middle; width: 24px; height: 24px; margin-right: 8px;">
@@ -248,34 +248,83 @@
           return;
         }
 
-        async function overrideStatusIfNeeded(bet) {
-  const betTime = new Date(bet.time); // ISO string UTC
-  const now = new Date();
-  const cutoff = getCutoffTimeUTC();
-  const statusEl = document.getElementById('status');
-  if (!statusEl) return;
-
-  const isNew = betTime >= cutoff;        // Bet dibuat setelah 03:00 UTC hari ini
-  const isBeforeCutoff = now < cutoff;    // Sekarang masih sebelum 03:00 UTC
-
-  if (isNew && isBeforeCutoff) {
-    // Tahan status → tampilkan "Pending..."
-    statusEl.innerHTML = 'Status: <span style="color:gray;">Pending...</span>';
-
-    const delay = cutoff.getTime() - now.getTime();
-    setTimeout(() => {
-      contract.methods.getPlayerStats(bet.player).call().then((stats) => {
-        const isWinner = Number(stats.totalWins) > 0;
-        statusEl.innerHTML = `Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span>`;
-      });
-    }, delay);
-  } else {
-    // Kalau sudah lewat cutoff, langsung tampilkan status
-    const stats = await contract.methods.getPlayerStats(bet.player).call();
-    const isWinner = Number(stats.totalWins) > 0;
-    statusEl.innerHTML = `Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span>`;
+        async function updateStatus(statusElement) {
+  if (!statusElement) {
+    console.error('Elemen status tidak ditemukan');
+    return;
   }
-        }
+
+  // Ambil data bet dari atribut HTML atau sumber lain
+  const bet = {
+    player: statusElement.dataset.player || '',
+    time: statusElement.dataset.time || ''
+  };
+
+  // Validasi data bet
+  if (!bet.player || !bet.time || isNaN(new Date(bet.time))) {
+    console.error('Data bet tidak valid:', bet);
+    statusElement.innerHTML = 'Status: <span style="color:gray;">Invalid Bet</span>';
+    return;
+  }
+
+  // Dapatkan waktu sekarang dan waktu taruhan
+  const now = new Date();
+  const betTime = new Date(bet.time);
+
+  // Tentukan waktu 03:00 UTC untuk reveal
+  const revealTime = new Date(betTime);
+  revealTime.setUTCDate(betTime.getUTCDate() + (betTime.getUTCHours() < 3 ? 0 : 1));
+  revealTime.setUTCHours(3, 0, 0, 0);
+
+  // Cek apakah taruhan terbaru (dalam 24 jam dan sebelum reveal)
+  const isRecentBet = betTime.getTime() > now.getTime() - 24 * 60 * 60 * 1000;
+  if (isRecentBet && now < revealTime) {
+    // Taruhan baru: Tampilkan "Pending"
+    statusElement.innerHTML = 'Status: <span style="color:gray;">Pending</span>';
+  } else {
+    // Taruhan lama atau lewat 03:00 UTC: Tampilkan status asli
+    try {
+      console.log('Mengambil stats untuk:', bet.player); // Debug
+      const stats = await contract.methods.getPlayerStats(bet.player).call();
+      console.log('Stats:', stats); // Debug
+      const isWinner = Number(stats.totalWins) > 0;
+      statusElement.innerHTML = `Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span>`;
+    } catch (err) {
+      console.error('Gagal ambil status dari kontrak:', err);
+      statusElement.innerHTML = 'Status: <span style="color:gray;">Error</span>';
+    }
+  }
+
+  // Jadwalkan pembaruan jika masih "Pending"
+  if (isRecentBet && now < revealTime) {
+    const timeUntilReveal = revealTime - now;
+    console.log('Pembaruan dijadwalkan dalam:', timeUntilReveal / 1000, 'detik'); // Debug
+    setTimeout(() => updateStatus(statusElement), timeUntilReveal);
+  }
+}
+
+// Fungsi untuk taruhan baru
+function placeBet(playerAddress) {
+  const statusElement = document.getElementById('status');
+  if (!statusElement) return;
+
+  // Set data taruhan baru
+  const betTime = new Date().toISOString();
+  statusElement.dataset.player = playerAddress;
+  statusElement.dataset.time = betTime;
+  statusElement.innerHTML = 'Status: <span style="color:gray;">Pending</span>';
+
+  // Perbarui status
+  updateStatus(statusElement);
+}
+
+// Inisialisasi saat halaman dimuat
+document.addEventListener('DOMContentLoaded', () => {
+  const statusElement = document.getElementById('status');
+  if (statusElement && statusElement.dataset.player && statusElement.dataset.time) {
+    updateStatus(statusElement);
+  }
+});
 
         const shortPlayer = bet.player.slice(0, 21) + "" + bet.player.slice(-21);
         const shortTxHash = bet.txHash.slice(0, 15) + "..." + bet.txHash.slice(-15);
