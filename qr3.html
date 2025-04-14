@@ -86,12 +86,13 @@
 }
 
 .logos {
-  max-width: 80px;
-  max-height: 80px;
+  width: 60px; /* Ukuran logo disesuaikan */
+  height: 60px;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  pointer-events: none; /* Cegah logo mengganggu interaksi QR */
 }
   </style>
 </head>
@@ -154,8 +155,8 @@
 
   logoImg.onload = () => {
     const logoSize = size * 0.3; // 20% dari QR
-    const logoX = (size - logoSize) / 3;
-    const logoY = (size - logoSize) / 3;
+    const logoX = (size - logoSize) / 2;
+    const logoY = (size - logoSize) / 2;
     ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
 
     const qrImage = tempCanvas.toDataURL("image/png");
@@ -178,7 +179,7 @@
 
         const logo = document.createElement("img");
         logo.src = "img/logo.svg"; // Ganti dengan path logo Anda
-        logo.className = "logo";
+        logo.className = "logos";
         logo.crossOrigin = "anonymous";
         logo.onerror = () => {
           console.error("Failed to load logo");
