@@ -45,6 +45,16 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.2);
       padding: 20px;
       z-index: 1000;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    #qrCanvasContainer:hover,
+    #qrCanvasContainer.active {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.4),
+                  0 0 20px 2px rgba(3, 169, 244, 0.5),
+                  0 0 30px 5px rgba(244, 65, 165, 0.5);
+      background: linear-gradient(90deg, rgba(3, 169, 244, 0.1), rgba(244, 65, 165, 0.1));
     }
 
     #closeBtn {
@@ -66,6 +76,7 @@
       position: relative;
       margin-top: 10px;
       text-align: center;
+      cursor: pointer;
     }
 
     #downloadBtn {
@@ -146,6 +157,13 @@
         showQRBtn.style.display = "none";
         downloadBtn.style.display = "inline-block";
       });
+    });
+
+    qrContainer.addEventListener("click", () => {
+      qrCanvasContainer.classList.add("active");
+      setTimeout(() => {
+        qrCanvasContainer.classList.remove("active");
+      }, 300);
     });
 
     closeBtn.addEventListener("click", () => {
