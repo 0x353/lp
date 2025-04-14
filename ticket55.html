@@ -176,7 +176,7 @@
 </head>
 <body>
   <div class="container" id="ticketContainer">
-    <h1>Public Ticket Detail</h1>
+    <h1>Pblic Ticket Detail</h1>
     <div id="ticketDetail">
       <center style="color: #00FF66;">
         <img src="img/loading.svg" style="vertical-align: middle; width: 24px; height: 24px; margin-right: 8px;">
@@ -254,36 +254,36 @@
 }
 
 async function overrideStatusIfNeeded(bet) {
-  const betTime = new Date(bet.time); // Harus ISO string UTC
+  const betTime = new Date(bet.time); // ISO string UTC
   const now = new Date();
   const cutoff = getCutoffTimeUTC();
-
   const statusEl = document.getElementById('status');
   if (!statusEl) return;
 
-  // Cek kalau bet masih baru dan sekarang belum lewat 03:00 AM UTC
-  const isNew = betTime >= cutoff; // Artinya bet dilakukan setelah jam 03:00 hari ini
-  const isBeforeCutoff = now < cutoff;
+  const isNew = betTime >= cutoff;        // Bet dibuat setelah 03:00 UTC hari ini
+  const isBeforeCutoff = now < cutoff;    // Sekarang masih sebelum 03:00 UTC
 
   if (isNew && isBeforeCutoff) {
-    // Halangi status Lost → ubah tampilan jadi pending sementara
+    // Tahan status → tampilkan "Pending..."
     statusEl.innerHTML = 'Status: <span style="color:gray;">Pending...</span>';
 
-    // Setelah jam 03:00 UTC, kembalikan status asli (Won/Lost)
     const delay = cutoff.getTime() - now.getTime();
     setTimeout(() => {
-      // Ambil ulang data hasil dari smart contract
       contract.methods.getPlayerStats(bet.player).call().then((stats) => {
         const isWinner = Number(stats.totalWins) > 0;
         statusEl.innerHTML = `Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span>`;
       });
     }, delay);
+  } else {
+    // Tidak perlu ditunda → tampilkan langsung
+    const stats = await contract.methods.getPlayerStats(bet.player).call();
+    const isWinner = Number(stats.totalWins) > 0;
+    statusEl.innerHTML = `Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span>`;
   }
 }
 
-// Panggil override ini setelah HTML selesai render
-overrideStatusIfNeeded(bet); // bet.time dalam format ISO string UTC
-        
+// Panggil setelah HTML siap
+overrideStatusIfNeeded(bet);
 
         const shortPlayer = bet.player.slice(0, 21) + "" + bet.player.slice(-21);
         const shortTxHash = bet.txHash.slice(0, 15) + "..." + bet.txHash.slice(-15);
