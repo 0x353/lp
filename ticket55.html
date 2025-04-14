@@ -176,7 +176,7 @@
 </head>
 <body>
   <div class="container" id="ticketContainer">
-    <h1>Pblic Ticket Detail</h1>
+    <h1>Public Ticket Detail</h1>
     <div id="ticketDetail">
       <center style="color: #00FF66;">
         <img src="img/loading.svg" style="vertical-align: middle; width: 24px; height: 24px; margin-right: 8px;">
@@ -248,12 +248,7 @@
           return;
         }
 
-        function getCutoffTimeUTC() {
-  const now = new Date();
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 3, 0, 0));
-}
-
-async function overrideStatusIfNeeded(bet) {
+        async function overrideStatusIfNeeded(bet) {
   const betTime = new Date(bet.time); // ISO string UTC
   const now = new Date();
   const cutoff = getCutoffTimeUTC();
@@ -275,15 +270,12 @@ async function overrideStatusIfNeeded(bet) {
       });
     }, delay);
   } else {
-    // Tidak perlu ditunda → tampilkan langsung
+    // Kalau sudah lewat cutoff, langsung tampilkan status
     const stats = await contract.methods.getPlayerStats(bet.player).call();
     const isWinner = Number(stats.totalWins) > 0;
     statusEl.innerHTML = `Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span>`;
   }
-}
-
-// Panggil setelah HTML siap
-overrideStatusIfNeeded(bet);
+        }
 
         const shortPlayer = bet.player.slice(0, 21) + "" + bet.player.slice(-21);
         const shortTxHash = bet.txHash.slice(0, 15) + "..." + bet.txHash.slice(-15);
