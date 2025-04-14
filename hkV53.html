@@ -1022,7 +1022,9 @@ sition: fixed;
     <button onclick="closeNotificationList()">Close</button>
 </div>
 
-       <button id="showQRBtn">Show QR Link</button>
+<div id="qr-container" style="position: relative;">
+  <button id="showQRBtn" style="position: absolute; left: 0; top: 0;">Show QR Link</button>
+</div>
 <div id="qrCanvasContainer">
   <div id="closeBtn">&times;</div>
   <div id="qrCanvas"></div>
