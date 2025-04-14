@@ -886,87 +886,99 @@ textarea:focus {
 }
 
 /* Qr Link */
-sition: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 1100;
-  background: linear-gradient(to right, #5f4bd3, #7e72f2);
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 16px;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-#showQRBtn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-}
-
-#qrCanvasContainer {
-  display: none;
-  position: fixed;
-  top: 70px; /* beri jarak dari tombol */
-  left: 20px;
-  width: 320px;
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-  padding: 20px;
-  z-index: 1000;
-}
-
-#closeBtn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  color: #ff4d4d;
-  font-size: 24px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-#closeBtn:hover {
-  transform: scale(1.2);
-}
-
-#qrCanvas {
-  position: relative;
-  margin-top: 10px;
-  text-align: center;
-}
-
-#downloadBtn {
-  margin-top: 20px;
-  background: linear-gradient(to right, #5f4bd3, #7e72f2);
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 16px;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-#downloadBtn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-}
-
-.logos {
-  width: 60px;
-  height: 60px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
+#showQRBtn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1100;
+      background: linear-gradient(to right, #5f4bd3, #7e72f2);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
+
+    #showQRBtn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    #qrCanvasContainer {
+      display: none;
+      position: fixed;
+      top: 70px;
+      left: 20px;
+      width: 320px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      padding: 20px;
+      z-index: 1000;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    #qrCanvasContainer:hover,
+    #qrCanvasContainer.active {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.4),
+                  0 0 20px 2px rgba(3, 169, 244, 0.5),
+                  0 0 30px 5px rgba(244, 65, 165, 0.5);
+      background: linear-gradient(90deg, rgba(3, 169, 244, 0.1), rgba(244, 65, 165, 0.1));
+    }
+
+    #closeBtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: #ff4d4d;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    #closeBtn:hover {
+      transform: scale(1.2);
+    }
+
+    #qrCanvas {
+      position: relative;
+      margin-top: 10px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    #downloadBtn {
+      margin-top: 20px;
+      background: linear-gradient(to right, #5f4bd3, #7e72f2);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    #downloadBtn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .logos {
+      width: 60px;
+      height: 60px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -2361,7 +2373,8 @@ window.onload = async () => {
 });
 };
     </script>
-      <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <script>
     const qrContainer = document.getElementById("qrCanvas");
     const showQRBtn = document.getElementById("showQRBtn");
@@ -2390,90 +2403,6 @@ window.onload = async () => {
         canvas = c;
         qrContainer.appendChild(canvas);
 
-        canvas.addEventListener("click", () => {
-          const tempCanvas = document.createElement("canvas");
-          const size = canvas.width;
-          tempCanvas.width = size;
-          tempCanvas.height = size;
-          const ctx = tempCanvas.getContext("2d");
-
-          ctx.drawImage(canvas, 0, 0, size, size);
-
-          const logoImg = new Image();
-          logoImg.src = "img/logo.svg";
-          logoImg.crossOrigin = "anonymous";
-
-          logoImg.onload = () => {
-            const logoSize = size * 0.2;
-            const logoX = (size - logoSize) / 2;
-            const logoY = (size - logoSize) / 2;
-            ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
-
-            const qrImage = tempCanvas.toDataURL("image/png");
-            const newWindow = window.open("", "_blank");
-            newWindow.document.write(`
-              <!DOCTYPE html>
-              <html>
-              <head>
-                <title>QR Code</title>
-                <style>
-                  body {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    height: 100vh;
-                    margin: 0;
-                    background: rgba(0, 0, 0, 0.8);
-                  }
-                  img {
-                    max-width: 90%;
-                    max-height: 90%;
-                    border: 12px solid white;
-                    border-radius: 20px;
-                  }
-                </style>
-              </head>
-              <body>
-                <img src="${qrImage}" alt="QR Code"/>
-              </body>
-              </html>
-            `);
-          };
-
-          logoImg.onerror = () => {
-            console.error("Logo gagal dimuat");
-            const qrImage = canvas.toDataURL("image/png");
-            const newWindow = window.open("", "_blank");
-            newWindow.document.write(`
-              <!DOCTYPE html>
-              <html>
-              <head>
-                <title>QR Code</title>
-                <style>
-                  body {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    height: 100vh;
-                    margin: 0;
-                    background: rgba(0, 0, 0, 0.8);
-                  }
-                  img {
-                    max-width: 90%;
-                    max-height: 90%;
-                    border: 12px solid white;
-                    border-radius: 20px;
-                  }
-                </style>
-              </head>
-              <body>
-                <img src="${qrImage}" alt="QR Code"/>
-              </body>
-              </html>
-            `);
-          };
-        });
-
         const logo = document.createElement("img");
         logo.src = "img/logo.svg";
         logo.className = "logos";
@@ -2486,6 +2415,13 @@ window.onload = async () => {
         showQRBtn.style.display = "none";
         downloadBtn.style.display = "inline-block";
       });
+    });
+
+    qrContainer.addEventListener("click", () => {
+      qrCanvasContainer.classList.add("active");
+      setTimeout(() => {
+        qrCanvasContainer.classList.remove("active");
+      }, 300);
     });
 
     closeBtn.addEventListener("click", () => {
@@ -2560,7 +2496,7 @@ window.onload = async () => {
           };
 
           const link = document.createElement("a");
-          link.download = `QRLottoChain${generateUniqueId()}.png`;
+          link.download = `LottoChain${generateUniqueId()}.png`;
           link.href = combinedCanvas.toDataURL("image/png");
           document.body.appendChild(link);
           link.click();
@@ -2568,7 +2504,7 @@ window.onload = async () => {
         };
 
         logoImage.onerror = () => {
-          console.error("Failed to load logo for download");
+          console.error("Failed to load logo for download, please try again.");
 
           ctx.font = "bold 120px 'Ubuntu', sans-serif";
           const gradient = ctx.createLinearGradient(900, 0, 3500, 0);
@@ -2604,7 +2540,7 @@ window.onload = async () => {
         };
       });
     });
-  </script>
+</script>
        
 </body>
 </html>
