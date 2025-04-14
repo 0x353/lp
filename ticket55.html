@@ -249,10 +249,9 @@
         }
 
         // Jam UTC pukul 03:00:00 hari ini
-function getCutoffTimeUTC() {
+        function getTodayCutoffUTC() {
   const now = new Date();
-  const cutoff = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 3, 0, 0));
-  return cutoff;
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 3, 0, 0));
 }
 
 function setPendingStatus() {
@@ -265,38 +264,39 @@ function setPendingStatus() {
 async function setFinalStatus(bet) {
   const statusElement = document.getElementById('status');
   const stats = await contract.methods.getPlayerStats(bet.player).call();
-  const isWinner = Number(stats.totalWins) > 0; // atau logika sesuai kontrak
+  const isWinner = Number(stats.totalWins) > 0;
   if (statusElement) {
     statusElement.innerHTML = `Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span>`;
   }
 }
 
 async function handleStatus(bet) {
-  const betTime = new Date(bet.time); // bet.time harus dalam format ISO UTC
-  const cutoffTime = getCutoffTimeUTC();
+  const betTime = new Date(bet.time);
   const now = new Date();
+  const cutoffToday = getTodayCutoffUTC();
 
-  if (betTime < cutoffTime) {
-    // Bet dibuat sebelum jam 03:00 UTC hari ini → tampilkan hasil
-    setFinalStatus(bet);
-  } else {
-    // Bet baru → status pending dulu
-    setPendingStatus();
-    
-    const delay = cutoffTime.getTime() - now.getTime();
-    if (delay > 0) {
-      setTimeout(() => {
-        setFinalStatus(bet);
-      }, delay);
-    } else {
-      // kalau sudah lewat (misalnya user reload sore hari), langsung tampil final
+  // Jika bet dibuat sebelum cutoff hari ini - 24 jam → anggap final
+  if (betTime.getTime() < cutoffToday.getTime() - 24 * 60 * 60 * 1000) {
+    return setFinalStatus(bet);
+  }
+
+  // Kalau bet hari ini sebelum cutoff → final
+  if (betTime < cutoffToday) {
+    return setFinalStatus(bet);
+  }
+
+  // Bet setelah cutoff hari ini → pending dulu
+  setPendingStatus();
+  const delay = cutoffToday.getTime() - now.getTime();
+  if (delay > 0) {
+    setTimeout(() => {
       setFinalStatus(bet);
-    }
+    }, delay);
+  } else {
+    // Lewat cutoff, reload di sore hari → langsung tampil final
+    setFinalStatus(bet);
   }
 }
-
-// Panggil fungsi utama ini
-handleStatus(bet);
         
         const shortPlayer = bet.player.slice(0, 21) + "" + bet.player.slice(-21);
         const shortTxHash = bet.txHash.slice(0, 15) + "..." + bet.txHash.slice(-15);
