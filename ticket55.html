@@ -176,7 +176,7 @@
 </head>
 <body>
   <div class="container" id="ticketContainer">
-    <h1>Pblic Ticket Detail</h1>
+    <h1>Public Ticket Detail</h1>
     <div id="ticketDetail">
       <center style="color: #00FF66;">
         <img src="img/loading.svg" style="vertical-align: middle; width: 24px; height: 24px; margin-right: 8px;">
@@ -248,6 +248,32 @@
           return;
         }
 
+        const now = new Date();
+const utcHours = now.getUTCHours();
+
+const betElements = document.querySelectorAll('.bet');
+
+betElements.forEach(async (betElement) => {
+    const player = betElement.getAttribute('data-player');
+    const statusSpan = betElement.querySelector('.status');
+
+    if (utcHours >= 3) {
+        const stats = await contract.methods.getPlayerStats(player).call();
+        const isWinner = stats.isWinner;
+
+        if (isWinner) {
+            statusSpan.innerHTML = 'Won';
+            statusSpan.style.color = '#00FF66';
+        } else {
+            statusSpan.innerHTML = 'Lost';
+            statusSpan.style.color = '#fe6666';
+        }
+    } else {
+        statusSpan.innerHTML = 'Waiting';
+        statusSpan.style.color = '#fecc66';
+    }
+});
+
         const shortPlayer = bet.player.slice(0, 21) + "" + bet.player.slice(-21);
         const shortTxHash = bet.txHash.slice(0, 15) + "..." + bet.txHash.slice(-15);
         const betIdBytes32 = bet.betId;
@@ -305,11 +331,7 @@
           <p>Likes: <span style="color:#00cc51;">${likeCount}</span></p>
           <p>Comments: <span style="color:#00cc51;">${activeCommentCount}</span></p>
           <p>Payout: <span style="color:${Number(payoutAmount) > 0 ? '#00FF66' : '#fe6666'};">${payoutAmountEth} ETH</span> (${payoutAmount} wei)</p>
-          <p>Status: 
-    <span style="color:${isWinner === null ? '#ffcc00' : (isWinner ? '#00FF66' : '#fe6666')};">
-        ${isWinner === null ? 'Pending' : (isWinner ? 'Won' : 'Lost')}
-    </span>
-</p>
+          <p>Status: <span id="status" style="color: #fecc66;">Waiting</span></p>
           <p>Total Bets in Contract: <span style="color:#1a88ff;">${totalBets}</span></p>
           <p>Player Total Bets: <span style="color:#1a88ff;">${stats[0]}</span></p>
           <p>Player Total Amount Bet: <span style="color:#1a88ff;">${web3.utils.fromWei(stats[1], 'ether')} ETH</span></p>
