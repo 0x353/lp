@@ -162,8 +162,8 @@
       // Buat QR code dengan resolusi tinggi untuk download
       const url = window.location.href;
       QRCode.toCanvas(url, { 
-        width: 2600, // Ukuran QR lebih kecil dari canvas untuk margin
-        margin: 8,
+        width: 2800, // Ukuran QR lebih kecil dari canvas untuk margin
+        margin: 7,
         errorCorrectionLevel: 'H'
       }, (err, highResCanvas) => {
         if (err) {
