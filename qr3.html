@@ -198,7 +198,7 @@
       const url = window.location.href;
       QRCode.toCanvas(url, { 
         width: 2800, // Ukuran QR lebih kecil dari canvas untuk margin
-        margin: 7,
+        margin: 8,
         errorCorrectionLevel: 'H'
       }, (err, highResCanvas) => {
         if (err) {
