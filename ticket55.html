@@ -176,7 +176,7 @@
 </head>
 <body>
   <div class="container" id="ticketContainer">
-    <h1>Puesdblic Ticket Detail</h1>
+    <h1>Public Ticket Detail</h1>
     <div id="ticketDetail">
       <center style="color: #00FF66;">
         <img src="img/loading.svg" style="vertical-align: middle; width: 24px; height: 24px; margin-right: 8px;">
@@ -248,38 +248,42 @@
           return;
         }
 
-        const delayStatusTime = 15 * 60 * 60 * 1000; // 15 jam dalam milidetik
-
-function setPendingStatus() {
+        async function updateStatus(bet) {
   const statusElement = document.getElementById('status');
-  if (statusElement) {
-    statusElement.innerHTML = 'Status: <span style="color:gray;">Pending...</span>';
-  }
-}
+  if (!statusElement) return;
 
-async function setFinalStatus(bet) {
-  try {
-    const statusElement = document.getElementById('status');
-    const stats = await contract.methods.getPlayerStats(bet.player).call();
-    const isWinner = Number(stats.totalWins) > 0;
-    if (statusElement) {
+  // Dapatkan waktu sekarang dalam UTC
+  const now = new Date();
+  const utcHours = now.getUTCHours();
+  const utcMinutes = now.getUTCMinutes();
+  const isBeforeRevealTime = utcHours < 3 || (utcHours === 3 && utcMinutes === 0);
+
+  if (isBeforeRevealTime) {
+    // Sembunyikan status sebelum 03:00 UTC
+    statusElement.style.display = 'none';
+  } else {
+    // Tampilkan status asli setelah 03:00 UTC
+    try {
+      statusElement.style.display = 'block'; // Unhidden
+      const stats = await contract.methods.getPlayerStats(bet.player).call();
+      const isWinner = Number(stats.totalWins) > 0;
       statusElement.innerHTML = `Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span>`;
+    } catch (err) {
+      console.error('Gagal ambil status:', err);
+      statusElement.innerHTML = 'Status: <span style="color:gray;">Error</span>';
     }
-  } catch (err) {
-    console.error('Gagal ambil status akhir:', err);
   }
+
+  // Jadwalkan pembaruan pada 03:00 UTC berikutnya
+  const nextReveal = new Date(now);
+  nextReveal.setUTCDate(now.getUTCDate() + (isBeforeRevealTime ? 0 : 1));
+  nextReveal.setUTCHours(3, 0, 0, 0); // Set ke 03:00 UTC
+  const timeUntilReveal = nextReveal - now;
+  setTimeout(() => updateStatus(bet), timeUntilReveal);
 }
 
-const betTime = new Date(bet.time).getTime();
-const now = Date.now();
-
-if (now - betTime >= delayStatusTime) {
-  setFinalStatus(bet);
-} else {
-  setPendingStatus();
-  const remainingTime = delayStatusTime - (now - betTime);
-  setTimeout(() => setFinalStatus(bet), remainingTime);
-}
+// Panggil fungsi saat halaman dimuat
+updateStatus(bet);
         
         const shortPlayer = bet.player.slice(0, 21) + "" + bet.player.slice(-21);
         const shortTxHash = bet.txHash.slice(0, 15) + "..." + bet.txHash.slice(-15);
