@@ -145,18 +145,21 @@
       opacity: 1;
     }
     .qr-wrapper {
-      display: none;
-      position: relative;
-      background: #ffffff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-      text-align: center;
-      margin-top: 20px;
-    }
-    .qr-wrapper.show {
-      display: block;
-    }
+    display: none;
+    position: relative;
+    background: #111111;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 400px;
+}
+
+.qr-wrapper.show {
+    display: block;
+}
     .logos {
       position: absolute;
       top: 50%;
@@ -169,7 +172,7 @@
     }
     .watermark {
       margin-top: 10px;
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Ubuntu', sans-serif;
       font-size: 16px;
       color: #007bff;
       text-shadow: 0 0 6px #03a9f4;
@@ -483,7 +486,7 @@
         size: 256,
         level: 'H',
         background: '#ffffff',
-        foreground: '#007bff'
+        foreground: '#000000'
       });
     }
 
@@ -558,16 +561,17 @@
         gradient.addColorStop(0, "#03a9f4");
         gradient.addColorStop(1, "#f441a5");
         ctx.fillStyle = gradient;
-        ctx.fillText("Lotto Chain", hdSize / 2, watermarkY);
+        ctx.fillText("Lotto Chain Decentralized Betting", hdSize / 2, watermarkY);
 
         completeDownload();
       };
 
       function completeDownload() {
-        const link = document.createElement('a');
-        link.download = "LottoQR-HD.png";
-        link.href = canvas.toDataURL("image/png");
-        link.click();
+    const link = document.createElement('a');
+    const uniqueId = Date.now();
+    link.download = `LottoChainQR_${uniqueId}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
       }
     }
 
