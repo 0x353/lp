@@ -262,15 +262,21 @@
 
         const betAmount = bet.betAmount;
 
-        let gasUsed = "N/A";
-        try {
-          const txReceipt = await web3.eth.getTransactionReceipt(bet.txHash);
-          if (txReceipt) {
-            gasUsed = web3.utils.fromWei((txReceipt.gasUsed * txReceipt.effectiveGasPrice).toString(), 'ether');
-          }
-        } catch (e) {
-          console.error("Error fetching gas fee:", e);
-        }
+        const gasFeeElement = document.getElementById('gasFee');
+let gasUsed = "N/A";
+
+try {
+  const txReceipt = await web3.eth.getTransactionReceipt(bet.txHash);
+
+  if (txReceipt && txReceipt.gasUsed && txReceipt.effectiveGasPrice) {
+    const totalGasCost = BigInt(txReceipt.gasUsed) * BigInt(txReceipt.effectiveGasPrice);
+    gasUsed = web3.utils.fromWei(totalGasCost.toString(), 'ether');
+  }
+} catch (e) {
+  console.error("Error fetching gas fee:", e);
+}
+
+gasFeeElement.innerText = `${gasUsed} ETH`;
 
         const totalBets = allBets.length;
         const timeDiff = Math.floor((Date.now() / 1000) - Number(bet.timestamp));
@@ -299,7 +305,7 @@
           <p>Bet Amount: <span style="color:#00FF66;">${betAmount}</span></p>
           <p>Is ETH: <span style="color:${bet.isETH ? '#00FF66' : '#fe6666'};">${bet.isETH ? 'Yes' : 'No'}</span></p>
           <p>Transaction: <a href="https://sepolia.basescan.org/tx/${bet.txHash}" target="_blank" style="color:#fe6666;">${shortTxHash}</a></p>
-          <p>Gas Fee: <span style="color:#ffcc00;">${gasUsed} ETH</span></p>
+          <p>Gas Fee: <span id="gasFee" style="color:#ffcc00;">Loading...</span></p>
           <p>Block: <a href="https://sepolia.basescan.org/block/${bet.blockNumber}" target="_blank">${bet.blockNumber}</a></p>
           <p>Time: <span style="color:orange;">${new Date(Number(bet.timestamp) * 1000).toISOString()} UTC</span> (<span style="color:#ffcc00;">${relativeTime}</span>)</p>
           <p>Likes: <span style="color:#00cc51;">${likeCount}</span></p>
