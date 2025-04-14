@@ -11,10 +11,32 @@
       padding: 20px;
       background-color: #f5f5f5;
     }
-    #qrCanvasContainer {
-  display: none;
-  position: absolute;
+
+    #showQRBtn {
+  position: fixed;
   top: 20px;
+  left: 20px;
+  z-index: 1100;
+  background: linear-gradient(to right, #5f4bd3, #7e72f2);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#showQRBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+#qrCanvasContainer {
+  display: none;
+  position: fixed;
+  top: 70px; /* beri jarak dari tombol */
   left: 20px;
   width: 320px;
   background: #ffffff;
@@ -22,41 +44,31 @@
   box-shadow: 0 4px 20px rgba(0,0,0,0.2);
   padding: 20px;
   z-index: 1000;
-    }
-    #closeBtn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      color: #ff4d4d;
-      font-size: 24px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    #closeBtn:hover {
-      transform: scale(1.2);
-    }
-    #downloadBtn {
-  display: none;
-  margin-top: 15px;
-  background: linear-gradient(to right, #5f4bd3, #7e72f2);
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 16px;
-  transition: transform 0.2s, box-shadow 0.2s;
-    }
-    #downloadBtn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    }
-    #showQRBtn {
+}
+
+#closeBtn {
   position: absolute;
-  top: 20px;
-  left: 360px; /* agar tombol ada di sebelah kanan QR container */
+  top: 10px;
+  right: 10px;
+  color: #ff4d4d;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+#closeBtn:hover {
+  transform: scale(1.2);
+}
+
+#qrCanvas {
+  position: relative;
+  margin-top: 10px;
+  text-align: center;
+}
+
+#downloadBtn {
+  margin-top: 20px;
   background: linear-gradient(to right, #5f4bd3, #7e72f2);
   color: white;
   border: none;
@@ -66,32 +78,21 @@
   font-weight: bold;
   font-size: 16px;
   transition: transform 0.2s, box-shadow 0.2s;
-    }
-    #showQRBtn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    }
-    #qr {
-      position: relative;
-      display: inline-block;
-    }
-    .logo {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 60px;
-      height: 60px;
-    }
+}
+
+#downloadBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
   </style>
 </head>
 <body>
-  <button id="showQRBtn">QR Link</button>
-  <div id="qrCanvasContainer">
-    <div id="closeBtn">×</div>
-    <div id="qr"></div>
-  </div>
+  <button id="showQRBtn">Show QR</button>
+<div id="qrCanvasContainer">
+  <div id="closeBtn">&times;</div>
+  <div id="qrCanvas"></div>
   <button id="downloadBtn">Download QR</button>
+</div>
 
   <div id="qrModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center;">
   <span style="position:absolute; top:20px; right:30px; color:white; font-size:36px; font-weight:bold; cursor:pointer;" onclick="document.getElementById('qrModal').style.display='none'">&times;</span>
