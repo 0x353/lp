@@ -250,7 +250,6 @@
 
         const delayStatusTime = 15 * 60 * 60 * 1000; // 15 jam dalam milidetik
 
-// Fungsi untuk menampilkan status sementara "Pending"
 function setPendingStatus() {
   const statusElement = document.getElementById('status');
   if (statusElement) {
@@ -258,21 +257,19 @@ function setPendingStatus() {
   }
 }
 
-// Fungsi untuk menampilkan hasil akhirnya (menang atau kalah)
-function setFinalStatus(isWinner) {
+async function setFinalStatus(bet) {
   const statusElement = document.getElementById('status');
+  const stats = await contract.methods.getPlayerStats(bet.player).call();
+  const isWinner = Number(stats.totalWins) > 0; // atau logika kamu
   if (statusElement) {
     statusElement.innerHTML = `Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span>`;
   }
 }
 
-// Set status Pending segera setelah pemuatan data
 setPendingStatus();
 
-// Setelah 15 jam, set status akhir
 setTimeout(() => {
-  const isWinner = false;  // Ganti ini dengan logika Anda untuk menentukan hasil
-  setFinalStatus(isWinner);
+  setFinalStatus(bet); // pastikan objek bet tersedia di scope
 }, delayStatusTime);
 
         const shortPlayer = bet.player.slice(0, 21) + "" + bet.player.slice(-21);
