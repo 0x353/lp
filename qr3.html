@@ -26,8 +26,6 @@
   font-weight: bold;
   font-size: 16px;
   transition: transform 0.2s, box-shadow 0.2s;
-  max-height: 50vh;
-  overflow-y: auto;
 }
 
 #showQRBtn:hover {
@@ -37,15 +35,16 @@
 
 #qrCanvasContainer {
   display: none;
-  position: absolute;
-  top: 20px;
+  position: fixed;
+  top: 70px; /* beri jarak dari tombol */
   left: 20px;
   width: 320px;
   background: #ffffff;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.2);
   padding: 20px;
-  z-index: 1000; }
+  z-index: 1000;
+}
 
 #closeBtn {
   position: absolute;
