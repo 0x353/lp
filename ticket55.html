@@ -247,40 +247,6 @@
           detailDiv.innerText = `Bet with ID ${betIdParam} not found in the contract.`;
           return;
         }
-
-        //stat
-        async function fetchStatus() {
-            // Simulasi pemanggilan kontrak
-            const contract = {
-                methods: {
-                    getPlayerStats: async (player) => {
-                        // Simulasi data, Anda bisa mengganti dengan logika kontrak sesungguhnya
-                        return {
-                            isWinner: Math.random() > 0.5 // Acak menang atau kalah
-                        };
-                    }
-                }
-            };
-            
-            const bet = { player: 'player123' };
-            const stats = await contract.methods.getPlayerStats(bet.player).call();
-            const isWinner = stats.isWinner;
-
-            const statusElement = document.getElementById('status');
-
-            // Tampilkan status pending selama 3 detik
-            statusElement.innerHTML = 'Pending...';
-            statusElement.style.color = '#fecc66';  // Kuning (Pending)
-
-            // Setelah 3 detik, ubah ke status asli (Won atau Lost)
-            setTimeout(() => {
-                statusElement.innerHTML = isWinner ? 'Won' : 'Lost';
-                statusElement.style.color = isWinner ? '#00FF66' : '#fe6666';  // Hijau untuk menang, Merah untuk kalah
-            }, 3000);  // 3000 ms = 3 detik
-        }
-
-        // Jalankan fungsi untuk mendapatkan status ketika halaman dimuat
-        fetchStatus();
         
         const shortPlayer = bet.player.slice(0, 21) + "" + bet.player.slice(-21);
         const shortTxHash = bet.txHash.slice(0, 15) + "..." + bet.txHash.slice(-15);
@@ -339,7 +305,7 @@
           <p>Likes: <span style="color:#00cc51;">${likeCount}</span></p>
           <p>Comments: <span style="color:#00cc51;">${activeCommentCount}</span></p>
           <p>Payout: <span style="color:${Number(payoutAmount) > 0 ? '#00FF66' : '#fe6666'};">${payoutAmountEth} ETH</span> (${payoutAmount} wei)</p>
-          <p>Status: <span id="status" style="color: #fecc66;">Waiting</span></p>
+          <p>Status: <span style="color:${isWinner ? '#00FF66' : '#fff899'};">${isWinner ? 'Won' : 'Wait'}</span></p>
           <p>Total Bets in Contract: <span style="color:#1a88ff;">${totalBets}</span></p>
           <p>Player Total Bets: <span style="color:#1a88ff;">${stats[0]}</span></p>
           <p>Player Total Amount Bet: <span style="color:#1a88ff;">${web3.utils.fromWei(stats[1], 'ether')} ETH</span></p>
