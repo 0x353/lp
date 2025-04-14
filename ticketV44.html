@@ -304,68 +304,48 @@ button:not(#closePopup):active::after {
         console.error("Error loading ticket:", err);
         detailDiv.innerText = `Failed to load bet detail: ${err.message}`;
     }
-    }         
+  }         
 
 function shareTo(betId) {
-  const url = `${window.location.origin}${window.location.pathname}?betId=${betId}`;
-  console.log("Generated URL:", url); // Debug URL
+      const url = `${window.location.origin}${window.location.pathname}?betId=${betId}`;
+      console.log("Generated URL:", url);
 
-  // Fungsi untuk handle share
-  function tryShare(isMobile) {
-    // Prioritas 1: Coba Web Share API
-    if (navigator.share) {
-      console.log("Try Web Share API");
-      navigator.share({
-        title: "Share Bet",
-        text: "Check this out!",
-        url: url
-      })
-        .then(() => console.log("Successful sharing"))
-        .catch((err) => {
-          // Hanya panggil fallback kalau bukan error pembatalan
-          if (err.name !== "AbortError") {
-            console.error("Web Share failed, tyr again:", err);
-            if (isMobile) {
-              tryIntent();
-            } else {
-              fallbackShare();
+      function tryShare(isMobile) {
+        if (navigator.share) {
+          console.log("Try Web Share API");
+          navigator.share({
+            title: "Share Bet",
+            text: "Check this out!",
+            url: url
+          }).catch((err) => {
+            if (err.name !== "AbortError") {
+              console.error("Web Share failed:", err);
+              if (isMobile) tryIntent();
+              else fallbackShare();
             }
-          } else {
-            console.log("Share cancelled, no action");
-          }
-        });
-    } else {
-      // Fallback ke Intent (mobile) atau modal (PC)
-      console.log("Web Share is not available");
-      if (isMobile) {
-        tryIntent();
-      } else {
-        fallbackShare();
+          });
+        } else {
+          console.log("Web Share not available");
+          if (isMobile) tryIntent();
+          else fallbackShare();
+        }
       }
-    }
-  }
 
-  // Fungsi untuk Intent di mobile
-  function tryIntent() {
-    console.log("Try Intent on mobile");
-    const shareIntent = `intent://#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT=${encodeURIComponent(url)};end`;
-    const facebookWeb = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-    console.log("Mencoba Intent:", shareIntent);
+      function tryIntent() {
+        console.log("Try Intent on mobile");
+        const shareIntent = `intent://#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT=${encodeURIComponent(url)};end`;
+        try {
+          window.location.href = shareIntent;
+          setTimeout(() => {
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+          }, 2000);
+        } catch (err) {
+          console.error("Intent error:", err);
+          window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+        }
+      }
 
-    try {
-      window.location.href = shareIntent;
-      setTimeout(() => {
-        console.log("Intent may have failed, open web");
-        window.open(facebookWeb, '_blank');
-      }, 2000);
-    } catch (err) {
-      console.error("Intent error:", err);
-      window.open(facebookWeb, '_blank');
-    }
-  }
-
-  // Fungsi untuk custom share modal di PC
-  function fallbackShare() {
+      function fallbackShare() {
     // Daftar platform dan URL share-nya dengan ikon PNG
     const shareOptions = [
         {
@@ -461,63 +441,137 @@ function shareTo(betId) {
       </button>
     `;
     document.body.appendChild(modal);
-  
-  }
     
-  // Cek apakah di perangkat mobile
-  if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
-    console.log("Mobile mode, try sharing");
-    tryShare(true);
-  } else {
-    console.log("PC mode, try sharing");
-    tryShare(false);
-  }
-       }
+      }
 
-function downloadPNG() {
-  const element = document.querySelector(".container");
-  html2canvas(element, {
-    scale: 6,
-    useCORS: true,
-    backgroundColor: "#121212"
-  }).then(canvas => {
-    const link = document.createElement("a");
-    link.download = "LottoChainTicket.png";
+      if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+        tryShare(true);
+      } else {
+        tryShare(false);
+      }
+    }
+
+    // QR Code Toggle
+    const toggleQRBtn = document.getElementById("toggleQRBtn");
+    const qrWrapper = document.getElementById("qrWrapper");
+    const qrCanvas = document.getElementById("qr");
+
+    function generateQRCode(value) {
+      const qr = new QRious({
+        element: qrCanvas,
+        value: value || window.location.href,
+        size: 256,
+        level: 'H',
+        background: '#ffffff',
+        foreground: '#000000'
+      });
+    }
+
+    generateQRCode(window.location.href);
+
+    toggleQRBtn.addEventListener("click", () => {
+      const isVisible = qrWrapper.classList.contains("show");
+      if (!isVisible) {
+        qrWrapper.classList.add("show");
+        toggleQRBtn.textContent = "Close QR";
+        toggleQRBtn.style.background = "#dc3545";
+        generateQRCode(window.location.href);
+      } else {
+        qrWrapper.classList.remove("show");
+        toggleQRBtn.textContent = "Show QR";
+        toggleQRBtn.style.background = "";
+      }
+    });
+
+    function downloadQR() {
+      const hdSize = 3000;
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = hdSize;
+      canvas.height = hdSize;
+
+      const hdQR = new QRious({
+        element: canvas,
+        value: window.location.href,
+        size: hdSize,
+        level: 'H',
+        background: '#ffffff',
+        foreground: '#007bff'
+      });
+
+      const logo = new Image();
+      logo.src = "img/logo.svg";
+      logo.onerror = () => {
+        console.error("Failed to load logo");
+        completeDownload();
+      };
+      logo.onload = () => {
+        const logoSize = hdSize * 0.19;
+        const logoX = (hdSize - logoSize) / 2;
+        const logoY = (hdSize - logoSize) / 2 - (hdSize * 0.04);
+
+        ctx.save();
+        ctx.beginPath();
+        const radius = 12 * (hdSize / 256);
+        ctx.moveTo(logoX + radius, logoY);
+        ctx.arcTo(logoX + logoSize, logoY, logoX + logoSize, logoY + logoSize, radius);
+        ctx.arcTo(logoX + logoSize, logoY + logoSize, logoX, logoY + logoSize, radius);
+        ctx.arcTo(logoX, logoY + logoSize, logoX, logoY, radius);
+        ctx.arcTo(logoX, logoY, logoX + logoSize, logoY, radius);
+        ctx.closePath();
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+        ctx.clip();
+        ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+        ctx.restore();
+
+        const watermarkY = logoY + logoSize + (hdSize * 0.07);
+        ctx.font = `${hdSize * 0.05}px Orbitron`;
+        ctx.textAlign = "center";
+        ctx.lineWidth = 1;
+        ctx.shadowColor = "#03a9f4";
+        ctx.shadowBlur = 6;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText("Lotto Chain", hdSize / 2, watermarkY);
+
+        const gradient = ctx.createLinearGradient(0, 0, hdSize, 0);
+        gradient.addColorStop(0, "#03a9f4");
+        gradient.addColorStop(1, "#f441a5");
+        ctx.fillStyle = gradient;
+        ctx.fillText("Lotto Chain Decentralized Betting", hdSize / 2, watermarkY);
+
+        completeDownload();
+      };
+
+      function completeDownload() {
+    const link = document.createElement('a');
+    const uniqueId = Date.now();
+    link.download = `LottoChainQR_${uniqueId}.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
-  }).catch(err => {
-    console.error("Failed to create PNG, try again:", err);
-    alert("Failed to generate image. Check console for details..");
-  });
-}
+      }
+    }
 
-function generateQRCode(canvas, text) {
-  const tempDiv = document.createElement("div");
-  new QRCode(tempDiv, {
-    text: text,
-    width: 128,
-    height: 128,
-    colorDark : "#ffffff",
-    colorLight : "#1e1e1e",
-    correctLevel : QRCode.CorrectLevel.H
-  });
+    function downloadPNG() {
+      const element = document.querySelector(".container");
+      html2canvas(element, {
+        scale: 6,
+        useCORS: true,
+        backgroundColor: "#121212"
+      }).then(canvas => {
+        const link = document.createElement("a");
+        const uniqueId = Date.now();
+        link.download = "LottoChainTicket_${uniqueId}.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      }).catch(err => {
+        console.error("Failed to create PNG:", err);
+        alert("Failed to generate image. Check console for details.");
+      });
+    }
 
-  // Ambil canvas dari div sementara
-  const generatedImg = tempDiv.querySelector("img") || tempDiv.querySelector("canvas");
-  if (generatedImg) {
-    const ctx = canvas.getContext("2d");
-    const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = 128;
-    tempCanvas.height = 128;
-    const tempCtx = tempCanvas.getContext("2d");
-    tempCtx.drawImage(generatedImg, 0, 0);
-
-    ctx.clearRect(0, 0, 128, 128);
-    ctx.drawImage(tempCanvas, 0, 0);
-  }
-}
-
-window.onload = loadBetDetail
+    window.onload = loadBetDetail;
+        
   </script>
 </body>
   </html>
