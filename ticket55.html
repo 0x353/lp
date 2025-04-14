@@ -15,13 +15,15 @@
     body {
       background-color: #000000;
       color: white;
-      padding: 20px;
       font-family: 'Ubuntu', sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
       margin: 0;
+      padding: 0;
+      width: 100%;
+      text-align: center;
     }
     .container {
     background-color: #000000;
@@ -56,12 +58,14 @@
     width: 100%;
     max-width: 800px;
     margin: 0 auto;
-    text-align: justify;
+    text-align: left;
     box-shadow: 0 0 12px rgba(80, 160, 255, 0.3), 0 0 18px rgba(80, 160, 255, 0.2);
     transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
     border: 1px solid rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(3px);
-}
+    box-sizing: border-box;
+    display: block;
+    }
 
 #ticketDetail:hover {
     border: 1px solid rgba(80, 160, 255, 0.3);
@@ -583,7 +587,8 @@
         backgroundColor: "#121212"
       }).then(canvas => {
         const link = document.createElement("a");
-        link.download = "LottoChainTicket.png";
+        const uniqueId = Date.now();
+        link.download = "LottoChainTicket_${uniqueId}.png";
         link.href = canvas.toDataURL("image/png");
         link.click();
       }).catch(err => {
