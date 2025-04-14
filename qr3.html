@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>QR Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@700&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: sans-serif;
@@ -97,11 +98,11 @@
   </style>
 </head>
 <body>
-  <button id="showQRBtn">Show QR</button>
+  <button id="showQRBtn">Show QR Link</button>
 <div id="qrCanvasContainer">
   <div id="closeBtn">&times;</div>
   <div id="qrCanvas"></div>
-  <button id="downloadBtn">Download QR</button>
+  <button id="downloadBtn">Download QR Link</button>
 </div>
 
   <div id="qrModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center;">
@@ -111,165 +112,205 @@
 
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <script>
-    const qrContainer = document.getElementById("qrCanvas");
-    const showQRBtn = document.getElementById("showQRBtn");
-    const downloadBtn = document.getElementById("downloadBtn");
-    const qrCanvasContainer = document.getElementById("qrCanvasContainer");
-    const closeBtn = document.getElementById("closeBtn");
+  const qrContainer = document.getElementById("qrCanvas");
+  const showQRBtn = document.getElementById("showQRBtn");
+  const downloadBtn = document.getElementById("downloadBtn");
+  const qrCanvasContainer = document.getElementById("qrCanvasContainer");
+  const closeBtn = document.getElementById("closeBtn");
 
-    let canvas;
+  let canvas;
 
-    showQRBtn.addEventListener("click", () => {
-      qrCanvasContainer.style.display = "block";
-      qrContainer.innerHTML = ""; // Bersihkan QR sebelumnya
+  showQRBtn.addEventListener("click", () => {
+    qrCanvasContainer.style.display = "block";
+    qrContainer.innerHTML = ""; // Bersihkan QR sebelumnya
 
-      const url = window.location.href;
+    const url = window.location.href;
 
-      QRCode.toCanvas(url, { 
-        width: 300, 
-        margin: 2,
-        errorCorrectionLevel: 'H' // Tingkat koreksi error tinggi untuk keandalan
-      }, (err, c) => {
-        if (err) {
-          console.error("Error generating QR:", err);
-          qrContainer.innerHTML = "<p style='color: red;'>Failed to generate QR code.</p>";
-          return;
-        }
-        canvas = c;
-        qrContainer.appendChild(canvas);
+    QRCode.toCanvas(url, { 
+      width: 300, 
+      margin: 2,
+      errorCorrectionLevel: 'H'
+    }, (err, c) => {
+      if (err) {
+        console.error("Error generating QR:", err);
+        qrContainer.innerHTML = "<p style='color: red;'>Failed to generate QR code.</p>";
+        return;
+      }
+      canvas = c;
+      qrContainer.appendChild(canvas);
 
-        canvas.addEventListener("click", () => {
-  const tempCanvas = document.createElement("canvas");
-  const size = canvas.width;
-  tempCanvas.width = size;
-  tempCanvas.height = size;
-  const ctx = tempCanvas.getContext("2d");
+      canvas.addEventListener("click", () => {
+        const tempCanvas = document.createElement("canvas");
+        const size = canvas.width;
+        tempCanvas.width = size;
+        tempCanvas.height = size;
+        const ctx = tempCanvas.getContext("2d");
 
-  // Gambar QR dari canvas asli
-  ctx.drawImage(canvas, 0, 0, size, size);
+        ctx.drawImage(canvas, 0, 0, size, size);
 
-  // Tambah logo ke tengah
-  const logoImg = new Image();
-  logoImg.src = "img/logo.svg";
-  logoImg.crossOrigin = "anonymous";
+        const logoImg = new Image();
+        logoImg.src = "img/logo.svg";
+        logoImg.crossOrigin = "anonymous";
 
-  logoImg.onload = () => {
-    const logoSize = size * 0.2; // 20% dari QR
-    const logoX = (size - logoSize) / 2;
-    const logoY = (size - logoSize) / 2;
-    ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
+        logoImg.onload = () => {
+          const logoSize = size * 0.2;
+          const logoX = (size - logoSize) / 2;
+          const logoY = (size - logoSize) / 2;
+          ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
 
-    const qrImage = tempCanvas.toDataURL("image/png");
-    const qrModal = document.getElementById("qrModal");
-    const qrModalImg = document.getElementById("qrModalImg");
-    qrModalImg.src = qrImage;
-    qrModal.style.display = "flex";
-  };
-
-  logoImg.onerror = () => {
-    console.error("Logo gagal dimuat untuk modal");
-    // Tetap tampilkan QR tanpa logo
-    const qrImage = canvas.toDataURL("image/png");
-    const qrModal = document.getElementById("qrModal");
-    const qrModalImg = document.getElementById("qrModalImg");
-    qrModalImg.src = qrImage;
-    qrModal.style.display = "flex";
-  };
-});
-
-        const logo = document.createElement("img");
-        logo.src = "img/logo.svg"; // Ganti dengan path logo Anda
-        logo.className = "logos";
-        logo.crossOrigin = "anonymous";
-        logo.onerror = () => {
-          console.error("Failed to load logo");
+          const qrImage = tempCanvas.toDataURL("image/png");
+          const qrModal = document.getElementById("qrModal");
+          const qrModalImg = document.getElementById("qrModalImg");
+          qrModalImg.src = qrImage;
+          qrModal.style.display = "flex";
         };
-        qrContainer.appendChild(logo);
 
-        showQRBtn.style.display = "none";
-        downloadBtn.style.display = "inline-block";
+        logoImg.onerror = () => {
+          console.error("Logo gagal dimuat untuk modal");
+          const qrImage = canvas.toDataURL("image/png");
+          const qrModal = document.getElementById("qrModal");
+          const qrModalImg = document.getElementById("qrModalImg");
+          qrModalImg.src = qrImage;
+          qrModal.style.display = "flex";
+        };
       });
-    });
 
-    closeBtn.addEventListener("click", () => {
-      qrCanvasContainer.style.display = "none";
-      showQRBtn.style.display = "inline-block";
-      downloadBtn.style.display = "none";
-      qrContainer.innerHTML = "";
-      canvas = null; // Reset canvas
-    });
+      const logo = document.createElement("img");
+      logo.src = "img/logo.svg";
+      logo.className = "logos";
+      logo.crossOrigin = "anonymous";
+      logo.onerror = () => {
+        console.error("Failed to load logo");
+      };
+      qrContainer.appendChild(logo);
 
-    downloadBtn.addEventListener("click", () => {
-      if (!canvas) {
-        alert("QR code belum dibuat. Klik 'QR Link' terlebih dahulu.");
+      showQRBtn.style.display = "none";
+      downloadBtn.style.display = "inline-block";
+    });
+  });
+
+  closeBtn.addEventListener("click", () => {
+    qrCanvasContainer.style.display = "none";
+    showQRBtn.style.display = "inline-block";
+    downloadBtn.style.display = "none";
+    qrContainer.innerHTML = "";
+    canvas = null;
+  });
+
+  downloadBtn.addEventListener("click", () => {
+    if (!canvas) {
+      alert("QR code has not been created. Click 'QR Link' first.");
+      return;
+    }
+
+    const url = window.location.href;
+    QRCode.toCanvas(url, { 
+      width: 4000,
+      margin: 8,
+      errorCorrectionLevel: 'H'
+    }, (err, highResCanvas) => {
+      if (err) {
+        console.error("Error generating high-res QR:", err);
+        alert("Failed to generate QR code for download.");
         return;
       }
 
-      // Buat QR code dengan resolusi tinggi untuk download
-      const url = window.location.href;
-      QRCode.toCanvas(url, { 
-        width: 2800, // Ukuran QR lebih kecil dari canvas untuk margin
-        margin: 8,
-        errorCorrectionLevel: 'H'
-      }, (err, highResCanvas) => {
-        if (err) {
-          console.error("Error generating high-res QR:", err);
-          alert("Gagal membuat QR code untuk download.");
-          return;
-        }
+      const combinedCanvas = document.createElement("canvas");
+      combinedCanvas.width = 4400;
+      combinedCanvas.height = 4400;
+      const ctx = combinedCanvas.getContext("2d");
 
-        // Buat canvas 3000x3000
-        const combinedCanvas = document.createElement("canvas");
-        combinedCanvas.width = 3000;
-        combinedCanvas.height = 3000;
-        const ctx = combinedCanvas.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, 4400, 4400);
 
-        // Latar belakang putih
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, 3000, 3000);
+      ctx.drawImage(highResCanvas, 200, 200, 4000, 4000);
 
-        // Gambar QR code dengan margin (200px di setiap sisi)
-        ctx.drawImage(highResCanvas, 200, 200, 2600, 2600);
+      const logoImage = new Image();
+      logoImage.crossOrigin = "anonymous";
+      logoImage.src = "img/logo.svg";
 
-        // Logo di tengah
-        const logoImage = new Image();
-        logoImage.crossOrigin = "anonymous";
-        logoImage.src = "img/logo.svg";
+      logoImage.onload = () => {
+        const logoSize = 400;
+        const logoX = (4400 - logoSize) / 2;
+        const logoY = (4400 - logoSize) / 2;
+        ctx.drawImage(logoImage, logoX, logoY, logoSize, logoSize);
 
-        logoImage.onload = () => {
-          // Logo berukuran 10% dari lebar QR code (2600 * 0.1 = 260px)
-          const logoSize = 260;
-          const logoX = (3000 - logoSize) / 2; // Pusat horizontal
-          const logoY = (3000 - logoSize) / 2; // Pusat vertikal
-          ctx.drawImage(logoImage, logoX, logoY, logoSize, logoSize);
+        ctx.font = "bold 80px 'Ubuntu', sans-serif";
+        const gradient = ctx.createLinearGradient(1000, 0, 3400, 0);
+        gradient.addColorStop(0, "#03a9f4");
+        gradient.addColorStop(1, "#f441a5");
+        ctx.fillStyle = gradient;
+        ctx.shadowColor = "rgba(0, 0, 0, 0.3)";
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 2;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        const watermarkText = "Lotto Chain Decentralized Betting";
+        const textX = 4400 / 2;
+        const textY = 4200;
+        ctx.fillText(watermarkText, textX, textY);
 
-          // Buat link download
-          const link = document.createElement("a");
-          link.download = "Lotto-qr-code-link.png";
-          link.href = combinedCanvas.toDataURL("image/png");
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
+        ctx.shadowColor = "transparent";
+        ctx.shadowBlur = 0;
+
+        const generateUniqueId = () => {
+          const timestamp = Date.now();
+          const randomStr = Math.random().toString(36).substring(2, 8);
+          return `${timestamp}${randomStr}`;
         };
 
-        logoImage.onerror = () => {
-          console.error("Gagal memuat logo untuk download");
-          // Tetap lanjutkan download tanpa logo
-          const link = document.createElement("a");
-          link.download = "Lotto-qr-code-link.png";
-          link.href = combinedCanvas.toDataURL("image/png");
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
+        const link = document.createElement("a");
+        link.download = `LottoChain${generateUniqueId()}.png`;
+        link.href = combinedCanvas.toDataURL("image/png");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
+
+      logoImage.onerror = () => {
+        console.error("Failed to load logo for download, please try again.");
+
+        ctx.font = "bold 80px 'Ubuntu', sans-serif";
+        const gradient = ctx.createLinearGradient(1000, 0, 3400, 0);
+        gradient.addColorStop(0, "#03a9f4");
+        gradient.addColorStop(1, "#f441a5");
+        ctx.fillStyle = gradient;
+        ctx.shadowColor = "rgba(0, 0, 0, 0.3)";
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 2;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        const watermarkText = "Lotto Chain Decentralized Betting";
+        const textX = 4400 / 2;
+        const textY = 4200;
+        ctx.fillText(watermarkText, textX, textY);
+
+        ctx.shadowColor = "transparent";
+        ctx.shadowBlur = 0;
+
+        const generateUniqueId = () => {
+          const timestamp = Date.now();
+          const randomStr = Math.random().toString(36).substring(2, 8);
+          return `${timestamp}${randomStr}`;
         };
-      });
+
+        const link = document.createElement("a");
+        link.download = `LottoChain${generateUniqueId()}.png`;
+        link.href = combinedCanvas.toDataURL("image/png");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
     });
+  });
 
-    document.getElementById("qrModal").addEventListener("click", (e) => {
-  if (e.target.id === "qrModal") {
-    e.target.style.display = "none";
-  }
-});
-  </script>
+  document.getElementById("qrModal").addEventListener("click", (e) => {
+    if (e.target.id === "qrModal") {
+      e.target.style.display = "none";
+    }
+  });
+</script>
 </body>
 </html>
