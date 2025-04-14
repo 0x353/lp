@@ -150,10 +150,23 @@
     margin: 0 auto;
     width: 100%;
     max-width: 400px;
+    transition: all 0.3s ease-in-out;
 }
 
 .qr-wrapper.show {
     display: block;
+}
+
+#qr {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 12px;
+}
+
+/* Hover effect khusus canvas QR */
+.qr-wrapper:hover #qr {
+    transform: scale(3);
+    box-shadow: 0 0 25px #03a9f4, 0 0 45px #f441a5;
+    background: linear-gradient(90deg, #03a9f4, #f441a5); /* hanya akan terlihat jika ada latar belakang pada canvas */
 }
     .logos {
       position: absolute;
@@ -169,7 +182,7 @@
       margin-top: 10px;
       font-family: 'Ubuntu', sans-serif;
       font-size: 16px;
-      color: #007bff;
+      color: #f441a5;
       text-shadow: 0 0 6px #03a9f4;
     }
   </style>
