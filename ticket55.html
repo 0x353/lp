@@ -248,103 +248,55 @@
           return;
         }
 
-        // Simulasi penyimpanan taruhan (ganti dengan sumber data Anda, misalnya API)
-let currentBet = null;
-
-async function updateStatus(status ELEMENT) {
-  if (!statusElement) {
-    console.error('Elemen status tidak ditemukan');
-    return;
-  }
-
-  // Gunakan currentBet atau ambil dari statusElement jika ada
-  let bet = currentBet;
-  if (statusElement.dataset.player && statusElement.dataset.time) {
-    bet = {
-      player: statusElement.dataset.player,
-      time: statusElement.dataset.time
-    };
-  }
-
-  // Validasi data bet
-  if (!bet || !bet.player || !bet.time || isNaN(new Date(bet.time))) {
-    console.error('Data bet tidak valid:', bet);
-    statusElement.innerHTML = 'Status: <span style="color:gray;">Invalid Bet</span>';
-    return;
-  }
-
-  // Dapatkan waktu sekarang dan waktu taruhan dalam UTC
+        // Jam UTC pukul 03:00:00 hari ini
+function getCutoffTimeUTC() {
   const now = new Date();
-  const betTime = new Date(bet.time);
-  const utcHours = now.getUTCHours();
-  const utcMinutes = now.getUTCMinutes();
-
-  // Tentukan waktu 03:00 UTC setelah taruhan dibuat
-  const revealTime = new Date(betTime);
-  revealTime.setUTCDate(betTime.getUTCDate() + (betTime.getUTCHours() < 3 ? 0 : 1));
-  revealTime.setUTCHours(3, 0, 0, 0);
-
-  // Cek apakah taruhan baru (dalam 24 jam dan sebelum revealTime)
-  const isRecentBet = betTime.getTime() > now.getTime() - 24 * 60 * 60 * 1000;
-  if (isRecentBet && now < revealTime) {
-    // Taruhan baru: Tampilkan "Pending"
-    statusElement.innerHTML = 'Status: <span style="color:gray;">Pending</span>';
-  } else {
-    // Taruhan lama atau lewat 03:00 UTC: Tampilkan status asli
-    try {
-      console.log('Mengambil stats untuk:', bet.player); // Debug
-      const stats = await contract.methods.getPlayerStats(bet.player).call();
-      console.log('Stats:', stats); // Debug
-      const isWinner = Number(stats.totalWins) > 0;
-      statusElement.innerHTML = `Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span>`;
-    } catch (err) {
-      console.error('Gagal ambil status dari kontrak:', err);
-      statusElement.innerHTML = 'Status: <span style="color:gray;">Error</span>';
-    }
-  }
-
-  // Jadwalkan pembaruan jika masih "Pending"
-  if (isRecentBet && now < revealTime) {
-    const timeUntilReveal = revealTime - now;
-    console.log('Pembaruan dijadwalkan dalam:', timeUntilReveal / 1000, 'detik'); // Debug
-    setTimeout(() => updateStatus(statusElement), timeUntilReveal);
-  }
+  const cutoff = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 3, 0, 0));
+  return cutoff;
 }
 
-// Fungsi untuk taruhan baru
-function placeBet(playerAddress) {
-  const statusElement = document.getElementById('status');
-  if (!statusElement) return;
-
-  // Simpan taruhan baru
-  currentBet = {
-    player: playerAddress,
-    time: new Date().toISOString()
-  };
-
-  // Update elemen
-  statusElement.dataset.player = currentBet.player;
-  statusElement.dataset.time = currentBet.time;
-  statusElement.innerHTML = 'Status: <span style="color:gray;">Pending</span>';
-
-  // Perbarui status
-  updateStatus(statusElement);
-}
-
-// Inisialisasi saat halaman dimuat
-document.addEventListener('DOMContentLoaded', () => {
+function setPendingStatus() {
   const statusElement = document.getElementById('status');
   if (statusElement) {
-    // Gunakan data dari HTML jika ada, atau tunggu placeBet
-    if (statusElement.dataset.player && statusElement.dataset.time) {
-      currentBet = {
-        player: statusElement.dataset.player,
-        time: statusElement.dataset.time
-      };
-      updateStatus(statusElement);
+    statusElement.innerHTML = 'Status: <span style="color:gray;">Pending...</span>';
+  }
+}
+
+async function setFinalStatus(bet) {
+  const statusElement = document.getElementById('status');
+  const stats = await contract.methods.getPlayerStats(bet.player).call();
+  const isWinner = Number(stats.totalWins) > 0; // atau logika sesuai kontrak
+  if (statusElement) {
+    statusElement.innerHTML = `Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span>`;
+  }
+}
+
+async function handleStatus(bet) {
+  const betTime = new Date(bet.time); // bet.time harus dalam format ISO UTC
+  const cutoffTime = getCutoffTimeUTC();
+  const now = new Date();
+
+  if (betTime < cutoffTime) {
+    // Bet dibuat sebelum jam 03:00 UTC hari ini → tampilkan hasil
+    setFinalStatus(bet);
+  } else {
+    // Bet baru → status pending dulu
+    setPendingStatus();
+    
+    const delay = cutoffTime.getTime() - now.getTime();
+    if (delay > 0) {
+      setTimeout(() => {
+        setFinalStatus(bet);
+      }, delay);
+    } else {
+      // kalau sudah lewat (misalnya user reload sore hari), langsung tampil final
+      setFinalStatus(bet);
     }
   }
-});
+}
+
+// Panggil fungsi utama ini
+handleStatus(bet);
         
         const shortPlayer = bet.player.slice(0, 21) + "" + bet.player.slice(-21);
         const shortTxHash = bet.txHash.slice(0, 15) + "..." + bet.txHash.slice(-15);
@@ -403,7 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <p>Likes: <span style="color:#00cc51;">${likeCount}</span></p>
           <p>Comments: <span style="color:#00cc51;">${activeCommentCount}</span></p>
           <p>Payout: <span style="color:${Number(payoutAmount) > 0 ? '#00FF66' : '#fe6666'};">${payoutAmountEth} ETH</span> (${payoutAmount} wei)</p>
-          <p id="status">Status: <span>Loading...</span></p>
+          <p id="status">Status: <span style="color:gray;">Please wait...</span></p>
           <p>Total Bets in Contract: <span style="color:#1a88ff;">${totalBets}</span></p>
           <p>Player Total Bets: <span style="color:#1a88ff;">${stats[0]}</span></p>
           <p>Player Total Amount Bet: <span style="color:#1a88ff;">${web3.utils.fromWei(stats[1], 'ether')} ETH</span></p>
