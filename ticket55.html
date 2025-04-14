@@ -250,34 +250,37 @@
 
         async function updateStatus(bet) {
   const statusElement = document.getElementById('status');
-  if (!statusElement) return;
+  if (!statusElement) {
+    console.error('Elemen status tidak ditemukan');
+    return;
+  }
 
   // Dapatkan waktu sekarang dalam UTC
   const now = new Date();
   const utcHours = now.getUTCHours();
   const utcMinutes = now.getUTCMinutes();
-  const isBeforeRevealTime = utcHours < 3 || (utcHours === 3 && utcMinutes === 0);
 
-  if (isBeforeRevealTime) {
-    // Sembunyikan status sebelum 03:00 UTC
+  // Cek apakah sebelum 03:00 UTC
+  if (utcHours < 3 || (utcHours === 3 && utcMinutes === 0)) {
+    // Sembunyikan status
     statusElement.style.display = 'none';
   } else {
-    // Tampilkan status asli setelah 03:00 UTC
+    // Tampilkan status asli
+    statusElement.style.display = 'block';
     try {
-      statusElement.style.display = 'block'; // Unhidden
       const stats = await contract.methods.getPlayerStats(bet.player).call();
       const isWinner = Number(stats.totalWins) > 0;
       statusElement.innerHTML = `Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span>`;
     } catch (err) {
-      console.error('Gagal ambil status:', err);
+      console.error('Gagal ambil status dari kontrak:', err);
       statusElement.innerHTML = 'Status: <span style="color:gray;">Error</span>';
     }
   }
 
   // Jadwalkan pembaruan pada 03:00 UTC berikutnya
   const nextReveal = new Date(now);
-  nextReveal.setUTCDate(now.getUTCDate() + (isBeforeRevealTime ? 0 : 1));
-  nextReveal.setUTCHours(3, 0, 0, 0); // Set ke 03:00 UTC
+  nextReveal.setUTCDate(now.getUTCDate() + (utcHours < 3 ? 0 : 1));
+  nextReveal.setUTCHours(3, 0, 0, 0);
   const timeUntilReveal = nextReveal - now;
   setTimeout(() => updateStatus(bet), timeUntilReveal);
 }
@@ -342,7 +345,7 @@ updateStatus(bet);
           <p>Likes: <span style="color:#00cc51;">${likeCount}</span></p>
           <p>Comments: <span style="color:#00cc51;">${activeCommentCount}</span></p>
           <p>Payout: <span style="color:${Number(payoutAmount) > 0 ? '#00FF66' : '#fe6666'};">${payoutAmountEth} ETH</span> (${payoutAmount} wei)</p>
-          <p id="status">Status: <span style="color:gray;">Pending...</span></p>
+          <p id="status"></p>
           <p>Total Bets in Contract: <span style="color:#1a88ff;">${totalBets}</span></p>
           <p>Player Total Bets: <span style="color:#1a88ff;">${stats[0]}</span></p>
           <p>Player Total Amount Bet: <span style="color:#1a88ff;">${web3.utils.fromWei(stats[1], 'ether')} ETH</span></p>
