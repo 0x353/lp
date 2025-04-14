@@ -248,27 +248,53 @@
           return;
         }
 
-        async function updateStatus(bet) {
-  const statusElement = document.getElementById('status');
+        // Simulasi penyimpanan taruhan (ganti dengan sumber data Anda, misalnya API)
+let currentBet = null;
+
+async function updateStatus(status ELEMENT) {
   if (!statusElement) {
     console.error('Elemen status tidak ditemukan');
     return;
   }
 
-  // Dapatkan waktu sekarang dalam UTC
+  // Gunakan currentBet atau ambil dari statusElement jika ada
+  let bet = currentBet;
+  if (statusElement.dataset.player && statusElement.dataset.time) {
+    bet = {
+      player: statusElement.dataset.player,
+      time: statusElement.dataset.time
+    };
+  }
+
+  // Validasi data bet
+  if (!bet || !bet.player || !bet.time || isNaN(new Date(bet.time))) {
+    console.error('Data bet tidak valid:', bet);
+    statusElement.innerHTML = 'Status: <span style="color:gray;">Invalid Bet</span>';
+    return;
+  }
+
+  // Dapatkan waktu sekarang dan waktu taruhan dalam UTC
   const now = new Date();
+  const betTime = new Date(bet.time);
   const utcHours = now.getUTCHours();
   const utcMinutes = now.getUTCMinutes();
 
-  // Cek apakah sebelum 03:00 UTC
-  if (utcHours < 3 || (utcHours === 3 && utcMinutes === 0)) {
-    // Sembunyikan status
-    statusElement.style.display = 'none';
+  // Tentukan waktu 03:00 UTC setelah taruhan dibuat
+  const revealTime = new Date(betTime);
+  revealTime.setUTCDate(betTime.getUTCDate() + (betTime.getUTCHours() < 3 ? 0 : 1));
+  revealTime.setUTCHours(3, 0, 0, 0);
+
+  // Cek apakah taruhan baru (dalam 24 jam dan sebelum revealTime)
+  const isRecentBet = betTime.getTime() > now.getTime() - 24 * 60 * 60 * 1000;
+  if (isRecentBet && now < revealTime) {
+    // Taruhan baru: Tampilkan "Pending"
+    statusElement.innerHTML = 'Status: <span style="color:gray;">Pending</span>';
   } else {
-    // Tampilkan status asli
-    statusElement.style.display = 'block';
+    // Taruhan lama atau lewat 03:00 UTC: Tampilkan status asli
     try {
+      console.log('Mengambil stats untuk:', bet.player); // Debug
       const stats = await contract.methods.getPlayerStats(bet.player).call();
+      console.log('Stats:', stats); // Debug
       const isWinner = Number(stats.totalWins) > 0;
       statusElement.innerHTML = `Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span>`;
     } catch (err) {
@@ -277,16 +303,48 @@
     }
   }
 
-  // Jadwalkan pembaruan pada 03:00 UTC berikutnya
-  const nextReveal = new Date(now);
-  nextReveal.setUTCDate(now.getUTCDate() + (utcHours < 3 ? 0 : 1));
-  nextReveal.setUTCHours(3, 0, 0, 0);
-  const timeUntilReveal = nextReveal - now;
-  setTimeout(() => updateStatus(bet), timeUntilReveal);
+  // Jadwalkan pembaruan jika masih "Pending"
+  if (isRecentBet && now < revealTime) {
+    const timeUntilReveal = revealTime - now;
+    console.log('Pembaruan dijadwalkan dalam:', timeUntilReveal / 1000, 'detik'); // Debug
+    setTimeout(() => updateStatus(statusElement), timeUntilReveal);
+  }
 }
 
-// Panggil fungsi saat halaman dimuat
-updateStatus(bet);
+// Fungsi untuk taruhan baru
+function placeBet(playerAddress) {
+  const statusElement = document.getElementById('status');
+  if (!statusElement) return;
+
+  // Simpan taruhan baru
+  currentBet = {
+    player: playerAddress,
+    time: new Date().toISOString()
+  };
+
+  // Update elemen
+  statusElement.dataset.player = currentBet.player;
+  statusElement.dataset.time = currentBet.time;
+  statusElement.innerHTML = 'Status: <span style="color:gray;">Pending</span>';
+
+  // Perbarui status
+  updateStatus(statusElement);
+}
+
+// Inisialisasi saat halaman dimuat
+document.addEventListener('DOMContentLoaded', () => {
+  const statusElement = document.getElementById('status');
+  if (statusElement) {
+    // Gunakan data dari HTML jika ada, atau tunggu placeBet
+    if (statusElement.dataset.player && statusElement.dataset.time) {
+      currentBet = {
+        player: statusElement.dataset.player,
+        time: statusElement.dataset.time
+      };
+      updateStatus(statusElement);
+    }
+  }
+});
         
         const shortPlayer = bet.player.slice(0, 21) + "" + bet.player.slice(-21);
         const shortTxHash = bet.txHash.slice(0, 15) + "..." + bet.txHash.slice(-15);
@@ -345,7 +403,7 @@ updateStatus(bet);
           <p>Likes: <span style="color:#00cc51;">${likeCount}</span></p>
           <p>Comments: <span style="color:#00cc51;">${activeCommentCount}</span></p>
           <p>Payout: <span style="color:${Number(payoutAmount) > 0 ? '#00FF66' : '#fe6666'};">${payoutAmountEth} ETH</span> (${payoutAmount} wei)</p>
-          <p id="status"></p>
+          <p id="status">Status: <span>Loading...</span></p>
           <p>Total Bets in Contract: <span style="color:#1a88ff;">${totalBets}</span></p>
           <p>Player Total Bets: <span style="color:#1a88ff;">${stats[0]}</span></p>
           <p>Player Total Amount Bet: <span style="color:#1a88ff;">${web3.utils.fromWei(stats[1], 'ether')} ETH</span></p>
