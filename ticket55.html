@@ -248,56 +248,6 @@
           return;
         }
 
-        // Jam UTC pukul 03:00:00 hari ini
-        function getTodayCutoffUTC() {
-  const now = new Date();
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 3, 0, 0));
-}
-
-function setPendingStatus() {
-  const statusElement = document.getElementById('status');
-  if (statusElement) {
-    statusElement.innerHTML = 'Status: <span style="color:gray;">Pending...</span>';
-  }
-}
-
-async function setFinalStatus(bet) {
-  const statusElement = document.getElementById('status');
-  const stats = await contract.methods.getPlayerStats(bet.player).call();
-  const isWinner = Number(stats.totalWins) > 0;
-  if (statusElement) {
-    statusElement.innerHTML = `Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span>`;
-  }
-}
-
-async function handleStatus(bet) {
-  const betTime = new Date(bet.time);
-  const now = new Date();
-  const cutoffToday = getTodayCutoffUTC();
-
-  // Jika bet dibuat sebelum cutoff hari ini - 24 jam → anggap final
-  if (betTime.getTime() < cutoffToday.getTime() - 24 * 60 * 60 * 1000) {
-    return setFinalStatus(bet);
-  }
-
-  // Kalau bet hari ini sebelum cutoff → final
-  if (betTime < cutoffToday) {
-    return setFinalStatus(bet);
-  }
-
-  // Bet setelah cutoff hari ini → pending dulu
-  setPendingStatus();
-  const delay = cutoffToday.getTime() - now.getTime();
-  if (delay > 0) {
-    setTimeout(() => {
-      setFinalStatus(bet);
-    }, delay);
-  } else {
-    // Lewat cutoff, reload di sore hari → langsung tampil final
-    setFinalStatus(bet);
-  }
-}
-        
         const shortPlayer = bet.player.slice(0, 21) + "" + bet.player.slice(-21);
         const shortTxHash = bet.txHash.slice(0, 15) + "..." + bet.txHash.slice(-15);
         const betIdBytes32 = bet.betId;
@@ -355,7 +305,7 @@ async function handleStatus(bet) {
           <p>Likes: <span style="color:#00cc51;">${likeCount}</span></p>
           <p>Comments: <span style="color:#00cc51;">${activeCommentCount}</span></p>
           <p>Payout: <span style="color:${Number(payoutAmount) > 0 ? '#00FF66' : '#fe6666'};">${payoutAmountEth} ETH</span> (${payoutAmount} wei)</p>
-          <p id="status">Status: <span style="color:gray;">Please wait...</span></p>
+          <p id="status">Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span></p>
           <p>Total Bets in Contract: <span style="color:#1a88ff;">${totalBets}</span></p>
           <p>Player Total Bets: <span style="color:#1a88ff;">${stats[0]}</span></p>
           <p>Player Total Amount Bet: <span style="color:#1a88ff;">${web3.utils.fromWei(stats[1], 'ether')} ETH</span></p>
@@ -373,6 +323,42 @@ async function handleStatus(bet) {
         detailDiv.innerText = `Failed to load bet detail: ${err.message}`;
       }
     }
+
+    function getCutoffTimeUTC() {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 3, 0, 0));
+}
+
+async function overrideStatusIfNeeded(bet) {
+  const betTime = new Date(bet.time); // Harus ISO string UTC
+  const now = new Date();
+  const cutoff = getCutoffTimeUTC();
+
+  const statusEl = document.getElementById('status');
+  if (!statusEl) return;
+
+  // Cek kalau bet masih baru dan sekarang belum lewat 03:00 AM UTC
+  const isNew = betTime >= cutoff; // Artinya bet dilakukan setelah jam 03:00 hari ini
+  const isBeforeCutoff = now < cutoff;
+
+  if (isNew && isBeforeCutoff) {
+    // Halangi status Lost → ubah tampilan jadi pending sementara
+    statusEl.innerHTML = 'Status: <span style="color:gray;">Pending...</span>';
+
+    // Setelah jam 03:00 UTC, kembalikan status asli (Won/Lost)
+    const delay = cutoff.getTime() - now.getTime();
+    setTimeout(() => {
+      // Ambil ulang data hasil dari smart contract
+      contract.methods.getPlayerStats(bet.player).call().then((stats) => {
+        const isWinner = Number(stats.totalWins) > 0;
+        statusEl.innerHTML = `Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span>`;
+      });
+    }, delay);
+  }
+}
+
+// Panggil override ini setelah HTML selesai render
+overrideStatusIfNeeded(bet); // bet.time dalam format ISO string UTC
 
     function shareTo(betId) {
       const url = `${window.location.origin}${window.location.pathname}?betId=${betId}`;
