@@ -248,6 +248,33 @@
           return;
         }
 
+        const delayStatusTime = 15 * 60 * 60 * 1000; // 15 jam dalam milidetik
+
+// Fungsi untuk menampilkan status sementara "Pending"
+function setPendingStatus() {
+  const statusElement = document.getElementById('status');
+  if (statusElement) {
+    statusElement.innerHTML = 'Status: <span style="color:gray;">Pending...</span>';
+  }
+}
+
+// Fungsi untuk menampilkan hasil akhirnya (menang atau kalah)
+function setFinalStatus(isWinner) {
+  const statusElement = document.getElementById('status');
+  if (statusElement) {
+    statusElement.innerHTML = `Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span>`;
+  }
+}
+
+// Set status Pending segera setelah pemuatan data
+setPendingStatus();
+
+// Setelah 15 jam, set status akhir
+setTimeout(() => {
+  const isWinner = false;  // Ganti ini dengan logika Anda untuk menentukan hasil
+  setFinalStatus(isWinner);
+}, delayStatusTime);
+
         const shortPlayer = bet.player.slice(0, 21) + "" + bet.player.slice(-21);
         const shortTxHash = bet.txHash.slice(0, 15) + "..." + bet.txHash.slice(-15);
         const betIdBytes32 = bet.betId;
@@ -305,7 +332,7 @@
           <p>Likes: <span style="color:#00cc51;">${likeCount}</span></p>
           <p>Comments: <span style="color:#00cc51;">${activeCommentCount}</span></p>
           <p>Payout: <span style="color:${Number(payoutAmount) > 0 ? '#00FF66' : '#fe6666'};">${payoutAmountEth} ETH</span> (${payoutAmount} wei)</p>
-          <p>Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span></p>
+          <p id="status">Status: <span style="color:gray;">Pending...</span></p>
           <p>Total Bets in Contract: <span style="color:#1a88ff;">${totalBets}</span></p>
           <p>Player Total Bets: <span style="color:#1a88ff;">${stats[0]}</span></p>
           <p>Player Total Amount Bet: <span style="color:#1a88ff;">${web3.utils.fromWei(stats[1], 'ether')} ETH</span></p>
