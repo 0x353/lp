@@ -262,26 +262,27 @@
 
         const betAmount = bet.betAmount;
 
-        let gasUsed = "N/A";
+        const gasFeeElement = document.getElementById('gasFee');
+
+let gasUsed = "N/A";
 
 try {
   const txReceipt = await web3.eth.getTransactionReceipt(bet.txHash);
   if (txReceipt && txReceipt.gasUsed && txReceipt.effectiveGasPrice) {
     const totalGasCost = BigInt(txReceipt.gasUsed) * BigInt(txReceipt.effectiveGasPrice);
     gasUsed = web3.utils.fromWei(totalGasCost.toString(), 'ether');
+  } else {
+    gasUsed = "Pending...";  // Transaksi belum dikonfirmasi
   }
 } catch (e) {
   console.error("Error fetching gas fee:", e);
+  gasUsed = "Error";
 }
 
-// Pastikan DOM sudah siap sebelum akses
-const gasFeeElement = document.getElementById('gasFee');
 if (gasFeeElement) {
   gasFeeElement.innerText = `${gasUsed} ETH`;
-} else {
-  console.warn('gasFee element not found in DOM.');
 }
-
+        
         const totalBets = allBets.length;
         const timeDiff = Math.floor((Date.now() / 1000) - Number(bet.timestamp));
         const daysAgo = Math.floor(timeDiff / (60 * 60 * 24));
