@@ -545,20 +545,26 @@
     });
 
     function downloadQR() {
-      const hdSize = 3000;
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = hdSize;
-      canvas.height = hdSize;
+  const hdSize = 3000;
+  const padding = hdSize * 0.1; // Padding 10% dari ukuran canvas
+  const qrSize = hdSize - padding * 2; // Ukuran QR code setelah dikurangi padding
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = hdSize;
+  canvas.height = hdSize;
 
-      const hdQR = new QRious({
-        element: canvas,
-        value: window.location.href,
-        size: hdSize,
-        level: 'H',
-        background: '#ffffff',
-        foreground: '#007bff'
-      });
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, hdSize, hdSize);
+
+  const hdQR = new QRious({
+    element: canvas,
+    value: window.location.href,
+    size: qrSize,
+    level: 'H',
+    background: '#ffffff',
+    foreground: '#000000',
+    padding: padding
+  });
 
       const logo = new Image();
       logo.src = "img/logo.svg";
