@@ -362,67 +362,43 @@
     }
 
     function shareTo(betId) {
-  const url = `${window.location.origin}${window.location.pathname}?betId=${betId}`;
-  console.log("Generated URL:", url);
+      const url = `${window.location.origin}${window.location.pathname}?betId=${betId}`;
+      console.log("Generated URL:", url);
 
-  async function tryShare(isMobile) {
-    const element = document.getElementById("ticketDetail");
-
-    try {
-      const canvas = await html2canvas(element, {
-        scale: 5,
-        useCORS: true,
-        backgroundColor: "#121212"
-      });
-
-      const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
-      const uniqueId = "0x" + Math.random().toString(36).substring(2, 10);
-      const fileName = `LottoTicket${uniqueId}.png`;
-
-      const file = new File([blob], fileName, { type: "image/png" });
-
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          title: "Lotto Chain Ticket",
-          text: "Here's my ticket!",
-          files: [file],
-          url: url
-        });
-      } else {
-        console.warn("Web Share API with files not supported.");
-        if (isMobile) tryIntent();
-        else fallbackShare();
+      function tryShare(isMobile) {
+        if (navigator.share) {
+          console.log("Try Web Share API");
+          navigator.share({
+            title: "Lotto Chain Ticket",
+            text: "Here's my ticket!",
+            url: url
+          }).catch((err) => {
+            if (err.name !== "AbortError") {
+              console.error("Web Share failed:", err);
+              if (isMobile) tryIntent();
+              else fallbackShare();
+            }
+          });
+        } else {
+          console.log("Web Share not available");
+          if (isMobile) tryIntent();
+          else fallbackShare();
+        }
       }
-    } catch (err) {
-      console.error("Share failed:", err);
-      if (isMobile) tryIntent();
-      else fallbackShare();
-    }
-  }
 
-  function tryIntent() {
-    console.log("Try Intent on mobile");
-    const shareIntent = `intent://#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT=${encodeURIComponent(url)};end`;
-    try {
-      window.location.href = shareIntent;
-      setTimeout(() => {
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
-      }, 2000);
-    } catch (err) {
-      console.error("Intent error:", err);
-      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
-    }
-  }
-
-  function fallbackShare() {
-    // kamu bisa isi ini dengan modal atau salin link
-    alert("Web Share API tidak tersedia. Silakan salin link ini: " + url);
-  }
-
-  // Panggil fungsi utama
-  const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
-  tryShare(isMobile);
-    }
+      function tryIntent() {
+        console.log("Try Intent on mobile");
+        const shareIntent = `intent://#Intent;action=android.intent.action.SEND;type=text/plain;S.android.intent.extra.TEXT=${encodeURIComponent(url)};end`;
+        try {
+          window.location.href = shareIntent;
+          setTimeout(() => {
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+          }, 2000);
+        } catch (err) {
+          console.error("Intent error:", err);
+          window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+        }
+      }
 
       function fallbackShare() {
     // Daftar platform dan URL share-nya dengan ikon PNG
