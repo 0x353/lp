@@ -12,26 +12,16 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   
   <style>
-    body {
+     body {
       background-color: #000000;
       color: white;
+      padding: 20px;
       font-family: 'Ubuntu', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      text-align: center;
     }
     .container {
-    background-color: #222222;
-    padding: 20px;
-    border-radius: 10px;
-    width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
+      background-color: #222222;
+      padding: 20px;
+      border-radius: 10px;
     }
     h1, h2 {
       background: linear-gradient(90deg, #03a9f4, #f441a5);
@@ -323,8 +313,9 @@
           <p>Contract: <a href="https://sepolia.basescan.org/address/${contractAddress}" target="_blank" style="color:#1a88ff;">${contractAddress.slice(0, 6)}...${contractAddress.slice(-4)}</a></p>
           <div style="margin-top:10px;"><br>
             <button onclick="shareTo('${bet.betId}')" style="background:linear-gradient(90deg, #03a9f4, #f441a5); font-size: 13px; color:white; border:none; padding:7px 12px; border-radius:0.9em; cursor:pointer; margin-right:5px;">
-              <img src="img/share.svg" style="width:18px; height:18px; vertical-align:middle;"> Share to
-            </button>
+              <img src="img/share.svg" style="width:18px; height:18px; vertical-align:middle;"> Share to</button>
+              <h2 style="color: #ccc; font-size: 13px; font-family: 'Ubuntu', sans-serif; border:none; padding:7px 12px; cursor:pointer; margin-left:5px;">
+              <img src="img/logo.svg" style="width:30px; height:30px; vertical-align:middle;">  Lotto Chain Dezentralized Betting</h2></div>
           </div>
         `;
       } catch (err) {
