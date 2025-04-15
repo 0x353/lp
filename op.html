@@ -1,73 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tombol Opsi Berdampingan</title>
-    <style>
-        .button-container {
-            display: flex;
-            gap: 10px; /* Jarak antar tombol */
-        }
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        .dropbtn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .dropbtn:hover {
-            background-color: #45a049;
-        }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #f9f9f9;
-            min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
-            border-radius: 5px;
-        }
-        .dropdown-content a {
-            color: black;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-        }
-        .dropdown-content a:hover {
-            background-color: #f1f1f1;
-        }
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dropdown Keren</title>
+  <style>
+    body {
+      background: #000;
+      font-family: 'Ubuntu', sans-serif;
+      color: #fff;
+      padding: 40px;
+    }
+
+    .button-container {
+      display: flex;
+      gap: 20px;
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropbtn {
+      background-color: #111;
+      color: #fff;
+      padding: 10px 20px;
+      border: 1px solid #03a9f4;
+      cursor: pointer;
+      border-radius: 10px;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+
+    .dropbtn:hover {
+      background-color: #0a0a0a;
+      box-shadow: 0 0 10px #03a9f4;
+    }
+
+    .arrow {
+      font-size: 12px;
+      color: #ccc;
+      transition: transform 0.3s ease, color 0.3s;
+    }
+
+    .dropdown:hover .arrow {
+      transform: rotate(180deg);
+      color: #03a9f4;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #111;
+      border: 1px solid #03a9f4;
+      min-width: 180px;
+      box-shadow: 0px 8px 16px rgba(0,0,0,0.6);
+      border-radius: 10px;
+      z-index: 1;
+      margin-top: 5px;
+    }
+
+    .dropdown-content a {
+      color: #fff;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      transition: background 0.3s;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #03a9f4;
+      color: #000;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+  </style>
 </head>
 <body>
-    <div class="button-container">
-        <!-- Tombol Pools -->
-        <div class="dropdown">
-            <button class="dropbtn">Pools</button>
-            <div class="dropdown-content">
-                <a href="https://example.com/pool1">Pool 1</a>
-                <a href="https://example.com/pool2">Pool 2</a>
-                <a href="https://example.com/pool3">Pool 3</a>
-            </div>
-        </div>
 
-        <!-- Tombol Select Chain -->
-        <div class="dropdown">
-            <button class="dropbtn">Select Chain</button>
-            <div class="dropdown-content">
-                <a href="https://example.com/chain1">Chain 1</a>
-                <a href="https://example.com/chain2">Chain 2</a>
-                <a href="https://example.com/chain3">Chain 3</a>
-            </div>
-        </div>
+  <div class="button-container">
+    <!-- Dropdown Pools -->
+    <div class="dropdown">
+      <button class="dropbtn">Pools <span class="arrow">▼</span></button>
+      <div class="dropdown-content">
+        <a href="#">Pool 1</a>
+        <a href="#">Pool 2</a>
+        <a href="#">Pool 3</a>
+      </div>
     </div>
+
+    <!-- Dropdown Select Chain -->
+    <div class="dropdown">
+      <button class="dropbtn">Select Chain <span class="arrow">▼</span></button>
+      <div class="dropdown-content">
+        <a href="#">Chain 1</a>
+        <a href="#">Chain 2</a>
+        <a href="#">Chain 3</a>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
