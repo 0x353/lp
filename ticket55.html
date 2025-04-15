@@ -186,19 +186,21 @@
       text-shadow: 0 0 6px #03a9f4;
     }
       .watermark-page {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-family: 'Ubuntu', sans-serif;
-    font-size: 20px;
-    font-weight: bold;
-    color: rgba(204, 204, 204, 0.2);
-    pointer-events: none;
-    z-index: 1000;
-  }
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-45deg); /* Miring seperti "/" */
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 48px;
+  font-weight: bold;
+  color: rgba(204, 204, 204, 0.35); /* Kurangi transparansi */
+  pointer-events: none;
+  z-index: 1000;
+  white-space: nowrap;
+      }
 
-  #ticketContainer {
-    position: relative;
+  #ticketDetail {
+  position: relative;
   }
   </style>
 </head>
@@ -605,12 +607,12 @@
     }
 
     function downloadPNG() {
-  const element = document.querySelector(".container");
+  const element = document.querySelector("#ticketDetail");
 
   // Tambah watermark secara dinamis
   const watermark = document.createElement("div");
   watermark.className = "watermark-page";
-  watermark.innerText = "Lotto Chain";
+  watermark.innerText = "Lotto Chain | https://lottochain.org";
   element.appendChild(watermark);
 
   html2canvas(element, {
@@ -624,13 +626,10 @@
     link.href = canvas.toDataURL("image/png");
     link.click();
 
-    // Hapus watermark setelah selesai
-    watermark.remove();
+    watermark.remove(); // Hapus watermark setelah simpan
   }).catch(err => {
     console.error("Failed to create PNG:", err);
     alert("Failed to generate image. Check console for details.");
-
-    // Hapus watermark jika ada error
     watermark.remove();
   });
     }
