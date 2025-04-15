@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tombol Opsi Berdampingan</title>
+    <style>
+        .button-container {
+            display: flex;
+            gap: 10px; /* Jarak antar tombol */
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropbtn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .dropbtn:hover {
+            background-color: #45a049;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 5px;
+        }
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="button-container">
+        <!-- Tombol Pools -->
+        <div class="dropdown">
+            <button class="dropbtn">Pools</button>
+            <div class="dropdown-content">
+                <a href="https://example.com/pool1">Pool 1</a>
+                <a href="https://example.com/pool2">Pool 2</a>
+                <a href="https://example.com/pool3">Pool 3</a>
+            </div>
+        </div>
+
+        <!-- Tombol Select Chain -->
+        <div class="dropdown">
+            <button class="dropbtn">Select Chain</button>
+            <div class="dropdown-content">
+                <a href="https://example.com/chain1">Chain 1</a>
+                <a href="https://example.com/chain2">Chain 2</a>
+                <a href="https://example.com/chain3">Chain 3</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
