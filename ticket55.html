@@ -185,6 +185,21 @@
       color: #f441a5;
       text-shadow: 0 0 6px #03a9f4;
     }
+      .watermark-page {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    color: rgba(204, 204, 204, 0.2);
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  #ticketContainer {
+    position: relative;
+  }
   </style>
 </head>
 <body>
@@ -590,23 +605,36 @@
     }
 
     function downloadPNG() {
-      const element = document.querySelector(".container");
-      html2canvas(element, {
-        scale: 6,
-        useCORS: true,
-        backgroundColor: "#121212"
-      }).then(canvas => {
-        const link = document.createElement("a");
-        const uniqueId = Date.now();
-        link.download = "LottoChainTicket_${uniqueId}.png";
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-      }).catch(err => {
-        console.error("Failed to create PNG:", err);
-        alert("Failed to generate image. Check console for details.");
-      });
-    }
+  const element = document.querySelector(".container");
 
+  // Tambah watermark secara dinamis
+  const watermark = document.createElement("div");
+  watermark.className = "watermark-page";
+  watermark.innerText = "Lotto Chain";
+  element.appendChild(watermark);
+
+  html2canvas(element, {
+    scale: 6,
+    useCORS: true,
+    backgroundColor: "#121212"
+  }).then(canvas => {
+    const link = document.createElement("a");
+    const uniqueId = Date.now();
+    link.download = `LottoChainTicket_${uniqueId}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+
+    // Hapus watermark setelah selesai
+    watermark.remove();
+  }).catch(err => {
+    console.error("Failed to create PNG:", err);
+    alert("Failed to generate image. Check console for details.");
+
+    // Hapus watermark jika ada error
+    watermark.remove();
+  });
+    }
+    
     window.onload = loadBetDetail;
   </script>
 </body>
