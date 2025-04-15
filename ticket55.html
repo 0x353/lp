@@ -189,17 +189,22 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) rotate(-45deg); /* Miring seperti "/" */
-  font-family: 'Ubuntu', sans-serif;
-  font-size: 48px;
-  font-weight: bold;
-  color: rgba(204, 204, 204, 0.10); /* Kurangi transparansi */
+  transform: translate(-50%, -50%) rotate(-20deg);
   pointer-events: none;
   z-index: 1000;
-  white-space: nowrap;
-      }
+  opacity: 0.3;
+}
 
-  #ticketDetail {
+.watermark-line {
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 45px;
+  font-weight: bold;
+  color: rgba(204, 204, 204, 0.3);
+  line-height: 1.2;
+  text-align: center;
+}
+
+  #ticketContainer {
   position: relative;
   }
   </style>
@@ -607,13 +612,17 @@
     }
 
     function downloadPNG() {
-  const element = document.querySelector("#ticketDetail");
+  const element = document.querySelector("#ticketContainer");
 
   // Tambah watermark secara dinamis
   const watermark = document.createElement("div");
   watermark.className = "watermark-page";
-  watermark.innerText = "Lotto Chain | https://lottochain.org";
-  element.appendChild(watermark);
+  watermark.innerHTML = `
+  <div class="watermark-line">Lotto Chain Lotto Chain Lotto Chain Lotto Chain Lotto Chain Lotto Chain</div>
+  <div class="watermark-line">Lotto Chain Dezentralized Betting Lotto Chain Dezentralized Betting</div>
+  <div class="watermark-line">https://lottochain.org https://lottochain.org https://lottochain.org</div>
+`;
+element.appendChild(watermark);
 
   html2canvas(element, {
     scale: 6,
