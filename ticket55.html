@@ -187,7 +187,7 @@
     }
       .watermark-page {
   position: absolute;
-  top: 35%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) rotate(-45deg); /* Miring seperti "/" */
   font-family: 'Ubuntu', sans-serif;
@@ -350,8 +350,10 @@
           <p>Contract: <a href="https://sepolia.basescan.org/address/${contractAddress}" target="_blank" style="color:#1a88ff;">${contractAddress.slice(0, 6)}...${contractAddress.slice(-4)}</a></p>
           <div style="margin-top:10px;"><br>
             <button onclick="shareTo('${bet.betId}')" style="background:linear-gradient(90deg, #03a9f4, #f441a5); font-size: 13px; color:white; border:none; padding:7px 12px; border-radius:0.9em; cursor:pointer; margin-right:5px;">
-              <img src="img/share.svg" style="width:18px; height:18px; vertical-align:middle;"> Share to
-            </button>
+              <img src="img/share.svg" style="width:20px; height:20px; vertical-align:middle;"> Share to
+            </button><br>
+            <h2 style="background:linear-gradient(90deg, #03a9f4, #f441a5); font-size: 20px; border:none; padding:7px 12px; border-radius:0.9em; cursor:pointer; margin-left:5px;">
+              <img src="img/logo.svg" style="width:25px; height:25px; vertical-align:middle;"> powered by Lotto Chain © https://lottochain.org</h2>
           </div>
         `;
       } catch (err) {
