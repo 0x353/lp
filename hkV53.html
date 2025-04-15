@@ -1397,6 +1397,19 @@ window.addEventListener("load", async () => {
                     // Tampilkan ikon notifikasi setelah wallet terhubung
                     document.getElementById("notificationIcon").style.display = "block";
 
+                    const chainId = await ethereum.request({ method: 'eth_chainId' });
+const networkStatusEl = document.getElementById('networkStatus');
+
+if (chainId === '0x14a34') {
+    networkStatusEl.innerHTML = `<img src="img/base.svg" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 6px;">
+  <span id="networkText">Network: Base</span>`;
+    networkStatusEl.style.color = '#1a88ff'; // hijau
+} else {
+    networkStatusEl.innerText = `Unsupported Network`;
+    networkStatusEl.style.color = '#ff3333'; // merah
+}
+networkStatusEl.style.display = 'block';
+
                     updateBalance();
                     loadUserBets();
                     loadBetHistory();
