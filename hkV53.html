@@ -1104,7 +1104,10 @@ textarea:focus {
         <center><button id="connectWallet" onclick="connectWallet()"><img src="img/connect.svg" alt="Wallet Icon" width="20" height="20" style="vertical-align: middle; margin-right: 5px;">Connect Wallet</button>  
         <button id="disconnectWallet" onclick="disconnectWallet()" style="display:none;"><img src="img/close.svg" alt="Disconnect Icon" width="20" height="20" style="vertical-align: middle; margin-right: 5px;">Disconnect</button>
         </center>
-        <p id="networkStatus" style="display:none; font-weight:bold;" color: #00ca09;"></p>
+        <p id="networkStatus" style="display:none; font-weight:bold; color: #1a88ff;">
+  <img src="img/base.svg" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 6px;">
+  <span id="networkText">Network: Base</span>
+        </p>
         <p id="walletAddress" style="display:none; color: #ad5cff"></p>
         <p id="walletBalance" style="display:none; color: #00ca09;">Balance: 0 ETH</p><br>
         <hr style="background-color: #333333; height: 1px; border: none;">
@@ -1559,8 +1562,9 @@ async function connectWallet() {
 const networkStatusEl = document.getElementById('networkStatus');
 
 if (chainId === '0x14a34') {
-    networkStatusEl.innerText = `Network: Sepolia Base Testnet`;
-    networkStatusEl.style.color = '#00ca09'; // hijau
+    networkStatusEl.innerHTML = `<img src="img/base.svg" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 6px;">
+  <span id="networkText">Network: Base</span>`;
+    networkStatusEl.style.color = '#1a88ff'; // hijau
 } else {
     networkStatusEl.innerText = `Unsupported Network`;
     networkStatusEl.style.color = '#ff3333'; // merah
@@ -1636,10 +1640,8 @@ function disconnectWallet() {
     document.getElementById("connectWallet").style.display = "block";
     document.getElementById("disconnectWallet").style.display = "none";
     const networkStatusEl = document.getElementById("networkStatus");
-    if (networkStatusEl) {
-        networkStatusEl.innerText = "";
-        networkStatusEl.style.display = "none";
-    }
+    networkStatusEl.style.display = "none";
+    networkStatusEl.innerHTML = "";
 }
 
 // **Update Balance**
