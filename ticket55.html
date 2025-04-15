@@ -563,13 +563,13 @@
         ctx.restore();
 
         const watermarkY = logoY + logoSize + (hdSize * 0.07);
-        ctx.font = `${hdSize * 0.05}px Orbitron`;
+        ctx.font = `${hdSize * 0.05}px Ubuntu`;
         ctx.textAlign = "center";
         ctx.lineWidth = 1;
         ctx.shadowColor = "#03a9f4";
         ctx.shadowBlur = 6;
         ctx.fillStyle = "#ffffff";
-        ctx.fillText("Lotto Chain", hdSize / 2, watermarkY);
+        ctx.fillText("Lotto Chain Decentralized Betting", hdSize / 2, watermarkY);
 
         const gradient = ctx.createLinearGradient(0, 0, hdSize, 0);
         gradient.addColorStop(0, "#03a9f4");
