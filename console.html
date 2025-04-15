@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blank Page with Color Switch</title>
+    <style>
+        body {
+            background-color: white; /* Default putih */
+            transition: background-color 0.3s; /* Smooth transition */
+        }
+        .color-switch {
+            margin: 20px; /* Jarak dari tepi */
+        }
+        .color-switch button {
+            padding: 8px 16px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Opsi ganti warna -->
+    <div class="color-switch">
+        <button onclick="changeColor('white')">Putih</button>
+        <button onclick="changeColor('black')">Hitam</button>
+    </div>
+
+    <script>
+        function changeColor(color) {
+            document.body.style.backgroundColor = color;
+            console.log('Background diubah ke: ' + color);
+        }
+    </script>
+</body>
+</html>
