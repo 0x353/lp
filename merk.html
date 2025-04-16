@@ -1,14 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Lotto Chain</title>
-  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap" rel="stylesheet" />
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
       padding: 0;
@@ -65,36 +61,48 @@
   </style>
 </head>
 <body>
-  <button class="download-btn">Download Container</button>
+  <!-- Tombol download -->
+  <button class="download-btn" onclick="downloadPNG()">Download Container</button>
 
-  <div class="container" id="capture-area">
+  <!-- Area yang akan di-capture -->
+  <div class="container" id="ticketContainer">
     <div class="logo-title">
-      <img src="img/logo.svg" alt="Logo">
+      <img src="img/logo.svg" alt="Logo" />
       <h1>Lotto Chain</h1>
     </div>
   </div>
 
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <script>
-    document.querySelector(".download-btn").addEventListener("click", () => {
-      const element = document.getElementById("capture-area");
+    function downloadPNG() {
+      const element = document.getElementById("ticketContainer");
+      if (!element) {
+        console.error("ticketContainer not found");
+        alert("Failed to generate image: Container not found.");
+        return;
+      }
 
-      // Tunggu semua font selesai dimuat
-      document.fonts.ready.then(() => {
-        html2canvas(element, {
-          backgroundColor: null,
-          useCORS: true,
-          scale: 10,
-          width: 1280,
-          height: 720
-        }).then(canvas => {
-          const link = document.createElement("a");
-          link.download = "lotto-chain-container.png";
-          link.href = canvas.toDataURL("image/png");
-          link.click();
-        });
+      html2canvas(element, {
+        scale: 6,
+        useCORS: true,
+        backgroundColor: null // transparan
+      }).then(canvas => {
+        const link = document.createElement("a");
+
+        const randomHex = Math.random().toString(16).slice(2, 10); // 8 karakter hex
+        const date = new Date();
+        const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        const uniqueId = `0x${randomHex}`;
+        const fileName = `PageTicket_${uniqueId}-${formattedDate}.png`;
+
+        link.download = fileName;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      }).catch(err => {
+        console.error("Failed to create PNG:", err);
+        alert("Failed to generate image. Check console for details.");
       });
-    });
+    }
   </script>
 </body>
 </html>
