@@ -245,6 +245,7 @@ html {
       </center>
     </div><br><br>
     <div class="button-container">
+      <button onclick="downloadTCT()">Download Ticket HD</button>
       <button onclick="downloadPNG()">Download Ticket HD</button>
       <button id="toggleQRBtn">Show QR</button>
     </div><br><br>
@@ -766,6 +767,36 @@ function downloadPNG() {
     });
 }
 
+function downloadTCT() {
+    const element = document.getElementById("ticketDetail");
+    if (!element) {
+        console.error("ticketDetail not found");
+        alert("Failed to generate image: Container not found.");
+        return;
+    }
+
+    html2canvas(element, {
+        scale: 6,
+        useCORS: true,
+        backgroundColor: "#121212"
+    }).then(canvas => {
+        const link = document.createElement("a");
+
+        const randomHex = Math.random().toString(16).slice(2, 10); // 8 karakter hex
+        const date = new Date();
+        const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        const uniqueId = `0x${randomHex}`;
+        const fileName = `PublicTicket_${uniqueId}-${formattedDate}.png`;
+
+        link.download = fileName;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+    }).catch(err => {
+        console.error("Failed to create PNG:", err);
+        alert("Failed to generate image. Check console for details.");
+    });
+}
+    
 // Inisialisasi setelah DOM siap
 document.addEventListener("DOMContentLoaded", () => {
     console.log("DOM fully loaded");
