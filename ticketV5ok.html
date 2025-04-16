@@ -200,27 +200,38 @@
     // Ganti dengan ABI kontrak asli Anda
     const abi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"liker","type":"address"},{"indexed":false,"internalType":"uint256","name":"likeCount","type":"uint256"}],"name":"BetLiked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"liker","type":"address"}],"name":"BetLiked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"liker","type":"address"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"},{"indexed":false,"internalType":"string","name":"likeType","type":"string"}],"name":"BetLiked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"liker","type":"address"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"},{"indexed":false,"internalType":"string","name":"likeType","type":"string"},{"indexed":false,"internalType":"uint256","name":"newLikeCount","type":"uint256"}],"name":"BetLiked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"liker","type":"address"},{"indexed":true,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":false,"internalType":"uint256","name":"newLikeCount","type":"uint256"}],"name":"BetLiked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":false,"internalType":"string","name":"number","type":"string"},{"indexed":false,"internalType":"uint256","name":"betAmount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"blockNumber","type":"uint256"},{"indexed":false,"internalType":"bytes32","name":"txHash","type":"bytes32"}],"name":"BetPlaced","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"drawId","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"winningNumber","type":"uint256"}],"name":"BetResultSet","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"liker","type":"address"},{"indexed":false,"internalType":"uint256","name":"likeCount","type":"uint256"}],"name":"BetUnliked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"liker","type":"address"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"newLikeCount","type":"uint256"}],"name":"BetUnliked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"winner","type":"address"},{"indexed":false,"internalType":"uint256","name":"winningNumber","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"prize","type":"uint256"}],"name":"BetWon","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"commenter","type":"address"},{"indexed":false,"internalType":"string","name":"comment","type":"string"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"CommentAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"commentIndex","type":"uint256"}],"name":"CommentDeleted","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"commentIndex","type":"uint256"},{"indexed":false,"internalType":"string","name":"newComment","type":"string"}],"name":"CommentUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"winner","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"ETHClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"winner","type":"address"}],"name":"LastWinnerUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint256","name":"totalPlayers","type":"uint256"}],"name":"PlayerJoined","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"winner","type":"address"},{"indexed":false,"internalType":"uint256","name":"reward","type":"uint256"}],"name":"RewardDistributed","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":false,"internalType":"uint256","name":"totalComments","type":"uint256"}],"name":"TotalCommentsUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"totalPayout","type":"uint256"}],"name":"TotalPayoutUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"totalPlayers","type":"uint256"}],"name":"TotalPlayersUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"newTotalPrizes","type":"uint256"}],"name":"TotalPrizesUpdated","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"winner","type":"address"},{"indexed":false,"internalType":"uint256","name":"prize","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"totalWinners","type":"uint256"}],"name":"WinnerAnnounced","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"winner","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"WinnerSet","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"bytes32","name":"betId","type":"bytes32"},{"indexed":true,"internalType":"address","name":"winner","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"number","type":"uint256"}],"name":"WinnerSet","type":"event"},{"inputs":[{"internalType":"bytes32","name":"betId","type":"bytes32"},{"internalType":"string","name":"_comment","type":"string"}],"name":"addComment","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"betComments","outputs":[{"internalType":"address","name":"commenter","type":"address"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"string","name":"commentText","type":"string"},{"internalType":"bool","name":"isDeleted","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"betHistory","outputs":[{"internalType":"address","name":"player","type":"address"},{"internalType":"bytes32","name":"betId","type":"bytes32"},{"internalType":"string","name":"number","type":"string"},{"internalType":"uint256","name":"betAmount","type":"uint256"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"uint256","name":"blockNumber","type":"uint256"},{"internalType":"bytes32","name":"txHash","type":"bytes32"},{"internalType":"bool","name":"isETH","type":"bool"},{"internalType":"uint256","name":"likeCount","type":"uint256"},{"internalType":"uint256","name":"commentCount","type":"uint256"},{"internalType":"uint256","name":"payoutAmount","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"betLikeCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"betLikeDetails","outputs":[{"internalType":"address","name":"liker","type":"address"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"string","name":"likeType","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"betLikeList","outputs":[{"internalType":"address","name":"liker","type":"address"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"string","name":"likeType","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"betLikers","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"address","name":"","type":"address"}],"name":"betLikes","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"betLikesArray","outputs":[{"internalType":"address","name":"liker","type":"address"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"string","name":"likeType","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"betPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"betResults","outputs":[{"internalType":"uint256","name":"drawId","type":"uint256"},{"internalType":"uint256","name":"winningNumber","type":"uint256"},{"internalType":"bool","name":"isProcessed","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"betToDrawId","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"betWinners","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"bets","outputs":[{"internalType":"address","name":"player","type":"address"},{"internalType":"bytes32","name":"betId","type":"bytes32"},{"internalType":"string","name":"number","type":"string"},{"internalType":"uint256","name":"betAmount","type":"uint256"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"uint256","name":"blockNumber","type":"uint256"},{"internalType":"bytes32","name":"txHash","type":"bytes32"},{"internalType":"bool","name":"isETH","type":"bool"},{"internalType":"uint256","name":"likeCount","type":"uint256"},{"internalType":"uint256","name":"commentCount","type":"uint256"},{"internalType":"uint256","name":"payoutAmount","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"claimETH","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"commentCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"contractBalance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"betId","type":"bytes32"},{"internalType":"uint256","name":"commentIndex","type":"uint256"}],"name":"deleteComment","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"distributeReward","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"betId","type":"bytes32"},{"internalType":"uint256","name":"commentIndex","type":"uint256"},{"internalType":"string","name":"newComment","type":"string"}],"name":"editComment","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getAllBets","outputs":[{"components":[{"internalType":"address","name":"player","type":"address"},{"internalType":"bytes32","name":"betId","type":"bytes32"},{"internalType":"string","name":"number","type":"string"},{"internalType":"uint256","name":"betAmount","type":"uint256"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"uint256","name":"blockNumber","type":"uint256"},{"internalType":"bytes32","name":"txHash","type":"bytes32"},{"internalType":"bool","name":"isETH","type":"bool"},{"internalType":"uint256","name":"likeCount","type":"uint256"},{"internalType":"uint256","name":"commentCount","type":"uint256"},{"internalType":"uint256","name":"payoutAmount","type":"uint256"}],"internalType":"struct BetHistory.Bet[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getAllPlayers","outputs":[{"internalType":"address[]","name":"","type":"address[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getAllWinners","outputs":[{"internalType":"address[]","name":"","type":"address[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"betId","type":"bytes32"}],"name":"getBetLikers","outputs":[{"internalType":"address[]","name":"","type":"address[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"betId","type":"bytes32"}],"name":"getComments","outputs":[{"components":[{"internalType":"address","name":"commenter","type":"address"},{"internalType":"string","name":"text","type":"string"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"bool","name":"isDeleted","type":"bool"}],"internalType":"struct BetHistory.CommentData[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"betId","type":"bytes32"}],"name":"getLikeCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_player","type":"address"}],"name":"getPlayerStats","outputs":[{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"topN","type":"uint256"}],"name":"getTopPlayers","outputs":[{"internalType":"address[]","name":"","type":"address[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_user","type":"address"}],"name":"getUserBets","outputs":[{"components":[{"internalType":"address","name":"player","type":"address"},{"internalType":"bytes32","name":"betId","type":"bytes32"},{"internalType":"string","name":"number","type":"string"},{"internalType":"uint256","name":"betAmount","type":"uint256"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"uint256","name":"blockNumber","type":"uint256"},{"internalType":"bytes32","name":"txHash","type":"bytes32"},{"internalType":"bool","name":"isETH","type":"bool"},{"internalType":"uint256","name":"likeCount","type":"uint256"},{"internalType":"uint256","name":"commentCount","type":"uint256"},{"internalType":"uint256","name":"payoutAmount","type":"uint256"}],"internalType":"struct BetHistory.Bet[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_betId","type":"uint256"}],"name":"getWinnerByBetId","outputs":[{"components":[{"internalType":"address","name":"winner","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"uint256","name":"number","type":"uint256"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"uint256","name":"prizesETH","type":"uint256"}],"internalType":"struct BetHistory.WinnerData","name":"","type":"tuple"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"address","name":"","type":"address"}],"name":"hasLiked","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"betId","type":"bytes32"},{"internalType":"address","name":"user","type":"address"}],"name":"hasUserLiked","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"lastLeaderboardReset","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"lastWinner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"betId","type":"bytes32"},{"internalType":"string","name":"likeType","type":"string"}],"name":"likeBet","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"maxBet","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"minBet","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"_number","type":"string"},{"internalType":"uint256","name":"_times","type":"uint256"},{"internalType":"bool","name":"_isETH","type":"bool"},{"internalType":"uint256","name":"_payoutAmount","type":"uint256"}],"name":"placeBet","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"playerBets","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"playerStats","outputs":[{"internalType":"uint256","name":"totalBets","type":"uint256"},{"internalType":"uint256","name":"totalAmountBet","type":"uint256"},{"internalType":"uint256","name":"totalWins","type":"uint256"},{"internalType":"uint256","name":"totalPayout","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"playerWins","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"players","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"rewardAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_drawId","type":"uint256"},{"internalType":"uint256","name":"_winningNumber","type":"uint256"}],"name":"setBetResult","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_winner","type":"address"},{"internalType":"uint256","name":"_amount","type":"uint256"},{"internalType":"uint256","name":"_betId","type":"uint256"},{"internalType":"uint256","name":"_number","type":"uint256"}],"name":"setWinner","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"topBettor","outputs":[{"internalType":"address","name":"player","type":"address"},{"internalType":"uint256","name":"totalBets","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"totalBetsByPlayer","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"totalComments","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"totalLikes","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalPayout","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"totalPayoutPerDraw","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalPlayers","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalWinners","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"betId","type":"bytes32"}],"name":"unlikeBet","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"userBets","outputs":[{"internalType":"address","name":"player","type":"address"},{"internalType":"bytes32","name":"betId","type":"bytes32"},{"internalType":"string","name":"number","type":"string"},{"internalType":"uint256","name":"betAmount","type":"uint256"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"uint256","name":"blockNumber","type":"uint256"},{"internalType":"bytes32","name":"txHash","type":"bytes32"},{"internalType":"bool","name":"isETH","type":"bool"},{"internalType":"uint256","name":"likeCount","type":"uint256"},{"internalType":"uint256","name":"commentCount","type":"uint256"},{"internalType":"uint256","name":"payoutAmount","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"winnerHistory","outputs":[{"internalType":"address","name":"winner","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"uint256","name":"number","type":"uint256"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"uint256","name":"prizesETH","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"winnings","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"withdrawETH","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
 
-    async function loadBetDetail() {
-      const detailDiv = document.getElementById("ticketDetail");
+        async function loadBetDetail() {
+    const detailDiv = document.getElementById("ticketDetail");
+    if (!detailDiv) {
+        console.error("ticketDetail element not found");
+        return;
+    }
 
-      if (typeof window.ethereum === 'undefined') {
+    detailDiv.innerHTML = `
+        <center style="color: #00FF66;">
+            <img src="img/loading.svg" style="vertical-align: middle; width: 24px; height: 24px; margin-right: 8px;">
+            Please wait, data is loading...
+        </center>
+    `;
+
+    if (typeof window.ethereum === 'undefined') {
         detailDiv.innerHTML = 'MetaMask or Web3 provider not found. Please install <a href="https://metamask.io" target="_blank">MetaMask</a>.';
         return;
-      }
+    }
 
-      try {
+    try {
         const web3 = new Web3(window.ethereum);
         await window.ethereum.request({ method: 'eth_requestAccounts' });
 
         const chainId = await web3.eth.getChainId();
         if (Number(chainId) !== 84532) {
-          detailDiv.innerText = "Please switch to Base Sepolia Testnet in MetaMask.";
-          return;
+            detailDiv.innerText = "Please switch to Base Sepolia Testnet in MetaMask.";
+            return;
         }
 
         if (!abi || !Array.isArray(abi) || abi.length === 0) {
-          detailDiv.innerText = "Error: ABI is not defined or invalid.";
-          return;
+            detailDiv.innerText = "Error: ABI is not defined or invalid.";
+            return;
         }
 
         const contract = new web3.eth.Contract(abi, contractAddress);
@@ -229,25 +240,25 @@
 
         console.log("Bet ID dari URL:", betIdParam);
         if (!betIdParam || !web3.utils.isHexStrict(betIdParam) || betIdParam.length !== 66) {
-          detailDiv.innerText = "Invalid Bet ID in URL. Must be a 32-byte hex string (e.g., 0x followed by 64 hex characters).";
-          return;
+            detailDiv.innerText = "Invalid Bet ID in URL. Must be a 32-byte hex string (e.g., 0x followed by 64 hex characters).";
+            return;
         }
 
         const allBets = await contract.methods.getAllBets().call();
         console.log("Data allBets:", allBets);
 
         if (!allBets || allBets.length === 0) {
-          detailDiv.innerText = "No bets found in the contract.";
-          return;
+            detailDiv.innerText = "No bets found in the contract.";
+            return;
         }
 
         const bet = allBets.find(b => b.betId.toLowerCase() === betIdParam.toLowerCase());
         if (!bet) {
-          detailDiv.innerText = `Bet with ID ${betIdParam} not found in the contract.`;
-          return;
+            detailDiv.innerText = `Bet with ID ${betIdParam} not found in the contract.`;
+            return;
         }
 
-        const shortPlayer = bet.player.slice(0, 21) + "" + bet.player.slice(-21);
+        const shortPlayer = bet.player.slice(0, 21) + "..." + bet.player.slice(-21);
         const shortTxHash = bet.txHash.slice(0, 15) + "..." + bet.txHash.slice(-15);
         const betIdBytes32 = bet.betId;
         const likeCount = await contract.methods.getLikeCount(betIdBytes32).call();
@@ -259,16 +270,17 @@
         const payoutAmount = isWinner ? winnerData.amount : "0";
         const payoutAmountEth = web3.utils.fromWei(payoutAmount, 'ether');
 
-        const betAmount = bet.betAmount;
+        const betAmount = web3.utils.fromWei(bet.betAmount, 'ether'); // Asumsi betAmount dalam wei
 
         let gasUsed = "N/A";
         try {
-          const txReceipt = await web3.eth.getTransactionReceipt(bet.txHash);
-          if (txReceipt) {
-            gasUsed = web3.utils.fromWei((txReceipt.gasUsed * txReceipt.effectiveGasPrice).toString(), 'ether');
-          }
+            const txReceipt = await web3.eth.getTransactionReceipt(bet.txHash);
+            if (txReceipt && txReceipt.gasUsed && txReceipt.effectiveGasPrice) {
+                const gasCost = BigInt(txReceipt.gasUsed) * BigInt(txReceipt.effectiveGasPrice);
+                gasUsed = web3.utils.fromWei(gasCost.toString(), 'ether');
+            }
         } catch (e) {
-          console.error("Error fetching gas fee:", e);
+            console.error("Error fetching gas fee:", e);
         }
 
         const totalBets = allBets.length;
@@ -281,62 +293,67 @@
         let totalPayout = web3.utils.toBN("0");
         const userBets = await contract.methods.getUserBets(bet.player).call();
         for (const userBet of userBets) {
-          const winner = await contract.methods.getWinnerByBetId(userBet.betId).call();
-          if (winner.winner === bet.player && Number(winner.amount) > 0) {
-            totalWins++;
-            totalPayout = totalPayout.add(web3.utils.toBN(winner.amount));
-          }
+            const winner = await contract.methods.getWinnerByBetId(userBet.betId).call();
+            if (winner.winner === bet.player && Number(winner.amount) > 0) {
+                totalWins++;
+                totalPayout = totalPayout.add(web3.utils.toBN(winner.amount));
+            }
         }
         const totalPayoutEth = web3.utils.fromWei(totalPayout, 'ether');
 
         detailDiv.innerHTML = `
-          <p>Player: <a href="https://sepolia.basescan.org/address/${bet.player}" target="_blank" style="color:#ad5cff;">${shortPlayer}</a></p>
-          <p>Bet ID: <span style="color:#b37500;">${bet.betId}</span>
-            <button onclick="navigator.clipboard.writeText('${bet.betId}'); alert('Bet ID copied!')" style="background:#111111; color:white; border:none; padding:5px 10px; border-radius:0.9em; cursor:pointer; margin-left:10px;">Copy</button>
-          </p>
-          <p>Bet Number: <span style="color:#00FF66;">${bet.number}</span></p>
-          <p>Bet Amount: <span style="color:#00FF66;">${betAmount}</span></p>
-          <p>Is ETH: <span style="color:${bet.isETH ? '#00FF66' : '#fe6666'};">${bet.isETH ? 'Yes' : 'No'}</span></p>
-          <p>Transaction: <a href="https://sepolia.basescan.org/tx/${bet.txHash}" target="_blank" style="color:#fe6666;">${shortTxHash}</a></p>
-          <p>Gas Fee: <span style="color:#ffcc00;">${gasUsed} ETH</span></p>
-          <p>Block: <a href="https://sepolia.basescan.org/block/${bet.blockNumber}" target="_blank">${bet.blockNumber}</a></p>
-          <p>Time: <span style="color:orange;">${new Date(Number(bet.timestamp) * 1000).toISOString()} UTC</span> (<span style="color:#ffcc00;">${relativeTime}</span>)</p>
-          <p>Likes: <span style="color:#00cc51;">${likeCount}</span></p>
-          <p>Comments: <span style="color:#00cc51;">${activeCommentCount}</span></p>
-          <p>Payout: <span style="color:${Number(payoutAmount) > 0 ? '#00FF66' : '#fe6666'};">${payoutAmountEth} ETH</span> (${payoutAmount} wei)</p>
-          <p>Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span></p>
-          <p>Total Bets in Contract: <span style="color:#1a88ff;">${totalBets}</span></p>
-          <p>Player Total Bets: <span style="color:#1a88ff;">${stats[0]}</span></p>
-          <p>Player Total Amount Bet: <span style="color:#1a88ff;">${web3.utils.fromWei(stats[1], 'ether')} ETH</span></p>
-          <p>Player Total Wins: <span style="color:#1a88ff;">${totalWins}</span></p>
-          <p>Player Total Payout: <span style="color:#1a88ff;">${totalPayoutEth} ETH</span></p>
-          <p>Contract: <a href="https://sepolia.basescan.org/address/${contractAddress}" target="_blank" style="color:#1a88ff;">${contractAddress.slice(0, 6)}...${contractAddress.slice(-4)}</a></p>
-          <div style="margin-top:10px;"><br>
-            <button onclick="shareTo('${bet.betId}')" style="background:linear-gradient(90deg, #03a9f4, #f441a5); font-size: 13px; color:white; border:none; padding:7px 12px; border-radius:0.9em; cursor:pointer; margin-right:5px;">
-              <img src="img/share.svg" style="width:18px; height:18px; vertical-align:middle;"> Share to</button>
-              <h2 style="color: #ccc; font-size: 13px; font-family: 'Ubuntu', sans-serif; border:none; padding:7px 12px; cursor:pointer; margin-left:5px;">
-              <img src="img/logo.svg" style="width:30px; height:30px; vertical-align:middle;">  Lotto Chain Dezentralized Betting</h2></div>
-          </div>
+            <p>Player: <a href="https://sepolia.basescan.org/address/${bet.player}" target="_blank" style="color:#ad5cff;">${shortPlayer}</a></p>
+            <p>Bet ID: <span style="color:#b37500;">${bet.betId}</span>
+                <button onclick="navigator.clipboard.writeText('${bet.betId}'); alert('Bet ID copied!')" style="background:#111111; color:white; border:none; padding:5px 10px; border-radius:0.9em; cursor:pointer; margin-left:10px;">Copy</button>
+            </p>
+            <p>Bet Number: <span style="color:#00FF66;">${bet.number}</span></p>
+            <p>Bet Amount: <span style="color:#00FF66;">${betAmount} ETH</span></p>
+            <p>Is ETH: <span style="color:${bet.isETH ? '#00FF66' : '#fe6666'};">${bet.isETH ? 'Yes' : 'No'}</span></p>
+            <p>Transaction: <a href="https://sepolia.basescan.org/tx/${bet.txHash}" target="_blank" style="color:#fe6666;">${shortTxHash}</a></p>
+            <p>Gas Fee: <span style="color:#ffcc00;">${gasUsed} ETH</span></p>
+            <p>Block: <a href="https://sepolia.basescan.org/block/${bet.blockNumber}" target="_blank">${bet.blockNumber}</a></p>
+            <p>Time: <span style="color:orange;">${new Date(Number(bet.timestamp) * 1000).toISOString()} UTC</span> (<span style="color:#ffcc00;">${relativeTime}</span>)</p>
+            <p>Likes: <span style="color:#00cc51;">${likeCount}</span></p>
+            <p>Comments: <span style="color:#00cc51;">${activeCommentCount}</span></p>
+            <p>Payout: <span style="color:${Number(payoutAmount) > 0 ? '#00FF66' : '#fe6666'};">${payoutAmountEth} ETH</span> (${payoutAmount} wei)</p>
+            <p>Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span></p>
+            <p>Total Bets in Contract: <span style="color:#1a88ff;">${totalBets}</span></p>
+            <p>Player Total Bets: <span style="color:#1a88ff;">${stats[0]}</span></p>
+            <p>Player Total Amount Bet: <span style="color:#1a88ff;">${web3.utils.fromWei(stats[1], 'ether')} ETH</span></p>
+            <p>Player Total Wins: <span style="color:#1a88ff;">${totalWins}</span></p>
+            <p>Player Total Payout: <span style="color:#1a88ff;">${totalPayoutEth} ETH</span></p>
+            <p>Contract: <a href="https://sepolia.basescan.org/address/${contractAddress}" target="_blank" style="color:#1a88ff;">${contractAddress.slice(0, 6)}...${contractAddress.slice(-4)}</a></p>
+            <div style="margin-top:10px;"><br>
+                <button onclick="shareTo('${bet.betId}')" style="background:linear-gradient(90deg, #03a9f4, #f441a5); font-size: 13px; color:white; border:none; padding:7px 12px; border-radius:0.9em; cursor:pointer; margin-right:5px;">
+                    <img src="img/share.svg" style="width:18px; height:18px; vertical-align:middle;"> Share to
+                </button>
+                <h2 style="color: #ccc; font-size: 13px; font-family: 'Ubuntu', sans-serif; border:none; padding:7px 12px; cursor:pointer; margin-left:5px;">
+                    <img src="img/logo.svg" style="width:30px; height:30px; vertical-align:middle;"> Lotto Chain Decentralized Betting
+                </h2>
+            </div>
         `;
-      } catch (err) {
+    } catch (err) {
         console.error("Error loading ticket:", err);
-        detailDiv.innerText = `Failed to load bet detail: ${err.message}`;
-      }
+        detailDiv.innerHTML = `Failed to load bet detail: ${err.message}. Please check MetaMask connection, network, or Bet ID.`;
     }
+}
 
-    function shareTo(betId) {
+function shareTo(betId) {
     const url = `${window.location.origin}${window.location.pathname}?betId=${betId}`;
     console.log("Generated URL:", url);
 
-    // Ambil container untuk di-render sebagai gambar
     const container = document.getElementById('ticketContainer');
+    if (!container) {
+        console.error("ticketContainer not found");
+        alert("Failed to share: Ticket container not found.");
+        return;
+    }
 
-    // Gunakan html2canvas untuk mengonversi container ke gambar
     html2canvas(container, {
-        backgroundColor: '#ffffff', // Atur background jika perlu
-        scale: 2 // Tingkatkan resolusi
+        backgroundColor: '#121212',
+        scale: 2,
+        useCORS: true
     }).then(canvas => {
-        // Konversi canvas ke blob untuk sharing
         canvas.toBlob(blob => {
             const file = new File([blob], `ticket-${betId}.png`, { type: 'image/png' });
 
@@ -347,7 +364,7 @@
                         title: "Share Bet",
                         text: "Check out my Lotto Chain ticket!",
                         url: url,
-                        files: [file] // Tambahkan gambar
+                        files: [file]
                     }).catch(err => {
                         if (err.name !== "AbortError") {
                             console.error("Web Share failed:", err);
@@ -363,260 +380,313 @@
             }
 
             function tryIntent() {
-                // Intent untuk mobile (hanya URL, karena file sulit via intent)
                 const intentUrl = `intent://${window.location.host}${window.location.pathname}?betId=${betId}#Intent;scheme=https;package=com.android.chrome;end`;
                 window.location.href = intentUrl;
             }
 
             function fallbackShare(file) {
-                // Fallback: Copy URL dan beri tahu user gambar tersedia
-                navigator.clipboard.writeText(url).then(() => {
-                    alert("Link copied to clipboard! Image is ready to download manually.");
-                    // Opsional: Trigger download gambar
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(file);
-                    link.download = `ticket-${betId}.png`;
-                    link.click();
-                }).catch(err => {
-                    console.error("Failed to copy:", err);
-                    alert("Please copy this link: " + url);
-                });
+                const shareOptions = [
+                    { name: "Facebook", url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, icon: "img/facebook.svg" },
+                    { name: "Twitter", url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=Check%20this%20out!`, icon: "img/twitter.svg" },
+                    { name: "WhatsApp", url: `https://api.whatsapp.com/send?text=${encodeURIComponent("Check this out: " + url)}`, icon: "img/wa.svg" },
+                    { name: "LinkedIn", url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, icon: "img/linke.svg" },
+                    { name: "Email", url: `mailto:?subject=Check%20this%20out&body=${encodeURIComponent(url)}`, icon: "img/email.svg" },
+                    { name: "Telegram", url: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=Check%20this%20out!`, icon: "img/telegram.svg" },
+                    { name: "Reddit", url: `https://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=Check%20this%20out!`, icon: "img/reddit.svg" },
+                    { name: "Discord", url: `https://discord.com/channels/@me?content=${encodeURIComponent("Check this out: " + url)}`, icon: "img/discord.svg" }
+                ];
+
+                const existingModal = document.getElementById("shareModal");
+                if (existingModal) existingModal.remove();
+
+                const modal = document.createElement("div");
+                modal.id = "shareModal";
+                modal.style.cssText = `
+                    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                    background: #000000; padding: 20px; border-radius: 8px;
+                    box-shadow: 0 0 12px rgba(80, 160, 255, 0.3), 0 0 18px rgba(80, 160, 255, 0.2);
+                    z-index: 1000; text-align: center;
+                `;
+                modal.innerHTML = `
+                    <h1>Share To</h1>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                        ${shareOptions.map(opt => `
+                            <button style="padding: 10px; background: #000000; border: none; border-radius: 0.9em; cursor: pointer;"
+                                    onclick="window.open('${opt.url}', '_blank'); document.getElementById('shareModal').remove();">
+                                <img src="${opt.icon}" alt="${opt.name}" width="32" height="32" style="display: block;">
+                            </button>
+                        `).join("")}
+                    </div>
+                    <button style="margin-top: 15px; padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 0.9em; cursor: pointer;"
+                            onclick="document.getElementById('shareModal').remove();">
+                        Close
+                    </button>
+                `;
+                document.body.appendChild(modal);
+
+                if (file) {
+                    navigator.clipboard.writeText(url).then(() => {
+                        alert("Link copied to clipboard! Image is ready to download.");
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(file);
+                        link.download = `ticket-${betId}.png`;
+                        link.click();
+                    }).catch(err => {
+                        console.error("Failed to copy:", err);
+                        alert("Please copy this link: " + url);
+                    });
+                } else {
+                    navigator.clipboard.writeText(url).then(() => {
+                        alert("Link copied to clipboard!");
+                    }).catch(err => {
+                        console.error("Failed to copy:", err);
+                        alert("Please copy this link: " + url);
+                    });
+                }
             }
 
-            // Deteksi perangkat mobile
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             tryShare(isMobile);
         }, 'image/png');
     }).catch(err => {
         console.error("Failed to generate image:", err);
-        // Fallback ke share hanya URL jika gagal
-        tryShare(false);
-    });
-                                                        }
-    const shareOptions = [
-        {
-            name: "Facebook",
-            url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
-            icon: "img/facebook.svg"
-        },
-        {
-            name: "Twitter",
-            url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=Check%20this%20out!`,
-            icon: "img/twitter.svg"
-        },
-        {
-            name: "WhatsApp",
-            url: `https://api.whatsapp.com/send?text=${encodeURIComponent("Check this out: " + url)}`,
-            icon: "img/wa.svg"
-        },
-        {
-            name: "LinkedIn",
-            url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
-            icon: "img/linke.svg"
-        },
-        {
-            name: "Email",
-            url: `mailto:?subject=Check%20this%20out&body=${encodeURIComponent(url)}`,
-            icon: "img/email.svg"
-        },
-        {
-            name: "Telegram",
-            url: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=Check%20this%20out!`,
-            icon: "img/telegram.svg"
-        },
-        {
-            name: "Reddit",
-            url: `https://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=Check%20this%20out!`,
-            icon: "img/reddit.svg"
-        },
-        {
-            name: "Discord",
-            url: `https://discord.com/channels/@me?content=${encodeURIComponent("Check this out: " + url)}`,
-            icon: "img/discord.svg"
+        // Fallback ke share hanya URL
+        function tryShare(isMobile) {
+            if (navigator.share) {
+                navigator.share({
+                    title: "Share Bet",
+                    text: "Check out my Lotto Chain ticket!",
+                    url: url
+                }).catch(err => {
+                    if (err.name !== "AbortError") {
+                        console.error("Web Share failed:", err);
+                        if (isMobile) tryIntent();
+                        else fallbackShare(null);
+                    }
+                });
+            } else {
+                if (isMobile) tryIntent();
+                else fallbackShare(null);
+            }
         }
-    ];
 
-    // Cek apakah modal sudah ada, hapus kalau ada
-    const existingModal = document.getElementById("shareModal");
-    if (existingModal) existingModal.remove();
+        function tryIntent() {
+            const intentUrl = `intent://${window.location.host}${window.location.pathname}?betId=${betId}#Intent;scheme=https;package=com.android.chrome;end`;
+            window.location.href = intentUrl;
+        }
 
-    // Buat modal
-    const modal = document.createElement("div");
-    modal.id = "shareModal";
-    modal.style.cssText = `
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #000000;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 12px rgba(80, 160, 255, 0.3), 0 0 18px rgba(80, 160, 255, 0.2);
-      z-index: 1000;
-      text-align: center;
-    `;
-    modal.innerHTML = `
-      <h1>Share To</h1>
-      <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
-        ${shareOptions
-            .map(
-                (opt) => `
-                  <button style="
-                    padding: 10px;
-                    background: #000000;
-                    border: none;
-                    border-radius: 0.9em;
-                    cursor: pointer;
-                  " onclick="window.open('${opt.url}', '_blank'); document.getElementById('shareModal').remove();">
-                    <img src="${opt.icon}" alt="${opt.name}" width="32" height="32" style="display: block;">
-                  </button>
-                `
-            )
-            .join("")}
-      </div>
-      <button style="
-        margin-top: 15px;
-        padding: 8px 16px;
-        background: #dc3545;
-        color: white;
-        border: none;
-        border-radius: 0.9em;
-        cursor: pointer;
-      " onclick="document.getElementById('shareModal').remove();">
-        Closed
-      </button>
-    `;
-    document.body.appendChild(modal);
-    
-      }
+        function fallbackShare() {
+            const shareOptions = [
+                { name: "Facebook", url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, icon: "img/facebook.svg" },
+                { name: "Twitter", url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=Check%20this%20out!`, icon: "img/twitter.svg" },
+                { name: "WhatsApp", url: `https://api.whatsapp.com/send?text=${encodeURIComponent("Check this out: " + url)}`, icon: "img/wa.svg" },
+                { name: "LinkedIn", url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, icon: "img/linke.svg" },
+                { name: "Email", url: `mailto:?subject=Check%20this%20out&body=${encodeURIComponent(url)}`, icon: "img/email.svg" },
+                { name: "Telegram", url: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=Check%20this%20out!`, icon: "img/telegram.svg" },
+                { name: "Reddit", url: `https://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=Check%20this%20out!`, icon: "img/reddit.svg" },
+                { name: "Discord", url: `https://discord.com/channels/@me?content=${encodeURIComponent("Check this out: " + url)}`, icon: "img/discord.svg" }
+            ];
 
-      if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
-        tryShare(true);
-      } else {
-        tryShare(false);
-      }
-    }
+            const existingModal = document.getElementById("shareModal");
+            if (existingModal) existingModal.remove();
 
-    // QR Code Toggle
+            const modal = document.createElement("div");
+            modal.id = "shareModal";
+            modal.style.cssText = `
+                position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                background: #000000; padding: 20px; border-radius: 8px;
+                box-shadow: 0 0 12px rgba(80, 160, 255, 0.3), 0 0 18px rgba(80, 160, 255, 0.2);
+                z-index: 1000; text-align: center;
+            `;
+            modal.innerHTML = `
+                <h1>Share To</h1>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                    ${shareOptions.map(opt => `
+                        <button style="padding: 10px; background: #000000; border: none; border-radius: 0.9em; cursor: pointer;"
+                                onclick="window.open('${opt.url}', '_blank'); document.getElementById('shareModal').remove();">
+                            <img src="${opt.icon}" alt="${opt.name}" width="32" height="32" style="display: block;">
+                        </button>
+                    `).join("")}
+                </div>
+                <button style="margin-top: 15px; padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 0.9em; cursor: pointer;"
+                        onclick="document.getElementById('shareModal').remove();">
+                    Close
+                </button>
+            `;
+            document.body.appendChild(modal);
+
+            navigator.clipboard.writeText(url).then(() => {
+                alert("Link copied to clipboard!");
+            }).catch(err => {
+                console.error("Failed to copy:", err);
+                alert("Please copy this link: " + url);
+            });
+        }
+
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        tryShare(isMobile);
+    });
+}
+
+function setupQREvents() {
     const toggleQRBtn = document.getElementById("toggleQRBtn");
     const qrWrapper = document.getElementById("qrWrapper");
     const qrCanvas = document.getElementById("qr");
 
+    if (!toggleQRBtn || !qrWrapper || !qrCanvas) {
+        console.error("QR elements not found in DOM");
+        return;
+    }
+
     function generateQRCode(value) {
-      const qr = new QRious({
-        element: qrCanvas,
-        value: value || window.location.href,
-        size: 256,
-        level: 'H',
-        background: '#ffffff',
-        foreground: '#000000'
-      });
+        try {
+            const qr = new QRious({
+                element: qrCanvas,
+                value: value || window.location.href,
+                size: 256,
+                level: 'H',
+                background: '#ffffff',
+                foreground: '#000000'
+            });
+        } catch (err) {
+            console.error("Failed to generate QR code:", err);
+        }
     }
 
     generateQRCode(window.location.href);
 
     toggleQRBtn.addEventListener("click", () => {
-      const isVisible = qrWrapper.classList.contains("show");
-      if (!isVisible) {
-        qrWrapper.classList.add("show");
-        toggleQRBtn.textContent = "Close QR";
-        toggleQRBtn.style.background = "#dc3545";
-        generateQRCode(window.location.href);
-      } else {
-        qrWrapper.classList.remove("show");
-        toggleQRBtn.textContent = "Show QR";
-        toggleQRBtn.style.background = "";
-      }
+        const isVisible = qrWrapper.classList.contains("show");
+        if (!isVisible) {
+            qrWrapper.classList.add("show");
+            toggleQRBtn.textContent = "Close QR";
+            toggleQRBtn.style.background = "#dc3545";
+            generateQRCode(window.location.href);
+        } else {
+            qrWrapper.classList.remove("show");
+            toggleQRBtn.textContent = "Show QR";
+            toggleQRBtn.style.background = "";
+        }
     });
+}
 
-    function downloadQR() {
-      const hdSize = 3000;
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = hdSize;
-      canvas.height = hdSize;
+function downloadQR() {
+    const hdSize = 3000;
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = hdSize;
+    canvas.height = hdSize;
 
-      const hdQR = new QRious({
-        element: canvas,
-        value: window.location.href,
-        size: hdSize,
-        level: 'H',
-        background: '#ffffff',
-        foreground: '#007bff'
-      });
+    try {
+        const hdQR = new QRious({
+            element: canvas,
+            value: window.location.href,
+            size: hdSize,
+            level: 'H',
+            background: '#ffffff',
+            foreground: '#000000'
+        });
 
-      const logo = new Image();
-      logo.src = "img/logo.svg";
-      logo.onerror = () => {
-        console.error("Failed to load logo");
+        const logo = new Image();
+        logo.src = "img/logo.svg";
+        logo.crossOrigin = "anonymous";
+        logo.onerror = () => {
+            console.error("Failed to load logo");
+            completeDownload();
+        };
+        logo.onload = () => {
+            const logoSize = hdSize * 0.19;
+            const logoX = (hdSize - logoSize) / 2;
+            const logoY = (hdSize - logoSize) / 2 - (hdSize * 0.04);
+
+            ctx.save();
+            ctx.beginPath();
+            const radius = 12 * (hdSize / 256);
+            ctx.moveTo(logoX + radius, logoY);
+            ctx.arcTo(logoX + logoSize, logoY, logoX + logoSize, logoY + logoSize, radius);
+            ctx.arcTo(logoX + logoSize, logoY + logoSize, logoX, logoY + logoSize, radius);
+            ctx.arcTo(logoX, logoY + logoSize, logoX, logoY, radius);
+            ctx.arcTo(logoX, logoY, logoX + logoSize, logoY, radius);
+            ctx.closePath();
+            ctx.fillStyle = "#ffffff";
+            ctx.fill();
+            ctx.clip();
+            ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+            ctx.restore();
+
+            const watermarkY = logoY + logoSize + (hdSize * 0.07);
+            ctx.font = `${hdSize * 0.05}px Arial`; // Ganti Orbitron dengan Arial jika tidak diinclude
+            ctx.textAlign = "center";
+            ctx.lineWidth = 1;
+            ctx.shadowColor = "#03a9f4";
+            ctx.shadowBlur = 6;
+            ctx.fillStyle = "#ffffff";
+            ctx.fillText("Lotto Chain", hdSize / 2, watermarkY);
+
+            const gradient = ctx.createLinearGradient(0, 0, hdSize, 0);
+            gradient.addColorStop(0, "#03a9f4");
+            gradient.addColorStop(1, "#f441a5");
+            ctx.fillStyle = gradient;
+            ctx.fillText("Lotto Chain Decentralized Betting", hdSize / 2, watermarkY);
+
+            completeDownload();
+        };
+    } catch (err) {
+        console.error("Failed to generate QR:", err);
         completeDownload();
-      };
-      logo.onload = () => {
-        const logoSize = hdSize * 0.19;
-        const logoX = (hdSize - logoSize) / 2;
-        const logoY = (hdSize - logoSize) / 2 - (hdSize * 0.04);
-
-        ctx.save();
-        ctx.beginPath();
-        const radius = 12 * (hdSize / 256);
-        ctx.moveTo(logoX + radius, logoY);
-        ctx.arcTo(logoX + logoSize, logoY, logoX + logoSize, logoY + logoSize, radius);
-        ctx.arcTo(logoX + logoSize, logoY + logoSize, logoX, logoY + logoSize, radius);
-        ctx.arcTo(logoX, logoY + logoSize, logoX, logoY, radius);
-        ctx.arcTo(logoX, logoY, logoX + logoSize, logoY, radius);
-        ctx.closePath();
-        ctx.fillStyle = "#ffffff";
-        ctx.fill();
-        ctx.clip();
-        ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
-        ctx.restore();
-
-        const watermarkY = logoY + logoSize + (hdSize * 0.07);
-        ctx.font = `${hdSize * 0.05}px Orbitron`;
-        ctx.textAlign = "center";
-        ctx.lineWidth = 1;
-        ctx.shadowColor = "#03a9f4";
-        ctx.shadowBlur = 6;
-        ctx.fillStyle = "#ffffff";
-        ctx.fillText("Lotto Chain", hdSize / 2, watermarkY);
-
-        const gradient = ctx.createLinearGradient(0, 0, hdSize, 0);
-        gradient.addColorStop(0, "#03a9f4");
-        gradient.addColorStop(1, "#f441a5");
-        ctx.fillStyle = gradient;
-        ctx.fillText("Lotto Chain Decentralized Betting", hdSize / 2, watermarkY);
-
-        completeDownload();
-      };
-
-      function completeDownload() {
-    const link = document.createElement('a');
-    const uniqueId = Date.now();
-    link.download = `LottoChainQR_${uniqueId}.png`;
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-      }
     }
 
-    function downloadPNG() {
-      const element = document.querySelector(".container");
-      html2canvas(element, {
+    function completeDownload() {
+        const link = document.createElement('a');
+        const uniqueId = Date.now();
+        link.download = `LottoChainQR_${uniqueId}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+    }
+}
+
+function downloadPNG() {
+    const element = document.getElementById("ticketContainer");
+    if (!element) {
+        console.error("ticketContainer not found");
+        alert("Failed to generate image: Container not found.");
+        return;
+    }
+
+    const watermark = document.createElement("div");
+    watermark.className = "watermark-page";
+    watermark.innerText = "Lotto Chain https://lottochain.org";
+    element.appendChild(watermark);
+
+    html2canvas(element, {
         scale: 6,
         useCORS: true,
         backgroundColor: "#121212"
-      }).then(canvas => {
+    }).then(canvas => {
         const link = document.createElement("a");
         const uniqueId = Date.now();
-        link.download = "LottoChainTicket_${uniqueId}.png";
+        link.download = `LottoChainTicket_${uniqueId}.png`;
         link.href = canvas.toDataURL("image/png");
         link.click();
-      }).catch(err => {
+        watermark.remove();
+    }).catch(err => {
         console.error("Failed to create PNG:", err);
         alert("Failed to generate image. Check console for details.");
-      });
-    }
+        watermark.remove();
+    });
+}
 
-    window.onload = loadBetDetail;
+// Inisialisasi setelah DOM siap
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("DOM fully loaded");
+    loadBetDetail().then(() => {
+        console.log("loadBetDetail completed");
+        setupQREvents();
+    }).catch(err => {
+        console.error("loadBetDetail failed:", err);
+        setupQREvents(); // Tetap setup QR events meski loadBetDetail gagal
+    });
+});
   </script>
 </body>
 </html>
