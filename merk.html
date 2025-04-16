@@ -62,7 +62,7 @@
 </head>
 <body>
   <!-- Tombol DI LUAR area tangkapan -->
-  <button class="download-btn" onclick="downloadPage()">Download Container Page</button>
+  <button class="download-btn" onclick="downloadPage()">Download Container</button>
 
   <!-- Area yang akan di-capture -->
   <div class="container" id="capture-area">
@@ -81,7 +81,7 @@
         backgroundColor: null,
         width: 1280,
         height: 720,
-        scale: 2
+        scale: 10
       }).then(canvas => {
         const link = document.createElement("a");
         link.download = "lotto-chain-container.png";
