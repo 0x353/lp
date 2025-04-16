@@ -1175,7 +1175,7 @@ textarea:focus {
     <button id="scrollUpBtn" onclick="scrollToTop()" 
   style="display: none; position: fixed; bottom: 20px; right: 20px; 
          background: #000000; border: none; border-radius: 50%; 
-         width: 40px; height: 40px; cursor: pointer; z-index: 999;">
+         width: 35px; height: 35px; cursor: pointer; z-index: 999;">
   <img src="img/up.svg" style="width: 20px; height: 20px;">
     </button>
         <br>
@@ -2472,7 +2472,7 @@ function scrollToTop() {
 // Show/hide scroll up button
 window.addEventListener("scroll", () => {
   const btn = document.getElementById("scrollUpBtn");
-  if (window.scrollY > 600) {
+  if (window.scrollY > 300) {
     btn.style.display = "block";
   } else {
     btn.style.display = "none";
