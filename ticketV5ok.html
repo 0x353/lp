@@ -270,7 +270,7 @@
         const payoutAmount = isWinner ? winnerData.amount : "0";
         const payoutAmountEth = web3.utils.fromWei(payoutAmount, 'ether');
 
-        const betAmount = web3.utils.fromWei(bet.betAmount, 'ether'); // Asumsi betAmount dalam wei
+        const betAmount = bet.betAmount;
 
         let gasUsed = "N/A";
         try {
@@ -307,7 +307,7 @@
                 <button onclick="navigator.clipboard.writeText('${bet.betId}'); alert('Bet ID copied!')" style="background:#111111; color:white; border:none; padding:5px 10px; border-radius:0.9em; cursor:pointer; margin-left:10px;">Copy</button>
             </p>
             <p>Bet Number: <span style="color:#00FF66;">${bet.number}</span></p>
-            <p>Bet Amount: <span style="color:#00FF66;">${betAmount} ETH</span></p>
+            <p>Bet Amount: <span style="color:#00FF66;">${betAmount}</span></p>
             <p>Is ETH: <span style="color:${bet.isETH ? '#00FF66' : '#fe6666'};">${bet.isETH ? 'Yes' : 'No'}</span></p>
             <p>Transaction: <a href="https://sepolia.basescan.org/tx/${bet.txHash}" target="_blank" style="color:#fe6666;">${shortTxHash}</a></p>
             <p>Gas Fee: <span style="color:#ffcc00;">${gasUsed} ETH</span></p>
@@ -316,7 +316,7 @@
             <p>Likes: <span style="color:#00cc51;">${likeCount}</span></p>
             <p>Comments: <span style="color:#00cc51;">${activeCommentCount}</span></p>
             <p>Payout: <span style="color:${Number(payoutAmount) > 0 ? '#00FF66' : '#fe6666'};">${payoutAmountEth} ETH</span> (${payoutAmount} wei)</p>
-            <p>Status: <span style="color:${isWinner ? '#00FF66' : '#fe6666'};">${isWinner ? 'Won' : 'Lost'}</span></p>
+            <p>Status: <span style="color:${isWinner ? '#00FF66' : '#fff899'};">${isWinner ? 'Won' : 'Waiting...'}</span></p>
             <p>Total Bets in Contract: <span style="color:#1a88ff;">${totalBets}</span></p>
             <p>Player Total Bets: <span style="color:#1a88ff;">${stats[0]}</span></p>
             <p>Player Total Amount Bet: <span style="color:#1a88ff;">${web3.utils.fromWei(stats[1], 'ether')} ETH</span></p>
@@ -351,7 +351,7 @@ function shareTo(betId) {
 
     html2canvas(container, {
         backgroundColor: '#121212',
-        scale: 2,
+        scale: 6,
         useCORS: true
     }).then(canvas => {
         canvas.toBlob(blob => {
@@ -361,8 +361,8 @@ function shareTo(betId) {
                 if (navigator.share) {
                     console.log("Try Web Share API");
                     navigator.share({
-                        title: "Share Bet",
-                        text: "Check out my Lotto Chain ticket!",
+                        title: "Lotto Chain Ticket",
+                        text: "Here's my ticket!",
                         url: url,
                         files: [file]
                     }).catch(err => {
