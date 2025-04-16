@@ -1171,6 +1171,13 @@ textarea:focus {
     <button class="nav-button" onclick="prevBetHistory()">Prev</button>
     <button class="nav-button" onclick="nextBetHistory()">Next</button>
 </div>
+
+    <button id="scrollUpBtn" onclick="scrollToTop()" 
+  style="display: none; position: fixed; bottom: 20px; right: 20px; 
+         background-color: #28a745; border: none; border-radius: 50%; 
+         width: 40px; height: 40px; cursor: pointer; z-index: 999;">
+  <img src="img/up-arrow.png" alt="Up" style="width: 20px; height: 20px;">
+    </button>
         <br>
 
        <!-- Prize Table -->
@@ -2454,6 +2461,21 @@ window.addEventListener('DOMContentLoaded', () => {
   const section = document.getElementById('betHistory') || document.getElementById('userBets');
   if (section) {
     section.scrollTop = section.scrollHeight;
+  }
+});
+
+// Scroll to top function
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// Show/hide scroll up button
+window.addEventListener("scroll", () => {
+  const btn = document.getElementById("scrollUpBtn");
+  if (window.scrollY > 200) {
+    btn.style.display = "block";
+  } else {
+    btn.style.display = "none";
   }
 });
       
