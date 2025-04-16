@@ -12,7 +12,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   
   <style>
-     body {
+      body {
       background-color: #000000;
       color: white;
       padding: 20px;
@@ -23,6 +23,7 @@
       padding: 20px;
       border-radius: 10px;
     }
+    
     h1, h2 {
       background: linear-gradient(90deg, #03a9f4, #f441a5);
       -webkit-background-clip: text;
@@ -149,11 +150,25 @@
     margin: 0 auto;
     width: 100%;
     max-width: 400px;
+    transition: all 0.3s ease-in-out;
 }
 
 .qr-wrapper.show {
     display: block;
 }
+
+#qr {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 12px;
+}
+
+/* Hover effect khusus canvas QR */
+.qr-wrapper:hover #qr {
+    transform: scale(2);
+    box-shadow: 0 0 25px #03a9f4, 0 0 45px #f441a5;
+    background: linear-gradient(90deg, #03a9f4, #f441a5); /* hanya akan terlihat jika ada latar belakang pada canvas */
+}
+    
     .logos {
       position: absolute;
       top: 50%;
