@@ -13,16 +13,27 @@
   
   <style>
       body {
-      background-color: #000000;
-      color: white;
-      padding: 20px;
-      font-family: 'Ubuntu', sans-serif;
-    }
-    .container {
-      background-color: #222222;
-      padding: 20px;
-      border-radius: 10px;
-    }
+  background-color: #000000;
+  color: white;
+  padding: 20px;
+  font-family: 'Ubuntu', sans-serif;
+  overflow-y: auto; /* Pastikan vertical scroll bisa */
+  height: auto; /* Tinggi fleksibel */
+  min-height: 100vh; /* Minimal tinggi layar penuh */
+  margin: 0;
+}
+
+html {
+  overflow-y: auto; /* Ini juga bantu scroll */
+  height: auto;
+}
+
+.container {
+  background-color: #222222;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 100px; /* Tambahan bawah biar scroll terasa */
+}
     
     h1, h2 {
       background: linear-gradient(90deg, #03a9f4, #f441a5);
@@ -226,7 +237,7 @@
 </head>
 <body>
   <div class="container" id="ticketContainer">
-    <h1>User Ticket Detail</h1>
+    <h1>User Ticket Detail</h1><br>
     <div id="ticketDetail">
       <center style="color: #00FF66;">
         <img src="img/loading.svg" style="vertical-align: middle; width: 24px; height: 24px; margin-right: 8px;">
