@@ -4,14 +4,18 @@
       <stop offset="0%" stop-color="#03a9f4"/>
       <stop offset="100%" stop-color="#f441a5"/>
     </linearGradient>
-  </defs>  <!-- 3D extrusion effect: multiple layers behind main text -->  <g font-family="Ubuntu, sans-serif" font-size="100" font-weight="700">
-    <!-- Layered 3D steps -->
-    <text x="10" y="100" fill="#111" opacity="0.15">Lotto Chain</text>
-    <text x="11" y="101" fill="#111" opacity="0.15">Lotto Chain</text>
-    <text x="12" y="102" fill="#111" opacity="0.15">Lotto Chain</text>
-    <text x="13" y="103" fill="#111" opacity="0.15">Lotto Chain</text>
-    <text x="14" y="104" fill="#111" opacity="0.15">Lotto Chain</text><!-- Front text with gradient -->
-<text x="15" y="105" fill="url(#grad1)">Lotto Chain</text>
+  </defs>
 
+  <!-- 3D extrusion effect: multiple layers behind main text -->
+  <g font-family="Ubuntu, sans-serif" font-size="100" font-weight="700" text-anchor="middle">
+    <!-- Layered 3D steps -->
+    <text x="385" y="95" fill="#111" opacity="0.15">Lotto Chain</text>
+    <text x="386" y="96" fill="#111" opacity="0.15">Lotto Chain</text>
+    <text x="387" y="97" fill="#111" opacity="0.15">Lotto Chain</text>
+    <text x="388" y="98" fill="#111" opacity="0.15">Lotto Chain</text>
+    <text x="389" y="99" fill="#111" opacity="0.15">Lotto Chain</text>
+
+    <!-- Front text with gradient -->
+    <text x="390" y="100" fill="url(#grad1)">Lotto Chain</text>
   </g>
 </svg>
