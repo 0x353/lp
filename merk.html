@@ -5,11 +5,15 @@
   <title>Lotto Chain</title>
   <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       padding: 0;
       background-color: transparent;
-      font-family: "Ubuntu", sans-serif
+      font-family: "Ubuntu", sans-serif;
     }
 
     .container {
@@ -33,12 +37,12 @@
       object-fit: contain;
     }
 
-    h1, h2 {
-    background: linear-gradient(90deg, #03a9f4, #f441a5);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-size: 100px;
-    margin: 0;
+    h1 {
+      background: linear-gradient(90deg, #03a9f4, #f441a5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 100px;
+      margin: 0;
     }
 
     .download-btn {
@@ -61,34 +65,36 @@
   </style>
 </head>
 <body>
-  <!-- Tombol DI LUAR area tangkapan -->
-  <button class="download-btn" onclick="downloadPage()">Download Container</button>
+  <button class="download-btn">Download Container</button>
 
-  <!-- Area yang akan di-capture -->
   <div class="container" id="capture-area">
     <div class="logo-title">
-      <img src="img/logo.svg">
+      <img src="img/logo.svg" alt="Logo">
       <h1>Lotto Chain</h1>
     </div>
   </div>
 
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <script>
-    function downloadPage() {
+    document.querySelector(".download-btn").addEventListener("click", () => {
       const element = document.getElementById("capture-area");
 
-      html2canvas(element, {
-        backgroundColor: null,
-        width: 1280,
-        height: 720,
-        scale: 10
-      }).then(canvas => {
-        const link = document.createElement("a");
-        link.download = "lotto-chain-container.png";
-        link.href = canvas.toDataURL("image/png");
-        link.click();
+      // Tunggu semua font selesai dimuat
+      document.fonts.ready.then(() => {
+        html2canvas(element, {
+          backgroundColor: null,
+          useCORS: true,
+          scale: 10,
+          width: 1280,
+          height: 720
+        }).then(canvas => {
+          const link = document.createElement("a");
+          link.download = "lotto-chain-container.png";
+          link.href = canvas.toDataURL("image/png");
+          link.click();
+        });
       });
-    }
+    });
   </script>
 </body>
 </html>
