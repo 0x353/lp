@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <title>Lotto Chain</title>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       padding: 0;
       background-color: transparent;
+      font-family: "Ubuntu", sans-serif
     }
 
     .container {
@@ -31,11 +33,12 @@
       object-fit: contain;
     }
 
-    h1 {
-      color: #fff;
-      font-size: 3em;
-      font-family: sans-serif;
-      margin: 0;
+    h1, h2 {
+    background: linear-gradient(90deg, #03a9f4, #f441a5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 50px;
+    margin: 0;
     }
 
     .download-btn {
@@ -55,6 +58,18 @@
     .download-btn:hover {
       background-color: #0088cc;
     }
+
+    .logo-title {
+  display: flex;
+  align-items: center;
+  gap: 24px; /* Jarak antara logo dan teks */
+}
+
+.logo-title img {
+  width: 64px;   /* Ukuran logo ideal */
+  height: 64px;
+  object-fit: contain;
+}
   </style>
 </head>
 <body>
@@ -64,7 +79,7 @@
   <!-- Area yang akan di-capture -->
   <div class="container" id="capture-area">
     <div class="logo-title">
-      <img src="logo.png" alt="Logo">
+      <img src="img/logo.svg">
       <h1>Lotto Chain</h1>
     </div>
   </div>
