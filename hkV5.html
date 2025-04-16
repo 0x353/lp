@@ -197,14 +197,17 @@ button:not(#closePopup):active::after {
 }
 
 #betHistory, #userBets {
-    font-size: 13px; /* Ukuran font yang nyaman */
-    text-align: justify; /* Rata kiri-kanan seperti di buku */
-    hyphens: auto; /* Tambahkan pemenggalan kata jika perlu */
-    line-height: 1.8; /* Jarak antar baris agar lebih nyaman dibaca */
-    max-width: 600px; /* Batasi lebar agar tidak terlalu panjang */
-    margin: auto; /* Pusatkan jika diperlukan */
-    padding: 15px; /* Beri ruang di dalam agar tidak terlalu mepet */
-    text-indent: 20px; /* Tambahkan indentasi di awal paragraf */
+    font-size: 13px;
+    text-align: justify;
+    hyphens: auto;
+    line-height: 1.8;
+    max-width: 600px;
+    margin: auto;
+    padding: 15px;
+    text-indent: 20px;
+    max-height: 600px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
 }
 
 table {
@@ -2266,19 +2269,27 @@ window.onload = async () => {
         console.error("Gagal memuat komentar saat halaman dimuat:", error);
     }
 
+    // Auto-scroll pas konten dimuat
+    window.addEventListener('DOMContentLoaded', () => {
+        const section = document.getElementById('betHistory') || document.getElementById('userBets');
+        if (section) {
+            section.scrollTop = section.scrollHeight;
+        }
+    });
+
     document.getElementById("refreshButton").addEventListener("click", function () {
-  const icon = this.querySelector(".refresh-icon");
+        const icon = this.querySelector(".refresh-icon");
 
-  // Reset animasi supaya bisa diulang
-  icon.classList.remove("spin-once");
-  void icon.offsetWidth; // paksa reflow
-  icon.classList.add("spin-once");
+        // Reset animasi supaya bisa diulang
+        icon.classList.remove("spin-once");
+        void icon.offsetWidth; // paksa reflow
+        icon.classList.add("spin-once");
 
-  // Tunggu animasi selesai, lalu reload konten bet history
-  setTimeout(() => {
-    loadBetHistory();
-  }, 2000);
-});
+        // Tunggu animasi selesai, lalu reload konten bet history
+        setTimeout(() => {
+            loadBetHistory();
+        }, 2000);
+    });
 };
     </script>
        
