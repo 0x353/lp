@@ -972,8 +972,11 @@ textarea:focus {
   <div id="betHistory" style="padding-top: 30px;"></div>
        </div>
 <div class="button-container">
+    <button class="nav-button" onclick="firstPage()">First</button>
     <button class="nav-button" onclick="prevBetHistory()">Prev</button>
+    <span id="pagination"></span> <!-- Menampilkan nomor halaman dinamis -->
     <button class="nav-button" onclick="nextBetHistory()">Next</button>
+    <button class="nav-button" onclick="lastPage()">Last</button>
 </div>
         <br>
 
@@ -1688,6 +1691,8 @@ async function loadBetHistory() {
     }
 
     document.getElementById("betHistory").innerHTML = html;
+    updatePagination(filteredBets.length);
+}
 
     // Update jumlah like dan status like setelah bet history dimuat
     for (let i = start; i < end; i++) {
@@ -1697,6 +1702,11 @@ async function loadBetHistory() {
 }
         
 // **Bet History Pagination**
+function firstPage() {
+    betHistoryPage = 0;
+    loadBetHistory();
+}
+
 function prevBetHistory() {
     if (betHistoryPage > 0) {
         betHistoryPage--;
@@ -1706,6 +1716,28 @@ function prevBetHistory() {
 
 function nextBetHistory() {
     betHistoryPage++;
+    loadBetHistory();
+}
+
+function lastPage() {
+    betHistoryPage = Math.floor(filteredBets.length / pageSize);
+    loadBetHistory();
+}
+
+function updatePagination(totalBets) {
+    const totalPages = Math.ceil(totalBets / pageSize);
+    let paginationHtml = "";
+
+    // Create page numbers dynamically
+    for (let i = 0; i < totalPages; i++) {
+        paginationHtml += `<button class="page-button" onclick="goToPage(${i})">${i + 1}</button>`;
+    }
+
+    document.getElementById("pagination").innerHTML = paginationHtml;
+}
+
+function goToPage(pageNumber) {
+    betHistoryPage = pageNumber;
     loadBetHistory();
 }
 
