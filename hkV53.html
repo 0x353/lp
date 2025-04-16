@@ -1036,6 +1036,19 @@ textarea:focus {
       width: 18px; /* Ukuran gambar sesuai dengan keinginan */
       height: auto;
     }
+
+    .comment-dropdown {
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(3, 169, 244, 0.3); /* shadow biru tipis */
+  transition: box-shadow 0.3s ease;
+  background-color: #1e1e1e; /* abu-abu gelap */
+}
+
+.comment-dropdown:hover {
+  box-shadow:
+    0 0 6px 1px rgba(3, 169, 244, 0.6),
+    0 0 10px 2px rgba(244, 65, 165, 0.5); /* efek gradasi seperti linear */
+}
     </style>
 </head>
 <body>
@@ -1870,32 +1883,15 @@ async function loadBetHistory() {
 
              <p id="likeStatus-${bet.betId}" style="font-size: 12px; color: gray; margin-top: 3px;"></p> 
 
-             <details class="comment-dropdown" style="
-    background-color: #1e1e1e;
-    border-radius: 8px;
-    box-shadow: 0 0 6px rgba(3, 169, 244, 0.3);
-    transition: box-shadow 0.3s ease;
-">
-  <summary style="
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      justify-content: space-between;
-      width: 100%;
-      padding: 10px 15px;
-      border-radius: 8px;
-      transition: box-shadow 0.3s ease;
-  "
-  onmouseover="this.style.boxShadow='0 0 10px 2px rgba(3, 169, 244, 0.5), 0 0 10px 2px rgba(244, 65, 165, 0.4)';"
-  onmouseout="this.style.boxShadow='0 0 6px rgba(3, 169, 244, 0.3)';"
-  >
+             <details class="comment-dropdown">
+    <summary style="display: flex; align-items: center; cursor: pointer; justify-content: space-between; width: 100%; padding: 0 15px;">
     <span style="display: flex; align-items: center; gap: 10px;">
-      <img src="img/comment.svg" style="width: 18px; height: 18px;">
-      <span id="commentCount-${bet.betId}" style="color: #00cc51; font-size: 15px; font-weight: bold;">0</span> Comments
+        <img src="img/comment.svg" style="width: 18px; height: 18px;" margin-right: 20px;">
+        <span id="commentCount-${bet.betId}" style="color: #00cc51; font-size: 15px; font-weight: bold;">0</span> Comments
     </span>
     <img src="img/clos.svg" style="width: 18px; height: 18px; margin-right: 20px;">
-  </summary>
-</details>
+</summary></details>
+             
     <div id="commentSection-${bet.betId}" class="comment-section">
         <div id="commentList-${bet.betId}" class="comment-list"></div>
         <textarea id="commentInput-${bet.betId}" placeholder="Write a comment..."></textarea>
