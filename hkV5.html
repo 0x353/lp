@@ -2288,12 +2288,16 @@ window.onload = async () => {
     }
 
     try {
+        // Ambil semua taruhan dari kontrak
         const allBets = await contract.methods.getAllBets().call();
+
+        // Ambil betId dari setiap taruhan
         const betIds = allBets.map(bet => bet.betId);
 
+        // Perbarui jumlah komentar dan muat komentar untuk setiap betId
         for (const betId of betIds) {
             await updateCommentCount(betId);
-            await loadComments(betId);
+            await loadComments(betId); // Memuat komentar langsung saat halaman dibuka
         }
     } catch (error) {
         console.error("Gagal memuat komentar saat halaman dimuat:", error);
@@ -2307,35 +2311,15 @@ window.onload = async () => {
         }
     });
 
-    // Lazy loading dengan pagination
-    const observerOptions = {
-        root: null,
-        rootMargin: "0px",
-        threshold: 1.0
-    };
-
-    const loadMoreObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                nextBetHistory(); // gunakan pagination, bukan hanya reload data
-                observer.unobserve(entry.target); // opsional, bisa dihapus kalau mau infinite
-            }
-        });
-    }, observerOptions);
-
-    const loadMoreElement = document.createElement('div');
-    loadMoreElement.classList.add('load-more');
-    document.getElementById('betHistory').appendChild(loadMoreElement);
-    loadMoreObserver.observe(loadMoreElement);
-
-    // Tombol refresh animasi
     document.getElementById("refreshButton").addEventListener("click", function () {
         const icon = this.querySelector(".refresh-icon");
 
+        // Reset animasi supaya bisa diulang
         icon.classList.remove("spin-once");
-        void icon.offsetWidth;
+        void icon.offsetWidth; // paksa reflow
         icon.classList.add("spin-once");
 
+        // Tunggu animasi selesai, lalu reload konten bet history
         setTimeout(() => {
             loadBetHistory();
         }, 2000);
