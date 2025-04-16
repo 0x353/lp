@@ -1874,12 +1874,11 @@ async function loadBetHistory() {
              <details class="comment-dropdown">
     <summary style="display: flex; align-items: center; cursor: pointer; justify-content: space-between; width: 100%; padding: 0 15px;">
     <span style="display: flex; align-items: center; gap: 10px;">
-        <img src="img/comment.svg" style="width: 18px; height: 18px;" margin-right: 20px;">
+        <img src="img/comment.svg" alt="Komentar" style="width: 18px; height: 18px;" margin-right: 20px;">
         <span id="commentCount-${bet.betId}" style="color: #00cc51; font-size: 15px; font-weight: bold;">0</span> Comments
     </span>
     <img src="img/clos.svg" style="width: 18px; height: 18px; margin-right: 20px;">
-</summary></details>
-             
+</summary>
     <div id="commentSection-${bet.betId}" class="comment-section">
         <div id="commentList-${bet.betId}" class="comment-list"></div>
         <textarea id="commentInput-${bet.betId}" placeholder="Write a comment..."></textarea>
