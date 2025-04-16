@@ -1709,10 +1709,12 @@ function nextBetHistory() {
     loadBetHistory();
 }
 
-// Jalankan pertama kali untuk inisialisasi betId
-loadBetHistory().then(() => {
-    setInterval(autoRefreshBetHistory, 2000); // Cek setiap 5 detik
-});
+// Lazy loading dengan IntersectionObserver
+const observerOptions = {
+    root: null, // viewport
+    rootMargin: "0px",
+    threshold: 1.0
+};
 
 // Like Function
 async function toggleLike(betId) {
