@@ -644,43 +644,48 @@ function setupQREvents() {
 
 function downloadQR() {
   const hdSize = 3000;
-  const padding = hdSize * 0.1; // Padding 10% dari ukuran canvas
-  const qrSize = hdSize - padding * 2; // Ukuran QR code setelah dikurangi padding
+  const padding = hdSize * 0.1;
+  const qrSize = hdSize - padding * 2;
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
+
   canvas.width = hdSize;
-  canvas.height = hdSize + 200; // Tambah tinggi canvas untuk ruang watermark di bawah
+  canvas.height = hdSize + 300;
 
-  // Gambar latar belakang berwarna putih
+  // Gambar latar belakang putih
   ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, hdSize, hdSize + 200);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Buat QR code
-  const hdQR = new QRious({
-    element: canvas,
+  // Buat offscreen canvas untuk QR
+  const qrCanvas = document.createElement("canvas");
+  qrCanvas.width = qrSize;
+  qrCanvas.height = qrSize;
+
+  const qr = new QRious({
+    element: qrCanvas,
     value: window.location.href,
     size: qrSize,
     level: 'H',
     background: '#ffffff',
     foreground: '#000000',
-    padding: padding
   });
 
-  const logo = new Image();
-  logo.src = "img/logo.svg";
-  logo.onerror = () => {
-    console.error("Failed to load logo");
-    completeDownload();
-  };
-  logo.onload = () => {
-    // Posisi logo di tengah QR code
-    const logoSize = qrSize * 0.19; // Proporsional dengan ukuran QR
-    const logoX = padding + (qrSize - logoSize) / 2; // Tengah relatif terhadap QR code
-    const logoY = padding + (qrSize - logoSize) / 2; // Tengah relatif terhadap QR code
+  // Gambar QR code ke canvas utama dengan padding
+  ctx.drawImage(qrCanvas, padding, padding);
 
+  const logo = new Image();
+  logo.src = "img/logo.svg"; // Path logo kamu
+  logo.crossOrigin = "anonymous";
+  logo.onload = () => {
+    // Hitung posisi logo di tengah area QR (bukan tengah canvas)
+    const logoSize = qrSize * 0.18;
+    const logoX = padding + (qrSize - logoSize) / 2;
+    const logoY = padding + (qrSize - logoSize) / 2;
+
+    // Gambar logo dengan corner radius
     ctx.save();
     ctx.beginPath();
-    const radius = 12 * (qrSize / 256); // Skala radius sesuai QR
+    const radius = logoSize * 0.2;
     ctx.moveTo(logoX + radius, logoY);
     ctx.arcTo(logoX + logoSize, logoY, logoX + logoSize, logoY + logoSize, radius);
     ctx.arcTo(logoX + logoSize, logoY + logoSize, logoX, logoY + logoSize, radius);
@@ -693,32 +698,43 @@ function downloadQR() {
     ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
     ctx.restore();
 
-    // Posisi watermark di bawah QR code
-    const watermarkY = hdSize - padding + 100; // Posisi di bawah QR dengan jarak
+    // Tambahkan watermark di bawah QR
+    const watermarkY = hdSize + 100;
     ctx.font = `${qrSize * 0.05}px Ubuntu`;
     ctx.textAlign = "center";
-    ctx.lineWidth = 1;
-    ctx.shadowColor = "#03a9f4";
+
+    // Shadow putih
+    ctx.shadowColor = "#ffffff";
     ctx.shadowBlur = 6;
     ctx.fillStyle = "#ffffff";
-    ctx.fillText("Lotto Chain Decentralized Betting", hdSize / 2, watermarkY);
+    ctx.fillText("Lotto Chain Decentralized Betting", canvas.width / 2, watermarkY);
 
-    const gradient = ctx.createLinearGradient(0, 0, hdSize, 0);
+    // Gradient text
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
     gradient.addColorStop(0, "#03a9f4");
     gradient.addColorStop(1, "#f441a5");
+    ctx.shadowColor = "transparent";
     ctx.fillStyle = gradient;
-    ctx.fillText("Lotto Chain Decentralized Betting", hdSize / 2, watermarkY);
+    ctx.fillText("Lotto Chain Decentralized Betting", canvas.width / 2, watermarkY);
 
     completeDownload();
   };
 
+  logo.onerror = () => {
+    console.error("Logo gagal dimuat.");
+    completeDownload();
+  };
+
   function completeDownload() {
+    const uniqueId = '0x' + Math.random().toString(16).slice(2, 13);
+    const fileName = `QRLottoChain${uniqueId}.png`;
+
     const link = document.createElement('a');
     link.href = canvas.toDataURL('image/png');
-    link.download = 'qrcode.png';
+    link.download = fileName;
     link.click();
   }
- }
+}
 
 function downloadPNG() {
     const element = document.getElementById("ticketContainer");
@@ -739,8 +755,8 @@ function downloadPNG() {
         backgroundColor: "#121212"
     }).then(canvas => {
         const link = document.createElement("a");
-        const uniqueId = Date.now();
-        link.download = `LottoChainTicket_${uniqueId}.png`;
+        const uniqueId = '0x' + Math.random().toString(16).slice(2, 13);
+        link.download = `PublicTicket_${uniqueId}.png`;
         link.href = canvas.toDataURL("image/png");
         link.click();
         watermark.remove();
