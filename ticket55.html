@@ -551,11 +551,13 @@
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   canvas.width = hdSize;
-  canvas.height = hdSize;
+  canvas.height = hdSize + 200; // Tambah tinggi canvas untuk ruang watermark di bawah
 
+  // Gambar latar belakang berwarna putih
   ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, hdSize, hdSize);
+  ctx.fillRect(0, 0, hdSize, hdSize + 200);
 
+  // Buat QR code
   const hdQR = new QRious({
     element: canvas,
     value: window.location.href,
@@ -566,58 +568,59 @@
     padding: padding
   });
 
-      const logo = new Image();
-      logo.src = "img/logo.svg";
-      logo.onerror = () => {
-        console.error("Failed to load logo");
-        completeDownload();
-      };
-      logo.onload = () => {
-        const logoSize = hdSize * 0.19;
-        const logoX = (hdSize - logoSize) / 2;
-        const logoY = (hdSize - logoSize) / 2 - (hdSize * 0.04);
+  const logo = new Image();
+  logo.src = "img/logo.svg";
+  logo.onerror = () => {
+    console.error("Failed to load logo");
+    completeDownload();
+  };
+  logo.onload = () => {
+    // Posisi logo di tengah QR code
+    const logoSize = qrSize * 0.19; // Proporsional dengan ukuran QR
+    const logoX = padding + (qrSize - logoSize) / 2; // Tengah relatif terhadap QR code
+    const logoY = padding + (qrSize - logoSize) / 2; // Tengah relatif terhadap QR code
 
-        ctx.save();
-        ctx.beginPath();
-        const radius = 12 * (hdSize / 256);
-        ctx.moveTo(logoX + radius, logoY);
-        ctx.arcTo(logoX + logoSize, logoY, logoX + logoSize, logoY + logoSize, radius);
-        ctx.arcTo(logoX + logoSize, logoY + logoSize, logoX, logoY + logoSize, radius);
-        ctx.arcTo(logoX, logoY + logoSize, logoX, logoY, radius);
-        ctx.arcTo(logoX, logoY, logoX + logoSize, logoY, radius);
-        ctx.closePath();
-        ctx.fillStyle = "#ffffff";
-        ctx.fill();
-        ctx.clip();
-        ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
-        ctx.restore();
+    ctx.save();
+    ctx.beginPath();
+    const radius = 12 * (qrSize / 256); // Skala radius sesuai QR
+    ctx.moveTo(logoX + radius, logoY);
+    ctx.arcTo(logoX + logoSize, logoY, logoX + logoSize, logoY + logoSize, radius);
+    ctx.arcTo(logoX + logoSize, logoY + logoSize, logoX, logoY + logoSize, radius);
+    ctx.arcTo(logoX, logoY + logoSize, logoX, logoY, radius);
+    ctx.arcTo(logoX, logoY, logoX + logoSize, logoY, radius);
+    ctx.closePath();
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+    ctx.clip();
+    ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+    ctx.restore();
 
-        const watermarkY = logoY + logoSize + (hdSize * 0.07);
-        ctx.font = `${hdSize * 0.05}px Ubuntu`;
-        ctx.textAlign = "center";
-        ctx.lineWidth = 1;
-        ctx.shadowColor = "#03a9f4";
-        ctx.shadowBlur = 6;
-        ctx.fillStyle = "#ffffff";
-        ctx.fillText("Lotto Chain Decentralized Betting", hdSize / 2, watermarkY);
+    // Posisi watermark di bawah QR code
+    const watermarkY = hdSize - padding + 100; // Posisi di bawah QR dengan jarak
+    ctx.font = `${qrSize * 0.05}px Ubuntu`;
+    ctx.textAlign = "center";
+    ctx.lineWidth = 1;
+    ctx.shadowColor = "#03a9f4";
+    ctx.shadowBlur = 6;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText("Lotto Chain Decentralized Betting", hdSize / 2, watermarkY);
 
-        const gradient = ctx.createLinearGradient(0, 0, hdSize, 0);
-        gradient.addColorStop(0, "#03a9f4");
-        gradient.addColorStop(1, "#f441a5");
-        ctx.fillStyle = gradient;
-        ctx.fillText("Lotto Chain Decentralized Betting", hdSize / 2, watermarkY);
+    const gradient = ctx.createLinearGradient(0, 0, hdSize, 0);
+    gradient.addColorStop(0, "#03a9f4");
+    gradient.addColorStop(1, "#f441a5");
+    ctx.fillStyle = gradient;
+    ctx.fillText("Lotto Chain Decentralized Betting", hdSize / 2, watermarkY);
 
-        completeDownload();
-      };
+    completeDownload();
+  };
 
-      function completeDownload() {
+  function completeDownload() {
     const link = document.createElement('a');
-    const uniqueId = Date.now();
-    link.download = `LottoChainQR_${uniqueId}.png`;
-    link.href = canvas.toDataURL("image/png");
+    link.href = canvas.toDataURL('image/png');
+    link.download = 'qrcode.png';
     link.click();
-      }
-    }
+  }
+}
 
     function downloadPNG() {
   const element = document.querySelector("#ticketContainer");
