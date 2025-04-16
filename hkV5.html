@@ -1374,8 +1374,9 @@ let userAccount = null;
 let userHasLiked = false;
 let likeContract;
 let userBetsPage = 0;
-let betHistoryPage = 0;
-const pageSize = 10;
+let betHistoryPage = 0; // Halaman saat ini
+const pageSize = 10; // Jumlah taruhan per halaman
+let filteredBets = [];
 const SEPOLIA_BASE_CHAIN_ID = "0x14a34"; // Chain ID Sepolia Base Testnet
 const SEPOLIA_RPC_URL = "https://sepolia.base.org"; // RPC Sepolia Base
 const SEPOLIA_EXPLORER_URL = "https://sepolia.basescan.org"; // Block Explorer
@@ -1820,6 +1821,17 @@ function nextUserBets() {
     userBetsPage++;
     loadUserBets();
 }
+
+async function updateLikeStatus(betId) {
+    // Placeholder: Ganti dengan implementasi asli jika ada
+    console.log(`Updating like status for betId: ${betId}`);
+}
+
+async function autoRefreshBetHistory() {
+    // Placeholder: Panggil loadBetHistory untuk refresh otomatis
+    console.log("Auto refreshing bet history...");
+    await loadBetHistory();
+}
         
 // **Load Bet History (with Pagination)**
 async function loadBetHistory() {
@@ -1830,6 +1842,14 @@ async function loadBetHistory() {
     const now = Math.floor(Date.now() / 1000);
     const oneMonthAgo = now - 30 * 24 * 60 * 60; // 30 hari dalam detik
     const filteredBets = reversedBets.filter(bet => bet.timestamp >= oneMonthAgo);
+
+    const totalPages = Math.ceil(filteredBets.length / pageSize);
+        if (betHistoryPage >= totalPages) {
+            betHistoryPage = totalPages - 1;
+        }
+        if (betHistoryPage < 0) {
+            betHistoryPage = 0;
+        }
     
     const start = betHistoryPage * pageSize;
     const end = Math.min(start + pageSize, filteredBets.length);
@@ -1914,16 +1934,20 @@ async function loadBetHistory() {
     }
 }
         
-   // Update nomor halaman
-    updatePageNumbers(filteredBets.length);
+// Update nomor halaman
+        updatePageNumbers(filteredBets.length);
+    } catch (error) {
+        console.error("Error loading bet history:", error);
+        document.getElementById("betHistory").innerHTML = "<p>Error loading bet history. Please try again later.</p>";
+    }
 }
 
 // **Fungsi untuk Menampilkan Nomor Halaman**
 function updatePageNumbers(totalBets) {
     const totalPages = Math.ceil(totalBets / pageSize);
     let pageHtml = "";
-    
-    // Batasi jumlah nomor halaman yang ditampilkan (misalnya, maksimal 5 nomor)
+
+    // Batasi jumlah nomor halaman yang ditampilkan (maksimal 5)
     const maxPagesToShow = 5;
     let startPage = Math.max(0, betHistoryPage - Math.floor(maxPagesToShow / 2));
     let endPage = Math.min(totalPages, startPage + maxPagesToShow);
@@ -1954,13 +1978,8 @@ function firstBetHistory() {
 }
 
 function lastBetHistory() {
-    const bets = await contract.methods.getAllBets().call();
-    const reversedBets = bets.slice().reverse();
-    const now = Math.floor(Date.now() / 1000);
-    const oneMonthAgo = now - 30 * 24 * 60 * 60;
-    const filteredBets = reversedBets.filter(bet => bet.timestamp >= oneMonthAgo);
     const totalPages = Math.ceil(filteredBets.length / pageSize);
-    betHistory hrsPage = totalPages - 1;
+    betHistoryPage = totalPages - 1;
     loadBetHistory();
 }
 
@@ -1972,18 +1991,13 @@ function prevBetHistory() {
 }
 
 function nextBetHistory() {
-    const bets = await contract.methods.getAllBets().call();
-    const reversedBets = bets.slice().reverse();
-    const now = Math.floor(Date.now() / 1000);
-    const oneMonthAgo = now - 30 * 24 * 60 * 60;
-    const filteredBets = reversedBets.filter(bet => bet.timestamp >= oneMonthAgo);
     const totalPages = Math.ceil(filteredBets.length / pageSize);
     if (betHistoryPage < totalPages - 1) {
         betHistoryPage++;
         loadBetHistory();
     }
-}
-
+}  
+   
 // Jalankan pertama kali untuk inisialisasi betId
 loadBetHistory().then(() => {
     setInterval(autoRefreshBetHistory, 2000); // Cek setiap 2 detik
