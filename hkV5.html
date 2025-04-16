@@ -1687,13 +1687,7 @@ async function loadBetHistory() {
         <hr style="background-color: #333333; height: 1px; border: none;">`;
     }
 
-    for (let i = start; i < end; i++) {
-    const bet = filteredBets[i];
-    const betElement = document.createElement("div");
-    betElement.className = "bet-item";
-    betElement.innerText = `Bet ID: ${bet.betId}, Amount: ${bet.amount}`;
-    document.getElementById("betHistory").appendChild(betElement);
-    }
+    document.getElementById("betHistory").innerHTML = html;
 
     // Update jumlah like dan status like setelah bet history dimuat
     for (let i = start; i < end; i++) {
