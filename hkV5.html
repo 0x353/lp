@@ -1155,21 +1155,22 @@ textarea:focus {
         <p id="betStatus"></p>
        <br>
        <h2>Public Bet History</h2>
-       <button onclick="window.open('search', '_blank')"><img src="img/search.svg" alt="Lotto" style="width: 15px; height: 15px;">  Search...</button><br><br>
-       <div class="button-container">
-    <button class="nav-button" onclick="prevBetHistory()">Prev</button>
-    <button class="nav-button" onclick="nextBetHistory()">Next</button>
-       </div>
-       <hr style="background-color: #333333; height: 1px; border: none;">
-       <div id="betHistoryContainer" style="position: relative;">
-  <button id="refreshButton" style="position: absolute; top: 0; right: 0; background: #000000; border: none; cursor: pointer;">
-    <img src="img/refresh.svg" class="refresh-icon" style="width: 15px; height: 15px;" />
-  </button>
-  <div id="betHistory" style="padding-top: 30px;"></div>
-       </div>
+<button onclick="window.open('search', '_blank')">
+    <img src="img/search.svg" alt="Lotto" style="width: 15px; height: 15px;"> Search...
+</button><br><br>
 <div class="button-container">
-    <button class="nav-button" onclick="prevBetHistory()">Prev</button>
+    <button class="nav-button" onclick="firstBetHistory()">First</button>
     <button class="nav-button" onclick="nextBetHistory()">Next</button>
+    <span id="pageNumbers"></span>
+    <button class="nav-button" onclick="prevBetHistory()">Prev</button>
+    <button class="nav-button" onclick="lastBetHistory()">Last</button>
+</div>
+<hr style="background-color: #333333; height: 1px; border: none;">
+<div id="betHistoryContainer" style="position: relative;">
+    <button id="refreshButton" style="position: absolute; top: 0; right: 0; background: #000000; border: none; cursor: pointer;">
+        <img src="img/refresh.svg" class="refresh-icon" style="width: 15px; height: 15px;" />
+    </button>
+    <div id="betHistory" style="padding-top: 30px;"></div>
 </div>
         <br>
 
@@ -1913,7 +1914,56 @@ async function loadBetHistory() {
     }
 }
         
+   // Update nomor halaman
+    updatePageNumbers(filteredBets.length);
+}
+
+// **Fungsi untuk Menampilkan Nomor Halaman**
+function updatePageNumbers(totalBets) {
+    const totalPages = Math.ceil(totalBets / pageSize);
+    let pageHtml = "";
+    
+    // Batasi jumlah nomor halaman yang ditampilkan (misalnya, maksimal 5 nomor)
+    const maxPagesToShow = 5;
+    let startPage = Math.max(0, betHistoryPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow);
+
+    // Sesuaikan startPage jika mendekati akhir
+    if (endPage - startPage < maxPagesToShow) {
+        startPage = Math.max(0, endPage - maxPagesToShow);
+    }
+
+    for (let i = startPage; i < endPage; i++) {
+        const isActive = i === betHistoryPage ? 'active' : '';
+        pageHtml += `<button class="nav-button ${isActive}" onclick="goToPage(${i})">${i + 1}</button>`;
+    }
+
+    document.getElementById("pageNumbers").innerHTML = pageHtml;
+}
+
+// **Navigasi ke Halaman Tertentu**
+function goToPage(page) {
+    betHistoryPage = page;
+    loadBetHistory();
+}
+
 // **Bet History Pagination**
+function firstBetHistory() {
+    betHistoryPage = 0;
+    loadBetHistory();
+}
+
+function lastBetHistory() {
+    const bets = await contract.methods.getAllBets().call();
+    const reversedBets = bets.slice().reverse();
+    const now = Math.floor(Date.now() / 1000);
+    const oneMonthAgo = now - 30 * 24 * 60 * 60;
+    const filteredBets = reversedBets.filter(bet => bet.timestamp >= oneMonthAgo);
+    const totalPages = Math.ceil(filteredBets.length / pageSize);
+    betHistory hrsPage = totalPages - 1;
+    loadBetHistory();
+}
+
 function prevBetHistory() {
     if (betHistoryPage > 0) {
         betHistoryPage--;
@@ -1922,13 +1972,21 @@ function prevBetHistory() {
 }
 
 function nextBetHistory() {
-    betHistoryPage++;
-    loadBetHistory();
+    const bets = await contract.methods.getAllBets().call();
+    const reversedBets = bets.slice().reverse();
+    const now = Math.floor(Date.now() / 1000);
+    const oneMonthAgo = now - 30 * 24 * 60 * 60;
+    const filteredBets = reversedBets.filter(bet => bet.timestamp >= oneMonthAgo);
+    const totalPages = Math.ceil(filteredBets.length / pageSize);
+    if (betHistoryPage < totalPages - 1) {
+        betHistoryPage++;
+        loadBetHistory();
+    }
 }
 
 // Jalankan pertama kali untuk inisialisasi betId
 loadBetHistory().then(() => {
-    setInterval(autoRefreshBetHistory, 2000); // Cek setiap 5 detik
+    setInterval(autoRefreshBetHistory, 2000); // Cek setiap 2 detik
 });
 
 // Like Function
