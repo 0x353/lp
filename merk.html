@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Lotto Chain</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: transparent;
+    }
+
+    .container {
+      width: 100%;
+      height: 100vh;
+      background-color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-title {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-title img {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+    }
+
+    h1 {
+      color: #fff;
+      font-size: 3em;
+      font-family: sans-serif;
+      margin: 0;
+    }
+
+    .download-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 24px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background-color: #00aaff;
+      color: white;
+      cursor: pointer;
+      z-index: 9999;
+    }
+
+    .download-btn:hover {
+      background-color: #0088cc;
+    }
+  </style>
+</head>
+<body>
+  <!-- Tombol DI LUAR area tangkapan -->
+  <button class="download-btn" onclick="downloadPage()">Download Container Page</button>
+
+  <!-- Area yang akan di-capture -->
+  <div class="container" id="capture-area">
+    <div class="logo-title">
+      <img src="logo.png" alt="Logo">
+      <h1>Lotto Chain</h1>
+    </div>
+  </div>
+
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script>
+    function downloadPage() {
+      const element = document.getElementById("capture-area");
+
+      html2canvas(element, {
+        backgroundColor: null,
+        width: 1280,
+        height: 720,
+        scale: 2
+      }).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "lotto-chain-container.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    }
+  </script>
+</body>
+</html>
