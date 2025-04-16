@@ -204,7 +204,7 @@ button:not(#closePopup):active::after {
     margin: auto;
     padding: 15px;
     text-indent: 20px;
-    max-height: min(800px, 80vh);
+    max-height: min(1000px, 90vh);
     overflow-y: auto;
     scroll-behavior: smooth; /* bikin halus scroll-nya */
 }
@@ -1166,18 +1166,17 @@ textarea:focus {
     <img src="img/refresh.svg" class="refresh-icon" style="width: 15px; height: 15px;" />
   </button>
   <div id="betHistory" style="padding-top: 30px;"></div>
+        <button id="scrollUpBtn" onclick="scrollToTop()" 
+  style="display: none; position: fixed; bottom: 20px; right: 20px; 
+         background-color: #28a745; border: none; border-radius: 50%; 
+         width: 40px; height: 40px; cursor: pointer; z-index: 999;">
+  <img src="img/up-arrow.png" alt="Up" style="width: 20px; height: 20px;">
+        </button>
        </div>
 <div class="button-container">
     <button class="nav-button" onclick="prevBetHistory()">Prev</button>
     <button class="nav-button" onclick="nextBetHistory()">Next</button>
 </div>
-
-    <button id="scrollUpBtn" onclick="scrollToTop()" 
-  style="display: none; position: fixed; bottom: 20px; right: 20px; 
-         background-color: #28a745; border: none; border-radius: 50%; 
-         width: 40px; height: 40px; cursor: pointer; z-index: 999;">
-  <img src="img/up-arrow.png" alt="Up" style="width: 20px; height: 20px;">
-    </button>
         <br>
 
        <!-- Prize Table -->
