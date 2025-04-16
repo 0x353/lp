@@ -749,21 +749,28 @@ function downloadPNG() {
     element.appendChild(watermark);
 
     html2canvas(element, {
-        scale: 6,
-        useCORS: true,
-        backgroundColor: "#121212"
-    }).then(canvas => {
-        const link = document.createElement("a");
-        const uniqueId = '0x' + Math.random().toString(16).slice(2, 13);
-        link.download = `PublicTicket_${uniqueId}.png`;
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-        watermark.remove();
-    }).catch(err => {
-        console.error("Failed to create PNG:", err);
-        alert("Failed to generate image. Check console for details.");
-        watermark.remove();
-    });
+    scale: 6,
+    useCORS: true,
+    backgroundColor: "#121212"
+}).then(canvas => {
+    const link = document.createElement("a");
+
+    const randomHex = Math.random().toString(16).slice(2, 10); // 8 karakter hex
+    const date = new Date();
+    const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    const uniqueId = `0x${randomHex}`;
+    const fileName = `PublicTicket_${uniqueId}-${formattedDate}.png`;
+
+    link.download = fileName;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+
+    watermark.remove();
+}).catch(err => {
+    console.error("Failed to create PNG:", err);
+    alert("Failed to generate image. Check console for details.");
+    watermark.remove();
+});
 }
 
 // Inisialisasi setelah DOM siap
