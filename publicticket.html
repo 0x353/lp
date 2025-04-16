@@ -648,9 +648,9 @@ function downloadQR() {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   canvas.width = hdSize;
-  canvas.height = hdSize + 200; // Tambah tinggi canvas untuk ruang watermark di bawah
+  canvas.height = hdSize + 200; // Tambah tinggi canvas untuk watermark
 
-  // Gambar latar belakang berwarna putih
+  // Gambar latar belakang putih
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, hdSize, hdSize + 200);
 
@@ -674,8 +674,8 @@ function downloadQR() {
   logo.onload = () => {
     // Posisi logo di tengah QR code
     const logoSize = qrSize * 0.19; // Proporsional dengan ukuran QR
-    const logoX = padding + (qrSize - logoSize) / 2; // Tengah relatif terhadap QR code
-    const logoY = padding + (qrSize - logoSize) / 2; // Tengah relatif terhadap QR code
+    const logoX = (hdSize - logoSize) / 2; // Tengah canvas secara horizontal
+    const logoY = (hdSize - logoSize) / 2; // Tengah canvas secara vertikal
 
     ctx.save();
     ctx.beginPath();
@@ -693,18 +693,22 @@ function downloadQR() {
     ctx.restore();
 
     // Posisi watermark di bawah QR code
-    const watermarkY = hdSize - padding + 100; // Posisi di bawah QR dengan jarak
+    const watermarkY = hdSize - padding + 150; // Di bawah QR code
     ctx.font = `${qrSize * 0.05}px Ubuntu`;
     ctx.textAlign = "center";
     ctx.lineWidth = 1;
-    ctx.shadowColor = "#03a9f4";
+
+    // Teks dengan bayangan putih
+    ctx.shadowColor = "#ffffff";
     ctx.shadowBlur = 6;
     ctx.fillStyle = "#ffffff";
     ctx.fillText("Lotto Chain Decentralized Betting", hdSize / 2, watermarkY);
 
+    // Teks dengan gradient
     const gradient = ctx.createLinearGradient(0, 0, hdSize, 0);
     gradient.addColorStop(0, "#03a9f4");
     gradient.addColorStop(1, "#f441a5");
+    ctx.shadowColor = "transparent"; // Nonaktifkan bayangan untuk gradient
     ctx.fillStyle = gradient;
     ctx.fillText("Lotto Chain Decentralized Betting", hdSize / 2, watermarkY);
 
@@ -712,9 +716,13 @@ function downloadQR() {
   };
 
   function completeDownload() {
+    // Generate ID unik (contoh: 11 karakter hexadecimal)
+    const uniqueId = '0x' + Math.random().toString(16).slice(2, 13);
+    const fileName = `LottoChain${uniqueId}.png`; // Format: LottoChain0xKfg7hfd63xx.png
+
     const link = document.createElement('a');
     link.href = canvas.toDataURL('image/png');
-    link.download = 'qrcode.png';
+    link.download = fileName;
     link.click();
   }
 }
