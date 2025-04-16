@@ -1039,6 +1039,25 @@ textarea:focus {
       width: 18px; /* Ukuran gambar sesuai dengan keinginan */
       height: auto;
     }
+
+    #scrollUpBtn {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #000000;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  z-index: 999;
+}
+
+#scrollUpBtn img {
+  width: 20px;
+  height: 20px;
+}
         
     </style>
 </head>
@@ -1171,14 +1190,11 @@ textarea:focus {
     <button class="nav-button" onclick="prevBetHistory()">Prev</button>
     <button class="nav-button" onclick="nextBetHistory()">Next</button>
 </div>
-
-    <button id="scrollUpBtn" onclick="scrollToTop()" 
-  style="display: none; position: fixed; bottom: 20px; right: 20px; 
-         background: #000000; border: none; border-radius: 50%; 
-         width: 35px; height: 35px; cursor: pointer; z-index: 999;">
-  <img src="img/up.svg" style="width: 20px; height: 20px;">
-    </button>
         <br>
+
+    <button id="scrollUpBtn" onclick="scrollToTop()">
+  <img src="img/up.svg">
+    </button>
 
        <!-- Prize Table -->
         <div id="prizes" class="section-box">
