@@ -1039,15 +1039,23 @@ textarea:focus {
 
     .comment-dropdown {
   border-radius: 6px;
-  box-shadow: 0 1px 4px rgba(3, 169, 244, 0.3); /* shadow biru tipis */
-  transition: box-shadow 0.3s ease;
   background-color: #1e1e1e; /* abu-abu gelap */
+  transition: box-shadow 0.3s ease;
 }
 
-.comment-dropdown:hover {
+/* Hanya tambahkan shadow saat summary di-hover, bukan seluruh details */
+.comment-dropdown > summary:hover {
   box-shadow:
     0 0 6px 1px rgba(3, 169, 244, 0.6),
-    0 0 10px 2px rgba(244, 65, 165, 0.5); /* efek gradasi seperti linear */
+    0 0 10px 2px rgba(244, 65, 165, 0.5);
+  border-radius: 6px;
+}
+
+/* Optional: styling isi komentar saat dropdown terbuka */
+.comment-content {
+  padding: 10px 15px;
+  color: #eee;
+  font-size: 14px;
 }
     </style>
 </head>
