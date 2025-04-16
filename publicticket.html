@@ -236,7 +236,7 @@ html {
 </head>
 <body>
   <div class="container" id="ticketContainer">
-    <h1>Public Ticket Detail</h1><br>
+    <h1>Public Ticket Details</h1><br>
     <div id="ticketDetail">
       <center style="color: #00FF66;">
         <img src="img/loading.svg" style="vertical-align: middle; width: 24px; height: 24px; margin-right: 8px;">
@@ -394,7 +394,6 @@ html {
             <p>Player Total Amount Bet: <span style="color:#1a88ff;">${web3.utils.fromWei(stats[1], 'ether')} ETH</span></p>
             <p>Player Total Wins: <span style="color:#1a88ff;">${totalWins}</span></p>
             <p>Player Total Payout: <span style="color:#1a88ff;">${totalPayoutEth} ETH</span></p>
-            <p>Contract: <a href="https://sepolia.basescan.org/address/${contractAddress}" target="_blank" style="color:#1a88ff;">${contractAddress.slice(0, 6)}...${contractAddress.slice(-4)}</a></p>
             <div style="margin-top:10px;"><br>
                 <button onclick="shareTo('${bet.betId}')" style="background:linear-gradient(90deg, #03a9f4, #f441a5); font-size: 13px; color:white; border:none; padding:7px 12px; border-radius:0.9em; cursor:pointer; margin-right:5px;">
                     <img src="img/share.svg" style="width:18px; height:18px; vertical-align:middle;"> Share to
