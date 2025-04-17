@@ -1156,10 +1156,8 @@ textarea:focus {
        <br>
        <h2>Public Bet History</h2>
        <button onclick="window.open('search', '_blank')"><img src="img/search.svg" alt="Lotto" style="width: 15px; height: 15px;">  Search...</button><br><br>
-       <div class="button-container">
-    <button class="nav-button" onclick="prevBetHistory()">Prev</button>
-    <button class="nav-button" onclick="nextBetHistory()">Next</button>
-       </div>
+       <input type="text" id="searchInput" placeholder="Search anything..." oninput="searchBetHistory()" 
+style="width: 100%; padding: 8px; font-size: 14px; margin-bottom: 10px;">
        <hr style="background-color: #333333; height: 1px; border: none;">
        <div id="betHistoryContainer" style="position: relative;">
   <button id="refreshButton" style="position: absolute; top: 0; right: 0; background: #000000; border: none; cursor: pointer;">
@@ -1370,6 +1368,8 @@ textarea:focus {
 let web3;
 let contract;
 let userAccount = null;
+let fullBetHistory = []; // simpan semua bets untuk pencarian
+let isSearching = false;
 let userHasLiked = false;
 let likeContract;
 let userBetsPage = 0;
@@ -1819,6 +1819,30 @@ function nextUserBets() {
     userBetsPage++;
     loadUserBets();
 }
+
+function renderBetHistoryPage() {
+    const start = betHistoryPage * pageSize;
+    const end = Math.min(start + pageSize, fullBetHistory.length);
+    renderBets(fullBetHistory.slice(start, end));
+}
+
+function searchBetHistory() {
+    const query = document.getElementById("searchInput").value.trim().toLowerCase();
+    isSearching = query.length > 0;
+
+    if (!isSearching) {
+        renderBetHistoryPage();
+        return;
+    }
+
+    const results = fullBetHistory.filter(bet => {
+        return Object.values(bet).some(value => {
+            return String(value).toLowerCase().includes(query);
+        });
+    });
+
+    renderBets(results);
+}
         
 // **Load Bet History (with Pagination)**
 async function loadBetHistory() {
@@ -1829,13 +1853,18 @@ async function loadBetHistory() {
     const now = Math.floor(Date.now() / 1000);
     const oneMonthAgo = now - 30 * 24 * 60 * 60; // 30 hari dalam detik
     const filteredBets = reversedBets.filter(bet => bet.timestamp >= oneMonthAgo);
+
+    fullBetHistory = filteredBets; // simpan untuk pencarian
+
+    if (!isSearching) renderBetHistoryPage();
+}
     
     const start = betHistoryPage * pageSize;
     const end = Math.min(start + pageSize, filteredBets.length);
 
+    function renderBets(betsToRender) {
     let html = "";
-    for (let i = start; i < end; i++) {
-        let bet = filteredBets[i];
+    for (let bet of betsToRender) {
         let shortPlayer = bet.player.slice(0, 10) + "..." + bet.player.slice(-10);
         let shortTxHash = bet.txHash.slice(0, 10) + "..." + bet.txHash.slice(-10);
 
@@ -1906,12 +1935,10 @@ async function loadBetHistory() {
 
     document.getElementById("betHistory").innerHTML = html;
 
-    // Update jumlah like dan status like setelah bet history dimuat
-    for (let i = start; i < end; i++) {
-        let bet = filteredBets[i];
+    betsToRender.forEach(async (bet) => {
         await updateLikeStatus(bet.betId);
+    });
     }
-}
         
 // **Bet History Pagination**
 function prevBetHistory() {
@@ -2487,18 +2514,23 @@ window.onload = async () => {
     }
 
     document.getElementById("refreshButton").addEventListener("click", function () {
-  const icon = this.querySelector(".refresh-icon");
+        const icon = this.querySelector(".refresh-icon");
 
-  // Reset animasi supaya bisa diulang
-  icon.classList.remove("spin-once");
-  void icon.offsetWidth; // paksa reflow
-  icon.classList.add("spin-once");
+        // Reset animasi supaya bisa diulang
+        icon.classList.remove("spin-once");
+        void icon.offsetWidth; // paksa reflow
+        icon.classList.add("spin-once");
 
-  // Tunggu animasi selesai, lalu reload konten bet history
-  setTimeout(() => {
-    loadBetHistory();
-  }, 2000);
-});
+        // Tunggu animasi selesai, lalu reload konten bet history
+        setTimeout(() => {
+            loadBetHistory();
+        }, 2000);
+    });
+
+    // Menambahkan kode loadBetHistory dan auto-refresh
+    loadBetHistory().then(() => {
+        setInterval(autoRefreshBetHistory, 2000); // Cek setiap 2 detik
+    });
 };
     </script>
 
