@@ -197,14 +197,17 @@ button:not(#closePopup):active::after {
 }
 
 #betHistory, #userBets {
-    font-size: 13px; /* Ukuran font yang nyaman */
-    text-align: justify; /* Rata kiri-kanan seperti di buku */
-    hyphens: auto; /* Tambahkan pemenggalan kata jika perlu */
-    line-height: 1.8; /* Jarak antar baris agar lebih nyaman dibaca */
-    max-width: 600px; /* Batasi lebar agar tidak terlalu panjang */
-    margin: auto; /* Pusatkan jika diperlukan */
-    padding: 15px; /* Beri ruang di dalam agar tidak terlalu mepet */
-    text-indent: 20px; /* Tambahkan indentasi di awal paragraf */
+    font-size: 13px;
+    text-align: justify;
+    hyphens: auto;
+    line-height: 1.8;
+    max-width: 600px;
+    margin: auto;
+    padding: 15px;
+    text-indent: 20px;
+    max-height: 1000px;
+    overflow-y: auto;
+    scroll-behavior: smooth; /* bikin halus scroll-nya */
 }
 
 table {
@@ -2546,11 +2549,13 @@ window.onload = async () => {
         }, 2000);
     });
 
-    // Menambahkan kode loadBetHistory dan auto-refresh
-    loadBetHistory().then(() => {
-        setInterval(autoRefreshBetHistory, 2000); // Cek setiap 2 detik
-    });
-};
+    // Auto-scroll pas konten dimuat
+  window.addEventListener('DOMContentLoaded', () => {
+    const section = document.getElementById('betHistory') || document.getElementById('userBets');
+    if (section) {
+      section.scrollTop = section.scrollHeight;
+    }
+  });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
