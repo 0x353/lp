@@ -1039,6 +1039,30 @@ textarea:focus {
       width: 18px; /* Ukuran gambar sesuai dengan keinginan */
       height: auto;
     }
+
+    .scroll-up-icon {
+  opacity: 0;
+  visibility: hidden;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  z-index: 999;
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.2s;
+}
+
+.scroll-up-icon.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Hover efek */
+.scroll-up-icon:hover {
+  transform: scale(1.2);
+  filter: brightness(1.2);
+}
         
     </style>
 </head>
@@ -1172,13 +1196,8 @@ textarea:focus {
     <button class="nav-button" onclick="nextBetHistory()">Next</button>
 </div>
 
-    <button id="scrollUpBtn" onclick="scrollToTop()" 
-style="display: none; position: fixed; bottom: 20px; right: 20px; 
-background: #000000; border: none; border-radius: 50%; 
-width: 30px; height: 30px; cursor: pointer; z-index: 999; 
-display: flex; justify-content: center; align-items: center;">
-<img src="img/up.svg" style="width: 20px; height: 20px;">
-    </button>
+      <img id="scrollUpIcon" src="img/up.svg" class="scroll-up-icon" onclick="scrollToTop()">
+    
        <!-- Prize Table -->
         <div id="prizes" class="section-box">
         <center><h2>4D ETH Prize Payouts</h2></center>
@@ -2468,13 +2487,12 @@ function scrollToTop() {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// Show/hide scroll up button
 window.addEventListener("scroll", () => {
-  const btn = document.getElementById("scrollUpBtn");
+  const icon = document.getElementById("scrollUpIcon");
   if (window.scrollY > 300) {
-    btn.style.display = "block";
+    icon.classList.add("show");
   } else {
-    btn.style.display = "none";
+    icon.classList.remove("show");
   }
 });
       
