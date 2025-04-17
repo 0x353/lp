@@ -1184,7 +1184,14 @@ textarea:focus {
         <p id="betStatus"></p>
        <br>
        <h2>Public Bet History</h2>
-       <button onclick="window.open('search', '_blank')"><img src="img/search.svg" alt="Lotto" style="width: 15px; height: 15px;">  Search...</button><br><br>
+       <br><div style="display: flex; justify-content: center; margin-bottom: 10px;">
+  <div style="position: relative; width: 70%;">
+    <img src="img/search.svg" 
+         style="position: absolute; top: 50%; left: 14px; transform: translateY(-50%); width: 16px; height: 16px; z-index: 1;">
+    <input type="text" id="searchInput" placeholder="Search anything..." oninput="searchBetHistory()" 
+           style="width: 100%; padding: 12px 12px 12px 24px; font-size: 14px; box-sizing: border-box; position: relative; z-index: 0;">
+  </div>
+        </div><br>
        <hr style="background-color: #333333; height: 1px; border: none;">
        <div id="betHistoryContainer" style="position: relative;">
   <button id="refreshButton" style="position: absolute; top: 0; right: 0; background: #000000; border: none; cursor: pointer;">
@@ -1395,6 +1402,8 @@ textarea:focus {
 let web3;
 let contract;
 let userAccount = null;
+let fullBetHistory = []; // simpan semua bets untuk pencarian
+let isSearching = false;
 let userHasLiked = false;
 let likeContract;
 let userBetsPage = 0;
@@ -1844,6 +1853,30 @@ function nextUserBets() {
     userBetsPage++;
     loadUserBets();
 }
+
+function renderBetHistoryPage() {
+    const start = betHistoryPage * pageSize;
+    const end = Math.min(start + pageSize, fullBetHistory.length);
+    renderBets(fullBetHistory.slice(start, end));
+}
+
+function searchBetHistory() {
+    const query = document.getElementById("searchInput").value.trim().toLowerCase();
+    isSearching = query.length > 0;
+
+    if (!isSearching) {
+        renderBetHistoryPage();
+        return;
+    }
+
+    const results = fullBetHistory.filter(bet => {
+        return Object.values(bet).some(value => {
+            return String(value).toLowerCase().includes(query);
+        });
+    });
+
+    renderBets(results);
+}
         
 // **Load Bet History (with Pagination)**
 async function loadBetHistory() {
@@ -1854,13 +1887,18 @@ async function loadBetHistory() {
     const now = Math.floor(Date.now() / 1000);
     const oneMonthAgo = now - 30 * 24 * 60 * 60; // 30 hari dalam detik
     const filteredBets = reversedBets.filter(bet => bet.timestamp >= oneMonthAgo);
+
+    fullBetHistory = filteredBets; // simpan untuk pencarian
+
+    if (!isSearching) renderBetHistoryPage();
+}
     
     const start = betHistoryPage * pageSize;
     const end = Math.min(start + pageSize, filteredBets.length);
 
+    function renderBets(betsToRender) {
     let html = "";
-    for (let i = start; i < end; i++) {
-        let bet = filteredBets[i];
+    for (let bet of betsToRender) {
         let shortPlayer = bet.player.slice(0, 10) + "..." + bet.player.slice(-10);
         let shortTxHash = bet.txHash.slice(0, 10) + "..." + bet.txHash.slice(-10);
 
@@ -1932,11 +1970,10 @@ async function loadBetHistory() {
     document.getElementById("betHistory").innerHTML = html;
 
     // Update jumlah like dan status like setelah bet history dimuat
-    for (let i = start; i < end; i++) {
-        let bet = filteredBets[i];
+    betsToRender.forEach(async (bet) => {
         await updateLikeStatus(bet.betId);
-    }
-}
+    });
+ }
         
 // **Bet History Pagination**
 function prevBetHistory() {
@@ -2536,6 +2573,9 @@ window.onload = async () => {
   setTimeout(() => {
     loadBetHistory();
   }, 2000);
+});
+    loadBetHistory().then(() => {
+    setInterval(autoRefreshBetHistory, 2000);
 });
 };
     </script>
