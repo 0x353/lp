@@ -1102,6 +1102,12 @@ textarea:focus {
         <h3>Lotto Chain Decentralizer Betting</h3>
         <br>
 
+       <!-- Container untuk notifikasi like dan komentar -->
+<div id="likeCommentNotificationSection" style="margin: 20px; padding: 10px; background: #222; border-radius: 8px; border: 1px solid #444;">
+    <h3 style="color: #ad5cff;">Notifikasi Like & Komentar</h3>
+    <div id="likeCommentNotificationList" style="max-height: 300px; overflow-y: auto;"></div>
+</div>
+
        <!-- Notifikasi Popup -->
 <div id="notificationPopup" class="popup hidden" role="alert">
     <button id="closePopup" onclick="closePopup()">×</button>
@@ -2296,7 +2302,146 @@ async function connectMetaMask() {
     } else {
         alert("MetaMask not detected! Please install MetaMask.");
     }
-}        
+}
+
+// Notifikasi Like Comment
+// Fungsi untuk format alamat (misal, 0x123...4567)
+function formatAddress(address) {
+    return address.slice(0, 6) + "..." + address.slice(-4);
+}
+
+// Fungsi untuk menambah notifikasi ke UI dan localStorage
+function addNotification(betId, sender, action, details) {
+    const notificationList = document.getElementById("likeCommentNotificationList");
+    const timestamp = new Date().toLocaleString();
+    const notificationId = `${betId}-${sender}-${Date.now()}`; // ID unik untuk notifikasi
+
+    // Buat HTML untuk notifikasi
+    const notificationHtml = `
+        <div id="notif-${notificationId}" style="background: #333; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px solid #444;">
+            <p style="color: #ad5cff; font-size: 12px; margin: 0;">
+                <strong>${formatAddress(sender)}</strong> ${action === "LIKE" ? "menyukai" : "mengomentari"} taruhan Anda (ID: ${betId.slice(0, 8)}...)
+            </p>
+            <p style="color: gray; font-size: 10px; margin: 5px 0;">${details}</p>
+            <p style="color: gray; font-size: 9px; margin: 0;">${timestamp}</p>
+            <button onclick="removeNotification('${notificationId}')" style="background: rgba(255, 0, 0, 0.5); color: white; border: none; padding: 3px 8px; border-radius: 3px; cursor: pointer;">Hapus</button>
+        </div>
+    `;
+
+    // Tambahkan ke UI
+    notificationList.insertAdjacentHTML("afterbegin", notificationHtml);
+
+    // Simpan ke localStorage
+    const notifications = JSON.parse(localStorage.getItem("likeCommentNotifications") || "[]");
+    notifications.push({ id: notificationId, betId, sender, action, details, timestamp });
+    localStorage.setItem("likeCommentNotifications", JSON.stringify(notifications));
+}
+
+// Fungsi untuk hapus notifikasi
+function removeNotification(notificationId) {
+    document.getElementById(`notif-${notificationId}`).remove();
+    const notifications = JSON.parse(localStorage.getItem("likeCommentNotifications") || "[]");
+    const updated = notifications.filter((n) => n.id !== notificationId);
+    localStorage.setItem("likeCommentNotifications", JSON.stringify(updated));
+}
+
+// Fungsi untuk load notifikasi dari localStorage saat halaman dimuat
+async function loadStoredNotifications(currentUser) {
+    const notifications = JSON.parse(localStorage.getItem("likeCommentNotifications") || "[]");
+    const notificationList = document.getElementById("likeCommentNotificationList");
+    notificationList.innerHTML = ""; // Kosongkan dulu
+
+    for (const notif of notifications) {
+        // Cek apakah currentUser adalah pemilik taruhan
+        try {
+            const bet = await contract.methods.bets(notif.betId).call();
+            if (bet.player.toLowerCase() === currentUser.toLowerCase()) {
+                const notificationHtml = `
+                    <div id="notif-${notif.id}" style="background: #333; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px solid #444;">
+                        <p style="color: #ad5cff; font-size: 12px; margin: 0;">
+                            <strong>${formatAddress(notif.sender)}</strong> ${notif.action === "LIKE" ? "menyukai" : "mengomentari"} taruhan Anda (ID: ${notif.betId.slice(0, 8)}...)
+                        </p>
+                        <p style="color: gray; font-size: 10px; margin: 5px 0;">${notif.details}</p>
+                        <p style="color: gray; font-size: 9px; margin: 0;">${notif.timestamp}</p>
+                        <button onclick="removeNotification('${notif.id}')" style="background: rgba(255, 0, 0, 0.5); color: white; border: none; padding: 3px 8px; border-radius: 3px; cursor: pointer;">Hapus</button>
+                    </div>
+                `;
+                notificationList.insertAdjacentHTML("afterbegin", notificationHtml);
+            }
+        } catch (error) {
+            console.error(`Gagal cek bet ${notif.betId}:`, error);
+        }
+    }
+}
+
+// Fungsi untuk subscribe ke event BetLiked dan CommentAdded
+async function subscribeToNotifications() {
+    try {
+        const accounts = await window.ethereum.request({ method: "eth_accounts" });
+        if (!accounts || accounts.length === 0) {
+            console.warn("MetaMask belum terhubung.");
+            return;
+        }
+        const currentUser = accounts[0].toLowerCase();
+
+        // Subscribe ke event BetLiked
+        contract.events.BetLiked({ fromBlock: "latest" }, async (error, event) => {
+            if (error) {
+                console.error("Error subscribing to BetLiked:", error);
+                return;
+            }
+            const { betId, liker, timestamp, likeType } = event.returnValues;
+            // Cek apakah currentUser adalah pemilik taruhan
+            try {
+                const bet = await contract.methods.bets(betId).call();
+                if (bet.player.toLowerCase() === currentUser) {
+                    addNotification(betId, liker, "LIKE", `Tipe like: ${likeType}`);
+                }
+            } catch (error) {
+                console.error(`Gagal cek bet ${betId}:`, error);
+            }
+        });
+
+        // Subscribe ke event CommentAdded
+        contract.events.CommentAdded({ fromBlock: "latest" }, async (error, event) => {
+            if (error) {
+                console.error("Error subscribing to CommentAdded:", error);
+                return;
+            }
+            const { betId, commenter, comment, timestamp } = event.returnValues;
+            // Cek apakah currentUser adalah pemilik taruhan
+            try {
+                const bet = await contract.methods.bets(betId).call();
+                if (bet.player.toLowerCase() === currentUser) {
+                    addNotification(betId, commenter, "COMMENT", `Komentar: ${comment}`);
+                }
+            } catch (error) {
+                console.error(`Gagal cek bet ${betId}:`, error);
+            }
+        });
+
+        // Load notifikasi yang tersimpan
+        loadStoredNotifications(currentUser);
+    } catch (error) {
+        console.error("Gagal subscribe ke notifikasi:", error);
+    }
+}
+
+// Update fungsi connectMetaMask untuk memulai subscription
+async function connectMetaMask() {
+    if (typeof window.ethereum !== "undefined") {
+        const accounts = await window.ethereum.request({ method: "eth_accounts" });
+        if (accounts.length > 0) {
+            console.log("Akun terdeteksi:", accounts[0]);
+            // Mulai subscribe ke notifikasi
+            subscribeToNotifications();
+        } else {
+            console.warn("Tidak ada akun MetaMask yang terhubung.");
+        }
+    } else {
+        alert("MetaMask tidak terdeteksi! Silakan instal MetaMask.");
+    }
+}
        
 // Modal Result
 function updateHistory(newBall1) {
@@ -2486,10 +2631,10 @@ window.addEventListener("scroll", () => {
     icon.classList.remove("show");
   }
 });
-      
-// Initialize saat halaman terbuka
+      // Initialize saat halaman terbuka
 window.onload = async () => {
     if (window.ethereum) {
+        // Handler untuk perubahan akun di MetaMask
         window.ethereum.on("accountsChanged", (accounts) => {
             if (accounts.length > 0) {
                 userAccount = accounts[0];
@@ -2502,10 +2647,24 @@ window.onload = async () => {
                 updateBalance();
                 loadUserBets();
                 loadBetHistory();
+                
+                // Mulai subscribe ke notifikasi like dan komentar
+                console.log("Akun berubah:", accounts[0]);
+                subscribeToNotifications();
             } else {
                 disconnectWallet();
+                // Kosongkan daftar notifikasi saat MetaMask terputus
+                console.warn("MetaMask terputus.");
+                document.getElementById("likeCommentNotificationList").innerHTML = "";
             }
         });
+
+        // Panggil connectMetaMask untuk inisialisasi awal
+        await connectMetaMask();
+    } else {
+        console.warn("MetaMask tidak terdeteksi!");
+        // Optional: Tampilkan pesan ke user
+        alert("MetaMask tidak terdeteksi! Silakan instal MetaMask.");
     }
 
     try {
@@ -2525,19 +2684,20 @@ window.onload = async () => {
     }
 
     document.getElementById("refreshButton").addEventListener("click", function () {
-  const icon = this.querySelector(".refresh-icon");
+        const icon = this.querySelector(".refresh-icon");
 
-  // Reset animasi supaya bisa diulang
-  icon.classList.remove("spin-once");
-  void icon.offsetWidth; // paksa reflow
-  icon.classList.add("spin-once");
+        // Reset animasi supaya bisa diulang
+        icon.classList.remove("spin-once");
+        void icon.offsetWidth; // Paksa reflow
+        icon.classList.add("spin-once");
 
-  // Tunggu animasi selesai, lalu reload konten bet history
-  setTimeout(() => {
-    loadBetHistory();
-  }, 2000);
-});
+        // Tunggu animasi selesai, lalu reload konten bet history
+        setTimeout(() => {
+            loadBetHistory();
+        }, 2000);
+    });
 };
+
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
