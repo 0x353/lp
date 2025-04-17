@@ -1174,6 +1174,12 @@ textarea:focus {
 <div class="button-container">
     <button class="nav-button" onclick="prevBetHistory()">Prev</button>
     <button class="nav-button" onclick="nextBetHistory()">Next</button>
+    <button onclick="scrollToBetHistory()" 
+        style="position: fixed; bottom: 20px; right: 20px; background: #000000; border: none; border-radius: 50%; padding: 10px; cursor: pointer; z-index: 999; transition: transform 0.3s ease, box-shadow 0.3s ease;"
+        onmouseover="this.style.transform='scale(1.15)'; this.style.boxShadow='0 0 12px 3px rgba(0,255,0,0.6)';"
+        onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
+  <img src="img/up.svg" style="width: 20px; height: 20px;" />
+    </button>
 </div>
         <br>
 
@@ -1963,6 +1969,13 @@ function nextBetHistory() {
 loadBetHistory().then(() => {
     setInterval(autoRefreshBetHistory, 2000); // Cek setiap 5 detik
 });
+
+function scrollToBetHistory() {
+    const betHistory = document.getElementById("betHistory");
+    if (betHistory) {
+        betHistory.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+}
 
 // Like Function
 async function toggleLike(betId) {
