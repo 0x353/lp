@@ -1625,6 +1625,8 @@ networkStatusEl.style.display = 'block';
             loadBetHistory();
             checkForWinnings();
 
+            await subscribeToNotifications(subscriptions);
+
             // **Perbaikan: Ganti getAllBetIds() dengan getAllBets()**
             const allBets = await contract.methods.getAllBets().call();
             const betIds = allBets.map(bet => bet.betId); // Ambil betId dari setiap taruhan
@@ -2305,18 +2307,18 @@ async function connectMetaMask() {
 }
 
 // Notifikasi Like Comment
-// Fungsi untuk format alamat (misal, 0x123...4567)
+// Fungsi untuk format alamat
 function formatAddress(address) {
     return address.slice(0, 6) + "..." + address.slice(-4);
 }
 
 // Fungsi untuk menambah notifikasi ke UI dan localStorage
 function addNotification(betId, sender, action, details) {
+    console.log(`Menambah notifikasi: ${action} dari ${sender} untuk betId ${betId}`);
     const notificationList = document.getElementById("likeCommentNotificationList");
     const timestamp = new Date().toLocaleString();
-    const notificationId = `${betId}-${sender}-${Date.now()}`; // ID unik untuk notifikasi
+    const notificationId = `${betId}-${sender}-${Date.now()}`;
 
-    // Buat HTML untuk notifikasi
     const notificationHtml = `
         <div id="notif-${notificationId}" style="background: #333; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px solid #444;">
             <p style="color: #ad5cff; font-size: 12px; margin: 0;">
@@ -2328,10 +2330,8 @@ function addNotification(betId, sender, action, details) {
         </div>
     `;
 
-    // Tambahkan ke UI
     notificationList.insertAdjacentHTML("afterbegin", notificationHtml);
 
-    // Simpan ke localStorage
     const notifications = JSON.parse(localStorage.getItem("likeCommentNotifications") || "[]");
     notifications.push({ id: notificationId, betId, sender, action, details, timestamp });
     localStorage.setItem("likeCommentNotifications", JSON.stringify(notifications));
@@ -2345,17 +2345,18 @@ function removeNotification(notificationId) {
     localStorage.setItem("likeCommentNotifications", JSON.stringify(updated));
 }
 
-// Fungsi untuk load notifikasi dari localStorage saat halaman dimuat
+// Fungsi untuk load notifikasi dari localStorage
 async function loadStoredNotifications(currentUser) {
+    console.log(`Memuat notifikasi untuk akun: ${currentUser}`);
     const notifications = JSON.parse(localStorage.getItem("likeCommentNotifications") || "[]");
     const notificationList = document.getElementById("likeCommentNotificationList");
-    notificationList.innerHTML = ""; // Kosongkan dulu
+    notificationList.innerHTML = "";
 
     for (const notif of notifications) {
-        // Cek apakah currentUser adalah pemilik taruhan
         try {
-            const bet = await contract.methods.bets(notif.betId).call();
-            if (bet.player.toLowerCase() === currentUser.toLowerCase()) {
+            const owner = await getBetOwner(notif.betId);
+            if (owner && owner.toLowerCase() === currentUser.toLowerCase()) {
+                console.log(`Notifikasi ditemukan: ${notif.action} dari ${notif.sender}`);
                 const notificationHtml = `
                     <div id="notif-${notif.id}" style="background: #333; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px solid #444;">
                         <p style="color: #ad5cff; font-size: 12px; margin: 0;">
@@ -2374,8 +2375,26 @@ async function loadStoredNotifications(currentUser) {
     }
 }
 
+// Fungsi untuk cek pemilik taruhan dari betHistory
+async function getBetOwner(betId) {
+    try {
+        const betHistory = await contract.methods.getAllBets().call();
+        for (const bet of betHistory) {
+            if (bet.betId === betId) {
+                console.log(`Pemilik bet ${betId}: ${bet.player}`);
+                return bet.player;
+            }
+        }
+        console.warn(`BetId ${betId} tidak ditemukan di betHistory`);
+        return null;
+    } catch (error) {
+        console.error(`Gagal ambil betHistory untuk betId ${betId}:`, error);
+        return null;
+    }
+}
+
 // Fungsi untuk subscribe ke event BetLiked dan CommentAdded
-async function subscribeToNotifications() {
+async function subscribeToNotifications(subscriptions) {
     try {
         const accounts = await window.ethereum.request({ method: "eth_accounts" });
         if (!accounts || accounts.length === 0) {
@@ -2383,65 +2402,52 @@ async function subscribeToNotifications() {
             return;
         }
         const currentUser = accounts[0].toLowerCase();
+        console.log(`Subscribe notifikasi untuk akun: ${currentUser}`);
 
         // Subscribe ke event BetLiked
-        contract.events.BetLiked({ fromBlock: "latest" }, async (error, event) => {
+        const likeSubscription = contract.events.BetLiked({ fromBlock: "latest" }, async (error, event) => {
             if (error) {
                 console.error("Error subscribing to BetLiked:", error);
                 return;
             }
             const { betId, liker, timestamp, likeType } = event.returnValues;
-            // Cek apakah currentUser adalah pemilik taruhan
+            console.log(`Event BetLiked: ${liker} menyukai ${betId}`);
             try {
-                const bet = await contract.methods.bets(betId).call();
-                if (bet.player.toLowerCase() === currentUser) {
+                const owner = await getBetOwner(betId);
+                if (owner && owner.toLowerCase() === currentUser) {
                     addNotification(betId, liker, "LIKE", `Tipe like: ${likeType}`);
                 }
             } catch (error) {
                 console.error(`Gagal cek bet ${betId}:`, error);
             }
         });
+        subscriptions.push(likeSubscription);
 
         // Subscribe ke event CommentAdded
-        contract.events.CommentAdded({ fromBlock: "latest" }, async (error, event) => {
+        const commentSubscription = contract.events.CommentAdded({ fromBlock: "latest" }, async (error, event) => {
             if (error) {
                 console.error("Error subscribing to CommentAdded:", error);
                 return;
             }
             const { betId, commenter, comment, timestamp } = event.returnValues;
-            // Cek apakah currentUser adalah pemilik taruhan
+            console.log(`Event CommentAdded: ${commenter} mengomentari ${betId}`);
             try {
-                const bet = await contract.methods.bets(betId).call();
-                if (bet.player.toLowerCase() === currentUser) {
+                const owner = await getBetOwner(betId);
+                if (owner && owner.toLowerCase() === currentUser) {
                     addNotification(betId, commenter, "COMMENT", `Komentar: ${comment}`);
                 }
             } catch (error) {
                 console.error(`Gagal cek bet ${betId}:`, error);
             }
         });
+        subscriptions.push(commentSubscription);
 
         // Load notifikasi yang tersimpan
-        loadStoredNotifications(currentUser);
+        await loadStoredNotifications(currentUser);
     } catch (error) {
         console.error("Gagal subscribe ke notifikasi:", error);
     }
-}
-
-// Update fungsi connectMetaMask untuk memulai subscription
-async function connectMetaMask() {
-    if (typeof window.ethereum !== "undefined") {
-        const accounts = await window.ethereum.request({ method: "eth_accounts" });
-        if (accounts.length > 0) {
-            console.log("Akun terdeteksi:", accounts[0]);
-            // Mulai subscribe ke notifikasi
-            subscribeToNotifications();
-        } else {
-            console.warn("Tidak ada akun MetaMask yang terhubung.");
-        }
-    } else {
-        alert("MetaMask tidak terdeteksi! Silakan instal MetaMask.");
-    }
-}
+                                         }
        
 // Modal Result
 function updateHistory(newBall1) {
@@ -2633,9 +2639,15 @@ window.addEventListener("scroll", () => {
 });
       // Initialize saat halaman terbuka
 window.onload = async () => {
+    let eventSubscriptions = []; // Simpan subscription untuk dibersihkan
+
     if (window.ethereum) {
         // Handler untuk perubahan akun di MetaMask
-        window.ethereum.on("accountsChanged", (accounts) => {
+        window.ethereum.on("accountsChanged", async (accounts) => {
+            // Bersihkan subscription lama
+            eventSubscriptions.forEach(sub => sub.unsubscribe());
+            eventSubscriptions = [];
+
             if (accounts.length > 0) {
                 userAccount = accounts[0];
                 document.getElementById("walletAddress").innerText = `Connected: ${userAccount}`;
@@ -2647,23 +2659,21 @@ window.onload = async () => {
                 updateBalance();
                 loadUserBets();
                 loadBetHistory();
-                
-                // Mulai subscribe ke notifikasi like dan komentar
-                console.log("Akun berubah:", accounts[0]);
-                subscribeToNotifications();
+
+                // Mulai subscribe ke notifikasi
+                console.log("Akun berubah:", userAccount);
+                await subscribeToNotifications(eventSubscriptions);
             } else {
                 disconnectWallet();
-                // Kosongkan daftar notifikasi saat MetaMask terputus
                 console.warn("MetaMask terputus.");
                 document.getElementById("likeCommentNotificationList").innerHTML = "";
             }
         });
 
         // Panggil connectMetaMask untuk inisialisasi awal
-        await connectMetaMask();
+        await connectMetaMask(eventSubscriptions);
     } else {
         console.warn("MetaMask tidak terdeteksi!");
-        // Optional: Tampilkan pesan ke user
         alert("MetaMask tidak terdeteksi! Silakan instal MetaMask.");
     }
 
@@ -2697,7 +2707,6 @@ window.onload = async () => {
         }, 2000);
     });
 };
-
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
