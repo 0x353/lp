@@ -1036,6 +1036,30 @@ textarea:focus {
       width: 18px; /* Ukuran gambar sesuai dengan keinginan */
       height: auto;
     }
+
+    .scroll-up-icon {
+  opacity: 0;
+  visibility: hidden;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  z-index: 999;
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.2s;
+}
+
+.scroll-up-icon.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Hover efek */
+.scroll-up-icon:hover {
+  transform: scale(1.2);
+  filter: brightness(1.2);
+}
         
     </style>
 </head>
@@ -1171,6 +1195,8 @@ textarea:focus {
     <button class="nav-button" onclick="prevBetHistory()">Prev</button>
     <button class="nav-button" onclick="nextBetHistory()">Next</button>
 </div>
+
+       <img id="scrollUpIcon" src="img/up.svg" class="scroll-up-icon" onclick="scrollToTop()">
         <br>
 
        <!-- Prize Table -->
@@ -2448,6 +2474,19 @@ function closeLikeModal(betId) {
     popupDiv.remove();
   }, 11000);
  }
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+window.addEventListener("scroll", () => {
+  const icon = document.getElementById("scrollUpIcon");
+  if (window.scrollY > 300) {
+    icon.classList.add("show");
+  } else {
+    icon.classList.remove("show");
+  }
+});
       
 // Initialize saat halaman terbuka
 window.onload = async () => {
