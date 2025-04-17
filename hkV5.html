@@ -1825,25 +1825,23 @@ function validateBetTimes() {
 async function loadUserBets() {
     if (!userAccount) return;
     const bets = await contract.methods.getUserBets(userAccount).call();
-    const reversedBets = bets.slice().reverse(); // Membalik urutan bets agar yang terbaru di atas
+    const reversedBets = bets.slice().reverse();
 
     const now = Math.floor(Date.now() / 1000);
-    const oneMonthAgo = now - 30 * 24 * 60 * 60; // 30 hari dalam detik
+    const oneMonthAgo = now - 30 * 24 * 60 * 60;
     const filteredBets = reversedBets.filter(bet => bet.timestamp >= oneMonthAgo);
-    
-    const winnerData = await contract.methods.getWinnerByBetId(betIdParam).call();
 
-    const isWinner = winnerData.winner !== '0x0000000000000000000000000000000000000000' && Number(winnerData.amount) > 0;
-    
     const start = userBetsPage * pageSize;
     const end = Math.min(start + pageSize, filteredBets.length);
 
     let html = "";
     for (let i = start; i < end; i++) {
         let bet = filteredBets[i];
+        const winnerData = await contract.methods.getWinnerByBetId(bet.betId).call();
+        const isWinner = winnerData.winner !== '0x0000000000000000000000000000000000000000' && Number(winnerData.amount) > 0;
+
         let shortPlayer = bet.player.slice(0, 10) + "..." + bet.player.slice(-10);
         let shortTxHash = bet.txHash.slice(0, 10) + "..." + bet.txHash.slice(-10);
-
         html += `<p>
             Wallet: <span style="color: #ad5cff;">${shortPlayer}</span><br>
             BetID: <span style="color: #b37500; font-size: 8px;">${bet.betId}</span><br>
@@ -1907,27 +1905,31 @@ async function loadBetHistory() {
     const reversedBets = bets.slice().reverse(); // Urutkan dari terbaru
 
     const now = Math.floor(Date.now() / 1000);
-    const oneMonthAgo = now - 30 * 24 * 60 * 60; // 30 hari dalam detik
+    const oneMonthAgo = now - 30 * 24 * 60 * 60;
     const filteredBets = reversedBets.filter(bet => bet.timestamp >= oneMonthAgo);
 
-    const winnerData = await contract.methods.getWinnerByBetId(betIdParam).call();
-
-    const isWinner = winnerData.winner !== '0x0000000000000000000000000000000000000000' && Number(winnerData.amount) > 0;
-
-    fullBetHistory = filteredBets; // simpan untuk pencarian
+    fullBetHistory = filteredBets;
 
     if (!isSearching) renderBetHistoryPage();
 }
-    
-    const start = betHistoryPage * pageSize;
-    const end = Math.min(start + pageSize, filteredBets.length);
 
-    function renderBets(betsToRender) {
+function renderBetHistoryPage() {
+    const start = betHistoryPage * pageSize;
+    const end = Math.min(start + pageSize, fullBetHistory.length);
+    const pageBets = fullBetHistory.slice(start, end);
+
+    renderBets(pageBets);
+}
+
+async function renderBets(betsToRender) {
     let html = "";
     for (let bet of betsToRender) {
+        const winnerData = await contract.methods.getWinnerByBetId(bet.betId).call();
+        const isWinner = winnerData.winner !== '0x0000000000000000000000000000000000000000' && Number(winnerData.amount) > 0;
+
         let shortPlayer = bet.player.slice(0, 10) + "..." + bet.player.slice(-10);
         let shortTxHash = bet.txHash.slice(0, 10) + "..." + bet.txHash.slice(-10);
-
+        
         html += `
         <p>
             Player: <span style="color: #ad5cff;">${shortPlayer}</span><br>
