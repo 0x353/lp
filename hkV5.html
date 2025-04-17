@@ -1831,6 +1831,10 @@ async function loadUserBets() {
     const oneMonthAgo = now - 30 * 24 * 60 * 60; // 30 hari dalam detik
     const filteredBets = reversedBets.filter(bet => bet.timestamp >= oneMonthAgo);
     
+    const winnerData = await contract.methods.getWinnerByBetId(betIdParam).call();
+
+    const isWinner = winnerData.winner !== '0x0000000000000000000000000000000000000000' && Number(winnerData.amount) > 0;
+    
     const start = userBetsPage * pageSize;
     const end = Math.min(start + pageSize, filteredBets.length);
 
@@ -1845,6 +1849,7 @@ async function loadUserBets() {
             BetID: <span style="color: #b37500; font-size: 8px;">${bet.betId}</span><br>
             BetNumber: <span style="color: #00FF66;">${bet.number}</span><br>
             BetAmount: <span style="color: #00FF66;">${bet.betAmount}</span><br>
+            <p>Status: <span style="color:${isWinner ? '#00FF66' : '#fff899'};">${isWinner ? 'Won' : 'Waiting...'}</span></p>
             Tx: <span style="color: #fe6666;">${shortTxHash}</span><br>
             Block: <a href="https://basescan.io/block/${bet.blockNumber}" target="_blank" style="color: #1a88ff;">${bet.blockNumber}</a><br>
             Time: <span style="color: orange;">${new Date(bet.timestamp * 1000).toISOString()} UTC</span><br>
@@ -1905,6 +1910,10 @@ async function loadBetHistory() {
     const oneMonthAgo = now - 30 * 24 * 60 * 60; // 30 hari dalam detik
     const filteredBets = reversedBets.filter(bet => bet.timestamp >= oneMonthAgo);
 
+    const winnerData = await contract.methods.getWinnerByBetId(betIdParam).call();
+
+    const isWinner = winnerData.winner !== '0x0000000000000000000000000000000000000000' && Number(winnerData.amount) > 0;
+
     fullBetHistory = filteredBets; // simpan untuk pencarian
 
     if (!isSearching) renderBetHistoryPage();
@@ -1928,6 +1937,8 @@ async function loadBetHistory() {
             BetNumber: <span style="color: #00FF66;">${bet.number}</span><br>
             
             BetAmount: <span style="color: #00FF66;">${bet.betAmount}</span><br>
+
+            <p>Status: <span style="color:${isWinner ? '#00FF66' : '#fff899'};">${isWinner ? 'Won' : 'Waiting...'}</span></p>
             
             Is ETH: <span style="color: ${bet.isETH ? '#00FF66' : '#fe6666'};">${bet.isETH ? 'Yes' : 'No'}</span><br>
             
