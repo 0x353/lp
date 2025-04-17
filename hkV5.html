@@ -2483,15 +2483,6 @@ window.addEventListener('DOMContentLoaded', () => {
 function scrollToTop() {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
-
-window.addEventListener("scroll", () => {
-  const icon = document.getElementById("scrollUpIcon");
-  if (window.scrollY > 300) {
-    icon.classList.add("show");
-  } else {
-    icon.classList.remove("show");
-  }
-});
       
 // Initialize saat halaman terbuka
 window.onload = async () => {
