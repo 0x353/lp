@@ -894,7 +894,7 @@ textarea:focus {
       top: 20px;
       left: 20px;
       z-index: 1100;
-      background: #111111;
+      background: #000000;
       color: white;
       border: none;
       padding: 12px 24px;
@@ -917,6 +917,9 @@ textarea:focus {
   left: 20px;
   width: 320px;
   background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px); 
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 16px;
   box-shadow: 
     0 4px 20px rgba(0, 0, 0, 0.4),
