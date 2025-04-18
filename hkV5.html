@@ -1950,7 +1950,7 @@ function searchBetHistory() {
         return;
     }
 
-    setSearchStatus("Searching...", "#f7e702", "img/searchI.svg");
+    setSearchStatus("Searching...", "#f7e702", "searchI.svg");
 
     setTimeout(() => {
         const results = fullBetHistory.filter(bet => {
@@ -1960,9 +1960,9 @@ function searchBetHistory() {
         });
 
         if (results.length > 0) {
-            setSearchStatus("Found results", "#00ff66", "img/success.svg", true);
+            setSearchStatus("Found results", "#00ff66", "success.svg", true);
         } else {
-            setSearchStatus("No results found", "#ff4747", "img/failed.svg", true);
+            setSearchStatus("No results found", "#ff4747", "failed.svg", true);
         }
 
         betHistoryPage = 0;
