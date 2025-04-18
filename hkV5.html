@@ -1900,9 +1900,12 @@ async function loadUserBets() {
 
     document.getElementById("userBets").innerHTML = html;
 
+    // Update semua status like, komentar, dan load isi komentar
     for (let i = start; i < end; i++) {
         let bet = filteredBets[i];
         await updateLikeStatus(bet.betId);
+        await updateCommentCount(bet.betId);
+        await loadComments(bet.betId);
     }
 }
                     
