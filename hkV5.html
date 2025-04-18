@@ -2048,6 +2048,7 @@ async function renderBets(betsToRender) {
     for (let bet of betsToRender) {
         await updateLikeStatus(bet.betId);
         await updateCommentCount(bet.betId);
+        await loadComments(bet.betId); 
     }
 }
         
@@ -2063,11 +2064,6 @@ function nextBetHistory() {
     betHistoryPage++;
     loadBetHistory();
 }
-
-// Jalankan pertama kali untuk inisialisasi betId
-loadBetHistory().then(() => {
-    setInterval(autoRefreshBetHistory, 2000); // Cek setiap 5 detik
-});
 
 // Like Function
 async function toggleLike(betId) {
