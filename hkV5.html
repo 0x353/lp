@@ -1191,6 +1191,8 @@ textarea:focus {
          style="position: absolute; top: 50%; left: 14px; transform: translateY(-50%); width: 16px; height: 16px; z-index: 1;">
     <input type="text" id="searchInput" placeholder="Search anything..." oninput="searchBetHistory()" 
            style="width: 100%; padding: 12px 12px 12px 24px; font-size: 14px; box-sizing: border-box; position: relative; z-index: 0;">
+
+      <div id="searchStatus" style="min-height: 24px;"></div>
   </div>
         </div><br>
        <hr style="background-color: #333333; height: 1px; border: none;">
@@ -1928,23 +1930,45 @@ function renderBetHistoryPage() {
     renderBets(fullBetHistory.slice(start, end));
 }
 
+function setSearchStatus(message, color, icon) {
+    const statusEl = document.getElementById("searchStatus");
+    statusEl.innerHTML = `<img src="img/${icon}" style="width: 16px; vertical-align: middle; margin-right: 8px;">
+                          <span>${message}</span>`;
+    statusEl.style.color = color;
+    statusEl.style.fontWeight = "bold";
+    statusEl.style.marginBottom = "10px";
+}
+
 function searchBetHistory() {
     const query = document.getElementById("searchInput").value.trim().toLowerCase();
-    isSearching = query.length > 0;
+    const statusEl = document.getElementById("searchStatus");
 
-    if (!isSearching) {
+    if (!query) {
+        statusEl.innerHTML = ""; // clear status
         renderBetHistoryPage();
         return;
     }
 
-    const results = fullBetHistory.filter(bet => {
-        return Object.values(bet).some(value => {
-            return String(value).toLowerCase().includes(query);
-        });
-    });
+    setSearchStatus("Searching...", "#f7e702", "search.png");
 
-    renderBets(results);
-}
+    setTimeout(() => {
+        const results = fullBetHistory.filter(bet => {
+            return Object.values(bet).some(value =>
+                String(value).toLowerCase().includes(query)
+            );
+        });
+
+        if (results.length > 0) {
+            setSearchStatus("Found results", "#00ff66", "success.png");
+        } else {
+            setSearchStatus("No results found", "#ff4747", "warning.png");
+        }
+
+        // Reset pagination saat mencari
+        betHistoryPage = 0;
+        renderBets(results);
+    }, 100); // timeout kecil agar DOM update status dulu
+                            }
         
 // **Load Bet History (with Pagination)**
 async function loadBetHistory() {
