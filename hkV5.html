@@ -1900,11 +1900,10 @@ async function loadUserBets() {
 
     document.getElementById("userBets").innerHTML = html;
 
-    for (let bet of betsToRender) {
-    await updateLikeStatus(bet.betId);
-    await updateCommentCount(bet.betId);
-    await loadComments(bet.betId);
-    }
+    betsToRender.forEach(async (bet) => {
+        await updateLikeStatus(bet.betId);
+    });
+}
                     
 // **User Bets Pagination**
 function prevUserBets() {
@@ -2045,11 +2044,10 @@ async function renderBets(betsToRender) {
     document.getElementById("betHistory").innerHTML = html;
 
     // Update jumlah like dan status like setelah bet history dimuat
-    for (let bet of betsToRender) {
-    await updateLikeStatus(bet.betId);
-    await updateCommentCount(bet.betId);
-    await loadComments(bet.betId);
-    }
+    betsToRender.forEach(async (bet) => {
+        await updateLikeStatus(bet.betId);
+    });
+}
         
 // **Bet History Pagination**
 function prevBetHistory() {
