@@ -1422,6 +1422,7 @@ let contract;
 let userAccount = null;
 let fullBetHistory = []; // simpan semua bets untuk pencarian
 let isSearching = false;
+let searchStatusTimeout;
 let userHasLiked = false;
 let likeContract;
 let userBetsPage = 0;
@@ -1923,19 +1924,20 @@ function nextUserBets() {
     loadUserBets();
 }
 
-function renderBetHistoryPage() {
-    const start = betHistoryPage * pageSize;
-    const end = Math.min(start + pageSize, fullBetHistory.length);
-    renderBets(fullBetHistory.slice(start, end));
-}
-
-function setSearchStatus(message, color, icon) {
+function setSearchStatus(message, color, icon, autoClear = false) {
     const statusEl = document.getElementById("searchStatus");
     statusEl.innerHTML = `<img src="img/${icon}" style="width: 16px; vertical-align: middle; margin-right: 8px;">
                           <span>${message}</span>`;
     statusEl.style.color = color;
     statusEl.style.fontWeight = "bold";
     statusEl.style.marginBottom = "10px";
+
+    if (autoClear) {
+        clearTimeout(searchStatusTimeout);
+        searchStatusTimeout = setTimeout(() => {
+            statusEl.innerHTML = "";
+        }, 5000);
+    }
 }
 
 function searchBetHistory() {
@@ -1958,16 +1960,15 @@ function searchBetHistory() {
         });
 
         if (results.length > 0) {
-            setSearchStatus("Found results", "#00ff66", "success.png");
+            setSearchStatus("Found results", "#00ff66", "success.png", true);
         } else {
-            setSearchStatus("No results found", "#ff4747", "warning.png");
+            setSearchStatus("No results found", "#ff4747", "warning.png", true);
         }
 
-        // Reset pagination saat mencari
         betHistoryPage = 0;
         renderBets(results);
-    }, 100); // timeout kecil agar DOM update status dulu
-                            }
+    }, 100);
+}
         
 // **Load Bet History (with Pagination)**
 async function loadBetHistory() {
