@@ -2044,10 +2044,11 @@ async function renderBets(betsToRender) {
 
     document.getElementById("betHistory").innerHTML = html;
 
-    // Update jumlah like dan status like setelah bet history dimuat
-    betsToRender.forEach(async (bet) => {
+    // Update jumlah like dan comment count setelah render selesai
+    for (let bet of betsToRender) {
         await updateLikeStatus(bet.betId);
-    });
+        await updateCommentCount(bet.betId);
+    }
 }
         
 // **Bet History Pagination**
