@@ -1900,9 +1900,10 @@ async function loadUserBets() {
 
     document.getElementById("userBets").innerHTML = html;
 
-    betsToRender.forEach(async (bet) => {
+    for (let i = start; i < end; i++) {
+        let bet = filteredBets[i];
         await updateLikeStatus(bet.betId);
-    });
+    }
 }
                     
 // **User Bets Pagination**
