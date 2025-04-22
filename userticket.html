@@ -238,6 +238,13 @@ html {
 <body>
   <div class="container" id="ticketContainer">
     <h1>User Ticket Details</h1><br>
+    <!-- Input betId lookup -->
+  <div style="margin-bottom: 20px;">
+    <input type="text" id="betIdInput" placeholder="Enter 32-byte betId (0x...)" style="width: 300px; padding: 8px;">
+    <button onclick="loadBetDetailFromInput()" style="padding: 8px 12px; margin-left: 10px; background-color: #00FF66; border: none; cursor: pointer; border-radius: 5px;">
+      Lookup
+    </button>
+  </div>
     <div id="ticketDetail">
       <center style="color: #00FF66;">
         <img src="img/loading.svg" style="vertical-align: middle; width: 24px; height: 24px; margin-right: 8px;">
@@ -408,6 +415,22 @@ html {
         console.error("Error loading ticket:", err);
         detailDiv.innerHTML = `Failed to load bet detail: ${err.message}. Please check MetaMask connection, network, or Bet ID.`;
     }
+}
+
+function loadBetDetailFromInput() {
+    const inputBetId = document.getElementById("betIdInput").value.trim();
+    if (!inputBetId || inputBetId.length !== 66 || !inputBetId.startsWith("0x")) {
+        alert("Please enter a valid 32-byte hex betId (starts with 0x and 64 hex characters)");
+        return;
+    }
+
+    // Append the betId to the URL without reloading
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.set('betId', inputBetId);
+    window.history.replaceState(null, '', newUrl.toString());
+
+    // Call main loader
+    loadBetDetail();
 }
 
 function shareTo(betId) {
