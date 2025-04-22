@@ -239,9 +239,28 @@ html {
   <div class="container" id="ticketContainer">
     <h1>User Ticket Details</h1><br>
     <!-- Input betId lookup -->
-  <div style="margin-bottom: 20px;">
-    <input type="text" id="betIdInput" placeholder="Enter 32-byte betId (0x...)" style="width: 500px; padding: 10px;">
-    <button onclick="loadBetDetailFromInput()" style="padding: 8px 12px; margin-left: 10px; background-color: #222222; border: none; cursor: pointer; border-radius: 5px;">
+<div style="display: flex; justify-content: center; align-items: center; margin-bottom: 40px; margin-top: 30px;">
+  <input 
+    type="text" 
+    id="betIdInput" 
+    placeholder="Enter 32-byte betId (0x...)" 
+    style="
+      width: 500px;
+      padding: 12px 20px;
+      border: 2px solid #03a9f4;
+      border-radius: 12px;
+      background: #111111;
+      color: #ffffff;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 12px rgba(3, 169, 244, 0.3);
+      outline: none;
+    "
+    onfocus="this.style.borderColor='#f441a5'; this.style.boxShadow='0 0 14px rgba(244, 65, 165, 0.6)';"
+    onblur="this.style.borderColor='#03a9f4'; this.style.boxShadow='0 0 12px rgba(3, 169, 244, 0.3)';"
+  >
+</div>
+    <button onclick="loadBetDetailFromInput()" style="padding: 8px 12px; margin-left: 10px; background-color: #ffffff; border: none; cursor: pointer; border-radius: 5px;">
       Lookup
     </button>
   </div>
