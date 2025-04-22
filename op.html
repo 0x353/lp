@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dropdown Keren</title>
   <style>
     body {
@@ -47,11 +47,6 @@
       transition: transform 0.3s ease, color 0.3s;
     }
 
-    .dropdown:hover .arrow {
-      transform: rotate(180deg);
-      color: #03a9f4;
-    }
-
     .dropdown-content {
       display: none;
       position: absolute;
@@ -79,13 +74,18 @@
       color: #000;
     }
 
-    .dropdown:hover .dropdown-content {
+    .dropdown-content img {
+      width: 18px;
+      height: auto;
+    }
+
+    .dropdown.show .dropdown-content {
       display: block;
     }
 
-    .dropdown-content img {
-      width: 18px; /* Ukuran gambar sesuai dengan keinginan */
-      height: auto;
+    .dropdown.show .arrow {
+      transform: rotate(180deg);
+      color: #03a9f4;
     }
   </style>
 </head>
@@ -94,7 +94,7 @@
   <div class="button-container">
     <!-- Dropdown Pools -->
     <div class="dropdown">
-      <button class="dropbtn">
+      <button class="dropbtn" onclick="toggleDropdown(this)">
         Pools <span class="arrow">▼</span>
       </button>
       <div class="dropdown-content">
@@ -106,7 +106,7 @@
 
     <!-- Dropdown Select Chain -->
     <div class="dropdown">
-      <button class="dropbtn">
+      <button class="dropbtn" onclick="toggleDropdown(this)">
         Select Chain <span class="arrow">▼</span>
       </button>
       <div class="dropdown-content">
@@ -116,6 +116,23 @@
       </div>
     </div>
   </div>
+
+  <script>
+    function toggleDropdown(button) {
+      const dropdown = button.parentElement;
+      const allDropdowns = document.querySelectorAll('.dropdown');
+      allDropdowns.forEach(d => {
+        if (d !== dropdown) d.classList.remove('show');
+      });
+      dropdown.classList.toggle('show');
+    }
+
+    window.onclick = function(event) {
+      if (!event.target.matches('.dropbtn') && !event.target.closest('.dropdown')) {
+        document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('show'));
+      }
+    }
+  </script>
 
 </body>
 </html>
