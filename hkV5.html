@@ -1400,6 +1400,96 @@ textarea:focus {
     </div>
 </div>
 
+           <!-- Privacy Policy Modal -->
+<div id="modalPrivacyLottoChain" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000000bb; z-index:9999; overflow:auto;">
+  <div style="background:#fff; margin:5% auto; padding:20px; width:90%; max-width:720px; border-radius:10px; position:relative;">
+    <h2 style="margin-top:0;">Privacy Policy</h2>
+    <div id="scrollPrivacyContent" style="max-height:400px; overflow-y:auto; border:1px solid #ccc; padding:10px; font-size:12px; line-height:1.5; color:#101010; text-align:justify;">
+      <p><strong>Lotto Chain 2025</strong><br>Version 1.0 – Updated: April 20, 2025</p>
+      <p><strong>A. Introduction:</strong><br>This Privacy Policy document is designed to explain how information is collected, used, stored, and protected in the use of the Lotto Chain platform. We respect the privacy of every user and are committed to maintaining the security and confidentiality of data that interacts with our system.
+      <br><br>Lotto Chain is a blockchain-based platform that operates in a decentralized manner. Therefore, our approach to privacy is aligned with the principles of openness, transparency, and personal responsibility.</p>
+      <p><strong>B. Scope:</strong><br>This Policy applies to all users, accessors, and third-party developers who use or connect to the Lotto Chain system through:
+<br><br>
+Smart contracts on public or private networks;
+<br>
+Web-based user interfaces, CLIs, or other applications;
+<br>
+Lotto Chain-related APIs and service nodes.</p>
+      <p><strong>C. Types of Information Collected:</strong><br>Lotto Chain does not collect personal information (such as name, address, ID number, or biometric information). However, in a technical context, the system may automatically record and manage the following data:
+<br><br>
+1. Wallet Address and On-Chain Activity.
+<br><br>
+Users public wallet address.
+<br>
+Smart contract calls.
+<br>
+Public and permanent transaction history on the blockchain.
+<br><br>
+2. Technical and Diagnostic Data.
+<br><br>
+Device type and operating system.
+<br>
+Browser, IP address, and visit timestamp.
+<br>
+System logs for performance monitoring and abuse prevention.</p>
+      <p><strong>D. Purpose of Use of Information:</strong><br>The technical information obtained is used exclusively for:
+<br>
+Optimizing system performance and stability;
+<br>
+Security monitoring and detection of suspicious or malicious activity;
+<br>
+Auditing, debugging, and other internal technical purposes;
+<br>
+Providing a consistent user experience across devices.
+<br>
+Lotto Chain does not sell, share, or rent user data to third parties in any form.</p>
+      <p><strong>E. Data Storage and Security:</strong><br>All collected data is processed in a secure and internally controlled environment. Our system adopts the following principles:
+<br><br>
+Data minimization;
+<br>
+Non-personally identifiable;
+<br>
+Zero access to user private keys or seed phrases.
+<br>
+Because Lotto Chain is non-custodial and permissionless, the security of the digital wallet, private keys, and seed phrases rests entirely with the user.</p>
+      <p><strong>F. User Rights and Freedoms:</strong><br>Platform users have the following rights:
+<br><br>
+1. Full Control over Digital Identity We do not manage the account registration or identity verification system. User identity is determined based on ownership of the wallet address.
+<br><br>
+2. Anonymity and Pseudonymity The use of the platform does not require personal data. Transactions are carried out with pseudonymous identities (based on cryptographic addresses).
+<br><br>
+3. Local Data Deletion Temporary data stored on the user's device can be completely deleted through the settings of each browser.</p>
+      <p><strong>G. Third Party Use:</strong><br>Some Lotto Chain services may be connected to or rely on public blockchain infrastructure, RPC networks, or third-party browser wallets (such as MetaMask, Trust Wallet, or other EVM support).
+<br><br>
+We are not responsible for the privacy policies of such third parties. Users are advised to read and understand the policies of each external service used with Lotto Chain.</p>
+      <p><strong>H. Policy Changes:</strong><br>This Policy and Privacy may be changed, updated, or revised at any time by the development team without immediate notice.
+<br><br>
+The latest version will be publicly available through the official website and project repository.
+<br><br>
+Continued use of the platform after the changes will be considered as acceptance of the latest version.</p>
+      <p><strong>I. Conclusion:</strong><br>This policy is part of the overall legal and ethical framework in the management and operation of Lotto Chain 2025. We encourage every user to understand and carry out their roles and responsibilities wisely in this decentralized ecosystem.</p>
+    </div>
+    
+    <!-- Checkbox -->
+<div style="display: flex; justify-content: flex-start; align-items: center; margin-left: 0%;">
+  <input type="checkbox" id="privacyCheckbox" style="width:auto; height:auto; margin-right:6px;" />
+  <label for="privacyCheckbox" style="color:#00c851;">I have read and agree to the Privacy Policy</label>
+</div>
+
+<div id="checkboxStatus" style="margin-top:10px; text-align:center; color:red; font-size:11px; display:none;">
+  <img src="img/wared.svg" style="width:16px; height:16px; vertical-align:middle; margin-right:4px;" />
+  Please check the agreement box first!
+</div>
+
+<!-- Button -->
+<div style="margin-top:15px; text-align:center;">
+  <button id="agreePrivacyBtn" style="display:none; padding:10px 20px; background:#1a88ff; color:#fff; border:none; border-radius:5px; opacity:0.5; pointer-events:none;">
+    Agree and Continue
+  </button>
+</div>
+  </div>
+</div>
+
         <!-- Footer -->
 <footer>
     <div class="social-icons">
@@ -2623,6 +2713,70 @@ window.addEventListener("scroll", () => {
     icon.classList.remove("show");
   }
 });
+
+function showPrivacyModal(walletAddress) {
+  if (localStorage.getItem(`privacyAccepted_${walletAddress}`) === "true") {
+    showWelcomePopup();
+    return;
+  }
+
+  document.getElementById("modalPrivacyLottoChain").style.display = "block";
+
+  const scrollBox = document.getElementById("scrollPrivacyContent");
+  const agreeBtn = document.getElementById("agreePrivacyBtn");
+  const checkbox = document.getElementById("privacyCheckbox");
+  const statusText = document.getElementById("checkboxStatus");
+
+  // Reset state
+  agreeBtn.style.display = "none";
+  agreeBtn.style.opacity = "0.5";
+  agreeBtn.style.pointerEvents = "none";
+  statusText.style.display = "none";
+  checkbox.checked = false;
+
+  let scrolledToBottom = false;
+
+  scrollBox.addEventListener("scroll", function () {
+    scrolledToBottom = scrollBox.scrollTop + scrollBox.clientHeight >= scrollBox.scrollHeight;
+
+    if (scrolledToBottom) {
+      agreeBtn.style.display = "inline-block";
+      if (checkbox.checked) {
+        agreeBtn.style.opacity = "1";
+        agreeBtn.style.pointerEvents = "auto";
+        statusText.style.display = "none";
+      } else {
+        agreeBtn.style.opacity = "0.5";
+        agreeBtn.style.pointerEvents = "auto"; // Tetap bisa diklik
+      }
+    }
+  });
+
+  checkbox.addEventListener("change", function () {
+    if (scrolledToBottom) {
+      if (checkbox.checked) {
+        agreeBtn.style.opacity = "1";
+        agreeBtn.style.pointerEvents = "auto";
+        statusText.style.display = "none";
+      } else {
+        agreeBtn.style.opacity = "0.5";
+        agreeBtn.style.pointerEvents = "auto"; // Masih bisa diklik, tapi status akan muncul
+      }
+    }
+  });
+
+  agreeBtn.onclick = function () {
+    if (!checkbox.checked) {
+      statusText.style.display = "block";
+      return;
+    }
+
+    // Sudah centang
+    localStorage.setItem(`privacyAccepted_${walletAddress}`, "true");
+    document.getElementById("modalPrivacyLottoChain").style.display = "none";
+    showWelcomePopup();
+  };
+}
       
 // Initialize saat halaman terbuka
 window.onload = async () => {
