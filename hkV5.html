@@ -1738,6 +1738,14 @@ networkStatusEl.style.display = 'block';
             loadBetHistory();
             checkForWinnings();
 
+            // Cek apakah wallet sudah menyetujui privacy policy
+const hasAccepted = localStorage.getItem(`privacyAccepted_${userAccount}`);
+if (!hasAccepted) {
+    showPrivacyModal(userAccount); // Tampilkan modal hanya jika belum menyetujui
+} else {
+    console.log("Privacy policy already accepted for this wallet.");
+        }
+
             // **Perbaikan: Ganti getAllBetIds() dengan getAllBets()**
             const allBets = await contract.methods.getAllBets().call();
             const betIds = allBets.map(bet => bet.betId); // Ambil betId dari setiap taruhan
